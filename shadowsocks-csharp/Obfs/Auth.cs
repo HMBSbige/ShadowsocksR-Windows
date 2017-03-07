@@ -861,6 +861,9 @@ namespace Shadowsocks.Obfs
             }
         }
 
+        // plaindata == null    try send buffer data, return null if empty buffer
+        // datalength == 0      sendback, return 0
+        // datalength == -1     keepalive
         public override byte[] ClientPreEncrypt(byte[] plaindata, int datalength, out int outlength)
         {
             byte[] outdata = new byte[datalength + datalength / 10 + 32];
@@ -875,6 +878,21 @@ namespace Shadowsocks.Obfs
             {
                 datalength = send_buffer.Length;
                 send_buffer = null;
+            }
+            else if (send_buffer != null)
+            {
+                if (datalength <= 0)
+                {
+                    return outdata;
+                }
+                else
+                {
+                    Array.Resize(ref send_buffer, send_buffer.Length + datalength);
+                    Array.Copy(data, 0, send_buffer, send_buffer.Length - datalength, datalength);
+                    data = send_buffer;
+                    datalength = send_buffer.Length;
+                    send_buffer = null;
+                }
             }
             const int unit_len = 8100;
             int ogn_datalength = datalength;
@@ -896,7 +914,7 @@ namespace Shadowsocks.Obfs
                 return outdata;
             }
             bool nopadding = false;
-            if (pack_id < 128 && datalength > 256)
+            if (pack_id < 32 && datalength > 256)
             {
                 int keep = random.Next(1, datalength + 128);
                 if (keep < datalength)

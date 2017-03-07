@@ -93,15 +93,11 @@ namespace Shadowsocks.Controller
 
         public bool Handle(byte[] firstPacket, int length, Socket socket)
         {
-            int local_port = ((IPEndPoint)socket.LocalEndPoint).Port;
-            bool in_port_map = _config.GetPortMapCache().ContainsKey(local_port);
-            bool accept = Accept(firstPacket, length);
-            if (!in_port_map && !accept)
+            if (!_config.GetPortMapCache().ContainsKey(((IPEndPoint)socket.LocalEndPoint).Port) && !Accept(firstPacket, length))
             {
                 return false;
             }
-            InvokeHandler handler = () =>
-            new ProxyAuthHandler(_config, _transfer, _IPRange, firstPacket, length, socket);
+            InvokeHandler handler = () => new ProxyAuthHandler(_config, _transfer, _IPRange, firstPacket, length, socket);
             handler.BeginInvoke(null, null);
             return true;
         }
