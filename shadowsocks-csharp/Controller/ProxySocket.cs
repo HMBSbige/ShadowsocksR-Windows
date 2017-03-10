@@ -129,10 +129,20 @@ namespace Shadowsocks.Controller
             return bytesRead;
         }
 
+        public int SendAll(byte[] buffer, int size, SocketFlags flags)
+        {
+            int sendSize = _socket.Send(buffer, size, 0);
+            while (sendSize < size)
+            {
+                int new_size = _socket.Send(buffer, sendSize, size - sendSize, 0);
+                sendSize += new_size;
+            }
+            return size;
+        }
+
         public virtual int Send(byte[] buffer, int size, SocketFlags flags)
         {
-            _socket.Send(buffer, size, 0);
-            return size;
+            return SendAll(buffer, size, 0);
         }
 
         public int BeginSend(byte[] buffer, int size, SocketFlags flags, AsyncCallback callback, object state)
@@ -491,8 +501,7 @@ namespace Shadowsocks.Controller
                 }
                 local_sendback_protocol = null;
             }
-            _socket.Send(buffer, size, 0);
-            return size;
+            return SendAll(buffer, size, 0);
         }
 
     }
@@ -747,12 +756,21 @@ namespace Shadowsocks.Controller
             }
             return bytesRead;
         }
+        public int SendAll(byte[] buffer, int size, SocketFlags flags)
+        {
+            int sendSize = _socket.Send(buffer, size, 0);
+            while (sendSize < size)
+            {
+                int new_size = _socket.Send(buffer, sendSize, size - sendSize, 0);
+                sendSize += new_size;
+            }
+            return size;
+        }
 
         public int Send(byte[] buffer, int size, SocketFlags flags)
         {
             int bytesToSend = 0;
             int obfsSendSize;
-            int sendSize;
             byte[] obfsBuffer;
 
             lock (_encryptionLock)
@@ -777,13 +795,7 @@ namespace Shadowsocks.Controller
                 _encryptor.Encrypt(bytesToEncrypt, outlength, SendEncryptBuffer, out bytesToSend);
                 obfsBuffer = _obfs.ClientEncode(SendEncryptBuffer, bytesToSend, out obfsSendSize);
             }
-            sendSize = _socket.Send(obfsBuffer, obfsSendSize, 0);
-            while (sendSize < obfsSendSize)
-            {
-                int new_size = _socket.Send(obfsBuffer, sendSize, obfsSendSize - sendSize, 0);
-                sendSize += new_size;
-            }
-            return obfsSendSize;
+            return SendAll(obfsBuffer, obfsSendSize, 0);
         }
 
         public IAsyncResult BeginReceiveFrom(byte[] buffer, int size, SocketFlags flags, ref EndPoint ep, AsyncCallback callback, object state)
@@ -1033,7 +1045,7 @@ namespace Shadowsocks.Controller
             bySock5Send[3] = 2;
 
             //发送Socks5代理第一次连接信息
-            _socket.Send(bySock5Send, 2 + bySock5Send[1], SocketFlags.None);
+            SendAll(bySock5Send, 2 + bySock5Send[1], SocketFlags.None);
 
             byte[] bySock5Receive = new byte[32];
             int iRecCount = _socket.Receive(bySock5Receive, bySock5Receive.Length, SocketFlags.None);
@@ -1073,7 +1085,7 @@ namespace Shadowsocks.Controller
                         {
                             bySock5Send[socks5RemoteUsername.Length + 3 + i] = (Byte)socks5RemotePassword[i];
                         }
-                        _socket.Send(bySock5Send, bySock5Send.Length, SocketFlags.None);
+                        SendAll(bySock5Send, bySock5Send.Length, SocketFlags.None);
                         iRecCount = _socket.Receive(bySock5Receive, bySock5Receive.Length, SocketFlags.None);
 
                         if (bySock5Receive[0] != 1 || bySock5Receive[1] != 0)
@@ -1150,7 +1162,7 @@ namespace Shadowsocks.Controller
                 dataSock5Send.Add((byte)(iRemotePort / 256));
                 dataSock5Send.Add((byte)(iRemotePort % 256));
 
-                _socket.Send(dataSock5Send.ToArray(), dataSock5Send.Count, SocketFlags.None);
+                SendAll(dataSock5Send.ToArray(), dataSock5Send.Count, SocketFlags.None);
                 iRecCount = _socket.Receive(bySock5Receive, bySock5Receive.Length, SocketFlags.None);
 
                 if (iRecCount < 2 || bySock5Receive[0] != 5 || bySock5Receive[1] != 0)
@@ -1191,7 +1203,7 @@ namespace Shadowsocks.Controller
                 dataSock5Send.Add((byte)(0));
                 dataSock5Send.Add((byte)(0));
 
-                _socket.Send(dataSock5Send.ToArray(), dataSock5Send.Count, SocketFlags.None);
+                SendAll(dataSock5Send.ToArray(), dataSock5Send.Count, SocketFlags.None);
                 iRecCount = _socket.Receive(bySock5Receive, bySock5Receive.Length, SocketFlags.None);
 
                 if (bySock5Receive[0] != 5 || bySock5Receive[1] != 0)
@@ -1281,7 +1293,7 @@ namespace Shadowsocks.Controller
                 cmd += "Proxy-Authorization: Basic " + authstr + "\r\n";
             cmd += "\r\n";
             byte[] httpData = System.Text.Encoding.UTF8.GetBytes(cmd);
-            _socket.Send(httpData, httpData.Length, SocketFlags.None);
+            SendAll(httpData, httpData.Length, SocketFlags.None);
             byte[] byReceive = new byte[1024];
             int iRecCount = _socket.Receive(byReceive, byReceive.Length, SocketFlags.None);
             if (iRecCount > 13)
