@@ -137,7 +137,7 @@ namespace Shadowsocks.Controller
             private string _remote_host;
             private int _remote_port;
 
-            public const int RecvSize = 4096;
+            public const int RecvSize = 1024 * 8;
             // remote receive buffer
             private byte[] remoteRecvBuffer = new byte[RecvSize];
             // connection receive buffer
@@ -411,44 +411,6 @@ namespace Shadowsocks.Controller
                     {
                         Close();
                     }
-                }
-                catch (Exception e)
-                {
-                    Logging.LogUsefulException(e);
-                    Close();
-                }
-            }
-
-            private void PipeRemoteSendCallback(IAsyncResult ar)
-            {
-                if (_closed)
-                {
-                    return;
-                }
-                try
-                {
-                    _remote.EndSend(ar);
-                    _local.BeginReceive(connetionRecvBuffer, RecvSize, 0,
-                        new AsyncCallback(PipeConnectionReceiveCallback), null);
-                }
-                catch (Exception e)
-                {
-                    Logging.LogUsefulException(e);
-                    Close();
-                }
-            }
-
-            private void PipeConnectionSendCallback(IAsyncResult ar)
-            {
-                if (_closed)
-                {
-                    return;
-                }
-                try
-                {
-                    _local.EndSend(ar);
-                    _remote.BeginReceive(remoteRecvBuffer, RecvSize, 0,
-                        new AsyncCallback(PipeRemoteReceiveCallback), null);
                 }
                 catch (Exception e)
                 {

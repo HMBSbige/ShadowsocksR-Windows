@@ -263,7 +263,7 @@ namespace Shadowsocks.Controller
                 if (cfg.try_keep_alive <= 0 && State == ConnectState.CONNECTED && remote != null && remoteUDP == null && remote.CanSendKeepAlive)
                 {
                     cfg.try_keep_alive++;
-                    RemoteSendWithoutCallback(remoteUDPRecvBuffer, -1);
+                    RemoteSend(remoteUDPRecvBuffer, -1);
                 }
                 else
                 {
@@ -1038,7 +1038,8 @@ namespace Shadowsocks.Controller
                 int bytesRead = remote.EndReceive(ar, out sendback);
                 if (sendback)
                 {
-                    RemoteSendWithoutCallback(remoteUDPRecvBuffer, 0);
+                    RemoteSend(remoteUDPRecvBuffer, 0);
+                    doConnectionRecv();
                 }
                 remoteTCPIdle = true;
                 return bytesRead;
@@ -1205,7 +1206,7 @@ namespace Shadowsocks.Controller
                     }
                     else if (remoteHeaderSendBuffer != null)
                     {
-                        RemoteSendWithoutCallback(remoteHeaderSendBuffer, remoteHeaderSendBuffer.Length);
+                        RemoteSend(remoteHeaderSendBuffer, remoteHeaderSendBuffer.Length);
                         remoteHeaderSendBuffer = null;
                     }
                 }
@@ -1416,7 +1417,8 @@ namespace Shadowsocks.Controller
                     ResetTimeout(cfg.TTL);
                     if (sendback)
                     {
-                        RemoteSendWithoutCallback(remoteUDPRecvBuffer, 0);
+                        RemoteSend(remoteUDPRecvBuffer, 0);
+                        doConnectionRecv();
                     }
 
                     if (bytesRead > 0)
@@ -1521,38 +1523,17 @@ namespace Shadowsocks.Controller
             }
         }
 
-        private void RemoteSendWithoutCallback(byte[] bytes, int length)
+        private int RemoteSend(byte[] bytes, int length)
         {
+            int total_len = 0;
             int send_len;
             send_len = remote.Send(bytes, length, SocketFlags.None);
             if (send_len > 0)
             {
                 server.ServerSpeedLog().AddUploadBytes(send_len, DateTime.Now);
                 speedTester.AddUploadSize(send_len);
-
-                while (true)
-                {
-                    send_len = remote.Send(null, 0, SocketFlags.None);
-                    if (send_len > 0)
-                    {
-                        server.ServerSpeedLog().AddUploadBytes(send_len, DateTime.Now);
-                        speedTester.AddUploadSize(send_len);
-                    }
-                    else
-                        break;
-                }
-            }
-        }
-
-        private void RemoteSend(byte[] bytes, int length)
-        {
-            int send_len;
-            send_len = remote.Send(bytes, length, SocketFlags.None);
-            if (send_len > 0)
-            {
-                server.ServerSpeedLog().AddUploadBytes(send_len, DateTime.Now);
-                speedTester.AddUploadSize(send_len);
-                ResetTimeout(cfg.TTL);
+                if (length >= 0) ResetTimeout(cfg.TTL);
+                total_len += send_len;
 
                 if (lastKeepTime == null || (DateTime.Now - lastKeepTime).TotalSeconds > 5)
                 {
@@ -1567,11 +1548,13 @@ namespace Shadowsocks.Controller
                     {
                         server.ServerSpeedLog().AddUploadBytes(send_len, DateTime.Now);
                         speedTester.AddUploadSize(send_len);
+                        total_len += send_len;
                     }
                     else
                         break;
                 }
             }
+            return total_len;
         }
 
         private void RemoteSendto(byte[] bytes, int length)
@@ -1641,8 +1624,9 @@ namespace Shadowsocks.Controller
                     {
                         ResetTimeout(cfg.TTL);
                     }
-                    RemoteSend(connetionRecvBuffer, bytesRead);
-                    doConnectionRecv();
+                    int send_len = RemoteSend(connetionRecvBuffer, bytesRead);
+                    if (!( send_len == 0 && bytesRead > 0) )
+                        doConnectionRecv();
                 }
                 else
                 {
