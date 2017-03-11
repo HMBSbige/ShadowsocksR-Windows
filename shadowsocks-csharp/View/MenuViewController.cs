@@ -380,7 +380,7 @@ namespace Shadowsocks.View
 
             SelectRandomItem.Checked = config.random;
             sameHostForSameTargetItem.Checked = config.sameHostForSameTarget;
-            //httpWhiteListItem.Checked = config.bypassWhiteList;
+            httpWhiteListItem.Checked = config.bypassWhiteList;
         }
 
         private void UpdateServersMenu()
