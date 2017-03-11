@@ -5,7 +5,31 @@ ShadowsocksR for Windows
 
 #### Download
 
-Download a [latest release].
+You will need to download and install [7-Zip](http://www.7-zip.org/) in order 
+to extract the ShadowsocksR archive.
+
+Download the [latest release] for ShadowsocksR for Windows.
+
+_Optionally_, right-click on the downloaded 7z file and select 
+**CRC SHA** > **SHA-256**. Verify that the SHA-256 checksum displayed 
+matches the expected checksum which was shown on the releases page.
+
+Right-click on the downloaded 7z file and do **7-Zip** > **Extract Here** 
+or extract to a new folder.
+
+_Optionally_, download and install [Gpg4win](https://www.gpg4win.org/). 
+From the Windows start menu, launch program **Kleopatra**. 
+Do **File** > **New Certificate** to create a personal OpenPGP key pair. 
+Save the signing key from
+[breakwa11/pubkey](https://github.com/breakwa11/pubkey) as a text file. 
+Then do **File** > **Import Certificates** to import the signing key text file.
+After import, select the signing key and do 
+**Certificates** > **Certify Certificates**. 
+You will need to enter the passphrase for your own key. 
+Finally, do **File** > **Decrypt/Verify Files** for the executable 
+you propose to use (see below). A message confirming successful verification 
+of the signature appears against a green background. 
+Close program **Kleopatra**.
 
 For >= Windows 8 or with .Net 4.0, using ShadowsocksR-dotnet4.0.exe.
 
