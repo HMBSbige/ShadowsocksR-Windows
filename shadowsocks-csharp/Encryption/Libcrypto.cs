@@ -53,9 +53,6 @@ namespace Shadowsocks.Encryption
                     Dictionary<string, EncryptFunc> func_map = new Dictionary<string, EncryptFunc>();
                     func_map["rc4"] = EVP_rc4;
                     func_map["aes-128-cfb"] = EVP_aes_128_cfb;
-                    func_map["aes-192-cfb"] = EVP_aes_192_cfb;
-                    func_map["aes-256-cfb"] = EVP_aes_256_cfb;
-                    func_map["bf-cfb"] = EVP_bf_cfb;
                     encrypt_func_map = func_map;
                     OpenSSL_add_all_ciphers();
                 }
@@ -149,19 +146,10 @@ namespace Shadowsocks.Encryption
         public static extern IntPtr EVP_get_cipherbyname(byte[] cipher_name);
 
         [DllImport(DLLNAME, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr EVP_aes_256_cfb();
-
-        [DllImport(DLLNAME, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr EVP_aes_192_cfb();
-
-        [DllImport(DLLNAME, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr EVP_aes_128_cfb();
 
         [DllImport(DLLNAME, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr EVP_rc4();
-
-        [DllImport(DLLNAME, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr EVP_bf_cfb();
 
         [DllImport(DLLNAME, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr EVP_CIPHER_CTX_new();
