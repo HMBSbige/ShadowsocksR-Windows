@@ -451,11 +451,14 @@ namespace Shadowsocks.Obfs
                 else
                 {
                     {
-                        byte[] hmac_data = new byte[43];
-                        byte[] rnd = new byte[22];
+                        int[] finish_len_set = new int[] { 32 }; //, 40, 64
+                        int finish_len = finish_len_set[random.Next(finish_len_set.Length)];
+                        byte[] hmac_data = new byte[11 + finish_len];
+                        byte[] rnd = new byte[finish_len - 10];
                         random.NextBytes(rnd);
 
                         byte[] handshake_finish = System.Text.Encoding.ASCII.GetBytes("\x14\x03\x03\x00\x01\x01" + "\x16\x03\x03\x00\x20");
+                        handshake_finish[handshake_finish.Length - 1] = (byte)finish_len;
                         handshake_finish.CopyTo(hmac_data, 0);
                         rnd.CopyTo(hmac_data, handshake_finish.Length);
 
@@ -515,9 +518,9 @@ namespace Shadowsocks.Obfs
                         {
                             authData.ticket_buf = new Dictionary<string, byte[]>();
                         }
-                        if (!authData.ticket_buf.ContainsKey(host))
+                        if (!authData.ticket_buf.ContainsKey(host) || random.Next(16) == 0)
                         {
-                            int ticket_size = random.Next(8, 26) * 16;
+                            int ticket_size = random.Next(32, 196) * 2;
                             ticket = new byte[ticket_size];
                             g_random.GetBytes(ticket);
                             authData.ticket_buf[host] = ticket;
@@ -613,13 +616,20 @@ namespace Shadowsocks.Obfs
                 }
                 else
                 {
-                    byte[] hmacsha1 = new byte[10];
                     byte[] data = new byte[32];
                     Array.Copy(encryptdata, 11, data, 0, 22);
                     hmac_sha1(data, data.Length);
-                    Array.Copy(data, 22, hmacsha1, 0, 10);
 
-                    if (Util.Utils.FindStr(encryptdata, 11 + 32 + 1 + 32, hmacsha1) != 11 + 22)
+                    if (!Util.Utils.BitCompare(encryptdata, 11 + 22, data, 22, 10))
+                    {
+                        throw new ObfsException("ClientDecode data error: wrong sha1");
+                    }
+
+                    data = new byte[datalength];
+                    Array.Copy(encryptdata, 0, data, 0, datalength - 10);
+                    hmac_sha1(data, data.Length);
+
+                    if (!Util.Utils.BitCompare(encryptdata, datalength - 10, data, datalength - 10, 10))
                     {
                         throw new ObfsException("ClientDecode data error: wrong sha1");
                     }

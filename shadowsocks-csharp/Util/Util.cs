@@ -71,6 +71,16 @@ namespace Shadowsocks.Util
             temp.CopyTo(buf, 0);
         }
 
+        public static bool BitCompare(byte[] target, int target_offset, byte[] m, int m_offset, int targetLength)
+        {
+            for (int i = 0; i < targetLength; ++i)
+            {
+                if (target[target_offset + i] != m[m_offset + i])
+                    return false;
+            }
+            return true;
+        }
+
         public static int FindStr(byte[] target, int targetLength, byte[] m)
         {
             if (m.Length > 0 && targetLength >= m.Length)
