@@ -133,8 +133,8 @@ namespace Shadowsocks.Controller
     {
         private delegate IPHostEntry GetHostEntryHandler(string ip);
 
-        public delegate Server GetCurrentServer(ServerSelectStrategy.FilterFunc filter, string targetURI = null, bool cfgRandom = false, bool usingRandom = false, bool forceRandom = false);
-        public delegate void KeepCurrentServer(string targetURI, string id);
+        public delegate Server GetCurrentServer(int localPort, ServerSelectStrategy.FilterFunc filter, string targetURI = null, bool cfgRandom = false, bool usingRandom = false, bool forceRandom = false);
+        public delegate void KeepCurrentServer(int localPort, string targetURI, string id);
         public GetCurrentServer getCurrentServer;
         public KeepCurrentServer keepCurrentServer;
         public Server server;
@@ -731,8 +731,10 @@ namespace Shadowsocks.Controller
                 else
                     server.ServerSpeedLog().AddNoErrorTimes();
             }
+            int local_port = ((IPEndPoint)connection.GetSocket().LocalEndPoint).Port;
+
             if (lastErrCode != 16)
-                keepCurrentServer(cfg.targetHost, server.id);
+                keepCurrentServer(local_port, cfg.targetHost, server.id);
             ResetTimeout(0);
             try
             {
@@ -811,17 +813,18 @@ namespace Shadowsocks.Controller
         {
             remote = null;
             remoteUDP = null;
+            int local_port = ((IPEndPoint)connection.GetSocket().LocalEndPoint).Port;
             if (select_server == null)
             {
                 if (cfg.targetHost == null)
                 {
                     cfg.targetHost = GetQueryString();
                     cfg.targetPort = GetQueryPort();
-                    server = this.getCurrentServer(null, cfg.targetHost, cfg.random, true);
+                    server = this.getCurrentServer(local_port, null, cfg.targetHost, cfg.random, true);
                 }
                 else
                 {
-                    server = this.getCurrentServer(null, cfg.targetHost, cfg.random, true, cfg.forceRandom);
+                    server = this.getCurrentServer(local_port, null, cfg.targetHost, cfg.random, true, cfg.forceRandom);
                 }
             }
             else
@@ -830,11 +833,11 @@ namespace Shadowsocks.Controller
                 {
                     cfg.targetHost = GetQueryString();
                     cfg.targetPort = GetQueryPort();
-                    server = this.getCurrentServer(select_server, cfg.targetHost, true, true);
+                    server = this.getCurrentServer(local_port, select_server, cfg.targetHost, true, true);
                 }
                 else
                 {
-                    server = this.getCurrentServer(select_server, cfg.targetHost, true, true, cfg.forceRandom);
+                    server = this.getCurrentServer(local_port, select_server, cfg.targetHost, true, true, cfg.forceRandom);
                 }
             }
             speedTester.server = server.server;
@@ -1036,6 +1039,11 @@ namespace Shadowsocks.Controller
             {
                 bool sendback;
                 int bytesRead = remote.EndReceive(ar, out sendback);
+
+                int bytesRecv = remote.GetAsyncResultSize(ar);
+                server.ServerSpeedLog().AddDownloadBytes(bytesRecv, DateTime.Now);
+                speedTester.AddDownloadSize(bytesRecv);
+
                 if (sendback)
                 {
                     RemoteSend(remoteUDPRecvBuffer, 0);
@@ -1326,8 +1334,6 @@ namespace Shadowsocks.Controller
                         if (pingTime >= 0)
                             server.ServerSpeedLog().AddConnectTime(pingTime);
                     }
-                    server.ServerSpeedLog().AddDownloadBytes(bytesRecv, DateTime.Now);
-                    speedTester.AddDownloadSize(bytesRecv);
                     ResetTimeout(cfg.TTL);
 
                     if (bytesRead > 0)
@@ -1537,7 +1543,11 @@ namespace Shadowsocks.Controller
 
                 if (lastKeepTime == null || (DateTime.Now - lastKeepTime).TotalSeconds > 5)
                 {
-                    if (keepCurrentServer != null) keepCurrentServer(cfg.targetHost, server.id);
+                    if (keepCurrentServer != null)
+                    {
+                        int local_port = ((IPEndPoint)connection.GetSocket().LocalEndPoint).Port;
+                        keepCurrentServer(local_port, cfg.targetHost, server.id);
+                    }
                     lastKeepTime = DateTime.Now;
                 }
 
