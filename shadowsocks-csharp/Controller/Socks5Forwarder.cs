@@ -142,6 +142,7 @@ namespace Shadowsocks.Controller
             private byte[] remoteRecvBuffer = new byte[RecvSize];
             // connection receive buffer
             private byte[] connetionRecvBuffer = new byte[RecvSize];
+            private int _totalRecvSize = 0;
 
             protected int TTL = 600;
             protected System.Timers.Timer timer;
@@ -374,8 +375,14 @@ namespace Shadowsocks.Controller
                         ResetTimeout(TTL);
                         //_local.BeginSend(remoteRecvBuffer, bytesRead, 0, new AsyncCallback(PipeConnectionSendCallback), null);
                         _local.Send(remoteRecvBuffer, bytesRead, 0);
-                        _remote.BeginReceive(remoteRecvBuffer, RecvSize, 0,
-                            new AsyncCallback(PipeRemoteReceiveCallback), null);
+                        _totalRecvSize += bytesRead;
+                        if (_totalRecvSize <= 1024 * 1024 * 2)
+                        {
+                            _remote.BeginReceive(remoteRecvBuffer, RecvSize, 0,
+                                new AsyncCallback(PipeRemoteReceiveCallback), null);
+                        }
+                        else
+                            PipeRemoteReceiveLoop();
                     }
                     else
                     {
@@ -387,6 +394,46 @@ namespace Shadowsocks.Controller
                     Logging.LogUsefulException(e);
                     Close();
                 }
+            }
+
+            private void PipeRemoteReceiveLoop()
+            {
+                bool final_close = false;
+                byte[] recv_buffer = new byte[RecvSize];
+                while (!_closed)
+                {
+                    try
+                    {
+                        int bytesRead = _remote.Receive(recv_buffer, RecvSize, 0);
+                        if (_remote != null && _remote.IsClose)
+                        {
+                            final_close = true;
+                            break;
+                        }
+                        if (_closed)
+                        {
+                            break;
+                        }
+                        ResetTimeout(TTL);
+
+                        if (bytesRead > 0)
+                        {
+                            _local.Send(recv_buffer, bytesRead, 0);
+                        }
+                        else
+                        {
+                            Close();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Logging.LogUsefulException(e);
+                        final_close = true;
+                        break;
+                    }
+                }
+                if (final_close)
+                    Close();
             }
 
             private void PipeConnectionReceiveCallback(IAsyncResult ar)
