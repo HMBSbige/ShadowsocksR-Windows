@@ -8,7 +8,8 @@ namespace Shadowsocks.Model
 {
     public class IPRangeSet
     {
-        private const string APNIC_FILENAME = "delegated-apnic.txt";
+        private const string APNIC_FILENAME = "delegated-apnic-latest";
+        private const string CHN_FILENAME = "chn_ip.txt";
         private uint[] _set;
 
         public IPRangeSet()
@@ -16,11 +17,11 @@ namespace Shadowsocks.Model
             _set = new uint[256 * 256 * 8];
         }
 
-        public void Insert(uint begin, uint size)
+        public void InsertRange(uint begin, uint end)
         {
             begin /= 256;
-            size /= 256;
-            for (uint i = begin; i < begin + size; ++i)
+            end /= 256;
+            for (uint i = begin; i <= end; ++i)
             {
                 uint pos = i / 32;
                 int mv = (int)(i & 31);
@@ -28,11 +29,25 @@ namespace Shadowsocks.Model
             }
         }
 
+        public void Insert(uint begin, uint size)
+        {
+            InsertRange(begin, begin + size - 1);
+        }
+
         public void Insert(IPAddress addr, uint size)
         {
             byte[] bytes_addr = addr.GetAddressBytes();
             Array.Reverse(bytes_addr);
             Insert(BitConverter.ToUInt32(bytes_addr, 0), size);
+        }
+
+        public void Insert(IPAddress addr_beg, IPAddress addr_end)
+        {
+            byte[] bytes_addr_beg = addr_beg.GetAddressBytes();
+            Array.Reverse(bytes_addr_beg);
+            byte[] bytes_addr_end = addr_end.GetAddressBytes();
+            Array.Reverse(bytes_addr_end);
+            InsertRange(BitConverter.ToUInt32(bytes_addr_beg, 0), BitConverter.ToUInt32(bytes_addr_end, 0));
         }
 
         public bool isIn(uint ip)
@@ -58,20 +73,30 @@ namespace Shadowsocks.Model
                 {
                     using (StreamReader stream = File.OpenText(APNIC_FILENAME))
                     {
-                        while (true)
-                        {
-                            string line = stream.ReadLine();
-                            if (line == null)
-                                break;
-                            string[] parts = line.Split('|');
-                            if (parts.Length < 7)
-                                continue;
-                            if (parts[0] != "apnic" || parts[1] != zone || parts[2] != "ipv4")
-                                continue;
-                            IPAddress addr;
-                            IPAddress.TryParse(parts[3], out addr);
-                            uint size = UInt32.Parse(parts[4]);
-                            Insert(addr, size);
+                        using (StreamWriter out_stream = new StreamWriter(File.OpenWrite(CHN_FILENAME))) {
+                            while (true)
+                            {
+                                string line = stream.ReadLine();
+                                if (line == null)
+                                    break;
+                                string[] parts = line.Split('|');
+                                if (parts.Length < 7)
+                                    continue;
+                                if (parts[0] != "apnic" || parts[1] != zone || parts[2] != "ipv4")
+                                    continue;
+                                IPAddress addr;
+                                IPAddress.TryParse(parts[3], out addr);
+                                uint size = UInt32.Parse(parts[4]);
+                                Insert(addr, size);
+
+                                byte[] addr_bytes = addr.GetAddressBytes();
+                                Array.Reverse(addr_bytes);
+                                uint ip_addr = BitConverter.ToUInt32(addr_bytes, 0);
+                                ip_addr += size - 1;
+                                addr_bytes = BitConverter.GetBytes(ip_addr);
+                                Array.Reverse(addr_bytes);
+                                out_stream.Write(parts[3] + " " + (new IPAddress(addr_bytes)).ToString() + "\r\n");
+                            }
                         }
                     }
                     return true;
@@ -80,6 +105,42 @@ namespace Shadowsocks.Model
                 {
                     return false;
                 }
+            }
+            return false;
+        }
+
+        public bool LoadChn()
+        {
+            if (File.Exists(CHN_FILENAME))
+            {
+                try
+                {
+                    using (StreamReader stream = File.OpenText(CHN_FILENAME))
+                    {
+                        while (true)
+                        {
+                            string line = stream.ReadLine();
+                            if (line == null)
+                                break;
+                            string[] parts = line.Split(' ');
+                            if (parts.Length < 2)
+                                continue;
+
+                            IPAddress addr_beg, addr_end;
+                            IPAddress.TryParse(parts[0], out addr_beg);
+                            IPAddress.TryParse(parts[1], out addr_end);
+                            Insert(addr_beg, addr_end);
+                        }
+                    }
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return !LoadApnic("CN");
             }
             return false;
         }
