@@ -45,7 +45,7 @@ namespace Shadowsocks.Obfs
 
         public void PackData(byte[] data, int datalength, byte[] outdata, out int outlength)
         {
-            int rand_len = datalength > 1300 ? 1 : random.Next(64) + 1;
+            int rand_len = datalength > 1300 ? 1 : LinearRandomInt(64) + 1;
             outlength = rand_len + datalength + 6;
             if (datalength > 0)
                 Array.Copy(data, 0, outdata, rand_len + 2, datalength);
@@ -58,7 +58,7 @@ namespace Shadowsocks.Obfs
 
         public void PackAuthData(byte[] data, int datalength, byte[] outdata, out int outlength)
         {
-            int rand_len = random.Next(250) + 1;
+            int rand_len = LinearRandomInt(250) + 1;
             int data_offset = rand_len + 4 + 2;
             outlength = data_offset + datalength + 12 + 10;
             AuthData authData = (AuthData)this.Server.data;
@@ -72,7 +72,7 @@ namespace Shadowsocks.Obfs
                 {
                     authData.clientID = new byte[4];
                     g_random.GetBytes(authData.clientID);
-                    authData.connectionID = (UInt32)random.Next(0x1000000);
+                    authData.connectionID = (UInt32)LinearRandomInt(0x1000000);
                 }
                 authData.connectionID += 1;
                 Array.Copy(authData.clientID, 0, outdata, data_offset + 4, 4);
@@ -115,7 +115,7 @@ namespace Shadowsocks.Obfs
             if (!has_sent_header)
             {
                 int headsize = GetHeadSize(plaindata, 30);
-                int _datalength = Math.Min(random.Next(32) + headsize, datalength);
+                int _datalength = Math.Min(LinearRandomInt(32) + headsize, datalength);
                 int outlen;
                 PackAuthData(data, _datalength, packdata, out outlen);
                 has_sent_header = true;
@@ -232,7 +232,7 @@ namespace Shadowsocks.Obfs
 
         public void PackData(byte[] data, int datalength, byte[] outdata, out int outlength)
         {
-            int rand_len = (datalength >= 1300 ? 0 : (datalength > 400 ? random.Next(128) : random.Next(1024))) + 1;
+            int rand_len = (datalength >= 1300 ? 0 : (datalength > 400 ? LinearRandomInt(128) : LinearRandomInt(1024))) + 1;
             outlength = rand_len + datalength + 6;
             if (datalength > 0)
                 Array.Copy(data, 0, outdata, rand_len + 2, datalength);
@@ -259,7 +259,7 @@ namespace Shadowsocks.Obfs
 
         public void PackAuthData(byte[] data, int datalength, byte[] outdata, out int outlength)
         {
-            int rand_len = (datalength > 400 ? random.Next(128) : random.Next(1024)) + 1;
+            int rand_len = (datalength > 400 ? LinearRandomInt(128) : LinearRandomInt(1024)) + 1;
             int data_offset = rand_len + 4 + 2;
             outlength = data_offset + datalength + 12 + 10;
             AuthData authData = (AuthData)this.Server.data;
@@ -278,7 +278,7 @@ namespace Shadowsocks.Obfs
                 {
                     authData.clientID = new byte[8];
                     g_random.GetBytes(authData.clientID);
-                    authData.connectionID = (UInt32)BitConverter.ToInt64(authData.clientID, 0) % 0xFFFFFD; // random.Next(0x1000000);
+                    authData.connectionID = (UInt32)BitConverter.ToInt64(authData.clientID, 0) % 0xFFFFFD;
                 }
                 authData.connectionID += 1;
                 Array.Copy(authData.clientID, 0, outdata, data_offset, 8);
@@ -332,7 +332,7 @@ namespace Shadowsocks.Obfs
             if (!has_sent_header)
             {
                 int headsize = GetHeadSize(plaindata, 30);
-                int _datalength = Math.Min(random.Next(32) + headsize, datalength);
+                int _datalength = Math.Min(LinearRandomInt(32) + headsize, datalength);
                 int outlen;
                 PackAuthData(data, _datalength, packdata, out outlen);
                 has_sent_header = true;
@@ -460,7 +460,7 @@ namespace Shadowsocks.Obfs
 
         public void PackData(byte[] data, int datalength, byte[] outdata, out int outlength)
         {
-            int rand_len = (datalength > 1200 ? 0 : (datalength > 400 ? random.Next(256) : random.Next(512))) + 1;
+            int rand_len = (datalength > 1200 ? 0 : (datalength > 400 ? LinearRandomInt(256) : LinearRandomInt(512))) + 1;
             outlength = rand_len + datalength + 8;
             if (datalength > 0)
                 Array.Copy(data, 0, outdata, rand_len + 4, datalength);
@@ -489,7 +489,7 @@ namespace Shadowsocks.Obfs
 
         public void PackAuthData(byte[] data, int datalength, byte[] outdata, out int outlength)
         {
-            int rand_len = (datalength > 400 ? random.Next(128) : random.Next(1024)) + 1;
+            int rand_len = (datalength > 400 ? LinearRandomInt(128) : LinearRandomInt(1024)) + 1;
             int data_offset = rand_len + 4 + 2;
             outlength = data_offset + datalength + 12 + 10;
             AuthData authData = (AuthData)this.Server.data;
@@ -508,7 +508,7 @@ namespace Shadowsocks.Obfs
                 {
                     authData.clientID = new byte[4];
                     g_random.GetBytes(authData.clientID);
-                    authData.connectionID = (UInt32)BitConverter.ToInt32(authData.clientID, 0) % 0xFFFFFD; // random.Next(0x1000000);
+                    authData.connectionID = (UInt32)BitConverter.ToInt32(authData.clientID, 0) % 0xFFFFFD;
                 }
                 authData.connectionID += 1;
                 Array.Copy(authData.clientID, 0, outdata, data_offset + 4, 4);
@@ -567,7 +567,7 @@ namespace Shadowsocks.Obfs
             if (!has_sent_header)
             {
                 int headsize = GetHeadSize(plaindata, 30);
-                int _datalength = Math.Min(random.Next(32) + headsize, datalength);
+                int _datalength = Math.Min(LinearRandomInt(32) + headsize, datalength);
                 int outlen;
                 PackAuthData(data, _datalength, packdata, out outlen);
                 has_sent_header = true;
@@ -726,7 +726,7 @@ namespace Shadowsocks.Obfs
 
         public void PackData(byte[] data, int datalength, byte[] outdata, out int outlength, bool nopadding = false)
         {
-            int rand_len = (datalength > 1200 || nopadding ? 0 : pack_id >= 16 ? random.Next(32) : (datalength > 900 ? random.Next(128) : random.Next(512))) + 1;
+            int rand_len = (datalength > 1200 || nopadding ? 0 : pack_id >= 16 ? NonLinearRandomInt(32) : (datalength > 900 ? NonLinearRandomInt(128) : NonLinearRandomInt(512))) + 1;
             outlength = rand_len + datalength + 8;
             if (datalength > 0)
                 Array.Copy(data, 0, outdata, rand_len + 4, datalength);
@@ -765,7 +765,7 @@ namespace Shadowsocks.Obfs
 
         public void PackAuthData(byte[] data, int datalength, byte[] outdata, out int outlength)
         {
-            int rand_len = (datalength > 400 ? random.Next(512) : random.Next(1024));
+            int rand_len = (datalength > 400 ? NonLinearRandomInt(512) : NonLinearRandomInt(1024));
             int data_offset = rand_len + 16 + 4 + 4 + 7;
             outlength = data_offset + datalength + 4;
             byte[] encrypt = new byte[24];
@@ -791,7 +791,7 @@ namespace Shadowsocks.Obfs
                 {
                     authData.clientID = new byte[4];
                     g_random.GetBytes(authData.clientID);
-                    authData.connectionID = (UInt32)BitConverter.ToInt32(authData.clientID, 0) % 0xFFFFFD; // random.Next(0x1000000);
+                    authData.connectionID = (UInt32)BitConverter.ToInt32(authData.clientID, 0) % 0xFFFFFD;
                 }
                 authData.connectionID += 1;
                 Array.Copy(authData.clientID, 0, encrypt, 4, 4);
@@ -916,7 +916,7 @@ namespace Shadowsocks.Obfs
             bool nopadding = false;
             if (pack_id < 32 && datalength > 256)
             {
-                int keep = random.Next(1, datalength + 128);
+                int keep = LinearRandomInt(datalength + 128);
                 if (keep < datalength)
                 {
                     send_buffer = new byte[keep];

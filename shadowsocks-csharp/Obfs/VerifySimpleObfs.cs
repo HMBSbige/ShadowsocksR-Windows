@@ -33,11 +33,41 @@ namespace Shadowsocks.Obfs
             base.SetServerInfo(serverInfo);
         }
 
+        public int LinearRandomInt(int max)
+        {
+            return random.Next(max);
+        }
+
+        public int NonLinearRandomInt(int max)
+        {
+            int r1, r2;
+            if ((max & 1) == 1)
+            {
+                int mid = (max + 1) >> 1;
+                r1 = random.Next(mid);
+                r2 = random.Next(mid + 1);
+                int r = r1 + r2;
+                if (r == max) return mid - 1;
+                if (r < mid) return mid - r - 1;
+                else return max - r + mid - 1;
+            }
+            else
+            {
+                int mid = max >> 1;
+                r1 = random.Next(mid);
+                r2 = random.Next(mid + 1);
+                int r = r1 + r2;
+                if (r < mid) return mid - r - 1;
+                else return max - r + mid - 1;
+            }
+        }
+
         public override byte[] ClientEncode(byte[] encryptdata, int datalength, out int outlength)
         {
             outlength = datalength;
             return encryptdata;
         }
+
         public override byte[] ClientDecode(byte[] encryptdata, int datalength, out int outlength, out bool needsendback)
         {
             outlength = datalength;
