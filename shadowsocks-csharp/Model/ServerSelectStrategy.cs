@@ -125,8 +125,6 @@ namespace Shadowsocks.Model
                 List<ServerIndex> serverList = new List<ServerIndex>();
                 for (int i = 0; i < configs.Count; ++i)
                 {
-                    if (forceChange && lastSelectIndex == i)
-                        continue;
                     if (configs[i].isEnable())
                     {
                         if (filter != null)
@@ -137,7 +135,7 @@ namespace Shadowsocks.Model
                         serverList.Add(new ServerIndex(i, configs[i]));
                     }
                 }
-                if (forceChange && serverList.Count > 1)
+                if (forceChange && serverList.Count > 1 && algorithm != (int)SelectAlgorithm.OneByOne)
                 {
                     for (int i = 0; i < serverList.Count; ++i)
                     {
@@ -168,14 +166,7 @@ namespace Shadowsocks.Model
                                 break;
                             }
                         }
-                        if (selIndex != -1)
-                        {
-                            serverListIndex = serverList[(selIndex + 1) % serverList.Count].index;
-                        }
-                        else
-                        {
-                            serverListIndex = serverList[0].index;
-                        }
+                        serverListIndex = serverList[(selIndex + 1) % serverList.Count].index;
                     }
                     else if (algorithm == (int)SelectAlgorithm.Random)
                     {
