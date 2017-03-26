@@ -62,6 +62,26 @@ namespace Shadowsocks.Obfs
             }
         }
 
+        public double TrapezoidRandomFloat(double d) // －1 <= d <= 1
+        {
+            if (d == 0)
+                return random.NextDouble();
+
+            double s = random.NextDouble();
+            //(2dx + 2(1 - d))x/2 = s
+            //dx^2 + (1-d)x - s = 0
+            double a = 1 - d;
+            //dx^2 + ax - s = 0
+            //[-a + sqrt(a^2 + 4ds)] / 2d
+            return (Math.Sqrt(a * a + 4 * d * s) - a) / (2 * d);
+        }
+
+        public int TrapezoidRandomInt(int max, double d)
+        {
+            double v = TrapezoidRandomFloat(d);
+            return (int)(v * max);
+        }
+
         public override byte[] ClientEncode(byte[] encryptdata, int datalength, out int outlength)
         {
             outlength = datalength;

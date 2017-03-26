@@ -689,6 +689,7 @@ namespace Shadowsocks.Obfs
         protected byte[] user_id;
         protected hash_func hash;
         protected byte[] send_buffer;
+        protected int last_datalength;
 
         public static List<string> SupportedObfs()
         {
@@ -724,9 +725,20 @@ namespace Shadowsocks.Obfs
             return null;
         }
 
-        public void PackData(byte[] data, int datalength, byte[] outdata, out int outlength, bool nopadding = false)
+        protected int GetRandLen(int datalength, int fulldatalength, bool nopadding)
         {
-            int rand_len = (datalength > 1200 || nopadding ? 0 : pack_id >= 16 ? NonLinearRandomInt(32) : (datalength > 900 ? NonLinearRandomInt(128) : NonLinearRandomInt(512))) + 1;
+            const int overhead = 8 + 1;
+            int rev_len = Server.tcp_mss - datalength - overhead;
+            if (rev_len <= 0 || nopadding || fulldatalength >= Server.buffer_size || last_datalength >= Server.buffer_size)
+                return 0;
+            if (datalength > 1100)
+                return LinearRandomInt(rev_len);
+            return TrapezoidRandomInt(rev_len, -0.3);
+        }
+
+        public void PackData(byte[] data, int datalength, int fulldatalength, byte[] outdata, out int outlength, bool nopadding = false)
+        {
+            int rand_len = GetRandLen(datalength, fulldatalength, nopadding) + 1;
             outlength = rand_len + datalength + 8;
             if (datalength > 0)
                 Array.Copy(data, 0, outdata, rand_len + 4, datalength);
@@ -765,8 +777,10 @@ namespace Shadowsocks.Obfs
 
         public void PackAuthData(byte[] data, int datalength, byte[] outdata, out int outlength)
         {
-            int rand_len = (datalength > 400 ? NonLinearRandomInt(512) : NonLinearRandomInt(1024));
-            int data_offset = rand_len + 16 + 4 + 4 + 7;
+            const int authhead_len = 7 + 4 + 16 + 4;
+            const int overhead = authhead_len + 4;
+            int rand_len = TrapezoidRandomInt(Server.tcp_mss - datalength - overhead, -0.3); //(datalength > 400 ? LinearRandomInt(512) : LinearRandomInt(1024));
+            int data_offset = rand_len + authhead_len;
             outlength = data_offset + datalength + 4;
             byte[] encrypt = new byte[24];
             byte[] encrypt_data = new byte[32];
@@ -914,21 +928,24 @@ namespace Shadowsocks.Obfs
                 return outdata;
             }
             bool nopadding = false;
-            if (pack_id < 32 && datalength > 256)
+            if (datalength > 120 * 4 && pack_id < 32 )
             {
-                int keep = LinearRandomInt(datalength + 128);
-                if (keep < datalength)
+                int send_len = LinearRandomInt(120 * 16);
+                if (send_len < datalength)
                 {
-                    send_buffer = new byte[keep];
-                    Array.Copy(data, datalength - keep, send_buffer, 0, keep);
-                    datalength -= keep;
+                    send_len = TrapezoidRandomInt(Math.Min(datalength, Server.tcp_mss - 9), -0.3);
+                    send_len = datalength - send_len;
+
+                    send_buffer = new byte[send_len];
+                    Array.Copy(data, datalength - send_len, send_buffer, 0, send_len);
+                    datalength -= send_len;
                     nopadding = true;
                 }
             }
             while (datalength > unit_len)
             {
                 int outlen;
-                PackData(data, unit_len, packdata, out outlen, nopadding);
+                PackData(data, unit_len, ogn_datalength, packdata, out outlen, nopadding);
                 Util.Utils.SetArrayMinSize2(ref outdata, outlength + outlen);
                 Array.Copy(packdata, 0, outdata, outlength, outlen);
                 outlength += outlen;
@@ -942,11 +959,12 @@ namespace Shadowsocks.Obfs
                 int outlen;
                 if (ogn_datalength == -1)
                     datalength = 0;
-                PackData(data, datalength, packdata, out outlen, nopadding);
+                PackData(data, datalength, ogn_datalength, packdata, out outlen, nopadding);
                 Util.Utils.SetArrayMinSize2(ref outdata, outlength + outlen);
                 Array.Copy(packdata, 0, outdata, outlength, outlen);
                 outlength += outlen;
             }
+            last_datalength = ogn_datalength;
             return outdata;
         }
 

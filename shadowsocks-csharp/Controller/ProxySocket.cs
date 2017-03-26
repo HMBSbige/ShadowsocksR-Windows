@@ -664,14 +664,14 @@ namespace Shadowsocks.Controller
                     server.setObfsData(_obfs.InitData());
                 }
             }
-            int mss = 1460;
+            int mss = 1448;
             string server_addr = server.server;
             if (_proxy_server != null)
                 server_addr = _proxy_server;
             _protocol.SetServerInfo(new ServerInfo(server_addr, server.server_port, server.protocolparam??"", server.getProtocolData(),
-                _encryptor.getIV(), _password, _encryptor.getKey(), head_len, mss));
+                _encryptor.getIV(), _password, _encryptor.getKey(), head_len, mss, RecvSize));
             _obfs.SetServerInfo(new ServerInfo(server_addr, server.server_port, server.obfsparam??"", server.getObfsData(),
-                _encryptor.getIV(), _password, _encryptor.getKey(), head_len, mss));
+                _encryptor.getIV(), _password, _encryptor.getKey(), head_len, mss, RecvSize));
         }
 
         public int Receive(byte[] recv_buffer, int size, SocketFlags flags, out int bytesRead, out int protocolSize, out bool sendback)
