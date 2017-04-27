@@ -372,13 +372,12 @@ namespace Shadowsocks.View
                     checkAdvSetting.Checked = true;
                 }
 
-                PasswordLabel.Checked = false;
-                IPLabel.Checked = false;
+                //PasswordLabel.Checked = false;
+                //IPLabel.Checked = false;
                 Update_SSR_controls_Visable();
                 UpdateObfsTextbox();
                 TextLink.SelectAll();
                 GenQR(TextLink.Text);
-                //IPTextBox.Focus();
             }
             else
             {
