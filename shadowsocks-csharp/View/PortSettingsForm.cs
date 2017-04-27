@@ -261,6 +261,7 @@ namespace Shadowsocks.View
 
         private void Add_Click(object sender, EventArgs e)
         {
+            SaveSelectedServer();
             string key = "0";
             if (!_modifiedConfiguration.portMap.ContainsKey(key))
             {
