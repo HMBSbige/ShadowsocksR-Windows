@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 
 namespace Shadowsocks.Obfs
@@ -82,9 +83,18 @@ namespace Shadowsocks.Obfs
                 return 4 + plaindata[1];
             return defaultValue;
         }
-        public long getSentLength()
+        public long GetSentLength()
         {
             return SentLength;
+        }
+        public virtual int GetOverhead()
+        {
+            return 0;
+        }
+
+        public int GetTcpMSS()
+        {
+            return Server.tcp_mss;
         }
     }
 }
