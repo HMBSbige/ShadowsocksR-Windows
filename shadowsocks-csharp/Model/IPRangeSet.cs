@@ -9,6 +9,7 @@ namespace Shadowsocks.Model
     public class IPRangeSet
     {
         private const string APNIC_FILENAME = "delegated-apnic-latest";
+        private const string APNIC_EXT_FILENAME = "delegated-apnic-extended-latest";
         private const string CHN_FILENAME = "chn_ip.txt";
         private uint[] _set;
 
@@ -67,11 +68,14 @@ namespace Shadowsocks.Model
 
         public bool LoadApnic(string zone)
         {
-            if (File.Exists(APNIC_FILENAME))
+            string filename = APNIC_EXT_FILENAME;
+            if (!File.Exists(filename))
+                filename = APNIC_FILENAME;
+            if (File.Exists(filename))
             {
                 try
                 {
-                    using (StreamReader stream = File.OpenText(APNIC_FILENAME))
+                    using (StreamReader stream = File.OpenText(filename))
                     {
                         using (StreamWriter out_stream = new StreamWriter(File.OpenWrite(CHN_FILENAME))) {
                             while (true)
