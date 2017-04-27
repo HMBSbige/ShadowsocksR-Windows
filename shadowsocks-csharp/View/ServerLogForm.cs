@@ -278,7 +278,7 @@ namespace Shadowsocks.View
             {
                 listOrder.Add(0);
             }
-            while (ServerDataGrid.RowCount < config.configs.Count)
+            while (ServerDataGrid.RowCount < config.configs.Count && ServerDataGrid.RowCount < ServerSpeedLogList.Length)
             {
                 ServerDataGrid.Rows.Add();
                 int id = ServerDataGrid.RowCount - 1;

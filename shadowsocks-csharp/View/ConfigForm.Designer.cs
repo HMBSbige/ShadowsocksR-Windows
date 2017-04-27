@@ -477,7 +477,8 @@
             "verify_deflate",
             "auth_sha1_v4",
             "auth_aes128_md5",
-            "auth_aes128_sha1"});
+            "auth_aes128_sha1",
+            "auth_chain_a"});
             this.TCPProtocolComboBox.Location = new System.Drawing.Point(108, 117);
             this.TCPProtocolComboBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 7);
             this.TCPProtocolComboBox.Name = "TCPProtocolComboBox";
