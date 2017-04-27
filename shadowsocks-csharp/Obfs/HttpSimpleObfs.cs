@@ -289,6 +289,7 @@ namespace Shadowsocks.Obfs
 
         protected static RNGCryptoServiceProvider g_random = new RNGCryptoServiceProvider();
         private Random random = new Random();
+        protected const int overhead = 5;
 
         public static List<string> SupportedObfs()
         {
@@ -308,6 +309,11 @@ namespace Shadowsocks.Obfs
         public override bool isAlwaysSendback()
         {
             return true;
+        }
+
+        public override int GetOverhead()
+        {
+            return overhead;
         }
 
         protected byte[] sni(string url)

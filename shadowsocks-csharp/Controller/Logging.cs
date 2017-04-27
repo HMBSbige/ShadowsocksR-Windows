@@ -83,6 +83,11 @@ namespace Shadowsocks.Controller
             Log(LogLevel.Error, o);
         }
 
+        public static void Info(object o)
+        {
+            Log(LogLevel.Info, o);
+        }
+
         [Conditional("DEBUG")]
         public static void Debug(object o)
         {
@@ -139,6 +144,10 @@ namespace Shadowsocks.Controller
                     // already closed
                 }
                 else if (se.SocketErrorCode == SocketError.Shutdown)
+                {
+                    // ignore
+                }
+                else if (se.SocketErrorCode == SocketError.Interrupted)
                 {
                     // ignore
                 }

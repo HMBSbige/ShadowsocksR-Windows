@@ -27,7 +27,7 @@ namespace Shadowsocks.Controller
         protected string _proxy_server;
         protected int _proxy_udp_port;
 
-        protected const int RecvSize = 2048;
+        protected const int RecvSize = 1460 * 2;
 
         private byte[] SendEncryptBuffer = new byte[RecvSize];
         private byte[] ReceiveDecryptBuffer = new byte[RecvSize * 2];
@@ -74,6 +74,14 @@ namespace Shadowsocks.Controller
             get
             {
                 return _socket.AddressFamily;
+            }
+        }
+
+        public int Available
+        {
+            get
+            {
+                return _socket.Available;
             }
         }
 
@@ -522,8 +530,12 @@ namespace Shadowsocks.Controller
         protected int _proxy_udp_port;
 
         //private bool header_sent = false;
-
-        protected const int RecvSize = 1024 * 4;
+        public const int MTU = 1492;
+        public const int MSS = MTU - 40;
+        protected const int RecvSize = MSS * 4;
+        public int TcpMSS = MSS;
+        public int RecvBufferSize;
+        public int OverHead;
 
         private byte[] SendEncryptBuffer = new byte[RecvSize];
         private byte[] ReceiveDecryptBuffer = new byte[RecvSize * 2];
@@ -589,6 +601,14 @@ namespace Shadowsocks.Controller
             get
             {
                 return _socket.AddressFamily;
+            }
+        }
+
+        public int Available
+        {
+            get
+            {
+                return _socket.Available;
             }
         }
 
@@ -664,14 +684,16 @@ namespace Shadowsocks.Controller
                     server.setObfsData(_obfs.InitData());
                 }
             }
-            int mss = 1448;
+            int mss = MSS;
             string server_addr = server.server;
+            OverHead = _protocol.GetOverhead() + _obfs.GetOverhead();
+            RecvBufferSize = RecvSize - OverHead;
             if (_proxy_server != null)
                 server_addr = _proxy_server;
             _protocol.SetServerInfo(new ServerInfo(server_addr, server.server_port, server.protocolparam??"", server.getProtocolData(),
-                _encryptor.getIV(), _password, _encryptor.getKey(), head_len, mss, RecvSize));
+                _encryptor.getIV(), _password, _encryptor.getKey(), head_len, mss, OverHead, RecvBufferSize));
             _obfs.SetServerInfo(new ServerInfo(server_addr, server.server_port, server.obfsparam??"", server.getObfsData(),
-                _encryptor.getIV(), _password, _encryptor.getKey(), head_len, mss, RecvSize));
+                _encryptor.getIV(), _password, _encryptor.getKey(), head_len, mss, OverHead, RecvBufferSize));
         }
 
         public int Receive(byte[] recv_buffer, int size, SocketFlags flags, out int bytesRead, out int protocolSize, out bool sendback)
@@ -692,6 +714,7 @@ namespace Shadowsocks.Controller
                         int outlength;
                         protocolSize = bytesToSend;
                         byte[] buffer = _protocol.ClientPostDecrypt(ReceiveDecryptBuffer, bytesToSend, out outlength);
+                        TcpMSS = _protocol.GetTcpMSS();
                         //if (recv_buffer.Length < outlength) //ASSERT
                         Array.Copy(buffer, 0, recv_buffer, 0, outlength);
                         return outlength;
@@ -737,6 +760,7 @@ namespace Shadowsocks.Controller
                         int outlength;
                         st.protocol_size = bytesToSend;
                         byte[] buffer = _protocol.ClientPostDecrypt(ReceiveDecryptBuffer, bytesToSend, out outlength);
+                        TcpMSS = _protocol.GetTcpMSS();
                         if (st.buffer.Length < outlength)
                         {
                             Array.Resize(ref st.buffer, outlength);

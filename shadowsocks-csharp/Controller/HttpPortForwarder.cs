@@ -172,7 +172,7 @@ namespace Shadowsocks.Controller
 
                     _remote = new Socket(ipAddress.AddressFamily,
                         SocketType.Stream, ProtocolType.Tcp);
-                    _remote.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
+                    _remote.NoDelay = true;
 
                     // Connect to the remote endpoint.
                     _remote.BeginConnect(remoteEP,

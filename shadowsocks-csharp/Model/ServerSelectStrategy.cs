@@ -114,7 +114,7 @@ namespace Shadowsocks.Model
             }
             if (lastUserSelectIndex != curIndex)
             {
-                if (configs.Count > curIndex && curIndex >= 0 && configs[curIndex].isEnable())
+                if (configs.Count > curIndex && curIndex >= 0 && configs[curIndex].isEnable() && algorithm != (int)SelectAlgorithm.Timer)
                 {
                     lastSelectIndex = curIndex;
                 }
@@ -132,6 +132,15 @@ namespace Shadowsocks.Model
                             if (!filter(configs[i], lastSelectIndex < 0 ? null : configs[lastSelectIndex]))
                                 continue;
                         }
+                        serverList.Add(new ServerIndex(i, configs[i]));
+                    }
+                }
+                if (serverList.Count == 0 && filter != null)
+                {
+                    for (int i = 0; i < configs.Count; ++i)
+                    {
+                        if (!filter(configs[i], lastSelectIndex < 0 ? null : configs[lastSelectIndex]))
+                            continue;
                         serverList.Add(new ServerIndex(i, configs[i]));
                     }
                 }
@@ -178,7 +187,7 @@ namespace Shadowsocks.Model
                     {
                         if (algorithm == (int)SelectAlgorithm.Timer)
                         {
-                            if ((DateTime.Now - lastSelectTime).TotalSeconds > 60 * 10)
+                            if ((DateTime.Now - lastSelectTime).TotalSeconds > 60 * 5)
                             {
                                 lastSelectTime = DateTime.Now;
                             }
