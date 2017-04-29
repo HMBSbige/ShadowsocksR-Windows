@@ -472,7 +472,7 @@ namespace Shadowsocks.Obfs
 
         public override byte[] ClientUdpPreEncrypt(byte[] plaindata, int datalength, out int outlength)
         {
-            byte[] outdata = new byte[datalength + 8];
+            byte[] outdata = new byte[datalength + 1024];
             if (user_key == null)
             {
                 user_id = new byte[4];
@@ -509,6 +509,10 @@ namespace Shadowsocks.Obfs
             encryptor.Encrypt(plaindata, datalength, outdata, out datalength);
             rand_data.CopyTo(outdata, datalength);
             auth_data.CopyTo(outdata, outlength - 8);
+            for (int i = 0; i < 4; ++i)
+            {
+                user_id[i] ^= md5data[i];
+            }
             user_id.CopyTo(outdata, outlength - 5);
             {
                 md5 = CreateHMAC(user_key);

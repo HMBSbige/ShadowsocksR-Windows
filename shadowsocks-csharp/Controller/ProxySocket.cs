@@ -93,6 +93,10 @@ namespace Shadowsocks.Controller
         public void Close()
         {
             _socket.Close();
+            _socket = null;
+
+            SendEncryptBuffer = null;
+            ReceiveDecryptBuffer = null;
         }
 
         public IAsyncResult BeginConnect(EndPoint ep, AsyncCallback callback, object state)
@@ -637,9 +641,16 @@ namespace Shadowsocks.Controller
                 lock (_decryptionLock)
                 {
                     if (_encryptor != null)
+                    {
                         ((IDisposable)_encryptor).Dispose();
+                        _encryptor = null;
+                    }
                 }
             }
+
+            _socket = null;
+            SendEncryptBuffer = null;
+            ReceiveDecryptBuffer = null;
         }
 
         public IAsyncResult BeginConnect(EndPoint ep, AsyncCallback callback, object state)

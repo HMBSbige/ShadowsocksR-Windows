@@ -560,22 +560,6 @@ namespace Shadowsocks.Controller
                 UpdatePACFromGFWListError(sender, e);
         }
 
-        private void StartReleasingMemory()
-        {
-            _ramThread = new Thread(new ThreadStart(ReleaseMemory));
-            _ramThread.IsBackground = true;
-            _ramThread.Start();
-        }
-
-        private void ReleaseMemory()
-        {
-            while (true)
-            {
-                Util.Utils.ReleaseMemory();
-                Thread.Sleep(30 * 1000);
-            }
-        }
-
         public void ShowConfigForm(int index)
         {
             if (ShowConfigFormEvent != null)

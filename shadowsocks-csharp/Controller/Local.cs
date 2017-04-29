@@ -506,6 +506,10 @@ namespace Shadowsocks.Controller
 
                 Connect();
             }
+            else
+            {
+                Close();
+            }
         }
 
         private void BeginConnect(IPAddress ipAddress, int serverPort)
@@ -696,10 +700,13 @@ namespace Shadowsocks.Controller
                 }
                 closed = true;
             }
-            Thread.Sleep(100);
+            Thread.Sleep(200);
             CloseSocket(ref remote);
             CloseSocket(ref remoteUDP);
-            Logging.Debug("Close   " + cfg.targetHost + ":" + cfg.targetPort.ToString() + " " + connection.GetSocket().Handle.ToString());
+            if (connection != null && cfg != null)
+            {
+                Logging.Debug("Close   " + cfg.targetHost + ":" + cfg.targetPort.ToString() + " " + connection.GetSocket().Handle.ToString());
+            }
             if (lastErrCode == 0 && server != null)
             {
                 if (!local_error && speedTester.sizeProtocolRecv == 0 && speedTester.sizeUpload > 0)
@@ -729,8 +736,10 @@ namespace Shadowsocks.Controller
                     {
                         if (this.State != ConnectState.READY && this.State != ConnectState.HANDSHAKE && server != null)
                         {
-                            server.ServerSpeedLog().AddDisconnectTimes();
-                            server.GetConnections().DecRef(this);
+                            if (server.GetConnections().DecRef(this))
+                            {
+                                server.ServerSpeedLog().AddDisconnectTimes();
+                            }
                         }
                         this.State = ConnectState.END;
                     }
@@ -750,7 +759,6 @@ namespace Shadowsocks.Controller
                     connection = null;
                     connectionUDP = null;
                 }
-
 
                 detector = null;
                 speedTester = null;
@@ -837,22 +845,26 @@ namespace Shadowsocks.Controller
                 if (!IPAddress.TryParse(host, out ipAddress))
                 {
                     ipAddress = Utils.DnsBuffer.Get(host);
-                }
-                if (ipAddress == null)
-                {
-                    ipAddress = Utils.QueryDns(host, cfg.dns_servers);
+                    if (ipAddress == null)
+                    {
+                        ipAddress = Utils.QueryDns(host, cfg.dns_servers);
+                    }
+                    if (ipAddress != null)
+                    {
+                        Utils.DnsBuffer.Set(host, new IPAddress(ipAddress.GetAddressBytes()));
+                        Utils.DnsBuffer.Sweep();
+                    }
                 }
                 if (ipAddress != null)
                 {
-                    Utils.DnsBuffer.Set(host, new IPAddress(ipAddress.GetAddressBytes()));
-                    Utils.DnsBuffer.Sweep();
-
                     cfg.targetHost = ipAddress.ToString();
                     ResetTimeout(cfg.TTL);
                 }
                 else
                 {
                     //throw new SocketException((int)SocketError.HostNotFound);
+                    Close();
+                    return;
                 }
             }
 
