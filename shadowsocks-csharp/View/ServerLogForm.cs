@@ -90,6 +90,7 @@ namespace Shadowsocks.View
                 }),
                 CreateMenuGroup("C&opy", new MenuItem[] {
                     CreateMenuItem("Copy current link", new EventHandler(this.copyLinkItem_Click)),
+                    CreateMenuItem("Copy current group links", new EventHandler(this.copyGroupLinkItem_Click)),
                     CreateMenuItem("Copy all enable links", new EventHandler(this.copyEnableLinksItem_Click)),
                     CreateMenuItem("Copy all links", new EventHandler(this.copyLinksItem_Click)),
                 }),
@@ -157,33 +158,44 @@ namespace Shadowsocks.View
             const long P = T * 1024L;
             const long E = P * 1024L;
 
-            if (bytes >= P * 990)
-                return (bytes / (double)E).ToString("F5") + "E";
-            if (bytes >= T * 990)
-                return (bytes / (double)P).ToString("F5") + "P";
-            if (bytes >= G * 990)
-                return (bytes / (double)T).ToString("F5") + "T";
             if (bytes >= M * 990)
             {
-                return (bytes / (double)G).ToString("F4") + "G";
+                if (bytes >= G * 990)
+                {
+                    if (bytes >= P * 990)
+                        return (bytes / (double)E).ToString("F3") + "E";
+                    if (bytes >= T * 990)
+                        return (bytes / (double)P).ToString("F3") + "P";
+                    return (bytes / (double)T).ToString("F3") + "T";
+                }
+                else
+                {
+                    if (bytes >= G * 99)
+                        return (bytes / (double)T).ToString("F2") + "G";
+                    if (bytes >= G * 9)
+                        return (bytes / (double)T).ToString("F3") + "G";
+                    return (bytes / (double)G).ToString("F4") + "G";
+                }
             }
-            if (bytes >= M * 100)
+            else
             {
-                return (bytes / (double)M).ToString("F1") + "M";
+                if (bytes >= K * 990)
+                {
+                    if (bytes >= M * 100)
+                        return (bytes / (double)M).ToString("F1") + "M";
+                    if (bytes > M * 9.9)
+                        return (bytes / (double)M).ToString("F2") + "M";
+                    return (bytes / (double)M).ToString("F3") + "M";
+                }
+                else
+                {
+                    if (bytes > K * 99)
+                        return (bytes / (double)K).ToString("F0") + "K";
+                    if (bytes > 900)
+                        return (bytes / (double)K).ToString("F1") + "K";
+                    return bytes.ToString();
+                }
             }
-            if (bytes >= M * 10)
-            {
-                return (bytes / (double)M).ToString("F2") + "M";
-            }
-            if (bytes >= K * 990)
-            {
-                return (bytes / (double)M).ToString("F3") + "M";
-            }
-            if (bytes > K * 2)
-            {
-                return (bytes / (double)K).ToString("F1") + "K";
-            }
-            return bytes.ToString();
         }
 
         public bool SetBackColor(DataGridViewCell cell, Color newColor)
@@ -674,6 +686,27 @@ namespace Shadowsocks.View
                 try
                 {
                     string link = config.configs[config.index].GetSSRLinkForServer();
+                    Clipboard.SetText(link);
+                }
+                catch { }
+            }
+        }
+
+        private void copyGroupLinkItem_Click(object sender, EventArgs e)
+        {
+            Configuration config = controller.GetCurrentConfiguration();
+            if (config.index >= 0 && config.index < config.configs.Count)
+            {
+                string group = config.configs[config.index].group;
+                string link = "";
+                for (int index = 0; index < config.configs.Count; ++index)
+                {
+                    if (config.configs[index].group != group)
+                        continue;
+                    link += config.configs[index].GetSSRLinkForServer() + "\r\n";
+                }
+                try
+                {
                     Clipboard.SetText(link);
                 }
                 catch { }

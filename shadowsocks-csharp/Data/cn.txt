@@ -123,6 +123,7 @@ Clear &Selected Total=清空选中节点历史流量(&S)
 Clear &Total=清空所有历史流量(&T)
 C&opy=复制(&O)
 Copy current link=复制选中链接
+Copy current group links=复制选中组链接
 Copy all enable links=复制所有开启节点链接
 Copy all links=复制所有节点链接
 &Window=窗口(&W)

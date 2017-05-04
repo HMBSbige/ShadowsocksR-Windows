@@ -707,7 +707,7 @@ namespace Shadowsocks.Controller
             {
                 Logging.Debug("Close   " + cfg.targetHost + ":" + cfg.targetPort.ToString() + " " + connection.GetSocket().Handle.ToString());
             }
-            if (lastErrCode == 0 && server != null)
+            if (lastErrCode == 0 && server != null && speedTester != null)
             {
                 if (!local_error && speedTester.sizeProtocolRecv == 0 && speedTester.sizeUpload > 0)
                 {
@@ -724,8 +724,9 @@ namespace Shadowsocks.Controller
                     server.ServerSpeedLog().AddNoErrorTimes();
             }
 
-            if (lastErrCode != 16)
+            if (lastErrCode == 0 && server != null && cfg != null && keepCurrentServer != null)
                 keepCurrentServer(localPort, cfg.targetHost, server.id);
+
             ResetTimeout(0);
             try
             {
@@ -982,7 +983,7 @@ namespace Shadowsocks.Controller
             {
                 connectionTCPIdle = false;
                 byte[] buffer = new byte[BufferSize];
-                int recv_size = remote == null ? RecvSize : remote.RecvBufferSize;
+                int recv_size = remote == null ? RecvSize : remote.TcpMSS - remote.OverHead;
                 connection.BeginReceive(buffer, recv_size, 0,
                     new AsyncCallback(PipeConnectionReceiveCallback), null);
             }

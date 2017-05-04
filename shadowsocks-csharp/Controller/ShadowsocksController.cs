@@ -24,8 +24,6 @@ namespace Shadowsocks.Controller
         // manipulates UI
         // interacts with low level logic
 
-        private Thread _ramThread;
-
         private Listener _listener;
         private List<Listener> _port_map_listener;
         private PACServer _pacServer;
