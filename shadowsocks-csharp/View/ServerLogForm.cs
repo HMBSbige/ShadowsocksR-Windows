@@ -171,9 +171,9 @@ namespace Shadowsocks.View
                 else
                 {
                     if (bytes >= G * 99)
-                        return (bytes / (double)T).ToString("F2") + "G";
+                        return (bytes / (double)G).ToString("F2") + "G";
                     if (bytes >= G * 9)
-                        return (bytes / (double)T).ToString("F3") + "G";
+                        return (bytes / (double)G).ToString("F3") + "G";
                     return (bytes / (double)G).ToString("F4") + "G";
                 }
             }
