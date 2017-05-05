@@ -9,11 +9,13 @@ namespace Shadowsocks.Controller
 
     class SpeedTester
     {
+#if DEBUG
         struct TransLog
         {
             public int dir;
             public int size;
         }
+#endif
         public DateTime timeConnectBegin;
         public DateTime timeConnectEnd;
         public DateTime timeBeginUpload;
@@ -51,7 +53,7 @@ namespace Shadowsocks.Controller
             return false;
         }
 
-        public void AddDownloadSize(int size)
+        public bool AddDownloadSize(int size)
         {
             //if (sizeDownloadList.Count == 2)
             //    sizeDownloadList[1] = new TransLog(size, DateTime.Now);
@@ -63,7 +65,7 @@ namespace Shadowsocks.Controller
                 transfer.AddDownload(server, size);
             }
 #if DEBUG
-            if (sizeTransfer.Count < 128)
+            if (sizeTransfer.Count < 1024 * 128)
             {
                 lock (sizeTransfer)
                 {
@@ -71,6 +73,7 @@ namespace Shadowsocks.Controller
                 }
             }
 #endif
+            return sizeDownload > 1024 * 128;
         }
         public void AddProtocolRecvSize(int size)
         {
@@ -82,7 +85,7 @@ namespace Shadowsocks.Controller
             sizeRecv += size;
         }
 
-        public void AddUploadSize(int size)
+        public bool AddUploadSize(int size)
         {
             sizeUpload += size;
             if (transfer != null && server != null)
@@ -90,7 +93,7 @@ namespace Shadowsocks.Controller
                 transfer.AddUpload(server, size);
             }
 #if DEBUG
-            if (sizeTransfer.Count < 128)
+            if (sizeTransfer.Count < 1024 * 128)
             {
                 lock (sizeTransfer)
                 {
@@ -98,6 +101,7 @@ namespace Shadowsocks.Controller
                 }
             }
 #endif
+            return sizeUpload > 1024 * 128;
         }
 
         public string TransferLog()

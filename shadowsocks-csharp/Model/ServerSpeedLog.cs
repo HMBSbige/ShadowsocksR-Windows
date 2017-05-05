@@ -445,7 +445,7 @@ namespace Shadowsocks.Model
                 Sweep();
             }
         }
-        protected static void UpdateTransLog(List<TransLog> transLog, int bytes, DateTime now, ref long maxTrans)
+        protected static void UpdateTransLog(List<TransLog> transLog, int bytes, DateTime now, ref long maxTrans, bool updateMaxTrans)
         {
             if (transLog.Count > 0)
             {
@@ -467,7 +467,7 @@ namespace Shadowsocks.Model
 
                         int base_times = maxTrans > 1024 * 100 ? 3 : 2;
                         int last_index = (transLog.Count - 1) - 2;
-                        if (transLog.Count >= 5 && transLog[last_index].times > base_times)
+                        if (updateMaxTrans && transLog.Count >= 5 && transLog[last_index].times > base_times)
                         {
                             int begin_index = last_index - 1;
                             for (; begin_index > 0; --begin_index)
@@ -489,8 +489,15 @@ namespace Shadowsocks.Model
                                 {
                                     t.size += transLog[i].size;
                                 }
-                                double a = 2.0 / (1 + 32);
-                                maxTrans = (long)(0.5 + maxTrans * (1 - a) + a * ((t.size - t.firstsize) / (t.endTime - t.recvTime).TotalSeconds));
+                                if (maxTrans == 0)
+                                {
+                                    maxTrans = (long)((t.size - t.firstsize) / (t.endTime - t.recvTime).TotalSeconds * 0.7);
+                                }
+                                else
+                                {
+                                    double a = 2.0 / (1 + 32);
+                                    maxTrans = (long)(0.5 + maxTrans * (1 - a) + a * ((t.size - t.firstsize) / (t.endTime - t.recvTime).TotalSeconds));
+                                }
                             }
                         }
                     }
@@ -521,20 +528,20 @@ namespace Shadowsocks.Model
                 transLog.Add(new TransLog(bytes, now));
             }
         }
-        public void AddUploadBytes(int bytes, DateTime now)
+        public void AddUploadBytes(int bytes, DateTime now, bool updateMaxTrans)
         {
             lock (this)
             {
                 transUpload += bytes;
-                UpdateTransLog(upTransLog, bytes, now, ref maxTransUpload);
+                UpdateTransLog(upTransLog, bytes, now, ref maxTransUpload, updateMaxTrans);
             }
         }
-        public void AddDownloadBytes(int bytes, DateTime now)
+        public void AddDownloadBytes(int bytes, DateTime now, bool updateMaxTrans)
         {
             lock (this)
             {
                 transDownload += bytes;
-                UpdateTransLog(downTransLog, bytes, now, ref maxTransDownload);
+                UpdateTransLog(downTransLog, bytes, now, ref maxTransDownload, updateMaxTrans);
             }
         }
         public void AddDownloadRawBytes(long bytes)
