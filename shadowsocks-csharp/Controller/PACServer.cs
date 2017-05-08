@@ -72,7 +72,7 @@ namespace Shadowsocks.Controller
                     }
                     else if (kv.Length == 1)
                     {
-                        if (line.IndexOf("auth=" + _config.localAuthPassword) > 0)
+                        if (!Util.Utils.isLocal(socket) || line.IndexOf("auth=" + _config.localAuthPassword) > 0)
                         {
                             if (line.IndexOf(" /pac?") > 0 && line.IndexOf("GET") == 0)
                             {
