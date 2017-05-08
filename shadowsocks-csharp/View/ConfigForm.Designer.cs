@@ -286,7 +286,6 @@
             // IPTextBox
             // 
             this.IPTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.IPTextBox.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.IPTextBox.Location = new System.Drawing.Point(108, 6);
             this.IPTextBox.MaxLength = 512;
             this.IPTextBox.Name = "IPTextBox";
@@ -298,7 +297,6 @@
             // NumServerPort
             // 
             this.NumServerPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.NumServerPort.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.NumServerPort.Location = new System.Drawing.Point(108, 33);
             this.NumServerPort.Maximum = new decimal(new int[] {
             65535,
@@ -312,7 +310,6 @@
             // PasswordTextBox
             // 
             this.PasswordTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.PasswordTextBox.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.PasswordTextBox.Location = new System.Drawing.Point(108, 60);
             this.PasswordTextBox.MaxLength = 256;
             this.PasswordTextBox.Name = "PasswordTextBox";
@@ -344,7 +341,6 @@
             // TextLink
             // 
             this.TextLink.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.TextLink.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.TextLink.Location = new System.Drawing.Point(108, 285);
             this.TextLink.Name = "TextLink";
             this.TextLink.ReadOnly = true;
@@ -499,7 +495,6 @@
             // TextObfsParam
             // 
             this.TextObfsParam.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.TextObfsParam.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.TextObfsParam.Location = new System.Drawing.Point(108, 204);
             this.TextObfsParam.Name = "TextObfsParam";
             this.TextObfsParam.Size = new System.Drawing.Size(233, 21);
@@ -551,7 +546,6 @@
             // NumUDPPort
             // 
             this.NumUDPPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.NumUDPPort.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.NumUDPPort.Location = new System.Drawing.Point(108, 334);
             this.NumUDPPort.Maximum = new decimal(new int[] {
             65535,
@@ -601,7 +595,6 @@
             // TextProtocolParam
             // 
             this.TextProtocolParam.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.TextProtocolParam.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.TextProtocolParam.Location = new System.Drawing.Point(108, 147);
             this.TextProtocolParam.Name = "TextProtocolParam";
             this.TextProtocolParam.Size = new System.Drawing.Size(233, 21);

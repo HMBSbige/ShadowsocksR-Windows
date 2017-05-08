@@ -494,14 +494,32 @@ namespace Shadowsocks.View
         private void DeleteButton_Click(object sender, EventArgs e)
         {
             _oldSelectedIndex = ServersListBox.SelectedIndex;
-            if (_oldSelectedIndex >= 0 && _oldSelectedIndex < _modifiedConfiguration.configs.Count)
+            var items = ServersListBox.SelectedIndices;
+            if (items.Count > 0)
             {
-                _modifiedConfiguration.configs.RemoveAt(_oldSelectedIndex);
+                int[] array = new int[items.Count];
+                int i = 0;
+                foreach (int index in items)
+                {
+                    array[i++] = index;
+                }
+                Array.Sort(array);
+                for (--i; i >= 0; --i)
+                {
+                    int index = array[i];
+                    if (index >= 0 && index < _modifiedConfiguration.configs.Count)
+                    {
+                        _modifiedConfiguration.configs.RemoveAt(index);
+                    }
+                }
             }
             if (_oldSelectedIndex >= _modifiedConfiguration.configs.Count)
             {
-                // can be -1
                 _oldSelectedIndex = _modifiedConfiguration.configs.Count - 1;
+            }
+            if (_oldSelectedIndex < 0)
+            {
+                _oldSelectedIndex = 0;
             }
             ServersListBox.SelectedIndex = _oldSelectedIndex;
             LoadConfiguration(_modifiedConfiguration);
