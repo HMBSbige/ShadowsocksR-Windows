@@ -73,7 +73,7 @@ namespace Shadowsocks.Controller
                 }
             }
 #endif
-            return sizeDownload > 1024 * 128;
+            return sizeDownload > 1024 * 256 && sizeDownload > (DateTime.Now - timeConnectEnd).TotalSeconds * 1024 * 16;
         }
         public void AddProtocolRecvSize(int size)
         {
@@ -101,7 +101,7 @@ namespace Shadowsocks.Controller
                 }
             }
 #endif
-            return sizeUpload > 1024 * 128;
+            return sizeUpload > 1024 * 256 && sizeUpload > (DateTime.Now - timeConnectEnd).TotalSeconds * 1024 * 16;
         }
 
         public string TransferLog()

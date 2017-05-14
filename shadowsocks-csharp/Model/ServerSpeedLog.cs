@@ -465,9 +465,9 @@ namespace Shadowsocks.Model
                     {
                         transLog.Add(new TransLog(bytes, now));
 
-                        int base_times = maxTrans > 1024 * 100 ? 3 : 2;
+                        int base_times = 1 + (maxTrans > 1024 * 512 ? 1 : 0);
                         int last_index = (transLog.Count - 1) - 2;
-                        if (updateMaxTrans && transLog.Count >= 5 && transLog[last_index].times > base_times)
+                        if (updateMaxTrans && transLog.Count >= 6 && transLog[last_index].times > base_times)
                         {
                             int begin_index = last_index - 1;
                             for (; begin_index > 0; --begin_index)
@@ -479,7 +479,7 @@ namespace Shadowsocks.Model
                                     break;
                                 }
                             }
-                            if (begin_index <= last_index - 3)
+                            if (begin_index <= last_index - 4)
                             {
                                 begin_index++;
                                 TransLog t = new TransLog(transLog[begin_index].firstsize, transLog[begin_index].recvTime);
