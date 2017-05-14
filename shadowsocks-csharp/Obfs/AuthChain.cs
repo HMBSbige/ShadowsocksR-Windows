@@ -509,11 +509,12 @@ namespace Shadowsocks.Obfs
             encryptor.Encrypt(plaindata, datalength, outdata, out datalength);
             rand_data.CopyTo(outdata, datalength);
             auth_data.CopyTo(outdata, outlength - 8);
+            byte[] uid = new byte[4];
             for (int i = 0; i < 4; ++i)
             {
-                user_id[i] ^= md5data[i];
+                uid[i] = (byte)(user_id[i] ^ md5data[i]);
             }
-            user_id.CopyTo(outdata, outlength - 5);
+            uid.CopyTo(outdata, outlength - 5);
             {
                 md5 = CreateHMAC(user_key);
                 md5data = md5.ComputeHash(outdata, 0, outlength - 1);
