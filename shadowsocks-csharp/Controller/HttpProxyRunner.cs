@@ -55,7 +55,14 @@ namespace Shadowsocks.Controller
         {
             if (_process == null)
                 return true;
-            return _process.HasExited;
+            try
+            {
+                return _process.HasExited;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public static void Kill()
