@@ -9,6 +9,12 @@ using Shadowsocks.Obfs;
 
 namespace Shadowsocks.Controller
 {
+    public abstract class IHandler
+    {
+        public delegate void InvokeHandler();
+        public abstract void Shutdown();
+    }
+
     public class CallbackState
     {
         public byte[] buffer;

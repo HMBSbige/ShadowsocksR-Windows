@@ -121,6 +121,7 @@ namespace Shadowsocks.Controller
         }
 
         class Handler
+            : IHandler
         {
             private IPRangeSet _IPRange;
             private Configuration _config;
@@ -343,6 +344,7 @@ namespace Shadowsocks.Controller
                 }
                 try
                 {
+                    Server.GetForwardServerRef().GetConnections().AddRef(this);
                     _remote.BeginReceive(remoteRecvBuffer, RecvSize, 0,
                         new AsyncCallback(PipeRemoteReceiveCallback), null);
                     _local.BeginReceive(connetionRecvBuffer, RecvSize, 0,
@@ -513,6 +515,13 @@ namespace Shadowsocks.Controller
                 Thread.Sleep(100);
                 CloseSocket(_remote);
                 CloseSocket(_local);
+                Server.GetForwardServerRef().GetConnections().DecRef(this);
+            }
+
+            public override void Shutdown()
+            {
+                InvokeHandler handler = () => Close();
+                handler.BeginInvoke(null, null);
             }
         }
     }

@@ -129,15 +129,9 @@ namespace Shadowsocks.Controller
         public bool forceRandom = false;
     }
 
-    public interface IHandler
-    {
-        void Shutdown();
-    }
-
     class Handler
         : IHandler
     {
-        private delegate void InvokeHandler();
         private delegate IPHostEntry GetHostEntryHandler(string ip);
 
         public delegate Server GetCurrentServer(int localPort, ServerSelectStrategy.FilterFunc filter, string targetURI = null, bool cfgRandom = false, bool usingRandom = false, bool forceRandom = false);
@@ -212,12 +206,13 @@ namespace Shadowsocks.Controller
             }
         }
 
-        private void ResetTimeout(Double time)
+        private void ResetTimeout(double time, bool reset_keep_alive = true)
         {
             if (time <= 0 && timer == null)
                 return;
 
-            cfg.try_keep_alive = 0;
+            if (reset_keep_alive)
+                cfg.try_keep_alive = 0;
 
             if (time <= 0)
             {
@@ -285,8 +280,14 @@ namespace Shadowsocks.Controller
                         {
                             if (lastErrCode == 0)
                             {
-                                lastErrCode = 8;
-                                s.ServerSpeedLog().AddTimeoutTimes();
+                                if (State == ConnectState.CONNECTING && cfg.socks5RemotePort > 0)
+                                {
+                                }
+                                else
+                                {
+                                    lastErrCode = 8;
+                                    s.ServerSpeedLog().AddTimeoutTimes();
+                                }
                             }
                             //remote.Shutdown(SocketShutdown.Both);
                             stop = true;
@@ -364,7 +365,6 @@ namespace Shadowsocks.Controller
                     || se.SocketErrorCode == SocketError.NotConnected
                     || se.SocketErrorCode == SocketError.Interrupted
                     || se.SocketErrorCode == SocketError.Shutdown
-                    || se.SocketErrorCode == SocketError.Interrupted
                     )
                 {
                     // closed by browser when sending
@@ -405,7 +405,8 @@ namespace Shadowsocks.Controller
                         if (s != null)
                         {
                             lastErrCode = 1;
-                            s.ServerSpeedLog().AddErrorTimes();
+                            if (cfg != null && cfg.socks5RemotePort == 0)
+                                s.ServerSpeedLog().AddErrorTimes();
                         }
                     }
                     return 2; // proxy ip/port error
@@ -417,7 +418,7 @@ namespace Shadowsocks.Controller
                         if (s != null)
                         {
                             lastErrCode = 3;
-                            s.ServerSpeedLog().AddErrorTimes();
+                            //s.ServerSpeedLog().AddErrorTimes();
                         }
                     }
                     return 3; // proxy ip/port error
@@ -684,7 +685,7 @@ namespace Shadowsocks.Controller
             }
         }
 
-        public void Shutdown()
+        public override void Shutdown()
         {
             InvokeHandler handler = () => Close();
             handler.BeginInvoke(null, null);
@@ -1339,6 +1340,7 @@ namespace Shadowsocks.Controller
                     }
                     ResetTimeout(cfg.TTL);
 
+                    speedTester.AddProtocolRecvSize(remote.GetAsyncProtocolSize(ar));
                     if (bytesRead > 0)
                     {
                         byte[] remoteSendBuffer = new byte[BufferSize];
@@ -1364,7 +1366,6 @@ namespace Shadowsocks.Controller
                         {
                             UDPoverTCPConnectionSend(remoteSendBuffer, bytesRead);
                         }
-                        speedTester.AddProtocolRecvSize(remote.GetAsyncProtocolSize(ar));
                         server.ServerSpeedLog().AddDownloadRawBytes(bytesRead);
                         speedTester.AddRecvSize(bytesRead);
                         _totalRecvSize += bytesRead;
@@ -1553,7 +1554,10 @@ namespace Shadowsocks.Controller
             if (send_len > 0)
             {
                 server.ServerSpeedLog().AddUploadBytes(send_len, DateTime.Now, speedTester.AddUploadSize(send_len));
-                if (length >= 0) ResetTimeout(cfg.TTL);
+                if (length >= 0)
+                    ResetTimeout(cfg.TTL);
+                else
+                    ResetTimeout(cfg.connect_timeout <= 0 ? 30 : cfg.connect_timeout, false);
                 total_len += send_len;
 
                 if (lastKeepTime == null || (DateTime.Now - lastKeepTime).TotalSeconds > 5)

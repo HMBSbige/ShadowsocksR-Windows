@@ -78,13 +78,11 @@ namespace Shadowsocks.Model
                 s = new IHandler[sockets.Count];
                 sockets.Keys.CopyTo(s, 0);
             }
-            foreach (Handler socket in s)
+            foreach (IHandler handler in s)
             {
                 try
                 {
-                    //socket.Shutdown(SocketShutdown.Both);
-                    socket.Shutdown();
-                    //socket.Close();
+                    handler.Shutdown();
                 }
                 catch
                 {
@@ -125,6 +123,7 @@ namespace Shadowsocks.Model
         private DnsBuffer dnsBuffer = new DnsBuffer();
         private DnsBuffer dnsTargetBuffer = new DnsBuffer();
         private Connections Connections = new Connections();
+        private static Server forwardServer = new Server();
 
         public void CopyServer(Server Server)
         {
@@ -136,6 +135,12 @@ namespace Shadowsocks.Model
             Connections = Server.Connections;
             enable = Server.enable;
         }
+
+        public static Server GetForwardServerRef()
+        {
+            return forwardServer;
+        }
+
         public void SetConnections(Connections Connections)
         {
             this.Connections = Connections;
