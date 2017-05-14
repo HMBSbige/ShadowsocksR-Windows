@@ -125,7 +125,7 @@ namespace Shadowsocks.Controller
                     {
                         RspSocks4aHandshakeReceive();
                     }
-                    else if (_firstPacket[0] == 5 && _firstPacketLength >= 2)
+                    else if (_firstPacket[0] == 5 && _firstPacketLength >= 3)
                     {
                         RspSocks5HandshakeReceive();
                     }
@@ -197,15 +197,31 @@ namespace Shadowsocks.Controller
             {
                 response = new byte[] { 0, 91 };
                 Console.WriteLine("socks 4/5 protocol error");
+                _connection.Send(response);
+                Close();
+                return;
             }
             bool no_auth = false;
             bool auth = false;
+            bool has_method = false;
             for (int index = 0; index < _firstPacket[1]; ++index)
             {
                 if (_firstPacket[2 + index] == 0)
+                {
                     no_auth = true;
+                    has_method = true;
+                }
                 else if (_firstPacket[2 + index] == 2)
+                {
                     auth = true;
+                    has_method = true;
+                }
+            }
+            if (!has_method)
+            {
+                Console.WriteLine("Socks5 no acceptable auth method");
+                Close();
+                return;
             }
             if (auth || !no_auth)
             {
