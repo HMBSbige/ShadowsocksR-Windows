@@ -9,6 +9,7 @@ namespace Shadowsocks.Model
         public delegate bool FilterFunc(Server server, Server selServer); // return true if select the server
         private Random randomGennarator;
         private int lastSelectIndex;
+        private string lastSelectID;
         private DateTime lastSelectTime;
         private int lastUserSelectIndex;
         private const int MAX_CHANCE = 10000;
@@ -99,26 +100,56 @@ namespace Shadowsocks.Model
             }
         }
 
-        public int Select(List<Server> configs, int curIndex, int algorithm, FilterFunc filter, bool forceChange = false)
+        protected int SubSelect(List<Server> configs, int curIndex, int algorithm, FilterFunc filter, bool forceChange)
         {
             if (randomGennarator == null)
             {
                 randomGennarator = new Random();
                 lastSelectIndex = -1;
             }
-            if (configs.Count <= lastSelectIndex || lastSelectIndex < 0 || !configs[lastSelectIndex].isEnable())
+            if (configs.Count <= lastSelectIndex || lastSelectIndex < 0)
             {
                 lastSelectIndex = -1;
                 lastSelectTime = DateTime.Now;
                 lastUserSelectIndex = -1;
             }
+            else
+            {
+                if (configs[lastSelectIndex].id != lastSelectID)
+                {
+                    if (lastSelectID != null)
+                    {
+                        for (int i = 0; i < configs.Count; ++i)
+                        {
+                            if (configs[i].id == lastSelectID)
+                            {
+                                lastSelectIndex = i;
+                                break;
+                            }
+                        }
+                    }
+                    if (configs[lastSelectIndex].id != lastSelectID)
+                    {
+                        lastSelectIndex = -1;
+                        lastSelectTime = DateTime.Now;
+                        lastUserSelectIndex = -1;
+                    }
+                }
+            }
             if (lastUserSelectIndex != curIndex)
             {
-                if (configs.Count > curIndex && curIndex >= 0 && configs[curIndex].isEnable() && algorithm != (int)SelectAlgorithm.Timer)
+                if (configs.Count > curIndex && curIndex >= 0 && algorithm != (int)SelectAlgorithm.Timer)
                 {
                     lastSelectIndex = curIndex;
                 }
                 lastUserSelectIndex = curIndex;
+            }
+            if (lastSelectIndex == -1)
+            {
+                if (configs.Count > curIndex && curIndex >= 0)
+                {
+                    lastSelectIndex = curIndex;
+                }
             }
             if (configs.Count > 0)
             {
@@ -214,7 +245,6 @@ namespace Shadowsocks.Model
                             double target = randomGennarator.NextDouble() * lastBeginVal;
                             serverListIndex = lowerBound(chances, target);
                             serverListIndex = serverList[serverListIndex].index;
-                            lastSelectIndex = serverListIndex;
                             return serverListIndex;
                         }
                     }
@@ -239,7 +269,6 @@ namespace Shadowsocks.Model
                             {
                                 if (curIndex == serverList[i].index)
                                 {
-                                    lastSelectIndex = curIndex;
                                     return curIndex;
                                 }
                             }
@@ -248,18 +277,30 @@ namespace Shadowsocks.Model
                             double target = randomGennarator.NextDouble() * lastBeginVal;
                             serverListIndex = lowerBound(chances, target);
                             serverListIndex = serverList[serverListIndex].index;
-                            lastSelectIndex = serverListIndex;
                             return serverListIndex;
                         }
                     }
                 }
-                lastSelectIndex = serverListIndex;
                 return serverListIndex;
             }
             else
             {
                 return -1;
             }
+        }
+
+        public int Select(List<Server> configs, int curIndex, int algorithm, FilterFunc filter, bool forceChange = false)
+        {
+            lastSelectIndex = SubSelect(configs, curIndex, algorithm, filter, forceChange);
+            if (lastSelectIndex >= 0 && lastSelectIndex < configs.Count)
+            {
+                lastSelectID = configs[lastSelectIndex].id;
+            }
+            else
+            {
+                lastSelectID = null;
+            }
+            return lastSelectIndex;
         }
     }
 }
