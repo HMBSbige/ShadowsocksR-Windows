@@ -5,8 +5,8 @@ Shadowsocks=Shadowsocks
 # Menu items
 
 Mode=系统代理模式
-No modify system proxy=不修改系统(IE)代理
-Disable system proxy=不经过代理直连
+No modify system proxy=保持当前状态不修改
+Disable system proxy=直连模式
 PAC=PAC 模式
 Global=全局模式
 Proxy rule=代理规则
@@ -116,7 +116,8 @@ Cancel=取消
 
 ServerLog=服务器记录
 &Control=操作(&C)
-&Disconnect All=断开当前所有连接(&D)
+&Disconnect direct connections=断开直连连接(&D)
+Disconnect &All=断开当前所有连接(&A)
 Clear &MaxSpeed=重置历史最高(&M)
 &Clear=清空(&C)
 Clear &Selected Total=清空选中节点历史流量(&S)
@@ -145,6 +146,7 @@ Timeout=超时
 Empty Response=空连
 Error Percent=出错比例
 Continuous=连错
+Version=版本
 
 # Global Log Form
 

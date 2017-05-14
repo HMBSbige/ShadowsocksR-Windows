@@ -5,8 +5,8 @@ Shadowsocks=Shadowsocks
 # Menu items
 
 Mode=系統代理模式
-No modify system proxy=不修改系統(IE)代理
-Disable system proxy=不經過代理直連
+No modify system proxy=保持當前狀態不修改
+Disable system proxy=直連模式
 PAC=PAC 模式
 Global=全局模式
 Proxy rule=代理規則
@@ -116,7 +116,8 @@ Cancel=取消
 
 ServerLog=伺服器記錄
 &Control=操作(&C)
-&Disconnect All=斷開當前所有連接(&D)
+&Disconnect direct connections=斷開直連連接(&D)
+Disconnect &All=斷開當前所有連接(&A)
 Clear &MaxSpeed=重置歷史最高(&M)
 &Clear=清空(&C)
 Clear &Selected Total=清空選中節點歷史流量(&S)
@@ -145,6 +146,7 @@ Timeout=超時
 Empty Response=空連
 Error Percent=出錯比例
 Continuous=連錯
+Version=版本
 
 # QRCode Form
 

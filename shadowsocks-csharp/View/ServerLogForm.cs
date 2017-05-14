@@ -81,9 +81,11 @@ namespace Shadowsocks.View
 
             this.Menu = new MainMenu(new MenuItem[] {
                 CreateMenuGroup("&Control", new MenuItem[] {
-                    CreateMenuItem("&Disconnect All", new EventHandler(this.Disconnect_Click)),
+                    CreateMenuItem("&Disconnect direct connections", new EventHandler(this.DisconnectForward_Click)),
+                    CreateMenuItem("Disconnect &All", new EventHandler(this.Disconnect_Click)),
+                    new MenuItem("-"),
                     CreateMenuItem("Clear &MaxSpeed", new EventHandler(this.ClearMaxSpeed_Click)),
-                    this.clearItem = CreateMenuItem("&Clear", new EventHandler(this.ClearItem_Click)),
+                    clearItem = CreateMenuItem("&Clear", new EventHandler(this.ClearItem_Click)),
                     new MenuItem("-"),
                     CreateMenuItem("Clear &Selected Total", new EventHandler(this.ClearSelectedTotal_Click)),
                     CreateMenuItem("Clear &Total", new EventHandler(this.ClearTotal_Click)),
@@ -132,7 +134,8 @@ namespace Shadowsocks.View
         {
             this.Text = title_perfix + I18N.GetString("ServerLog") + "("
                 + (controller.GetCurrentConfiguration().shareOverLan ? "any" : "local") + ":" + controller.GetCurrentConfiguration().localPort.ToString()
-                + I18N.GetString(" Version") + UpdateChecker.FullVersion
+                + "(" + Model.Server.GetForwardServerRef().GetConnections().Count.ToString()+ ")"
+                + " " + I18N.GetString("Version") + UpdateChecker.FullVersion
                 + ")";
         }
         private void UpdateTexts()
@@ -615,6 +618,7 @@ namespace Shadowsocks.View
             {
 
             }
+            UpdateTitle();
             if (ServerDataGrid.SortedColumn != null)
             {
                 ServerDataGrid.Sort(ServerDataGrid.SortedColumn, (ListSortDirection)((int)ServerDataGrid.SortOrder - 1));
@@ -751,6 +755,11 @@ namespace Shadowsocks.View
             this.TopMost = topmostItem.Checked;
         }
 
+        private void DisconnectForward_Click(object sender, EventArgs e)
+        {
+            Model.Server.GetForwardServerRef().GetConnections().CloseAll();
+        }
+
         private void Disconnect_Click(object sender, EventArgs e)
         {
             Configuration config = controller.GetCurrentConfiguration();
@@ -759,6 +768,7 @@ namespace Shadowsocks.View
                 Server server = config.configs[id];
                 server.GetConnections().CloseAll();
             }
+            Model.Server.GetForwardServerRef().GetConnections().CloseAll();
         }
 
         private void ClearMaxSpeed_Click(object sender, EventArgs e)
@@ -1091,11 +1101,19 @@ namespace Shadowsocks.View
             const int WM_SIZING = 532;
             //const int WM_SIZE = 533;
             const int WM_MOVING = 534;
+            const int WM_SYSCOMMAND = 0x0112;
+            const int SC_MINIMIZE = 0xF020;
             switch (message.Msg)
             {
                 case WM_SIZING:
                 case WM_MOVING:
                     updatePause = 2;
+                    break;
+                case WM_SYSCOMMAND:
+                    if ((int)message.WParam == SC_MINIMIZE)
+                    {
+                        Util.Utils.ReleaseMemory();
+                    }
                     break;
             }
             base.WndProc(ref message);
@@ -1127,14 +1145,6 @@ namespace Shadowsocks.View
             }
             this.Width = width + SystemInformation.VerticalScrollBarWidth + (this.Width - this.ClientSize.Width) + 1;
             ServerDataGrid.AutoResizeColumnHeadersHeight();
-        }
-
-        private void ServerLogForm_Activated(object sender, EventArgs e)
-        {
-            //if (updateTick > 0)
-            //{
-            //    updateSize = 4;
-            //}
         }
     }
 }

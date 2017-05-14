@@ -289,7 +289,6 @@
             this.Name = "ServerLogForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ServerLog";
-            this.Activated += new System.EventHandler(this.ServerLogForm_Activated);
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ServerLogForm_FormClosed);
             this.ResizeEnd += new System.EventHandler(this.ServerLogForm_ResizeEnd);
             this.Move += new System.EventHandler(this.ServerLogForm_Move);
