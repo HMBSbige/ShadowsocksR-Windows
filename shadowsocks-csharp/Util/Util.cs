@@ -43,9 +43,18 @@ namespace Shadowsocks.Util
             GC.Collect(GC.MaxGeneration);
             GC.WaitForPendingFinalizers();
 
-            SetProcessWorkingSetSize(Process.GetCurrentProcess().Handle,
-                                     (UIntPtr)0xFFFFFFFFFFFFFFFF,
-                                     (UIntPtr)0xFFFFFFFFFFFFFFFF);
+            if (UIntPtr.Size == 4)
+            {
+                SetProcessWorkingSetSize(Process.GetCurrentProcess().Handle,
+                                         (UIntPtr)0xFFFFFFFF,
+                                         (UIntPtr)0xFFFFFFFF);
+            }
+            else if (UIntPtr.Size == 8)
+            {
+                SetProcessWorkingSetSize(Process.GetCurrentProcess().Handle,
+                                         (UIntPtr)0xFFFFFFFFFFFFFFFF,
+                                         (UIntPtr)0xFFFFFFFFFFFFFFFF);
+            }
 #endif
         }
 
