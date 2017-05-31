@@ -751,10 +751,10 @@ namespace Shadowsocks.Controller
 
                 if (!reconnect)
                 {
-                    Logging.Debug("Disconnect " + cfg.targetHost + ":" + cfg.targetPort.ToString() + " " + connection.GetSocket().Handle.ToString());
+                    Logging.Info($"Disconnect {cfg.targetHost}:{cfg.targetPort.ToString()}");
                     CloseSocket(ref connection);
                     CloseSocket(ref connectionUDP);
-                    Logging.Debug("Transfer " + cfg.targetHost + ":" + cfg.targetPort.ToString() + speedTester.TransferLog());
+                    Logging.Debug($"Transfer {cfg.targetHost}:{cfg.targetPort.ToString() + speedTester.TransferLog()}");
                 }
                 else
                 {
@@ -835,7 +835,7 @@ namespace Shadowsocks.Controller
                 }
             }
             speedTester.server = server.server;
-            Logging.Debug("Connect " + cfg.targetHost + ":" + cfg.targetPort.ToString() + " " + connection.GetSocket().Handle.ToString());
+            Logging.Info($"Connect {cfg.targetHost}:{cfg.targetPort.ToString()}");
 
             ResetTimeout(cfg.TTL);
             if (cfg.fouce_local_dns_query && cfg.targetHost != null)
@@ -1266,34 +1266,17 @@ namespace Shadowsocks.Controller
                 while (remoteUDPRecvBufferLength > 6)
                 {
                     int len = (remoteUDPRecvBuffer[0] << 8) + remoteUDPRecvBuffer[1];
-                    if (len >= 0xff00)
-                    {
-                        len = (remoteUDPRecvBuffer[1] << 8) + remoteUDPRecvBuffer[2] + 0xff00;
-                    }
                     if (len > remoteUDPRecvBufferLength)
                         break;
-                    if (len >= 0xff00)
-                    {
-                        byte[] buffer = new byte[len - 1];
-                        Array.Copy(remoteUDPRecvBuffer, 1, buffer, 0, len - 1);
-                        remoteUDPRecvBufferLength -= len;
-                        Array.Copy(remoteUDPRecvBuffer, len, remoteUDPRecvBuffer, 0, remoteUDPRecvBufferLength);
 
-                        buffer[0] = 0;
-                        buffer[1] = 0;
-                        buffer_list.Add(buffer);
-                    }
-                    else
-                    {
-                        byte[] buffer = new byte[len];
-                        Array.Copy(remoteUDPRecvBuffer, buffer, len);
-                        remoteUDPRecvBufferLength -= len;
-                        Array.Copy(remoteUDPRecvBuffer, len, remoteUDPRecvBuffer, 0, remoteUDPRecvBufferLength);
+                    byte[] buffer = new byte[len];
+                    Array.Copy(remoteUDPRecvBuffer, buffer, len);
+                    remoteUDPRecvBufferLength -= len;
+                    Array.Copy(remoteUDPRecvBuffer, len, remoteUDPRecvBuffer, 0, remoteUDPRecvBufferLength);
 
-                        buffer[0] = 0;
-                        buffer[1] = 0;
-                        buffer_list.Add(buffer);
-                    }
+                    buffer[0] = 0;
+                    buffer[1] = 0;
+                    buffer_list.Add(buffer);
                 }
             }
             if (buffer_list.Count == 0)
@@ -1701,21 +1684,9 @@ namespace Shadowsocks.Controller
                     {
                         if (connetionSendBuffer[0] == 0 && connetionSendBuffer[1] == 0)
                         {
-                            if (bytesRead >= 0xff00)
-                            {
-                                byte[] connetionSendBuffer2 = new byte[bytesRead + 1];
-                                Array.Copy(connetionSendBuffer, 0, connetionSendBuffer2, 1, bytesRead);
-                                connetionSendBuffer2[0] = 0xff;
-                                connetionSendBuffer2[1] = (byte)((bytesRead - 0xff00 + 1) >> 8);
-                                connetionSendBuffer2[2] = (byte)((bytesRead - 0xff00 + 1));
-                                RemoteSend(connetionSendBuffer2, bytesRead + 1);
-                            }
-                            else
-                            {
-                                connetionSendBuffer[0] = (byte)(bytesRead >> 8);
-                                connetionSendBuffer[1] = (byte)(bytesRead);
-                                RemoteSend(connetionSendBuffer, bytesRead);
-                            }
+                            connetionSendBuffer[0] = (byte)(bytesRead >> 8);
+                            connetionSendBuffer[1] = (byte)(bytesRead);
+                            RemoteSend(connetionSendBuffer, bytesRead);
                             doConnectionRecv();
                         }
                     }

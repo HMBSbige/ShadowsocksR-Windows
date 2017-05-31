@@ -254,7 +254,8 @@
             "http_simple",
             "http_post",
             "random_head",
-            "tls1.2_ticket_auth"});
+            "tls1.2_ticket_auth",
+            "tls1.2_ticket_fastauth"});
             this.ObfsCombo.Location = new System.Drawing.Point(108, 174);
             this.ObfsCombo.Margin = new System.Windows.Forms.Padding(3, 3, 3, 7);
             this.ObfsCombo.Name = "ObfsCombo";
