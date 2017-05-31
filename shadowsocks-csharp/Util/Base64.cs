@@ -27,15 +27,28 @@ namespace Shadowsocks.Util
             return data;
         }
 
-        public static string EncodeUrlSafeBase64(string val)
+        public static string EncodeUrlSafeBase64(byte[] val, bool trim)
         {
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(val)).Replace('+', '-').Replace('/', '_').TrimEnd('=');
+            if (trim)
+                return Convert.ToBase64String(val).Replace('+', '-').Replace('/', '_').TrimEnd('=');
+            else
+                return Convert.ToBase64String(val).Replace('+', '-').Replace('/', '_');
+        }
+
+        public static byte[] DecodeUrlSafeBase64ToBytes(string val)
+        {
+            var data = val.Replace('-', '+').Replace('_', '/').PadRight(val.Length + (4 - val.Length % 4) % 4, '=');
+            return Convert.FromBase64String(data);
+        }
+
+        public static string EncodeUrlSafeBase64(string val, bool trim = true)
+        {
+            return EncodeUrlSafeBase64(Encoding.UTF8.GetBytes(val), trim);
         }
 
         public static string DecodeUrlSafeBase64(string val)
         {
-            var data = val.Replace('-', '+').Replace('_', '/').PadRight(val.Length + (4 - val.Length % 4) % 4, '=');
-            return Encoding.UTF8.GetString(Convert.FromBase64String(data));
+            return Encoding.UTF8.GetString(DecodeUrlSafeBase64ToBytes(val));
         }
     }
 }

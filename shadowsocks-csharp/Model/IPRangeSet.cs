@@ -151,6 +151,10 @@ namespace Shadowsocks.Model
 
         public void Reverse()
         {
+            IPAddress addr_beg, addr_end;
+            IPAddress.TryParse("240.0.0.0", out addr_beg);
+            IPAddress.TryParse("255.255.255.255", out addr_end);
+            Insert(addr_beg, addr_end);
             for (uint i = 0; i < _set.Length; ++i)
             {
                 _set[i] = ~_set[i];

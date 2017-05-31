@@ -18,7 +18,6 @@ namespace Shadowsocks.Controller
 
         Configuration _config;
         bool _shareOverLAN;
-        bool _bypassWhiteList;
         string _authUser;
         string _authPass;
         Socket _socket;
@@ -68,7 +67,6 @@ namespace Shadowsocks.Controller
                 if (this._shareOverLAN != config.shareOverLan
                     || _authUser != config.authUser
                     || _authPass != config.authPass
-                    || _bypassWhiteList != config.bypassWhiteList
                     || _socket == null
                     || ((IPEndPoint)_socket.LocalEndPoint).Port != config.localPort)
                 {
@@ -86,7 +84,6 @@ namespace Shadowsocks.Controller
             this._shareOverLAN = config.shareOverLan;
             this._authUser = config.authUser;
             this._authPass = config.authPass;
-            this._bypassWhiteList = config.bypassWhiteList;
             _stop = false;
 
             int localPort = port == 0 ? _config.localPort : port;
@@ -124,25 +121,25 @@ namespace Shadowsocks.Controller
                     _socket_v6.Bind(localEndPointV6);
                     _socket_v6.Listen(1024);
                 }
-                try
+                //try
                 {
                     //throw new SocketException();
                     _socket.Bind(localEndPoint);
                     _socket.Listen(1024);
                 }
-                catch (SocketException e)
-                {
-                    if (_socket_v6 == null)
-                    {
-                        throw e;
-                    }
-                    else
-                    {
-                        _socket.Close();
-                        _socket = _socket_v6;
-                        _socket_v6 = null;
-                    }
-                }
+                //catch (SocketException e)
+                //{
+                //    if (_socket_v6 == null)
+                //    {
+                //        throw e;
+                //    }
+                //    else
+                //    {
+                //        _socket.Close();
+                //        _socket = _socket_v6;
+                //        _socket_v6 = null;
+                //    }
+                //}
 
                 // Start an asynchronous socket to listen for connections.
                 Console.WriteLine("ShadowsocksR started on port " + localPort.ToString());
@@ -157,8 +154,12 @@ namespace Shadowsocks.Controller
             catch (SocketException)
             {
                 _socket.Close();
+                _socket = null;
                 if (_socket_v6 != null)
+                {
                     _socket_v6.Close();
+                    _socket_v6 = null;
+                }
                 throw;
             }
         }

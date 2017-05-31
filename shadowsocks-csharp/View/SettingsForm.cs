@@ -208,11 +208,6 @@ namespace Shadowsocks.View
             {
                 return;
             }
-            if (_modifiedConfiguration.configs.Count == 0)
-            {
-                MessageBox.Show(I18N.GetString("Please add at least one server"));
-                return;
-            }
             controller.SaveServersConfig(_modifiedConfiguration);
             this.Close();
         }

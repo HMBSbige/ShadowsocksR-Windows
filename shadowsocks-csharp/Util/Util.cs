@@ -84,6 +84,27 @@ namespace Shadowsocks.Util
             temp.CopyTo(buf, 0);
         }
 
+        public static UInt32 RandUInt32()
+        {
+            byte[] temp = new byte[4];
+            RNGCryptoServiceProvider rngServiceProvider = new RNGCryptoServiceProvider();
+            rngServiceProvider.GetBytes(temp);
+            return BitConverter.ToUInt32(temp, 0);
+        }
+
+        public static void Shuffle<T>(IList<T> list, Random rng)
+        {
+            int n = list.Count;
+            while (n > 1)
+            {
+                int k = rng.Next(n);
+                n--;
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
+        }
+
         public static bool BitCompare(byte[] target, int target_offset, byte[] m, int m_offset, int targetLength)
         {
             for (int i = 0; i < targetLength; ++i)
@@ -197,6 +218,8 @@ namespace Shadowsocks.Util
             byte[] addr = ip.GetAddressBytes();
             if (addr.Length == 4)
             {
+                if (ip.Equals(new IPAddress(0)))
+                    return false;
                 string[] netmasks = new string[]
                 {
                     "0.0.0.0/8",
