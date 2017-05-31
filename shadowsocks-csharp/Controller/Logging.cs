@@ -81,18 +81,20 @@ namespace Shadowsocks.Controller
         public static void Error(object o)
         {
             Log(LogLevel.Error, o);
+            System.Diagnostics.Debug.WriteLine($@"[{DateTime.Now}] ERROR {o}");
         }
 
         public static void Info(object o)
         {
             Log(LogLevel.Info, o);
+            System.Diagnostics.Debug.WriteLine($@"[{DateTime.Now}] INFO  {o}");
         }
 
         [Conditional("DEBUG")]
         public static void Debug(object o)
         {
             Log(LogLevel.Debug, o);
-            System.Diagnostics.Debug.WriteLine($@"[{DateTime.Now}] {o}");
+            System.Diagnostics.Debug.WriteLine($@"[{DateTime.Now}] DEBUG {o}");
         }
 
         private static string ToString(StackFrame[] stacks)
