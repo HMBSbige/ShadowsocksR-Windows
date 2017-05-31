@@ -672,7 +672,11 @@ namespace Shadowsocks.View
 
         private void TextBox_Enter(object sender, EventArgs e)
         {
-            SaveOldSelectedServer();
+            int change = SaveOldSelectedServer();
+            if (change == 1)
+            {
+                LoadConfiguration(_modifiedConfiguration);
+            }
             LoadSelectedServer();
             ((TextBox)sender).SelectAll();
         }
@@ -730,7 +734,11 @@ namespace Shadowsocks.View
 
         private void checkSSRLink_CheckedChanged(object sender, EventArgs e)
         {
-            SaveOldSelectedServer();
+            int change = SaveOldSelectedServer();
+            if (change == 1)
+            {
+                LoadConfiguration(_modifiedConfiguration);
+            }
             LoadSelectedServer();
         }
 
