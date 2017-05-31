@@ -100,25 +100,12 @@ namespace Shadowsocks.Controller
             {
                 Kill();
                 string polipoConfig = Resources.privoxy_conf;
-                bool bypass = configuration.bypassWhiteList;
                 _runningPort = this.GetFreePort();
                 polipoConfig = polipoConfig.Replace("__SOCKS_PORT__", configuration.localPort.ToString());
                 polipoConfig = polipoConfig.Replace("__PRIVOXY_BIND_PORT__", _runningPort.ToString());
                 polipoConfig = polipoConfig.Replace("__PRIVOXY_BIND_IP__", "127.0.0.1");
-                polipoConfig = polipoConfig.Replace("__BYPASS_ACTION__", "actionsfile " + _subPath + "/bypass.action");
+                polipoConfig = polipoConfig.Replace("__BYPASS_ACTION__", "");
                 FileManager.ByteArrayToFile(runningPath + "/privoxy.conf", System.Text.Encoding.UTF8.GetBytes(polipoConfig));
-
-                //string bypassConfig = "{+forward-override{forward .}}\n0.[0-9]*.[0-9]*.[0-9]*/\n10.[0-9]*.[0-9]*.[0-9]*/\n127.[0-9]*.[0-9]*.[0-9]*/\n192.168.[0-9]*.[0-9]*/\n172.1[6-9].[0-9]*.[0-9]*/\n172.2[0-9].[0-9]*.[0-9]*/\n172.3[0-1].[0-9]*.[0-9]*/\n169.254.[0-9]*.[0-9]*/\n::1/\nfc00::/\nfe80::/\nlocalhost/\n";
-                string bypassConfig = "{+forward-override{forward .}}\n";
-                if (bypass)
-                {
-                    string bypass_path = Path.Combine(System.Windows.Forms.Application.StartupPath, PACServer.BYPASS_FILE);
-                    if (File.Exists(bypass_path))
-                    {
-                        bypassConfig += File.ReadAllText(bypass_path, Encoding.UTF8);
-                    }
-                }
-                FileManager.ByteArrayToFile(runningPath + "/bypass.action", System.Text.Encoding.UTF8.GetBytes(bypassConfig));
 
                 Restart();
             }

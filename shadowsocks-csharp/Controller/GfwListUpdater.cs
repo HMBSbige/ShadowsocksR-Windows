@@ -18,11 +18,7 @@ namespace Shadowsocks.Controller
 
         private const string GFWLIST_TEMPLATE_URL = "https://raw.githubusercontent.com/breakwa11/breakwa11.github.io/master/ssr/ss_gfw.pac";
 
-        private const string BYPASS_LIST_URL = "https://raw.githubusercontent.com/breakwa11/breakwa11.github.io/master/ssr/ss_bypass.action";
-
         private static string PAC_FILE = PACServer.PAC_FILE;
-
-        private static string BYPASS_FILE = PACServer.BYPASS_FILE;
 
         private static string USER_RULE_FILE = PACServer.USER_RULE_FILE;
 
@@ -31,8 +27,6 @@ namespace Shadowsocks.Controller
         private static string gfwlist_template = null;
 
         private Configuration lastConfig;
-
-        private Random random = new Random();
 
         public int update_type;
 
@@ -133,7 +127,7 @@ namespace Shadowsocks.Controller
                     if (http.BaseAddress.StartsWith(GFWLIST_URL))
                     {
                         http.BaseAddress = GFWLIST_BACKUP_URL;
-                        http.DownloadStringAsync(new Uri(GFWLIST_BACKUP_URL + "?rnd=" + random.Next().ToString()));
+                        http.DownloadStringAsync(new Uri(GFWLIST_BACKUP_URL + "?rnd=" + Util.Utils.RandUInt32().ToString()));
                     }
                     else
                     {
@@ -181,36 +175,6 @@ namespace Shadowsocks.Controller
             }
 
         }
-        private void http_DownloadBypassListCompleted(object sender, DownloadStringCompletedEventArgs e)
-        {
-            try
-            {
-                string content = e.Result;
-                if (File.Exists(BYPASS_FILE))
-                {
-                    string original = File.ReadAllText(BYPASS_FILE, Encoding.UTF8);
-                    if (original == content)
-                    {
-                        update_type = 8;
-                        UpdateCompleted(this, new ResultEventArgs(false));
-                        return;
-                    }
-                }
-                File.WriteAllText(BYPASS_FILE, content, Encoding.UTF8);
-                if (UpdateCompleted != null)
-                {
-                    update_type = 8;
-                    UpdateCompleted(this, new ResultEventArgs(true));
-                }
-            }
-            catch (Exception ex)
-            {
-                if (Error != null)
-                {
-                    Error(this, new ErrorEventArgs(ex));
-                }
-            }
-        }
 
         public void UpdatePACFromGFWList(Configuration config)
         {
@@ -225,7 +189,7 @@ namespace Shadowsocks.Controller
                 }
                 http.Proxy = proxy;
                 http.DownloadStringCompleted += http_DownloadGFWTemplateCompleted;
-                http.DownloadStringAsync(new Uri(GFWLIST_TEMPLATE_URL + "?rnd=" + random.Next().ToString()));
+                http.DownloadStringAsync(new Uri(GFWLIST_TEMPLATE_URL + "?rnd=" + Util.Utils.RandUInt32().ToString()));
             }
             else
             {
@@ -238,7 +202,7 @@ namespace Shadowsocks.Controller
                 http.Proxy = proxy;
                 http.BaseAddress = GFWLIST_URL;
                 http.DownloadStringCompleted += http_DownloadStringCompleted;
-                http.DownloadStringAsync(new Uri(GFWLIST_URL + "?rnd=" + random.Next().ToString()));
+                http.DownloadStringAsync(new Uri(GFWLIST_URL + "?rnd=" + Util.Utils.RandUInt32().ToString()));
             }
         }
 
@@ -252,20 +216,7 @@ namespace Shadowsocks.Controller
             }
             http.Proxy = proxy;
             http.DownloadStringCompleted += http_DownloadPACCompleted;
-            http.DownloadStringAsync(new Uri(url + "?rnd=" + random.Next().ToString()));
-        }
-
-        public void UpdateBypassListFromDefault(Configuration config)
-        {
-            WebClient http = new WebClient();
-            WebProxy proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
-            if (!string.IsNullOrEmpty(config.authPass))
-            {
-                proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);
-            }
-            http.Proxy = proxy;
-            http.DownloadStringCompleted += http_DownloadBypassListCompleted;
-            http.DownloadStringAsync(new Uri(BYPASS_LIST_URL + "?rnd=" + random.Next().ToString()));
+            http.DownloadStringAsync(new Uri(url + "?rnd=" + Util.Utils.RandUInt32().ToString()));
         }
 
         public List<string> ParseResult(string response)
