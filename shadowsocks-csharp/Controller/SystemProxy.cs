@@ -526,45 +526,50 @@ namespace Shadowsocks.Controller
             }
             bool global = sysProxyMode == (int)ProxyMode.Global;
             bool enabled = sysProxyMode != (int)ProxyMode.Direct;
-            //using (RegistryKey registry = OpenUserRegKey(@"Software\Microsoft\Windows\CurrentVersion\Internet Settings", true))
-            //{
-            //    try
-            //    {
-            //        if (enabled)
-            //        {
-            //            if (global)
-            //            {
-            //                RegistrySetValue(registry, "ProxyEnable", 1);
-            //                RegistrySetValue(registry, "ProxyServer", "127.0.0.1:" + config.localPort.ToString());
-            //                RegistrySetValue(registry, "AutoConfigURL", "");
-            //            }
-            //            else
-            //            {
-            //                string pacUrl;
-            //                pacUrl = "http://127.0.0.1:" + config.localPort.ToString() + "/pac?" + "auth=" + config.localAuthPassword + "&t=" + Util.Utils.GetTimestamp(DateTime.Now);
-            //                RegistrySetValue(registry, "ProxyEnable", 0);
-            //                RegistrySetValue(registry, "ProxyServer", "");
-            //                RegistrySetValue(registry, "AutoConfigURL", pacUrl);
-            //            }
-            //        }
-            //        else
-            //        {
-            //            RegistrySetValue(registry, "ProxyEnable", 0);
-            //            RegistrySetValue(registry, "ProxyServer", "");
-            //            RegistrySetValue(registry, "AutoConfigURL", "");
-            //        }
-            //        IEProxyUpdate(config, sysProxyMode);
-            //        SystemProxy.NotifyIE();
-            //        //Must Notify IE first, or the connections do not chanage
-            //        CopyProxySettingFromLan();
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        Logging.LogUsefulException(e);
-            //        // TODO this should be moved into views
-            //        //MessageBox.Show(I18N.GetString("Failed to update registry"));
-            //    }
-            //}
+            Version win8 = new Version("6.2");
+            if (Environment.OSVersion.Version.CompareTo(win8) < 0)
+            {
+                using (RegistryKey registry = OpenUserRegKey(@"Software\Microsoft\Windows\CurrentVersion\Internet Settings", true))
+                {
+                    try
+                    {
+                        if (enabled)
+                        {
+                            if (global)
+                            {
+                                RegistrySetValue(registry, "ProxyEnable", 1);
+                                RegistrySetValue(registry, "ProxyServer", "127.0.0.1:" + config.localPort.ToString());
+                                RegistrySetValue(registry, "AutoConfigURL", "");
+                            }
+                            else
+                            {
+                                string pacUrl;
+                                pacUrl = "http://127.0.0.1:" + config.localPort.ToString() + "/pac?" + "auth=" + config.localAuthPassword + "&t=" + Util.Utils.GetTimestamp(DateTime.Now);
+                                RegistrySetValue(registry, "ProxyEnable", 0);
+                                RegistrySetValue(registry, "ProxyServer", "");
+                                RegistrySetValue(registry, "AutoConfigURL", pacUrl);
+                            }
+                        }
+                        else
+                        {
+                            RegistrySetValue(registry, "ProxyEnable", 0);
+                            RegistrySetValue(registry, "ProxyServer", "");
+                            RegistrySetValue(registry, "AutoConfigURL", "");
+                        }
+                        IEProxyUpdate(config, sysProxyMode);
+                        SystemProxy.NotifyIE();
+                        //Must Notify IE first, or the connections do not chanage
+                        CopyProxySettingFromLan();
+                    }
+                    catch (Exception e)
+                    {
+                        Logging.LogUsefulException(e);
+                        // TODO this should be moved into views
+                        //MessageBox.Show(I18N.GetString("Failed to update registry"));
+                    }
+                }
+            }
+            else
             {
                 try
                 {
