@@ -145,6 +145,7 @@
     <Compile Include="Controller\Socks5Forwarder.cs" />
     <Compile Include="Controller\SpeedTest.cs" />
     <Compile Include="Controller\UpdateChecker.cs" />
+    <Compile Include="Controller\UpdateFreeNode.cs" />
     <Compile Include="Encryption\EncryptorBase.cs" />
     <Compile Include="Encryption\EncryptorFactory.cs" />
     <Compile Include="Encryption\IVEncryptor.cs" />
@@ -239,6 +240,12 @@
     <Compile Include="View\ShowTextForm.Designer.cs">
       <DependentUpon>ShowTextForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="View\SubscribeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\SubscribeForm.Designer.cs">
+      <DependentUpon>SubscribeForm.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="View\ConfigForm.resx">
       <DependentUpon>ConfigForm.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -268,6 +275,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\ShowTextForm.resx">
       <DependentUpon>ShowTextForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\SubscribeForm.resx">
+      <DependentUpon>SubscribeForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="app.manifest">

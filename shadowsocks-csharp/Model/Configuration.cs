@@ -75,7 +75,6 @@ namespace Shadowsocks.Model
         public bool random;
         public int sysProxyMode;
         public bool shareOverLan;
-        public bool bypassWhiteList;
         public int localPort;
         public string localAuthPassword;
 
@@ -107,6 +106,11 @@ namespace Shadowsocks.Model
 
         public bool isHideTips;
 
+        public string nodeFeedURL;
+        public string nodeFeedGroup;
+        public string nodeFeedDecodePass;
+        public bool nodeFeedAutoUpdate;
+
         public Dictionary<string, string> token = new Dictionary<string, string>();
         public Dictionary<string, PortMapConfig> portMap = new Dictionary<string, PortMapConfig>();
 
@@ -116,6 +120,7 @@ namespace Shadowsocks.Model
         private Dictionary<int, PortMapConfigCache> portMapCache = new Dictionary<int, PortMapConfigCache>();
 
         private static string CONFIG_FILE = "gui-config.json";
+        private static string DEFAULT_SERVER = "ssr://bm9naWNhdC5uZXQ6NDQzOmF1dGhfYWVzMTI4X21kNTpyYzQtbWQ1LTY6dGxzMS4yX3RpY2tldF9hdXRoOlJHMHRhMWg3SzJ3Lz9vYmZzcGFyYW09Ym05bmFXTmhkQzV1WlhRJnByb3RvcGFyYW09TWpBd01EQXhPaXR0TkRoaU1XdEImcmVtYXJrcz1ibTluYVdOaGRDNXVaWFEmZ3JvdXA9Um5KbFpWTlRVaTF3ZFdKc2FXTQ";
 
         public static void SetPassword(string password)
         {
@@ -365,10 +370,22 @@ namespace Shadowsocks.Model
         {
             index = 0;
             localPort = 1080;
+
             reconnectTimes = 2;
             keepVisitTime = 180;
             connect_timeout = 5;
             dns_server = "";
+
+            randomAlgorithm = (int)ServerSelectStrategy.SelectAlgorithm.LowException;
+            random = true;
+            sysProxyMode = (int)ProxyMode.Global;
+            proxyRuleMode = (int)ProxyRuleMode.BypassLanAndChina;
+
+            nodeFeedURL = "https://raw.githubusercontent.com/breakwa11/breakwa11.github.io/master/free/freenode.txt";
+            nodeFeedGroup = "";
+            nodeFeedDecodePass = "ShadowsocksR";
+            nodeFeedAutoUpdate = true;
+
             configs = new List<Server>()
             {
                 GetDefaultServer()
@@ -382,7 +399,6 @@ namespace Shadowsocks.Model
             random = config.random;
             sysProxyMode = config.sysProxyMode;
             shareOverLan = config.shareOverLan;
-            bypassWhiteList = config.bypassWhiteList;
             localPort = config.localPort;
             reconnectTimes = config.reconnectTimes;
             randomAlgorithm = config.randomAlgorithm;
@@ -404,6 +420,10 @@ namespace Shadowsocks.Model
             sameHostForSameTarget = config.sameHostForSameTarget;
             keepVisitTime = config.keepVisitTime;
             isHideTips = config.isHideTips;
+            nodeFeedURL = config.nodeFeedURL;
+            nodeFeedGroup = config.nodeFeedGroup;
+            nodeFeedDecodePass = config.nodeFeedDecodePass;
+            nodeFeedAutoUpdate = config.nodeFeedAutoUpdate;
         }
 
         public void FixConfiguration()
@@ -553,7 +573,7 @@ namespace Shadowsocks.Model
 
         public static Server GetDefaultServer()
         {
-            return new Server();
+            return new Server(DEFAULT_SERVER, null);
         }
 
         public bool isDefaultConfig()
@@ -561,6 +581,18 @@ namespace Shadowsocks.Model
             if (configs.Count == 1 && configs[0].server == Configuration.GetDefaultServer().server)
                 return true;
             return false;
+        }
+
+        public bool isAllFreeNode()
+        {
+            if (String.IsNullOrEmpty(nodeFeedGroup))
+                return false;
+            for (int i = 0; i < configs.Count; ++i)
+            {
+                if (configs[i].group != nodeFeedGroup)
+                    return false;
+            }
+            return true;
         }
 
         public static Server CopyServer(Server server)

@@ -316,7 +316,7 @@ namespace Shadowsocks.Model
             this.id = BitConverter.ToString(id).Replace("-", "");
         }
 
-        public Server(string ssURL) : this()
+        public Server(string ssURL, string force_group) : this()
         {
             if (ssURL.StartsWith("ss://", StringComparison.OrdinalIgnoreCase))
             {
@@ -324,7 +324,7 @@ namespace Shadowsocks.Model
             }
             else if (ssURL.StartsWith("ssr://", StringComparison.OrdinalIgnoreCase))
             {
-                ServerFromSSR(ssURL);
+                ServerFromSSR(ssURL, force_group);
             }
             else
             {
@@ -350,7 +350,7 @@ namespace Shadowsocks.Model
             return params_dict;
         }
 
-        public void ServerFromSSR(string ssrURL)
+        public void ServerFromSSR(string ssrURL, string force_group)
         {
             // ssr://host:port:protocol:method:obfs:base64pass/?obfsparam=base64&remarks=base64&group=base64&udpport=0&uot=1
             Match ssr = Regex.Match(ssrURL, "ssr://([A-Za-z0-9_-]+)", RegexOptions.IgnoreCase);
@@ -420,6 +420,8 @@ namespace Shadowsocks.Model
             {
                 server_udp_port = int.Parse(params_dict["udpport"]);
             }
+            if (!String.IsNullOrEmpty(force_group))
+                group = force_group;
         }
 
         public void ServerFromSS(string ssURL)

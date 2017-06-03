@@ -214,17 +214,24 @@ namespace Shadowsocks.Controller
             _config.FlushPortMapCache();
         }
 
-        public bool AddServerBySSURL(string ssURL)
+        public bool AddServerBySSURL(string ssURL, string force_group = null, bool toLast = false)
         {
             if (ssURL.StartsWith("ss://", StringComparison.OrdinalIgnoreCase) || ssURL.StartsWith("ssr://", StringComparison.OrdinalIgnoreCase))
             {
                 try
                 {
-                    var server = new Server(ssURL);
-                    int index = _config.index + 1;
-                    if (index < 0 || index > _config.configs.Count)
-                        index = _config.configs.Count;
-                    _config.configs.Insert(index, server);
+                    var server = new Server(ssURL, force_group);
+                    if (toLast)
+                    {
+                        _config.configs.Add(server);
+                    }
+                    else
+                    {
+                        int index = _config.index + 1;
+                        if (index < 0 || index > _config.configs.Count)
+                            index = _config.configs.Count;
+                        _config.configs.Insert(index, server);
+                    }
                     SaveConfig(_config);
                     return true;
                 }
@@ -258,12 +265,6 @@ namespace Shadowsocks.Controller
             {
                 ToggleRuleModeChanged(this, new EventArgs());
             }
-        }
-
-        public void ToggleBypass(bool bypass)
-        {
-            _config.bypassWhiteList = bypass;
-            SaveConfig(_config);
         }
 
         public void ToggleSelectRandom(bool enabled)
@@ -363,14 +364,6 @@ namespace Shadowsocks.Controller
             if (gfwListUpdater != null)
             {
                 gfwListUpdater.UpdatePACFromGFWList(_config, url);
-            }
-        }
-
-        public void UpdateBypassListFromDefault()
-        {
-            if (gfwListUpdater != null)
-            {
-                gfwListUpdater.UpdateBypassListFromDefault(_config);
             }
         }
 
