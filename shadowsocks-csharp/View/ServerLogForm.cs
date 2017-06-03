@@ -544,7 +544,13 @@ namespace Shadowsocks.View
                             else if (cell.Tag != null)
                             {
                                 cell.Tag = (int)cell.Tag - 1;
-                                if ((int)cell.Tag == 0) SetBackColor(cell, Color.FromArgb(0xf0, 0xf0, 0xff));
+                                if ((int)cell.Tag == 0)
+                                {
+                                    if (fullVal == "0")
+                                        SetBackColor(cell, Color.FromArgb(0xff, 0x80, 0x80));
+                                    else
+                                        SetBackColor(cell, Color.FromArgb(0xf0, 0xf0, 0xff));
+                                }
                                 //Color col = cell.Style.BackColor;
                                 //SetBackColor(cell, Color.FromArgb(Math.Min(255, col.R + colAdd), Math.Min(255, col.G + colAdd), Math.Min(255, col.B + colAdd)));
                             }
