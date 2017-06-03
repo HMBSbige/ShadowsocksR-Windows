@@ -13,7 +13,7 @@ namespace Shadowsocks.Controller
 {
     public class UpdateChecker
     {
-        private const string UpdateURL = "https://breakwa11.github.io/update/ssr-win-4.0.xml";
+        private const string UpdateURL = "https://raw.githubusercontent.com/breakwa11/breakwa11.github.io/master/update/ssr-win-4.0.xml";
 
         public string LatestVersionNumber;
         public string LatestVersionURL;
@@ -21,7 +21,7 @@ namespace Shadowsocks.Controller
 
         public const string Name = "ShadowsocksR";
         public const string Copyright = "Copyright © BreakWa11 2017. Fork from Shadowsocks by clowwindy";
-        public const string Version = "4.3.1";
+        public const string Version = "4.4.0";
 #if !_DOTNET_4_0
         public const string NetVer = "2.0";
 #elif !_CONSOLE
@@ -63,7 +63,7 @@ namespace Shadowsocks.Controller
                 }
                 //UseProxy = !UseProxy;
                 http.DownloadStringCompleted += http_DownloadStringCompleted;
-                http.DownloadStringAsync(new Uri(UpdateURL));
+                http.DownloadStringAsync(new Uri(UpdateURL + "?rnd=" + Util.Utils.RandUInt32().ToString()));
             }
             catch (Exception e)
             {
