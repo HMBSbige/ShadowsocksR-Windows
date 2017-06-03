@@ -388,11 +388,14 @@ namespace Shadowsocks.View
                         Util.Utils.Shuffle(urls, r);
                         urls.RemoveRange(max_node_num, urls.Count - max_node_num);
                     }
-                    for (int i = config.configs.Count - 1; i >= 0; --i)
+                    if (!String.IsNullOrEmpty(config.nodeFeedGroup))
                     {
-                        if (config.configs[i].group == config.nodeFeedGroup)
+                        for (int i = config.configs.Count - 1; i >= 0; --i)
                         {
-                            config.configs.RemoveAt(i);
+                            if (config.configs[i].group == config.nodeFeedGroup)
+                            {
+                                config.configs.RemoveAt(i);
+                            }
                         }
                     }
                     foreach (string url in urls)
