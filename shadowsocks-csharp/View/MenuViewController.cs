@@ -372,9 +372,10 @@ namespace Shadowsocks.View
                 }
                 URL_Split(updateFreeNodeChecker.FreeNodeResult, ref urls);
                 int count = 0;
-                if (urls.Count == 1 && !urls[0].StartsWith("ss"))
+                for (int i = urls.Count - 1; i >= 0; --i)
                 {
-                    return;
+                    if (!urls[i].StartsWith("ss"))
+                        urls.RemoveAt(i);
                 }
                 if (urls.Count > 0)
                 {
