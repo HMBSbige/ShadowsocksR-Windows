@@ -320,7 +320,7 @@ namespace Shadowsocks.Model
         {
             if (ssURL.StartsWith("ss://", StringComparison.OrdinalIgnoreCase))
             {
-                ServerFromSS(ssURL);
+                ServerFromSS(ssURL, force_group);
             }
             else if (ssURL.StartsWith("ssr://", StringComparison.OrdinalIgnoreCase))
             {
@@ -330,6 +330,23 @@ namespace Shadowsocks.Model
             {
                 throw new FormatException();
             }
+        }
+
+        public bool isMatchServer(Server server)
+        {
+            if (this.server == server.server
+                && server_port == server.server_port
+                && server_udp_port == server.server_udp_port
+                && method == server.method
+                && protocol == server.protocol
+                && protocolparam == server.protocolparam
+                && obfs == server.obfs
+                && obfsparam == server.obfsparam
+                && password == server.password
+                && udp_over_tcp == server.udp_over_tcp
+                )
+                return true;
+            return false;
         }
 
         private Dictionary<string, string> ParseParam(string param_str)
@@ -424,7 +441,7 @@ namespace Shadowsocks.Model
                 group = force_group;
         }
 
-        public void ServerFromSS(string ssURL)
+        public void ServerFromSS(string ssURL, string force_group)
         {
             Regex UrlFinder = new Regex("^(?i)ss://([A-Za-z0-9+-/=_]+)(#(.+))?", RegexOptions.IgnoreCase),
                 DetailsParser = new Regex("^((?<method>.+):(?<password>.*)@(?<hostname>.+?)" +
@@ -442,6 +459,8 @@ namespace Shadowsocks.Model
             password = match.Groups["password"].Value;
             server = match.Groups["hostname"].Value;
             server_port = int.Parse(match.Groups["port"].Value);
+            if (!String.IsNullOrEmpty(force_group))
+                group = force_group;
         }
 
         public string GetSSLinkForServer()

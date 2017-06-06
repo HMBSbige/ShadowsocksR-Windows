@@ -112,17 +112,7 @@ namespace Shadowsocks.Controller
         {
             for (int i = 0; i < servers.Count; ++i)
             {
-                if (servers[i].server == server.server
-                    && servers[i].server_port == server.server_port
-                    && servers[i].server_udp_port == server.server_udp_port
-                    && servers[i].method == server.method
-                    && servers[i].protocol == server.protocol
-                    && servers[i].protocolparam == server.protocolparam
-                    && servers[i].obfs == server.obfs
-                    && servers[i].obfsparam == server.obfsparam
-                    && servers[i].password == server.password
-                    && servers[i].udp_over_tcp == server.udp_over_tcp
-                    )
+                if (server.isMatchServer(servers[i]))
                 {
                     return i;
                 }

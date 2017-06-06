@@ -108,7 +108,6 @@ namespace Shadowsocks.Model
 
         public string nodeFeedURL;
         public string nodeFeedGroup;
-        public string nodeFeedDecodePass;
         public bool nodeFeedAutoUpdate;
 
         public Dictionary<string, string> token = new Dictionary<string, string>();
@@ -121,6 +120,8 @@ namespace Shadowsocks.Model
 
         private static string CONFIG_FILE = "gui-config.json";
         private static string DEFAULT_SERVER = "ssr://bm9naWNhdC5uZXQ6NDQzOmF1dGhfYWVzMTI4X21kNTpyYzQtbWQ1LTY6dGxzMS4yX3RpY2tldF9hdXRoOlJHMHRhMWg3SzJ3Lz9vYmZzcGFyYW09Ym05bmFXTmhkQzV1WlhRJnByb3RvcGFyYW09TWpBd01EQXhPaXR0TkRoaU1XdEImcmVtYXJrcz1ibTluYVdOaGRDNXVaWFEmZ3JvdXA9Um5KbFpWTlRVaTF3ZFdKc2FXTQ";
+        private static string DEFAULT_FEED_URL = "https://raw.githubusercontent.com/breakwa11/breakwa11.github.io/master/free/freenodeplain.txt";
+        private static string OLD_DEFAULT_FEED_URL = "https://raw.githubusercontent.com/breakwa11/breakwa11.github.io/master/free/freenode.txt";
 
         public static void SetPassword(string password)
         {
@@ -381,9 +382,8 @@ namespace Shadowsocks.Model
             sysProxyMode = (int)ProxyMode.Global;
             proxyRuleMode = (int)ProxyRuleMode.BypassLanAndChina;
 
-            nodeFeedURL = "https://raw.githubusercontent.com/breakwa11/breakwa11.github.io/master/free/freenode.txt";
+            nodeFeedURL = DEFAULT_FEED_URL;
             nodeFeedGroup = "";
-            nodeFeedDecodePass = "ShadowsocksR";
             nodeFeedAutoUpdate = true;
 
             configs = new List<Server>()
@@ -422,7 +422,6 @@ namespace Shadowsocks.Model
             isHideTips = config.isHideTips;
             nodeFeedURL = config.nodeFeedURL;
             nodeFeedGroup = config.nodeFeedGroup;
-            nodeFeedDecodePass = config.nodeFeedDecodePass;
             nodeFeedAutoUpdate = config.nodeFeedAutoUpdate;
         }
 
@@ -454,6 +453,10 @@ namespace Shadowsocks.Model
             if (localAuthPassword == null || localAuthPassword.Length < 16)
             {
                 localAuthPassword = randString(20);
+            }
+            if (nodeFeedURL == OLD_DEFAULT_FEED_URL)
+            {
+                nodeFeedURL = DEFAULT_FEED_URL;
             }
 
             Dictionary<string, int> id = new Dictionary<string, int>();

@@ -90,7 +90,7 @@ namespace Shadowsocks.View
                     CreateMenuItem("Clear &Selected Total", new EventHandler(this.ClearSelectedTotal_Click)),
                     CreateMenuItem("Clear &Total", new EventHandler(this.ClearTotal_Click)),
                 }),
-                CreateMenuGroup("C&opy", new MenuItem[] {
+                CreateMenuGroup("Port &out", new MenuItem[] {
                     CreateMenuItem("Copy current link", new EventHandler(this.copyLinkItem_Click)),
                     CreateMenuItem("Copy current group links", new EventHandler(this.copyGroupLinkItem_Click)),
                     CreateMenuItem("Copy all enable links", new EventHandler(this.copyEnableLinksItem_Click)),
@@ -385,7 +385,7 @@ namespace Shadowsocks.View
                         else if (columnName == "AvgLatency")
                         {
                             if (serverSpeedLog.avgConnectTime >= 0)
-                                SetCellText(cell, serverSpeedLog.avgConnectTime);
+                                SetCellText(cell, serverSpeedLog.avgConnectTime / 1000);
                             else
                                 SetCellText(cell, "-");
                         }

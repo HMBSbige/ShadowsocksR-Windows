@@ -56,7 +56,6 @@ namespace Shadowsocks.View
         {
             textBoxURL.Text = _modifiedConfiguration.nodeFeedURL;
             textBoxGroup.Text = _modifiedConfiguration.nodeFeedGroup;
-            textBoxDecodeKey.Text = _modifiedConfiguration.nodeFeedDecodePass;
             checkBoxAutoUpdate.Checked = _modifiedConfiguration.nodeFeedAutoUpdate;
         }
 
@@ -64,7 +63,6 @@ namespace Shadowsocks.View
         {
             _modifiedConfiguration.nodeFeedURL = textBoxURL.Text;
             _modifiedConfiguration.nodeFeedGroup = textBoxGroup.Text;
-            _modifiedConfiguration.nodeFeedDecodePass = textBoxDecodeKey.Text;
             _modifiedConfiguration.nodeFeedAutoUpdate = checkBoxAutoUpdate.Checked;
             return 0;
         }

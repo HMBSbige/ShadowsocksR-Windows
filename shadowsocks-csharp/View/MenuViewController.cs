@@ -240,7 +240,7 @@ namespace Shadowsocks.View
                     CreateMenuItem("Edit servers...", new EventHandler(this.Config_Click)),
                     CreateMenuItem("Import servers from file...", new EventHandler(this.Import_Click)),
                     new MenuItem("-"),
-                    CreateMenuItem("Subscribe setting", new EventHandler(this.SubscribeSetting_Click)),
+                    CreateMenuItem("Subscribe setting...", new EventHandler(this.SubscribeSetting_Click)),
                     CreateMenuItem("Update subscribe SSR node", new EventHandler(this.CheckNodeUpdate_Click)),
                     CreateMenuItem("Update subscribe SSR node(bypass proxy)", new EventHandler(this.CheckNodeUpdateBypassProxy_Click)),
                     new MenuItem("-"),
@@ -325,33 +325,19 @@ namespace Shadowsocks.View
 
         void updateFreeNodeChecker_NewFreeNodeFound(object sender, EventArgs e)
         {
-            if (updateFreeNodeChecker.FreeNodeResult != null)
+            if (!String.IsNullOrEmpty(updateFreeNodeChecker.FreeNodeResult))
             {
                 List<string> urls = new List<string>();
                 updateFreeNodeChecker.FreeNodeResult.TrimEnd('\r', '\n', ' ');
                 Configuration config = controller.GetCurrentConfiguration();
+                Server selected_server = null;
+                if (config.index >= 0 && config.index < config.configs.Count)
+                {
+                    selected_server = config.configs[config.index];
+                }
                 try
                 {
-                    byte[] bytes = Util.Base64.DecodeBase64ToBytes(updateFreeNodeChecker.FreeNodeResult);
-                    if (!String.IsNullOrEmpty(config.nodeFeedDecodePass))
-                    {
-                        try
-                        {
-                            Encryption.IEncryptor encryptor = Encryption.EncryptorFactory.GetEncryptor("aes-256-cfb", config.nodeFeedDecodePass);
-                            byte[] outbytes = new byte[bytes.Length];
-                            int outlength;
-                            encryptor.Decrypt(bytes, bytes.Length, outbytes, out outlength);
-                            updateFreeNodeChecker.FreeNodeResult = Encoding.UTF8.GetString(outbytes, 0, outlength);
-                        }
-                        catch
-                        {
-
-                        }
-                    }
-                    else
-                    {
-                        updateFreeNodeChecker.FreeNodeResult = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-                    }
+                    updateFreeNodeChecker.FreeNodeResult = Util.Base64.DecodeBase64(updateFreeNodeChecker.FreeNodeResult);
                 }
                 catch
                 {
@@ -389,46 +375,85 @@ namespace Shadowsocks.View
                         Util.Utils.Shuffle(urls, r);
                         urls.RemoveRange(max_node_num, urls.Count - max_node_num);
                     }
-                    if (!String.IsNullOrEmpty(config.nodeFeedGroup))
+                    foreach (string url in urls)
                     {
-                        for (int i = config.configs.Count - 1; i >= 0; --i)
+                        try // try get group name
                         {
-                            if (config.configs[i].group == config.nodeFeedGroup)
+                            Server server = new Server(url, null);
+                            if (!String.IsNullOrEmpty(server.group))
                             {
-                                config.configs.RemoveAt(i);
+                                config.nodeFeedGroup = server.group;
+                                break;
                             }
                         }
+                        catch
+                        { }
                     }
+                    if (String.IsNullOrEmpty(config.nodeFeedGroup))
+                    {
+                        config.nodeFeedGroup = config.nodeFeedURL;
+                    }
+
+                    for (int i = config.configs.Count - 1; i >= 0; --i)
+                    {
+                        if (config.configs[i].id == selected_server.id && config.nodeFeedGroup == selected_server.group)
+                        {
+                            urls.RemoveAt(0);
+                        }
+                        if (config.configs[i].id != selected_server.id && config.configs[i].group == config.nodeFeedGroup)
+                        {
+                            config.configs.RemoveAt(i);
+                        }
+                    }
+                    controller.SaveServersConfig(config);
                     foreach (string url in urls)
                     {
                         if (controller.AddServerBySSURL(url, config.nodeFeedGroup, true))
                             ++count;
                     }
-                    if (String.IsNullOrEmpty(config.nodeFeedGroup))
+                    config = controller.GetCurrentConfiguration();
+                    if (selected_server != null)
                     {
-                        config = controller.GetCurrentConfiguration();
-                        int index = config.configs.Count - count;
-                        config.nodeFeedGroup = config.configs[index].group;
-                        if (!String.IsNullOrEmpty(config.nodeFeedGroup))
+                        bool match = false;
+                        for (int i = config.configs.Count - 1; i >= 0; --i)
                         {
-                            for (int i = index - 1; i >= 0; --i)
+                            if (config.configs[i].id == selected_server.id)
                             {
-                                if (config.configs[i].group == config.nodeFeedGroup)
+                                config.index = i;
+                                match = true;
+                                break;
+                            }
+                            else if (config.configs[i].group == selected_server.group)
+                            {
+                                if (config.configs[i].isMatchServer(selected_server))
                                 {
-                                    config.configs.RemoveAt(i);
+                                    config.index = i;
+                                    match = true;
+                                    break;
                                 }
                             }
-                            controller.SaveServersConfig(config);
+                        }
+                        if (!match)
+                        {
+                            config.index = config.configs.Count - 1;
                         }
                     }
+                    else
+                    {
+                        config.index = config.configs.Count - 1;
+                    }
+                    controller.SaveServersConfig(config);
+
                     if (count > 0)
+                    {
                         ShowBalloonTip(I18N.GetString("Success"),
                             I18N.GetString("Update subscribe SSR node success"), ToolTipIcon.Info, 10000);
-                    else
-                        ShowBalloonTip(I18N.GetString("Error"),
-                            I18N.GetString("Update subscribe SSR node failure"), ToolTipIcon.Info, 10000);
+                        return;
+                    }
                 }
             }
+            ShowBalloonTip(I18N.GetString("Error"),
+                I18N.GetString("Update subscribe SSR node failure"), ToolTipIcon.Info, 10000);
         }
 
         void updateChecker_NewVersionFound(object sender, EventArgs e)
@@ -1001,6 +1026,10 @@ namespace Shadowsocks.View
 
         private void URL_Split(string text, ref List<string> out_urls)
         {
+            if (String.IsNullOrEmpty(text))
+            {
+                return;
+            }
             int ss_index = text.IndexOf("ss://", 1, StringComparison.OrdinalIgnoreCase);
             int ssr_index = text.IndexOf("ssr://", 1, StringComparison.OrdinalIgnoreCase);
             int index = ss_index;

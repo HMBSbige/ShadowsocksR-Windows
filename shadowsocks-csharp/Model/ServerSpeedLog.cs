@@ -46,7 +46,6 @@ namespace Shadowsocks.Model
         public long totalUploadBytes;
         public long totalDownloadBytes;
         public long totalDownloadRawBytes;
-        public int sumConnectTime;
         public long avgConnectTime;
         public long avgDownloadBytes;
         public long maxDownloadBytes;
@@ -69,8 +68,7 @@ namespace Shadowsocks.Model
         private List<TransLog> upTransLog = new List<TransLog>();
         private long maxTransDownload = 0;
         private long maxTransUpload = 0;
-        private List<int> connectTime = null;
-        private int sumConnectTime = 0;
+        private int avgConnectTime = -1;
         //private List<TransLog> speedLog = null;
         private LinkedList<ErrorLog> errList = new LinkedList<ErrorLog>();
 
@@ -121,7 +119,6 @@ namespace Shadowsocks.Model
                 ret.totalUploadBytes = transUpload;
                 ret.totalDownloadBytes = transDownload;
                 ret.totalDownloadRawBytes = transDownloadRaw;
-                ret.sumConnectTime = sumConnectTime;
             }
             return ret;
         }
@@ -282,30 +279,7 @@ namespace Shadowsocks.Model
         {
             get
             {
-                lock (this)
-                {
-                    if (connectTime != null)
-                    {
-                        if (connectTime.Count > 4)
-                        {
-                            List<int> sTime = new List<int>();
-                            foreach (int t in connectTime)
-                            {
-                                sTime.Add(t);
-                            }
-                            sTime.Sort();
-                            int sum = 0;
-                            for (int i = 0; i < connectTime.Count / 2; ++i)
-                            {
-                                sum += sTime[i];
-                            }
-                            return sum / (connectTime.Count / 2);
-                        }
-                        if (connectTime.Count > 0)
-                            return sumConnectTime / connectTime.Count;
-                    }
-                    return -1;
-                }
+                return avgConnectTime;
             }
         }
         public void ClearError()
@@ -579,14 +553,22 @@ namespace Shadowsocks.Model
         {
             lock (this)
             {
-                if (connectTime == null)
-                    connectTime = new List<int>();
-                connectTime.Add(millisecond);
-                sumConnectTime += millisecond;
-                while (connectTime.Count > 20)
+                if (millisecond == 0)
                 {
-                    sumConnectTime -= connectTime[0];
-                    connectTime.RemoveAt(0);
+                    millisecond = 10;
+                }
+                else
+                {
+                    millisecond *= 1000;
+                }
+                if (avgConnectTime == -1)
+                {
+                    avgConnectTime = millisecond;
+                }
+                else
+                {
+                    double a = 2.0 / (1 + 16);
+                    avgConnectTime = (int)(0.5 + avgConnectTime * (1 - a) + a * millisecond);
                 }
             }
         }

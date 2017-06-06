@@ -527,7 +527,7 @@ namespace Shadowsocks.Controller
             bool global = sysProxyMode == (int)ProxyMode.Global;
             bool enabled = sysProxyMode != (int)ProxyMode.Direct;
             Version win8 = new Version("6.2");
-            if (Environment.OSVersion.Version.CompareTo(win8) < 0)
+            //if (Environment.OSVersion.Version.CompareTo(win8) < 0)
             {
                 using (RegistryKey registry = OpenUserRegKey(@"Software\Microsoft\Windows\CurrentVersion\Internet Settings", true))
                 {
@@ -569,7 +569,7 @@ namespace Shadowsocks.Controller
                     }
                 }
             }
-            else
+            if (Environment.OSVersion.Version.CompareTo(win8) >= 0)
             {
                 try
                 {
