@@ -33,6 +33,7 @@ namespace Shadowsocks.View
         private MenuItem clearItem;
         private List<int> listOrder = new List<int>();
         private int lastRefreshIndex = 0;
+        private bool firstDispley = true;
         private bool rowChange = false;
         private int updatePause = 0;
         private int updateTick = 0;
@@ -312,13 +313,19 @@ namespace Shadowsocks.View
                     }
                 }
             }
+            int displayBeginIndex = ServerDataGrid.FirstDisplayedScrollingRowIndex;
+            int displayEndIndex = displayBeginIndex + ServerDataGrid.DisplayedRowCount(true);
             try
             {
                 for (int list_index = (lastRefreshIndex >= ServerDataGrid.RowCount) ? 0 : lastRefreshIndex, rowChangeCnt = 0;
-                    list_index < ServerDataGrid.RowCount && rowChangeCnt <= 200;
-                    ++list_index, ++rowChangeCnt)
+                    list_index < ServerDataGrid.RowCount && rowChangeCnt <= 100;
+                    ++list_index)
                 {
                     lastRefreshIndex = list_index + 1;
+                    if (list_index < displayBeginIndex || list_index >= displayEndIndex)
+                        continue;
+                    ++rowChangeCnt;
+
                     DataGridViewCell id_cell = ServerDataGrid[0, list_index];
                     int id = (int)id_cell.Value;
                     Server server = config.configs[id];
@@ -605,16 +612,6 @@ namespace Shadowsocks.View
                                 SetCellText(cell, "-");
                             }
                         }
-                        if (columnName == "Server")
-                        {
-                            if (cell.Style.Alignment != DataGridViewContentAlignment.MiddleLeft)
-                                cell.Style.Alignment = DataGridViewContentAlignment.MiddleLeft;
-                        }
-                        else
-                        {
-                            if (cell.Style.Alignment != DataGridViewContentAlignment.MiddleRight)
-                                cell.Style.Alignment = DataGridViewContentAlignment.MiddleRight;
-                        }
                     }
                     if (rowChange)
                         rowChangeCnt++;
@@ -632,6 +629,11 @@ namespace Shadowsocks.View
             if (last_rowcount == 0 && config.index >= 0 && config.index < ServerDataGrid.RowCount)
             {
                 ServerDataGrid[0, config.index].Selected = true;
+            }
+            if (firstDispley)
+            {
+                ServerDataGrid.FirstDisplayedScrollingRowIndex = Math.Max(0, config.index - ServerDataGrid.DisplayedRowCount(true) / 2);
+                firstDispley = false;
             }
         }
 

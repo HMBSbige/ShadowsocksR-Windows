@@ -88,7 +88,7 @@ namespace Shadowsocks.View
             LoadCurrentConfiguration();
 
             Configuration cfg = controller.GetCurrentConfiguration();
-            if (cfg.isDefaultConfig() || cfg.nodeFeedAutoUpdate || cfg.isAllFreeNode())
+            if (cfg.isDefaultConfig() || cfg.nodeFeedAutoUpdate)
             {
                 updateFreeNodeChecker.CheckUpdate(controller.GetCurrentConfiguration(), !cfg.isDefaultConfig());
             }
@@ -398,7 +398,33 @@ namespace Shadowsocks.View
                     {
                         if (config.configs[i].id == selected_server.id && config.nodeFeedGroup == selected_server.group)
                         {
-                            urls.RemoveAt(0);
+                            bool match = false;
+                            for (int j = 0; j < urls.Count; ++j)
+                            {
+                                try // try get group name
+                                {
+                                    Server server = new Server(urls[j], null);
+                                    {
+                                        if (selected_server.isMatchServer(server))
+                                        {
+                                            match = true;
+                                            urls.RemoveAt(j);
+                                            break;
+                                        }
+                                    }
+                                }
+                                catch
+                                { }
+                            }
+                            if (match)
+                            {
+                                config.configs.RemoveAt(i);
+                                config.configs.Add(selected_server);
+                            }
+                            else
+                            {
+                                urls.RemoveAt(0);
+                            }
                         }
                         if (config.configs[i].id != selected_server.id && config.configs[i].group == config.nodeFeedGroup)
                         {

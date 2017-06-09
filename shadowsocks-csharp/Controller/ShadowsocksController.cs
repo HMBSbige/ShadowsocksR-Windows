@@ -144,7 +144,9 @@ namespace Shadowsocks.Controller
                     int i = FindFirstMatchServer(servers[j], mergeConfig.configs);
                     if (i != -1)
                     {
+                        bool enable = servers[j].enable;
                         servers[j].CopyServer(mergeConfig.configs[i]);
+                        servers[j].enable = enable;
                     }
                 }
             }

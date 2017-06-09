@@ -63,7 +63,7 @@ Down=下移
 
 New server=未配置的伺服器
 
-Server=伺服器(截圖注意打碼)
+Server=伺服器(截圖打碼)
 Server IP=伺服器 IP
 Server Port=伺服器連接埠
 UDP Port=UDP連接埠

@@ -421,7 +421,10 @@ namespace Shadowsocks.View
         public void SetServerListSelectedIndex(int index)
         {
             ServersListBox.ClearSelected();
-            ServersListBox.SelectedIndex = index;
+            if (index < ServersListBox.Items.Count)
+                ServersListBox.SelectedIndex = index;
+            else
+                _oldSelectedIndex = ServersListBox.SelectedIndex;
         }
 
         private void LoadCurrentConfiguration()
