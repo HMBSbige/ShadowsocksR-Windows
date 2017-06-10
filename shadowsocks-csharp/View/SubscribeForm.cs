@@ -33,7 +33,12 @@ namespace Shadowsocks.View
 
         private void UpdateTexts()
         {
-
+            this.Text = I18N.GetString("Subscribe Settings");
+            label1.Text = I18N.GetString("URL");
+            label2.Text = I18N.GetString("Group name");
+            checkBoxAutoUpdate.Text = I18N.GetString("Auto update");
+            buttonOK.Text = I18N.GetString("OK");
+            buttonCancel.Text = I18N.GetString("Cancel");
         }
 
         private void SubscribeForm_FormClosed(object sender, FormClosedEventArgs e)

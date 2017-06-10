@@ -162,6 +162,7 @@ Please input PAC Url=請輸入 PAC 網址
 # InputPassword Form
 
 InputPassword=輸入密碼
+Parse gui-config.json error, maybe require password to decrypt=解析 gui-config.json 出錯, 可能需要密碼解密
 
 # ResetPassword Form
 
@@ -185,6 +186,13 @@ Proxy With Rule=規則代理
 #Cancel=
 #&Add=
 #&Delete=
+
+# SubscribeForm Form
+
+Subscribe Settings=訂閱設置
+URL=網址
+Group name=組名
+Auto update=自動更新
 
 # Messages
 

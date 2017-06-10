@@ -66,8 +66,10 @@ namespace Shadowsocks
                     if (try_times >= 5)
                         return;
                     InputPassword dlg = new InputPassword();
-                    dlg.ShowDialog();
-                    Configuration.SetPassword(dlg.password);
+                    if (dlg.ShowDialog() == DialogResult.OK)
+                        Configuration.SetPassword(dlg.password);
+                    else
+                        return;
                     try_times += 1;
                 }
 #endif
