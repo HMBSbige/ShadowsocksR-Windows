@@ -413,6 +413,11 @@ namespace Shadowsocks.Util
                         {
                             foreach (IPAddress ad in callback.EndInvoke(result).AddressList)
                             {
+                                if (ad.AddressFamily == AddressFamily.InterNetwork)
+                                    return ad;
+                            }
+                            foreach (IPAddress ad in callback.EndInvoke(result).AddressList)
+                            {
                                 return ad;
                             }
                         }
