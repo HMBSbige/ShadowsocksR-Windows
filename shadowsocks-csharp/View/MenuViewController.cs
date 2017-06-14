@@ -240,14 +240,15 @@ namespace Shadowsocks.View
                     CreateMenuItem("Edit servers...", new EventHandler(this.Config_Click)),
                     CreateMenuItem("Import servers from file...", new EventHandler(this.Import_Click)),
                     new MenuItem("-"),
-                    CreateMenuItem("Subscribe setting...", new EventHandler(this.SubscribeSetting_Click)),
-                    CreateMenuItem("Update subscribe SSR node", new EventHandler(this.CheckNodeUpdate_Click)),
-                    CreateMenuItem("Update subscribe SSR node(bypass proxy)", new EventHandler(this.CheckNodeUpdateBypassProxy_Click)),
-                    new MenuItem("-"),
                     sameHostForSameTargetItem = CreateMenuItem("Same host for same address", new EventHandler(this.SelectSameHostForSameTargetItem_Click)),
                     new MenuItem("-"),
                     CreateMenuItem("Server statistic...", new EventHandler(this.ShowServerLogItem_Click)),
                     CreateMenuItem("Disconnect current", new EventHandler(this.DisconnectCurrent_Click)),
+                }),
+                CreateMenuGroup("Servers Subscribe", new MenuItem[] {
+                    CreateMenuItem("Subscribe setting...", new EventHandler(this.SubscribeSetting_Click)),
+                    CreateMenuItem("Update subscribe SSR node", new EventHandler(this.CheckNodeUpdate_Click)),
+                    CreateMenuItem("Update subscribe SSR node(bypass proxy)", new EventHandler(this.CheckNodeUpdateBypassProxy_Click)),
                 }),
                 SelectRandomItem = CreateMenuItem("Load balance", new EventHandler(this.SelectRandomItem_Click)),
                 CreateMenuItem("Global settings...", new EventHandler(this.Setting_Click)),
@@ -365,6 +366,7 @@ namespace Shadowsocks.View
                 }
                 if (urls.Count > 0)
                 {
+                    bool keep_selected_server = false; // set 'false' if import all nodes
                     if (max_node_num <= 0 || max_node_num >= urls.Count)
                     {
                         urls.Reverse();
@@ -374,6 +376,7 @@ namespace Shadowsocks.View
                         Random r = new Random();
                         Util.Utils.Shuffle(urls, r);
                         urls.RemoveRange(max_node_num, urls.Count - max_node_num);
+                        keep_selected_server = true;
                     }
                     foreach (string url in urls)
                     {
@@ -394,50 +397,77 @@ namespace Shadowsocks.View
                         config.nodeFeedGroup = config.nodeFeedURL;
                     }
 
-                    for (int i = config.configs.Count - 1; i >= 0; --i)
+                    if (keep_selected_server && selected_server.group == config.nodeFeedGroup)
                     {
-                        if (config.configs[i].id == selected_server.id && config.nodeFeedGroup == selected_server.group)
+                        bool match = false;
+                        for (int i = 0; i < urls.Count; ++i)
                         {
-                            bool match = false;
-                            for (int j = 0; j < urls.Count; ++j)
+                            try
                             {
-                                try // try get group name
+                                Server server = new Server(urls[i], null);
+                                if (selected_server.isMatchServer(server))
                                 {
-                                    Server server = new Server(urls[j], null);
-                                    {
-                                        if (selected_server.isMatchServer(server))
-                                        {
-                                            if (selected_server.isMatchServer(Configuration.GetDefaultServer()))
-                                                continue;
-                                            match = true;
-                                            urls.RemoveAt(j);
-                                            break;
-                                        }
-                                    }
+                                    match = true;
+                                    break;
                                 }
-                                catch
-                                { }
                             }
-                            if (match)
-                            {
-                                config.configs.RemoveAt(i);
-                                config.configs.Add(selected_server);
-                            }
-                            else
-                            {
-                                urls.RemoveAt(0);
-                            }
+                            catch
+                            { }
                         }
-                        if (config.configs[i].id != selected_server.id && config.configs[i].group == config.nodeFeedGroup)
+                        if (!match)
                         {
-                            config.configs.RemoveAt(i);
+                            urls.RemoveAt(0);
+                            urls.Add(selected_server.GetSSRLinkForServer());
                         }
                     }
-                    controller.SaveServersConfig(config);
-                    foreach (string url in urls)
+
+                    // import all, find difference
                     {
-                        if (controller.AddServerBySSURL(url, config.nodeFeedGroup, true))
-                            ++count;
+                        Dictionary<string, Server> old_servers = new Dictionary<string, Server>();
+                        for (int i = config.configs.Count - 1; i >= 0; --i)
+                        {
+                            if (config.nodeFeedGroup == config.configs[i].group)
+                            {
+                                old_servers[config.configs[i].id] = config.configs[i];
+                            }
+                        }
+                        foreach (string url in urls)
+                        {
+                            try
+                            {
+                                Server server = new Server(url, config.nodeFeedGroup);
+                                bool match = false;
+                                foreach (KeyValuePair<string, Server> pair in old_servers)
+                                {
+                                    if (server.isMatchServer(pair.Value))
+                                    {
+                                        match = true;
+                                        old_servers.Remove(pair.Key);
+                                        ++count;
+                                        break;
+                                    }
+                                }
+                                if (!match)
+                                {
+                                    config.configs.Add(server);
+                                    ++count;
+                                }
+                            }
+                            catch
+                            { }
+                        }
+                        foreach (KeyValuePair<string, Server> pair in old_servers)
+                        {
+                            for (int i = config.configs.Count - 1; i >= 0; --i)
+                            {
+                                if (config.configs[i].id == pair.Key)
+                                {
+                                    config.configs.RemoveAt(i);
+                                    break;
+                                }
+                            }
+                        }
+                        controller.SaveServersConfig(config);
                     }
                     config = controller.GetCurrentConfiguration();
                     if (selected_server != null)

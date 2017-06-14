@@ -76,13 +76,59 @@ namespace Shadowsocks.Controller
                             }
                             if ((_config.proxyRuleMode == (int)ProxyRuleMode.BypassLanAndChina || _config.proxyRuleMode == (int)ProxyRuleMode.BypassLanAndNotChina) && _IPRange != null)
                             {
-                                ipAddress = Utils.DnsBuffer.Get(host);
+                                if (!IPAddress.TryParse(host, out ipAddress))
+                                {
+                                    Shadowsocks.Model.HostMap hostMap = HostMap.Instance();
+                                    string host_addr;
+                                    if (hostMap.GetHost(host, out host_addr))
+                                    {
+                                        if (!String.IsNullOrEmpty(host_addr))
+                                        {
+                                            string lower_host_addr = host_addr.ToLower();
+                                            if (lower_host_addr.StartsWith("reject")
+                                                || lower_host_addr.StartsWith("direct")
+                                                )
+                                            {
+                                                return 1;
+                                            }
+                                            else if (lower_host_addr.StartsWith("localproxy"))
+                                            {
+                                                return 2;
+                                            }
+                                            else if (lower_host_addr.IndexOf('.') >= 0 || lower_host_addr.IndexOf(':') >= 0)
+                                            {
+                                                if (!IPAddress.TryParse(lower_host_addr, out ipAddress))
+                                                {
+                                                    //
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (ipAddress == null)
+                                    {
+                                        ipAddress = Utils.DnsBuffer.Get(host);
+                                    }
+                                }
                                 if (ipAddress == null)
                                 {
-                                    ipAddress = Util.Utils.QueryDns(host, _config.dns_server);
+                                    if (host.IndexOf('.') >= 0)
+                                    {
+                                        ipAddress = Util.Utils.QueryDns(host, _config.dns_server);
+                                    }
+                                    else
+                                    {
+                                        ipAddress = Utils.QueryDns(host, null);
+                                    }
                                     if (ipAddress != null)
                                     {
                                         Utils.DnsBuffer.Set(host, new IPAddress(ipAddress.GetAddressBytes()));
+                                        if (host.IndexOf('.') >= 0)
+                                        {
+                                            if (Util.Utils.isLAN(ipAddress)) // assume that it is polution if return LAN address
+                                            {
+                                                return 0;
+                                            }
+                                        }
                                     }
                                     else
                                     {
@@ -174,7 +220,7 @@ namespace Shadowsocks.Controller
                             ipAddress = new IPAddress(addr);
                             _targetPort = (_firstPacket[5] << 8) | _firstPacket[6];
                             _remote_host = ipAddress.ToString();
-                            Logging.Debug("Direct connect " + _remote_host + ":" + _targetPort.ToString());
+                            Logging.Debug((_remote_go_proxy ? "Local proxy" : "Direct") + " connect " + _remote_host + ":" + _targetPort.ToString());
                         }
                         else if (_firstPacket[0] == 4)
                         {
@@ -183,7 +229,7 @@ namespace Shadowsocks.Controller
                             ipAddress = new IPAddress(addr);
                             _targetPort = (_firstPacket[17] << 8) | _firstPacket[18];
                             _remote_host = ipAddress.ToString();
-                            Logging.Debug("Direct connect " + _remote_host + ":" + _targetPort.ToString());
+                            Logging.Debug((_remote_go_proxy ? "Local proxy" : "Direct") + " connect " + _remote_host + ":" + _targetPort.ToString());
                         }
                         else if (_firstPacket[0] == 3)
                         {
@@ -192,17 +238,48 @@ namespace Shadowsocks.Controller
                             Array.Copy(_firstPacket, 2, addr, 0, addr.Length);
                             _remote_host = Encoding.UTF8.GetString(_firstPacket, 2, len);
                             _targetPort = (_firstPacket[len + 2] << 8) | _firstPacket[len + 3];
-                            Logging.Debug("Direct connect " + _remote_host + ":" + _targetPort.ToString());
+                            Logging.Debug((_remote_go_proxy ? "Local proxy" : "Direct") + " connect " + _remote_host + ":" + _targetPort.ToString());
 
                             if (!_remote_go_proxy)
                             {
                                 if (!IPAddress.TryParse(_remote_host, out ipAddress))
                                 {
-                                    ipAddress = Utils.DnsBuffer.Get(_remote_host);
+                                    Shadowsocks.Model.HostMap hostMap = HostMap.Instance();
+                                    string host_addr;
+                                    if (hostMap.GetHost(_remote_host, out host_addr))
+                                    {
+                                        if (!String.IsNullOrEmpty(host_addr))
+                                        {
+                                            string lower_host_addr = host_addr.ToLower();
+                                            if (lower_host_addr.StartsWith("reject"))
+                                            {
+                                                Close();
+                                                return;
+                                            }
+                                            else if (lower_host_addr.IndexOf('.') >= 0 || lower_host_addr.IndexOf(':') >= 0)
+                                            {
+                                                if (!IPAddress.TryParse(lower_host_addr, out ipAddress))
+                                                {
+                                                    //
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (ipAddress == null)
+                                    {
+                                        ipAddress = Utils.DnsBuffer.Get(_remote_host);
+                                    }
                                 }
                                 if (ipAddress == null)
                                 {
-                                    ipAddress = Utils.QueryDns(_remote_host, _config.dns_server);
+                                    if (_remote_host.IndexOf('.') >= 0)
+                                    {
+                                        ipAddress = Util.Utils.QueryDns(_remote_host, _config.dns_server);
+                                    }
+                                    else
+                                    {
+                                        ipAddress = Utils.QueryDns(_remote_host, null);
+                                    }
                                 }
                                 if (ipAddress != null)
                                 {

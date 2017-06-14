@@ -374,6 +374,10 @@ namespace Shadowsocks.Controller
             _config.FlushPortMapCache();
             ReloadIPRange();
 
+            HostMap hostMap = new HostMap();
+            hostMap.LoadHostFile();
+            HostMap.Instance().Clear(hostMap);
+
 #if !_CONSOLE
             if (polipoRunner == null)
             {
