@@ -849,7 +849,14 @@ namespace Shadowsocks.Controller
                     ipAddress = Utils.DnsBuffer.Get(host);
                     if (ipAddress == null)
                     {
-                        ipAddress = Utils.QueryDns(host, cfg.dns_servers);
+                        if (host.IndexOf('.') >= 0)
+                        {
+                            ipAddress = Utils.QueryDns(host, cfg.dns_servers);
+                        }
+                        else
+                        {
+                            ipAddress = Utils.QueryDns(host, null);
+                        }
                     }
                     if (ipAddress != null)
                     {
@@ -882,29 +889,36 @@ namespace Shadowsocks.Controller
             try
             {
                 IPAddress ipAddress;
-                string serverURI = server.server;
+                string serverHost = server.server;
                 int serverPort = server.server_port;
                 if (cfg.socks5RemotePort > 0)
                 {
-                    serverURI = cfg.socks5RemoteHost;
+                    serverHost = cfg.socks5RemoteHost;
                     serverPort = cfg.socks5RemotePort;
                 }
-                bool parsed = IPAddress.TryParse(serverURI, out ipAddress);
+                bool parsed = IPAddress.TryParse(serverHost, out ipAddress);
                 if (!parsed)
                 {
-                    if (server.DnsBuffer().isExpired(serverURI))
+                    if (server.DnsBuffer().isExpired(serverHost))
                     {
                         bool dns_ok = false;
                         {
                             DnsBuffer buf = server.DnsBuffer();
                             lock (buf)
                             {
-                                if (buf.isExpired(serverURI))
+                                if (buf.isExpired(serverHost))
                                 {
-                                    ipAddress = Util.Utils.QueryDns(serverURI, cfg.dns_servers);
+                                    if (serverHost.IndexOf('.') >= 0)
+                                    {
+                                        ipAddress = Util.Utils.QueryDns(serverHost, cfg.dns_servers);
+                                    }
+                                    else
+                                    {
+                                        ipAddress = Utils.QueryDns(serverHost, null);
+                                    }
                                     if (ipAddress != null)
                                     {
-                                        buf.UpdateDns(serverURI, ipAddress);
+                                        buf.UpdateDns(serverHost, ipAddress);
                                         dns_ok = true;
                                     }
                                 }
