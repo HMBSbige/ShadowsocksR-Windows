@@ -342,6 +342,7 @@ namespace Shadowsocks.View
                 }
                 catch
                 {
+                    updateFreeNodeChecker.FreeNodeResult = "";
                 }
                 int max_node_num = 0;
 
@@ -361,7 +362,7 @@ namespace Shadowsocks.View
                 int count = 0;
                 for (int i = urls.Count - 1; i >= 0; --i)
                 {
-                    if (!urls[i].StartsWith("ss"))
+                    if (!urls[i].StartsWith("ssr"))
                         urls.RemoveAt(i);
                 }
                 if (urls.Count > 0)

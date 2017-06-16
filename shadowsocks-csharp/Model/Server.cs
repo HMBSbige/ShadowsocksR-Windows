@@ -395,10 +395,11 @@ namespace Shadowsocks.Model
                 match = UrlFinder.Match(data);
                 if (match.Success)
                     break;
-                ssr = Regex.Match(ssrURL, @"ssr://([A-Za-z0-9-_.:=?&/\[\]]+)", RegexOptions.IgnoreCase);
-                if (ssr.Success)
-                    data = ssr.Groups[1].Value;
-                else
+                // try match which not encode to base64
+                //ssr = Regex.Match(ssrURL, @"ssr://([A-Za-z0-9-_.:=?&/\[\]]+)", RegexOptions.IgnoreCase);
+                //if (ssr.Success)
+                //    data = ssr.Groups[1].Value;
+                //else
                     throw new FormatException();
             }
             if (match == null || !match.Success)
@@ -411,23 +412,23 @@ namespace Shadowsocks.Model
             method = match.Groups[4].Value;
             obfs = match.Groups[5].Value.Length == 0 ? "plain" : match.Groups[5].Value;
             obfs = obfs.Replace("_compatible", "");
-            password = Util.Base64.DecodeUrlSafeBase64(match.Groups[6].Value);
+            password = Util.Base64.DecodeStandardSSRUrlSafeBase64(match.Groups[6].Value);
 
             if (params_dict.ContainsKey("protoparam"))
             {
-                protocolparam = Util.Base64.DecodeUrlSafeBase64(params_dict["protoparam"]);
+                protocolparam = Util.Base64.DecodeStandardSSRUrlSafeBase64(params_dict["protoparam"]);
             }
             if (params_dict.ContainsKey("obfsparam"))
             {
-                obfsparam = Util.Base64.DecodeUrlSafeBase64(params_dict["obfsparam"]);
+                obfsparam = Util.Base64.DecodeStandardSSRUrlSafeBase64(params_dict["obfsparam"]);
             }
             if (params_dict.ContainsKey("remarks"))
             {
-                remarks = Util.Base64.DecodeUrlSafeBase64(params_dict["remarks"]);
+                remarks = Util.Base64.DecodeStandardSSRUrlSafeBase64(params_dict["remarks"]);
             }
             if (params_dict.ContainsKey("group"))
             {
-                group = Util.Base64.DecodeUrlSafeBase64(params_dict["group"]);
+                group = Util.Base64.DecodeStandardSSRUrlSafeBase64(params_dict["group"]);
             }
             if (params_dict.ContainsKey("uot"))
             {
