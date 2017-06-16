@@ -151,10 +151,14 @@ namespace Shadowsocks.Controller
                         new AsyncCallback(AcceptCallback),
                         _socket_v6);
             }
-            catch (SocketException)
+            catch (SocketException e)
             {
-                _socket.Close();
-                _socket = null;
+                Logging.LogUsefulException(e);
+                if (_socket != null)
+                {
+                    _socket.Close();
+                    _socket = null;
+                }
                 if (_socket_v6 != null)
                 {
                     _socket_v6.Close();
