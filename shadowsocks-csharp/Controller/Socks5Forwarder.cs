@@ -95,6 +95,10 @@ namespace Shadowsocks.Controller
                                             {
                                                 return 2;
                                             }
+                                            else if (lower_host_addr.StartsWith("remoteproxy"))
+                                            {
+                                                return 0;
+                                            }
                                             else if (lower_host_addr.IndexOf('.') >= 0 || lower_host_addr.IndexOf(':') >= 0)
                                             {
                                                 if (!IPAddress.TryParse(lower_host_addr, out ipAddress))
