@@ -62,6 +62,16 @@ namespace Shadowsocks.Model
         public int server_port;
     }
 
+    [Serializable]
+    public class ServerSubscribe
+    {
+        private static string DEFAULT_FEED_URL = "https://raw.githubusercontent.com/breakwa11/breakwa11.github.io/master/free/freenodeplain.txt";
+        private static string OLD_DEFAULT_FEED_URL = "https://raw.githubusercontent.com/breakwa11/breakwa11.github.io/master/free/freenode.txt";
+
+        public string URL = DEFAULT_FEED_URL;
+        public string Group;
+    }
+
     public class GlobalConfiguration
     {
         public static string config_password = "";
@@ -78,12 +88,12 @@ namespace Shadowsocks.Model
         public int localPort;
         public string localAuthPassword;
 
-        public string dns_server;
+        public string dnsServer;
         public int reconnectTimes;
         public int randomAlgorithm;
         public bool randomInGroup;
         public int TTL;
-        public int connect_timeout;
+        public int connectTimeout;
 
         public int proxyRuleMode;
 
@@ -106,9 +116,8 @@ namespace Shadowsocks.Model
 
         public bool isHideTips;
 
-        public string nodeFeedURL;
-        public string nodeFeedGroup;
         public bool nodeFeedAutoUpdate;
+        public List<ServerSubscribe> serverSubscribes;
 
         public Dictionary<string, string> token = new Dictionary<string, string>();
         public Dictionary<string, PortMapConfig> portMap = new Dictionary<string, PortMapConfig>();
@@ -119,9 +128,6 @@ namespace Shadowsocks.Model
         private Dictionary<int, PortMapConfigCache> portMapCache = new Dictionary<int, PortMapConfigCache>();
 
         private static string CONFIG_FILE = "gui-config.json";
-        private static string DEFAULT_SERVER = "ssr://bm9naWNhdC5uZXQ6NDQzOmF1dGhfYWVzMTI4X21kNTpyYzQtbWQ1LTY6dGxzMS4yX3RpY2tldF9hdXRoOlJHMHRhMWg3SzJ3Lz9vYmZzcGFyYW09Ym05bmFXTmhkQzV1WlhRJnByb3RvcGFyYW09TWpBd01EQXhPaXR0TkRoaU1XdEImcmVtYXJrcz1ibTluYVdOaGRDNXVaWFEmZ3JvdXA9Um5KbFpWTlRVaTF3ZFdKc2FXTQ";
-        private static string DEFAULT_FEED_URL = "https://raw.githubusercontent.com/breakwa11/breakwa11.github.io/master/free/freenodeplain.txt";
-        private static string OLD_DEFAULT_FEED_URL = "https://raw.githubusercontent.com/breakwa11/breakwa11.github.io/master/free/freenode.txt";
 
         public static void SetPassword(string password)
         {
@@ -374,17 +380,22 @@ namespace Shadowsocks.Model
 
             reconnectTimes = 2;
             keepVisitTime = 180;
-            connect_timeout = 5;
-            dns_server = "";
+            connectTimeout = 5;
+            dnsServer = "";
 
             randomAlgorithm = (int)ServerSelectStrategy.SelectAlgorithm.LowException;
             random = true;
             sysProxyMode = (int)ProxyMode.Global;
             proxyRuleMode = (int)ProxyRuleMode.BypassLanAndChina;
 
-            nodeFeedURL = DEFAULT_FEED_URL;
-            nodeFeedGroup = "";
+            //nodeFeedURL = DEFAULT_FEED_URL;
+            //nodeFeedGroup = "";
             nodeFeedAutoUpdate = true;
+
+            serverSubscribes = new List<ServerSubscribe>()
+            {
+                new ServerSubscribe()
+            };
 
             configs = new List<Server>()
             {
@@ -404,8 +415,8 @@ namespace Shadowsocks.Model
             randomAlgorithm = config.randomAlgorithm;
             randomInGroup = config.randomInGroup;
             TTL = config.TTL;
-            connect_timeout = config.connect_timeout;
-            dns_server = config.dns_server;
+            connectTimeout = config.connectTimeout;
+            dnsServer = config.dnsServer;
             proxyEnable = config.proxyEnable;
             pacDirectGoProxy = config.pacDirectGoProxy;
             proxyType = config.proxyType;
@@ -420,9 +431,8 @@ namespace Shadowsocks.Model
             sameHostForSameTarget = config.sameHostForSameTarget;
             keepVisitTime = config.keepVisitTime;
             isHideTips = config.isHideTips;
-            nodeFeedURL = config.nodeFeedURL;
-            nodeFeedGroup = config.nodeFeedGroup;
             nodeFeedAutoUpdate = config.nodeFeedAutoUpdate;
+            serverSubscribes = config.serverSubscribes;
         }
 
         public void FixConfiguration()
@@ -443,9 +453,9 @@ namespace Shadowsocks.Model
             {
                 token = new Dictionary<string, string>();
             }
-            if (connect_timeout == 0)
+            if (connectTimeout == 0)
             {
-                connect_timeout = 10;
+                connectTimeout = 10;
                 reconnectTimes = 2;
                 TTL = 180;
                 keepVisitTime = 180;
@@ -453,10 +463,6 @@ namespace Shadowsocks.Model
             if (localAuthPassword == null || localAuthPassword.Length < 16)
             {
                 localAuthPassword = randString(20);
-            }
-            if (nodeFeedURL == OLD_DEFAULT_FEED_URL)
-            {
-                nodeFeedURL = DEFAULT_FEED_URL;
             }
 
             Dictionary<string, int> id = new Dictionary<string, int>();
@@ -576,7 +582,7 @@ namespace Shadowsocks.Model
 
         public static Server GetDefaultServer()
         {
-            return new Server(DEFAULT_SERVER, null);
+            return new Server();
         }
 
         public bool isDefaultConfig()
@@ -584,18 +590,6 @@ namespace Shadowsocks.Model
             if (configs.Count == 1 && configs[0].server == Configuration.GetDefaultServer().server)
                 return true;
             return false;
-        }
-
-        public bool isAllFreeNode()
-        {
-            if (String.IsNullOrEmpty(nodeFeedGroup))
-                return false;
-            for (int i = 0; i < configs.Count; ++i)
-            {
-                if (configs[i].group != nodeFeedGroup)
-                    return false;
-            }
-            return true;
         }
 
         public static Server CopyServer(Server server)

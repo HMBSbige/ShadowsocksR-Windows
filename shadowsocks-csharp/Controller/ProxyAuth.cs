@@ -544,11 +544,11 @@ namespace Shadowsocks.Controller
                 handler.cfg.proxyUserAgent = _config.proxyUserAgent;
             }
             handler.cfg.TTL = _config.TTL;
-            handler.cfg.connect_timeout = _config.connect_timeout;
+            handler.cfg.connect_timeout = _config.connectTimeout;
             handler.cfg.autoSwitchOff = _config.autoBan;
-            if (!string.IsNullOrEmpty(_config.dns_server))
+            if (!string.IsNullOrEmpty(_config.dnsServer))
             {
-                handler.cfg.dns_servers = _config.dns_server;
+                handler.cfg.dns_servers = _config.dnsServer;
             }
             if (_config.GetPortMapCache().ContainsKey(local_port))
             {

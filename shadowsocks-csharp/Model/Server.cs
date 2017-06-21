@@ -136,6 +136,12 @@ namespace Shadowsocks.Model
             enable = Server.enable;
         }
 
+        public void CopyServerInfo(Server Server)
+        {
+            remarks = Server.remarks;
+            group = Server.group;
+        }
+
         public static Server GetForwardServerRef()
         {
             return forwardServer;
@@ -299,7 +305,7 @@ namespace Shadowsocks.Model
 
         public Server()
         {
-            server = "server ip or url";
+            server = "server host";
             server_port = 8388;
             method = "aes-256-cfb";
             protocol = "origin";
@@ -308,7 +314,7 @@ namespace Shadowsocks.Model
             obfsparam = "";
             password = "0";
             remarks_base64 = "";
-            group = "";
+            group = "FreeSSR-public";
             udp_over_tcp = false;
             enable = true;
             byte[] id = new byte[16];

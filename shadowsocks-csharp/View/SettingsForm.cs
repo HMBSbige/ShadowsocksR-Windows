@@ -137,8 +137,8 @@ namespace Shadowsocks.View
                 _modifiedConfiguration.randomAlgorithm = RandomComboBox.SelectedIndex;
                 _modifiedConfiguration.randomInGroup = checkBalanceInGroup.Checked;
                 _modifiedConfiguration.TTL = Convert.ToInt32(NumTTL.Value);
-                _modifiedConfiguration.connect_timeout = Convert.ToInt32(NumTimeout.Value);
-                _modifiedConfiguration.dns_server = DNSText.Text;
+                _modifiedConfiguration.connectTimeout = Convert.ToInt32(NumTimeout.Value);
+                _modifiedConfiguration.dnsServer = DNSText.Text;
                 _modifiedConfiguration.proxyEnable = CheckSockProxy.Checked;
                 _modifiedConfiguration.pacDirectGoProxy = checkBoxPacProxy.Checked;
                 _modifiedConfiguration.proxyType = comboProxyType.SelectedIndex;
@@ -179,8 +179,8 @@ namespace Shadowsocks.View
             }
             checkBalanceInGroup.Checked = _modifiedConfiguration.randomInGroup;
             NumTTL.Value = _modifiedConfiguration.TTL;
-            NumTimeout.Value = _modifiedConfiguration.connect_timeout;
-            DNSText.Text = _modifiedConfiguration.dns_server;
+            NumTimeout.Value = _modifiedConfiguration.connectTimeout;
+            DNSText.Text = _modifiedConfiguration.dnsServer;
 
             CheckSockProxy.Checked = _modifiedConfiguration.proxyEnable;
             checkBoxPacProxy.Checked = _modifiedConfiguration.pacDirectGoProxy;

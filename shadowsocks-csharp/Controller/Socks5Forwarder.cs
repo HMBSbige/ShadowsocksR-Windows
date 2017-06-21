@@ -117,7 +117,7 @@ namespace Shadowsocks.Controller
                                 {
                                     if (host.IndexOf('.') >= 0)
                                     {
-                                        ipAddress = Util.Utils.QueryDns(host, _config.dns_server);
+                                        ipAddress = Util.Utils.QueryDns(host, _config.dnsServer);
                                     }
                                     else
                                     {
@@ -278,7 +278,7 @@ namespace Shadowsocks.Controller
                                 {
                                     if (_remote_host.IndexOf('.') >= 0)
                                     {
-                                        ipAddress = Util.Utils.QueryDns(_remote_host, _config.dns_server);
+                                        ipAddress = Util.Utils.QueryDns(_remote_host, _config.dnsServer);
                                     }
                                     else
                                     {
