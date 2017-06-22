@@ -445,11 +445,14 @@ namespace Shadowsocks.View
                     // import all, find difference
                     {
                         Dictionary<string, Server> old_servers = new Dictionary<string, Server>();
-                        for (int i = config.configs.Count - 1; i >= 0; --i)
+                        if (!String.IsNullOrEmpty(lastGroup))
                         {
-                            if (lastGroup == config.configs[i].group)
+                            for (int i = config.configs.Count - 1; i >= 0; --i)
                             {
-                                old_servers[config.configs[i].id] = config.configs[i];
+                                if (lastGroup == config.configs[i].group)
+                                {
+                                    old_servers[config.configs[i].id] = config.configs[i];
+                                }
                             }
                         }
                         foreach (string url in urls)
