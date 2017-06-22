@@ -436,6 +436,8 @@ namespace Shadowsocks.Model
             {
                 group = Util.Base64.DecodeStandardSSRUrlSafeBase64(params_dict["group"]);
             }
+            else
+                group = "";
             if (params_dict.ContainsKey("uot"))
             {
                 udp_over_tcp = int.Parse(params_dict["uot"]) != 0;
@@ -468,6 +470,8 @@ namespace Shadowsocks.Model
             server_port = int.Parse(match.Groups["port"].Value);
             if (!String.IsNullOrEmpty(force_group))
                 group = force_group;
+            else
+                group = "";
         }
 
         public string GetSSLinkForServer()

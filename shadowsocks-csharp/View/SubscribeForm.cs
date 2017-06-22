@@ -80,6 +80,8 @@ namespace Shadowsocks.View
 
         private void buttonOK_Click(object sender, EventArgs e)
         {
+            int select_index = _modifiedConfiguration.serverSubscribes.Count;
+            SaveSelected(select_index);
             if (SaveAllSettings() == -1)
             {
                 return;
@@ -150,12 +152,7 @@ namespace Shadowsocks.View
             int select_index = _modifiedConfiguration.serverSubscribes.Count;
             if (_old_select_index >= 0 && _old_select_index < _modifiedConfiguration.serverSubscribes.Count)
             {
-                ServerSubscribe ss = _modifiedConfiguration.serverSubscribes[_old_select_index];
-                ServerSubscribe new_ss = new ServerSubscribe();
-                new_ss.URL = ss.URL;
-                new_ss.Group = ss.Group;
-                select_index = _old_select_index + 1;
-                _modifiedConfiguration.serverSubscribes.Insert(select_index, new_ss);
+                _modifiedConfiguration.serverSubscribes.Insert(select_index, new ServerSubscribe());
             }
             else
             {
