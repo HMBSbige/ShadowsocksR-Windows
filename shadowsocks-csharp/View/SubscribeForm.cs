@@ -80,7 +80,7 @@ namespace Shadowsocks.View
 
         private void buttonOK_Click(object sender, EventArgs e)
         {
-            int select_index = _modifiedConfiguration.serverSubscribes.Count;
+            int select_index = listServerSubscribe.SelectedIndex;
             SaveSelected(select_index);
             if (SaveAllSettings() == -1)
             {
