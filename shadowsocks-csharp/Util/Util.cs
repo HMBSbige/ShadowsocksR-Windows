@@ -411,12 +411,13 @@ namespace Shadowsocks.Util
                         IAsyncResult result = callback.BeginInvoke(host, null, null);
                         if (result.AsyncWaitHandle.WaitOne(10000, true))
                         {
-                            foreach (IPAddress ad in callback.EndInvoke(result).AddressList)
+                            IPHostEntry ipHostEntry = callback.EndInvoke(result);
+                            foreach (IPAddress ad in ipHostEntry.AddressList)
                             {
                                 if (ad.AddressFamily == AddressFamily.InterNetwork)
                                     return ad;
                             }
-                            foreach (IPAddress ad in callback.EndInvoke(result).AddressList)
+                            foreach (IPAddress ad in ipHostEntry.AddressList)
                             {
                                 return ad;
                             }
