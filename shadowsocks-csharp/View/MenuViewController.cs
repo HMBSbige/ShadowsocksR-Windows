@@ -41,6 +41,7 @@ namespace Shadowsocks.View
         private MenuItem ruleBypassLan;
         private MenuItem ruleBypassChina;
         private MenuItem ruleBypassNotChina;
+        private MenuItem ruleUser;
         private MenuItem ruleDisableBypass;
 
         private MenuItem SeperatorItem;
@@ -234,6 +235,7 @@ namespace Shadowsocks.View
                     ruleBypassLan = CreateMenuItem("Bypass LAN", new EventHandler(this.RuleBypassLanItem_Click)),
                     ruleBypassChina = CreateMenuItem("Bypass LAN && China", new EventHandler(this.RuleBypassChinaItem_Click)),
                     ruleBypassNotChina = CreateMenuItem("Bypass LAN && not China", new EventHandler(this.RuleBypassNotChinaItem_Click)),
+                    ruleUser = CreateMenuItem("User custom", new EventHandler(this.RuleUserItem_Click)),
                     new MenuItem("-"),
                     ruleDisableBypass = CreateMenuItem("Disable bypass", new EventHandler(this.RuleBypassDisableItem_Click)),
                 }),
@@ -593,6 +595,7 @@ namespace Shadowsocks.View
             ruleBypassLan.Checked = config.proxyRuleMode == (int)ProxyRuleMode.BypassLan;
             ruleBypassChina.Checked = config.proxyRuleMode == (int)ProxyRuleMode.BypassLanAndChina;
             ruleBypassNotChina.Checked = config.proxyRuleMode == (int)ProxyRuleMode.BypassLanAndNotChina;
+            ruleUser.Checked = config.proxyRuleMode == (int)ProxyRuleMode.UserCustom;
         }
 
         private void LoadCurrentConfiguration()
@@ -982,22 +985,27 @@ namespace Shadowsocks.View
 
         private void RuleBypassLanItem_Click(object sender, EventArgs e)
         {
-            controller.ToggleRuleMode(1);
+            controller.ToggleRuleMode((int)ProxyRuleMode.BypassLan);
         }
 
         private void RuleBypassChinaItem_Click(object sender, EventArgs e)
         {
-            controller.ToggleRuleMode(2);
+            controller.ToggleRuleMode((int)ProxyRuleMode.BypassLanAndChina);
         }
 
         private void RuleBypassNotChinaItem_Click(object sender, EventArgs e)
         {
-            controller.ToggleRuleMode(3);
+            controller.ToggleRuleMode((int)ProxyRuleMode.BypassLanAndNotChina);
+        }
+
+        private void RuleUserItem_Click(object sender, EventArgs e)
+        {
+            controller.ToggleRuleMode((int)ProxyRuleMode.UserCustom);
         }
 
         private void RuleBypassDisableItem_Click(object sender, EventArgs e)
         {
-            controller.ToggleRuleMode(0);
+            controller.ToggleRuleMode((int)ProxyRuleMode.Disable);
         }
 
         private void SelectRandomItem_Click(object sender, EventArgs e)

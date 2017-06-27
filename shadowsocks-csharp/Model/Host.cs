@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 
 namespace Shadowsocks.Model
@@ -28,8 +29,10 @@ namespace Shadowsocks.Model
     public class HostMap
     {
         Dictionary<string, HostNode> root = new Dictionary<string, HostNode>();
+        IPSegment ips = new IPSegment("remoteproxy");
+
         static HostMap instance = new HostMap();
-        const string HOST_FILENAME = "host.txt";
+        const string HOST_FILENAME = "user.rule";
 
         public static HostMap Instance()
         {
@@ -50,6 +53,17 @@ namespace Shadowsocks.Model
 
         public void AddHost(string host, string addr)
         {
+            IPAddress ip_addr = null;
+            if (IPAddress.TryParse(host, out ip_addr))
+            {
+                string[] addr_parts = addr.Split(new char[] { ' ', '\t', }, 2, StringSplitOptions.RemoveEmptyEntries);
+                if (addr_parts.Length >= 2)
+                {
+                    ips.insert(new IPAddressCmp(host), new IPAddressCmp(addr_parts[0]), addr_parts[1]);
+                    return;
+                }
+            }
+
             string[] parts = host.Split('.');
             Dictionary<string, HostNode> node = root;
             bool include_sub = false;
@@ -102,6 +116,13 @@ namespace Shadowsocks.Model
                 node = node[parts[i]].subnode;
             }
             return false;
+        }
+
+        public bool GetIP(IPAddress ip, out string addr)
+        {
+            string host = ip.ToString();
+            addr = ips.Get(new IPAddressCmp(host)) as string;
+            return addr != null;
         }
 
         public bool LoadHostFile()

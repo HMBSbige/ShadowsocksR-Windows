@@ -13,6 +13,7 @@ Proxy rule=代理规则
 Bypass LAN=绕过局域网
 Bypass LAN && China=绕过局域网和大陆
 Bypass LAN && not China=绕过局域网和非大陆
+User custom=用户自定义
 Disable bypass=全局
 Servers=服务器
 Edit servers...=编辑服务器...
