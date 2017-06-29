@@ -233,18 +233,11 @@ namespace Shadowsocks.View
                     ret = 1; // display changed
                 }
                 Server oldServer = _modifiedConfiguration.configs[_oldSelectedIndex];
-                if (oldServer.server == server.server
-                    && oldServer.server_port == server.server_port
-                    && oldServer.password == server.password
-                    && oldServer.method == server.method
-                    )
+                if (oldServer.isMatchServer(server))
                 {
-                    if (oldServer.obfs == server.obfs
-                        && oldServer.obfsparam == server.obfsparam)
-                        server.setObfsData(oldServer.getObfsData());
-                    if (oldServer.protocol == server.protocol
-                        && oldServer.protocolparam == server.protocolparam)
-                        server.setProtocolData(oldServer.getProtocolData());
+                    server.setObfsData(oldServer.getObfsData());
+                    server.setProtocolData(oldServer.getProtocolData());
+                    server.enable = oldServer.enable;
                 }
                 _modifiedConfiguration.configs[_oldSelectedIndex] = server;
 

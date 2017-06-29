@@ -389,13 +389,10 @@ namespace Shadowsocks.Model
             sysProxyMode = (int)ProxyMode.Global;
             proxyRuleMode = (int)ProxyRuleMode.BypassLanAndChina;
 
-            //nodeFeedURL = DEFAULT_FEED_URL;
-            //nodeFeedGroup = "";
             nodeFeedAutoUpdate = true;
 
             serverSubscribes = new List<ServerSubscribe>()
             {
-                new ServerSubscribe()
             };
 
             configs = new List<Server>()
