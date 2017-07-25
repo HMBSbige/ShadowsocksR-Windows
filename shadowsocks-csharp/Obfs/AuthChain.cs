@@ -126,7 +126,7 @@ namespace Shadowsocks.Obfs
             return new MbedTLS.HMAC_MD5(key);
         }
 
-        protected int GetRandLen(int datalength, xorshift128plus random, byte[] last_hash)
+        protected virtual int GetRandLen(int datalength, xorshift128plus random, byte[] last_hash)
         {
             if (datalength > 1440)
                 return 0;
@@ -545,9 +545,116 @@ namespace Shadowsocks.Obfs
             encryptor.Decrypt(plaindata, outlength, plaindata, out outlength);
             return plaindata;
         }
+    }
 
-        public override void Dispose()
+    class AuthChain_b : AuthChain_a
+    {
+        public AuthChain_b(string method)
+            : base(method)
         {
+
+        }
+
+        private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
+            {"auth_chain_b", new int[]{1, 0, 1}},
+        };
+
+        protected int[] data_size_list = null;
+        protected int[] data_size_list2 = null;
+
+        public static new List<string> SupportedObfs()
+        {
+            return new List<string>(_obfs.Keys);
+        }
+
+        public override Dictionary<string, int[]> GetObfs()
+        {
+            return _obfs;
+        }
+
+        protected void InitDataSizeList()
+        {
+            xorshift128plus random = new xorshift128plus();
+            random.init_from_bin(Server.key);
+            int len = (int)(random.next() % 8 + 4);
+            List<int> data_list = new List<int>();
+            for (int i = 0; i < len; ++i)
+            {
+                data_list.Add((int)(random.next() % 2340 % 2040 % 1440));
+            }
+            data_list.Sort();
+            data_size_list = data_list.ToArray();
+
+            len = (int)(random.next() % 16 + 8);
+            data_list.Clear();
+            for (int i = 0; i < len; ++i)
+            {
+                data_list.Add((int)(random.next() % 2340 % 2040 % 1440));
+            }
+            data_list.Sort();
+            data_size_list2 = data_list.ToArray();
+        }
+
+        public override void SetServerInfo(ServerInfo serverInfo)
+        {
+            Server = serverInfo;
+            InitDataSizeList();
+        }
+
+        protected int FindPos(int[] arr, int key)
+        {
+            int low = 0;
+            int high = arr.Length - 1;
+            int middle = -1;
+
+            if (key > arr[high])
+                return arr.Length;
+
+            while (low < high)
+            {
+                middle = (low + high) / 2;
+                if (key > arr[middle])
+                {
+                    low = middle + 1;
+                }
+                else if (key <= arr[middle])
+                {
+                    high = middle;
+                }
+            }
+            return low;
+        }
+
+        protected override int GetRandLen(int datalength, xorshift128plus random, byte[] last_hash)
+        {
+            if (datalength >= 1440)
+                return 0;
+            random.init_from_bin(last_hash, datalength);
+
+            int pos = FindPos(data_size_list, datalength + Server.overhead);
+            int final_pos = pos + (int)(random.next() % (ulong)(data_size_list.Length));
+            if (final_pos < data_size_list.Length)
+            {
+                return data_size_list[final_pos] - datalength - Server.overhead;
+            }
+
+            pos = FindPos(data_size_list2, datalength + Server.overhead);
+            final_pos = pos + (int)(random.next() % (ulong)(data_size_list2.Length));
+            if (final_pos < data_size_list2.Length)
+            {
+                return data_size_list2[final_pos] - datalength - Server.overhead;
+            }
+            if (final_pos < pos + data_size_list2.Length - 1)
+            {
+                return 0;
+            }
+            if (datalength > 1300)
+                return (int)(random.next() % 31);
+            if (datalength > 900)
+                return (int)(random.next() % 127);
+            if (datalength > 400)
+                return (int)(random.next() % 521);
+            return (int)(random.next() % 1021);
         }
 
     }
