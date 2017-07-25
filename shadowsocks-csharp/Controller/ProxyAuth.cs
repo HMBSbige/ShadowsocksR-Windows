@@ -93,6 +93,8 @@ namespace Shadowsocks.Controller
         {
             CloseSocket(ref _connection);
             CloseSocket(ref _connectionUDP);
+
+            _config = null;
         }
 
         bool AuthConnection(Socket connection, string authUser, string authPass)
@@ -584,6 +586,7 @@ namespace Shadowsocks.Controller
                     {
                         handler.Start(_remoteHeaderSendBuffer, _remoteHeaderSendBuffer.Length, "socks5");
                     }
+                    Dispose();
                     return;
                 }
             }
@@ -596,9 +599,26 @@ namespace Shadowsocks.Controller
                 {
                     handler.Start(_remoteHeaderSendBuffer, _remoteHeaderSendBuffer.Length, local_sendback_protocol);
                 }
+                Dispose();
                 return;
             }
+            Dispose();
             Close();
+        }
+
+        private void Dispose()
+        {
+            _transfer = null;
+            _IPRange = null;
+
+            _firstPacket = null;
+            _connection = null;
+            _connectionUDP = null;
+
+            _connetionRecvBuffer = null;
+            _remoteHeaderSendBuffer = null;
+
+            httpProxyState = null;
         }
     }
 }

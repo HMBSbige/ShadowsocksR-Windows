@@ -212,10 +212,6 @@ namespace Shadowsocks.Obfs
             }
             return outdata;
         }
-
-        public override void Dispose()
-        {
-        }
     }
 
 }

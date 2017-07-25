@@ -55,7 +55,7 @@ namespace Shadowsocks.Obfs
             outlength = datalength;
             return plaindata;
         }
-        public abstract void Dispose();
+
         public virtual object InitData()
         {
             return null;
@@ -96,5 +96,29 @@ namespace Shadowsocks.Obfs
         {
             return Server.tcp_mss;
         }
+
+
+        #region IDisposable
+        protected bool _disposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            lock (this)
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+                _disposed = true;
+            }
+        }
+        #endregion
+
     }
 }

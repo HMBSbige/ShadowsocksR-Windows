@@ -260,10 +260,6 @@ namespace Shadowsocks.Obfs
                 return outdata;
             }
         }
-
-        public override void Dispose()
-        {
-        }
     }
     public class TlsAuthData
     {
@@ -672,10 +668,6 @@ namespace Shadowsocks.Obfs
                 }
                 return encryptdata;
             }
-        }
-
-        public override void Dispose()
-        {
         }
     }
 }

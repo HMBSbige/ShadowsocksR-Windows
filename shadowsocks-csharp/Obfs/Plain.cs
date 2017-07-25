@@ -36,9 +36,5 @@ namespace Shadowsocks.Obfs
             needsendback = false;
             return encryptdata;
         }
-
-        public override void Dispose()
-        {
-        }
     }
 }
