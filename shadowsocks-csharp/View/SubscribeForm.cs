@@ -56,6 +56,14 @@ namespace Shadowsocks.View
         {
             _modifiedConfiguration = controller.GetConfiguration();
             LoadAllSettings();
+            if (listServerSubscribe.Items.Count == 0)
+            {
+                textBoxURL.Enabled = false;
+            }
+            else
+            {
+                textBoxURL.Enabled = true;
+            }
         }
 
         private void LoadAllSettings()
@@ -161,6 +169,8 @@ namespace Shadowsocks.View
             UpdateList();
             UpdateSelected(select_index);
             SetSelectIndex(select_index);
+
+            textBoxURL.Enabled = true;
         }
 
         private void buttonDel_Click(object sender, EventArgs e)
@@ -176,6 +186,10 @@ namespace Shadowsocks.View
                 UpdateList();
                 UpdateSelected(select_index);
                 SetSelectIndex(select_index);
+            }
+            if (listServerSubscribe.Items.Count == 0)
+            {
+                textBoxURL.Enabled = false;
             }
         }
     }

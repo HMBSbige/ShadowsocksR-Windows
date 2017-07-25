@@ -135,13 +135,16 @@ namespace Shadowsocks.View
             bool global = config.sysProxyMode == (int)ProxyMode.Global;
             bool random = config.random;
 
-            Bitmap icon = null;
             try
             {
-                icon = new Bitmap("icon.png");
+                using (Bitmap icon = new Bitmap("icon.png"))
+                {
+                    _notifyIcon.Icon = Icon.FromHandle(icon.GetHicon());
+                }
             }
             catch
             {
+                Bitmap icon = null;
                 if (dpi < 97)
                 {
                     // dpi = 96;
@@ -171,8 +174,8 @@ namespace Shadowsocks.View
                     mul_r = 0.4;
                 }
 
+                using (Bitmap iconCopy = new Bitmap(icon))
                 {
-                    Bitmap iconCopy = new Bitmap(icon);
                     for (int x = 0; x < iconCopy.Width; x++)
                     {
                         for (int y = 0; y < iconCopy.Height; y++)
@@ -185,10 +188,9 @@ namespace Shadowsocks.View
                                 ((byte)(color.B * mul_b))));
                         }
                     }
-                    icon = iconCopy;
+                    _notifyIcon.Icon = Icon.FromHandle(iconCopy.GetHicon());
                 }
             }
-            _notifyIcon.Icon = Icon.FromHandle(icon.GetHicon());
 
             // we want to show more details but notify icon title is limited to 63 characters
             string text = (enabled ?
@@ -857,20 +859,22 @@ namespace Shadowsocks.View
 
         private void Import_Click(object sender, EventArgs e)
         {
-            OpenFileDialog dlg = new OpenFileDialog();
-            dlg.InitialDirectory = System.Windows.Forms.Application.StartupPath;
-            if (dlg.ShowDialog() == DialogResult.OK)
+            using (OpenFileDialog dlg = new OpenFileDialog())
             {
-                string name = dlg.FileName;
-                Configuration cfg = Configuration.LoadFile(name);
-                if (cfg.configs.Count == 1 && cfg.configs[0].server == Configuration.GetDefaultServer().server)
+                dlg.InitialDirectory = System.Windows.Forms.Application.StartupPath;
+                if (dlg.ShowDialog() == DialogResult.OK)
                 {
-                    MessageBox.Show("Load config file failed", "ShadowsocksR");
-                }
-                else
-                {
-                    controller.MergeConfiguration(cfg);
-                    LoadCurrentConfiguration();
+                    string name = dlg.FileName;
+                    Configuration cfg = Configuration.LoadFile(name);
+                    if (cfg.configs.Count == 1 && cfg.configs[0].server == Configuration.GetDefaultServer().server)
+                    {
+                        MessageBox.Show("Load config file failed", "ShadowsocksR");
+                    }
+                    else
+                    {
+                        controller.MergeConfiguration(cfg);
+                        LoadCurrentConfiguration();
+                    }
                 }
             }
         }
@@ -1169,32 +1173,33 @@ namespace Shadowsocks.View
 
         private bool ScanQRCode(Screen screen, Bitmap fullImage, Rectangle cropRect, out string url, out Rectangle rect)
         {
-            Bitmap target = new Bitmap(cropRect.Width, cropRect.Height);
-
-            using (Graphics g = Graphics.FromImage(target))
+            using (Bitmap target = new Bitmap(cropRect.Width, cropRect.Height))
             {
-                g.DrawImage(fullImage, new Rectangle(0, 0, cropRect.Width, cropRect.Height),
-                                cropRect,
-                                GraphicsUnit.Pixel);
-            }
-            var source = new BitmapLuminanceSource(target);
-            var bitmap = new BinaryBitmap(new HybridBinarizer(source));
-            QRCodeReader reader = new QRCodeReader();
-            var result = reader.decode(bitmap);
-            if (result != null)
-            {
-                url = result.Text;
-                double minX = Int32.MaxValue, minY = Int32.MaxValue, maxX = 0, maxY = 0;
-                foreach (ResultPoint point in result.ResultPoints)
+                using (Graphics g = Graphics.FromImage(target))
                 {
-                    minX = Math.Min(minX, point.X);
-                    minY = Math.Min(minY, point.Y);
-                    maxX = Math.Max(maxX, point.X);
-                    maxY = Math.Max(maxY, point.Y);
+                    g.DrawImage(fullImage, new Rectangle(0, 0, cropRect.Width, cropRect.Height),
+                                    cropRect,
+                                    GraphicsUnit.Pixel);
                 }
-                //rect = new Rectangle((int)minX, (int)minY, (int)(maxX - minX), (int)(maxY - minY));
-                rect = new Rectangle(cropRect.Left + (int)minX, cropRect.Top + (int)minY, (int)(maxX - minX), (int)(maxY - minY));
-                return true;
+                var source = new BitmapLuminanceSource(target);
+                var bitmap = new BinaryBitmap(new HybridBinarizer(source));
+                QRCodeReader reader = new QRCodeReader();
+                var result = reader.decode(bitmap);
+                if (result != null)
+                {
+                    url = result.Text;
+                    double minX = Int32.MaxValue, minY = Int32.MaxValue, maxX = 0, maxY = 0;
+                    foreach (ResultPoint point in result.ResultPoints)
+                    {
+                        minX = Math.Min(minX, point.X);
+                        minY = Math.Min(minY, point.Y);
+                        maxX = Math.Max(maxX, point.X);
+                        maxY = Math.Max(maxY, point.Y);
+                    }
+                    //rect = new Rectangle((int)minX, (int)minY, (int)(maxX - minX), (int)(maxY - minY));
+                    rect = new Rectangle(cropRect.Left + (int)minX, cropRect.Top + (int)minY, (int)(maxX - minX), (int)(maxY - minY));
+                    return true;
+                }
             }
             url = "";
             rect = new Rectangle();
@@ -1203,32 +1208,33 @@ namespace Shadowsocks.View
 
         private bool ScanQRCodeStretch(Screen screen, Bitmap fullImage, Rectangle cropRect, double mul, out string url, out Rectangle rect)
         {
-            Bitmap target = new Bitmap((int)(cropRect.Width * mul), (int)(cropRect.Height * mul));
-
-            using (Graphics g = Graphics.FromImage(target))
+            using (Bitmap target = new Bitmap((int)(cropRect.Width * mul), (int)(cropRect.Height * mul)))
             {
-                g.DrawImage(fullImage, new Rectangle(0, 0, target.Width, target.Height),
-                                cropRect,
-                                GraphicsUnit.Pixel);
-            }
-            var source = new BitmapLuminanceSource(target);
-            var bitmap = new BinaryBitmap(new HybridBinarizer(source));
-            QRCodeReader reader = new QRCodeReader();
-            var result = reader.decode(bitmap);
-            if (result != null)
-            {
-                url = result.Text;
-                double minX = Int32.MaxValue, minY = Int32.MaxValue, maxX = 0, maxY = 0;
-                foreach (ResultPoint point in result.ResultPoints)
+                using (Graphics g = Graphics.FromImage(target))
                 {
-                    minX = Math.Min(minX, point.X);
-                    minY = Math.Min(minY, point.Y);
-                    maxX = Math.Max(maxX, point.X);
-                    maxY = Math.Max(maxY, point.Y);
+                    g.DrawImage(fullImage, new Rectangle(0, 0, target.Width, target.Height),
+                                    cropRect,
+                                    GraphicsUnit.Pixel);
                 }
-                //rect = new Rectangle((int)minX, (int)minY, (int)(maxX - minX), (int)(maxY - minY));
-                rect = new Rectangle(cropRect.Left + (int)(minX / mul), cropRect.Top + (int)(minY / mul), (int)((maxX - minX) / mul), (int)((maxY - minY) / mul));
-                return true;
+                var source = new BitmapLuminanceSource(target);
+                var bitmap = new BinaryBitmap(new HybridBinarizer(source));
+                QRCodeReader reader = new QRCodeReader();
+                var result = reader.decode(bitmap);
+                if (result != null)
+                {
+                    url = result.Text;
+                    double minX = Int32.MaxValue, minY = Int32.MaxValue, maxX = 0, maxY = 0;
+                    foreach (ResultPoint point in result.ResultPoints)
+                    {
+                        minX = Math.Min(minX, point.X);
+                        minY = Math.Min(minY, point.Y);
+                        maxX = Math.Max(maxX, point.X);
+                        maxY = Math.Max(maxY, point.Y);
+                    }
+                    //rect = new Rectangle((int)minX, (int)minY, (int)(maxX - minX), (int)(maxY - minY));
+                    rect = new Rectangle(cropRect.Left + (int)(minX / mul), cropRect.Top + (int)(minY / mul), (int)((maxX - minX) / mul), (int)((maxY - minY) / mul));
+                    return true;
+                }
             }
             url = "";
             rect = new Rectangle();

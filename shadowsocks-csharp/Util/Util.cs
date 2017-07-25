@@ -31,6 +31,8 @@ namespace Shadowsocks.Util
             }
         }
 
+        static Process current_process = Process.GetCurrentProcess();
+
         public static void ReleaseMemory()
         {
 #if !_CONSOLE
@@ -45,13 +47,13 @@ namespace Shadowsocks.Util
 
             if (UIntPtr.Size == 4)
             {
-                SetProcessWorkingSetSize(Process.GetCurrentProcess().Handle,
+                SetProcessWorkingSetSize(current_process.Handle,
                                          (UIntPtr)0xFFFFFFFF,
                                          (UIntPtr)0xFFFFFFFF);
             }
             else if (UIntPtr.Size == 8)
             {
-                SetProcessWorkingSetSize(Process.GetCurrentProcess().Handle,
+                SetProcessWorkingSetSize(current_process.Handle,
                                          (UIntPtr)0xFFFFFFFFFFFFFFFF,
                                          (UIntPtr)0xFFFFFFFFFFFFFFFF);
             }
@@ -464,8 +466,10 @@ namespace Shadowsocks.Util
         public static int GetDpiMul()
         {
             int dpi;
-            Graphics graphics = Graphics.FromHwnd(IntPtr.Zero);
-            dpi = (int)graphics.DpiX;
+            using (Graphics graphics = Graphics.FromHwnd(IntPtr.Zero))
+            {
+                dpi = (int)graphics.DpiX;
+            }
             return (dpi * 4 + 48) / 96;
         }
 
@@ -478,12 +482,14 @@ namespace Shadowsocks.Util
 
         public static Point GetScreenPhysicalSize()
         {
-            Graphics g = Graphics.FromHwnd(IntPtr.Zero);
-            IntPtr desktop = g.GetHdc();
-            int PhysicalScreenWidth = GetDeviceCaps(desktop, (int)DeviceCap.DESKTOPHORZRES);
-            int PhysicalScreenHeight = GetDeviceCaps(desktop, (int)DeviceCap.DESKTOPVERTRES);
+            using (Graphics g = Graphics.FromHwnd(IntPtr.Zero))
+            {
+                IntPtr desktop = g.GetHdc();
+                int PhysicalScreenWidth = GetDeviceCaps(desktop, (int)DeviceCap.DESKTOPHORZRES);
+                int PhysicalScreenHeight = GetDeviceCaps(desktop, (int)DeviceCap.DESKTOPVERTRES);
 
-            return new Point(PhysicalScreenWidth, PhysicalScreenHeight);
+                return new Point(PhysicalScreenWidth, PhysicalScreenHeight);
+            }
         }
 
         [DllImport("gdi32.dll")]

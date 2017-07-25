@@ -240,7 +240,7 @@ namespace Shadowsocks.Controller
             foreach (INTERNET_PER_CONN_OPTION eachOption in _optionlist)
             {
                 Marshal.StructureToPtr(eachOption, current, false);
-                current = (IntPtr)((int)current + Marshal.SizeOf(eachOption));
+                current = (IntPtr)((long)current + Marshal.SizeOf(eachOption));
             }
 
             // Initialize a INTERNET_PER_CONN_OPTION_LIST instance.
