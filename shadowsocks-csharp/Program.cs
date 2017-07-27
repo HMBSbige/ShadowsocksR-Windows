@@ -65,16 +65,18 @@ namespace Shadowsocks
                 {
                     if (try_times >= 5)
                         return;
-                    InputPassword dlg = new InputPassword();
-                    if (dlg.ShowDialog() == DialogResult.OK)
-                        Configuration.SetPassword(dlg.password);
-                    else
-                        return;
+                    using (InputPassword dlg = new InputPassword())
+                    {
+                        if (dlg.ShowDialog() == DialogResult.OK)
+                            Configuration.SetPassword(dlg.password);
+                        else
+                            return;
+                    }
                     try_times += 1;
                 }
 #endif
                 _controller = new ShadowsocksController();
-
+                HostMap.Instance().LoadHostFile();
 #if !_CONSOLE
                 _viewController = new MenuViewController(_controller);
 #endif
