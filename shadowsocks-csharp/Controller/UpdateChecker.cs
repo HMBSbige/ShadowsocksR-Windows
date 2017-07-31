@@ -13,7 +13,7 @@ namespace Shadowsocks.Controller
 {
     public class UpdateChecker
     {
-        private const string UpdateURL = "https://raw.githubusercontent.com/breakwa11/breakwa11.github.io/master/update/ssr-win-4.0.xml";
+        private const string UpdateURL = "https://raw.githubusercontent.com/shadowsocksrr/breakwa11.github.io/master/update/ssr-win-4.0.xml";
 
         public string LatestVersionNumber;
         public string LatestVersionURL;
