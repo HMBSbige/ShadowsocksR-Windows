@@ -909,12 +909,12 @@ namespace Shadowsocks.View
 
         private void OpenWiki_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/breakwa11/shadowsocks-rss/wiki");
+            Process.Start("https://github.com/shadowsocksrr/shadowsocks-rss/wiki");
         }
 
         private void FeedbackItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/shadowsocksr/shadowsocksr-csharp/issues/new");
+            Process.Start("https://github.com/shadowsocksrr/shadowsocksr-csharp/issues/new");
         }
 
         private void ResetPasswordItem_Click(object sender, EventArgs e)
