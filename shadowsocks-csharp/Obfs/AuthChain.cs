@@ -683,7 +683,7 @@ namespace Shadowsocks.Obfs
             return _obfs;
         }
 
-        protected void InitDataSizeList()
+        protected new void InitDataSizeList()
         {
             xorshift128plus random = new xorshift128plus();
             random.init_from_bin(Server.key);
@@ -739,9 +739,7 @@ namespace Shadowsocks.Obfs
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
             {"auth_chain_d", new int[]{1, 0, 1}},
         };
-
-        protected int[] data_size_list0 = null;
-
+        
         public static new List<string> SupportedObfs()
         {
             return new List<string>(_obfs.Keys);
@@ -761,7 +759,7 @@ namespace Shadowsocks.Obfs
             }
         }
 
-        protected void InitDataSizeList()
+        protected new void InitDataSizeList()
         {
             xorshift128plus random = new xorshift128plus();
             random.init_from_bin(Server.key);
