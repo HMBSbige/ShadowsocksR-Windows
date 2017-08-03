@@ -707,6 +707,8 @@ namespace Shadowsocks.Obfs
         {
             int other_data_size = datalength + Server.overhead;
 
+            // 一定要在random使用前初始化，以保证服务器与客户端同步，保证包大小验证结果正确
+            random.init_from_bin(last_hash, datalength);
             if (other_data_size >= data_size_list0[data_size_list0.Length - 1])
             {
                 if (datalength >= 1440)
@@ -720,7 +722,6 @@ namespace Shadowsocks.Obfs
                 return (int)(random.next() % 1021);
             }
 
-            random.init_from_bin(last_hash, datalength);
             int pos = FindPos(data_size_list0, other_data_size);
             int final_pos = pos + (int)(random.next() % (ulong)(data_size_list0.Length - pos));
             return data_size_list0[final_pos] - other_data_size;
@@ -739,7 +740,7 @@ namespace Shadowsocks.Obfs
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
             {"auth_chain_d", new int[]{1, 0, 1}},
         };
-        
+
         public static new List<string> SupportedObfs()
         {
             return new List<string>(_obfs.Keys);
