@@ -658,4 +658,148 @@ namespace Shadowsocks.Obfs
         }
 
     }
+
+    class AuthChain_c : AuthChain_b
+    {
+        public AuthChain_c(string method)
+            : base(method)
+        {
+
+        }
+
+        private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
+            {"auth_chain_c", new int[]{1, 0, 1}},
+        };
+
+        protected int[] data_size_list0 = null;
+
+        public static new List<string> SupportedObfs()
+        {
+            return new List<string>(_obfs.Keys);
+        }
+
+        public override Dictionary<string, int[]> GetObfs()
+        {
+            return _obfs;
+        }
+
+        protected new void InitDataSizeList()
+        {
+            xorshift128plus random = new xorshift128plus();
+            random.init_from_bin(Server.key);
+            int len = (int)(random.next() % (8 + 16) + (4 + 8));
+            List<int> data_list = new List<int>();
+            for (int i = 0; i < len; ++i)
+            {
+                data_list.Add((int)(random.next() % 2340 % 2040 % 1440));
+            }
+            data_list.Sort();
+            data_size_list0 = data_list.ToArray();
+        }
+
+        public override void SetServerInfo(ServerInfo serverInfo)
+        {
+            Server = serverInfo;
+            InitDataSizeList();
+        }
+
+        protected override int GetRandLen(int datalength, xorshift128plus random, byte[] last_hash)
+        {
+            int other_data_size = datalength + Server.overhead;
+
+            // 一定要在random使用前初始化，以保证服务器与客户端同步，保证包大小验证结果正确
+            random.init_from_bin(last_hash, datalength);
+            if (other_data_size >= data_size_list0[data_size_list0.Length - 1])
+            {
+                if (datalength >= 1440)
+                    return 0;
+                if (datalength > 1300)
+                    return (int)(random.next() % 31);
+                if (datalength > 900)
+                    return (int)(random.next() % 127);
+                if (datalength > 400)
+                    return (int)(random.next() % 521);
+                return (int)(random.next() % 1021);
+            }
+
+            int pos = FindPos(data_size_list0, other_data_size);
+            int final_pos = pos + (int)(random.next() % (ulong)(data_size_list0.Length - pos));
+            return data_size_list0[final_pos] - other_data_size;
+        }
+
+    }
+
+    class AuthChain_d : AuthChain_c
+    {
+        public AuthChain_d(string method)
+            : base(method)
+        {
+
+        }
+
+        private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
+            {"auth_chain_d", new int[]{1, 0, 1}},
+        };
+
+        public static new List<string> SupportedObfs()
+        {
+            return new List<string>(_obfs.Keys);
+        }
+
+        public override Dictionary<string, int[]> GetObfs()
+        {
+            return _obfs;
+        }
+
+        protected void CheckAndPatchDataSize(List<int> data_list, xorshift128plus random)
+        {
+            if (data_list[data_list.Count - 1] < 1300 && data_list.Count < 64)
+            {
+                data_list.Add((int)(random.next() % 2340 % 2040 % 1440));
+                CheckAndPatchDataSize(data_list, random);
+            }
+        }
+
+        protected new void InitDataSizeList()
+        {
+            xorshift128plus random = new xorshift128plus();
+            random.init_from_bin(Server.key);
+            int len = (int)(random.next() % (8 + 16) + (4 + 8));
+            List<int> data_list = new List<int>();
+            for (int i = 0; i < len; ++i)
+            {
+                data_list.Add((int)(random.next() % 2340 % 2040 % 1440));
+            }
+            data_list.Sort();
+            int old_len = data_list.Count;
+            CheckAndPatchDataSize(data_list, random);
+            if (old_len != data_list.Count)
+            {
+                data_list.Sort();
+            }
+            data_size_list0 = data_list.ToArray();
+        }
+
+        public override void SetServerInfo(ServerInfo serverInfo)
+        {
+            Server = serverInfo;
+            InitDataSizeList();
+        }
+
+        protected override int GetRandLen(int datalength, xorshift128plus random, byte[] last_hash)
+        {
+            int other_data_size = datalength + Server.overhead;
+
+            if (other_data_size >= data_size_list0[data_size_list0.Length - 1])
+            {
+                return 0;
+            }
+
+            random.init_from_bin(last_hash, datalength);
+            int pos = FindPos(data_size_list0, other_data_size);
+            int final_pos = pos + (int)(random.next() % (ulong)(data_size_list0.Length - pos));
+            return data_size_list0[final_pos] - other_data_size;
+        }
+
+    }
 }
