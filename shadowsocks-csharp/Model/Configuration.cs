@@ -78,6 +78,27 @@ namespace Shadowsocks.Model
         public static string config_password = "";
     }
 
+    [Serializable()]
+    class ConfigurationException : System.Exception
+    {
+        public ConfigurationException() : base() { }
+        public ConfigurationException(string message) : base(message) { }
+        public ConfigurationException(string message, System.Exception inner) : base(message, inner) { }
+        protected ConfigurationException(System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context)
+        { }
+    }
+    [Serializable()]
+    class ConfigurationWarning : System.Exception
+    {
+        public ConfigurationWarning() : base() { }
+        public ConfigurationWarning(string message) : base(message) { }
+        public ConfigurationWarning(string message, System.Exception inner) : base(message, inner) { }
+        protected ConfigurationWarning(System.Runtime.Serialization.SerializationInfo info,
+            System.Runtime.Serialization.StreamingContext context)
+        { }
+    }
+
     [Serializable]
     public class Configuration
     {
@@ -219,7 +240,7 @@ namespace Shadowsocks.Model
                             if (selServer != null)
                                 return selServer.group == server.group;
                             return false;
-                        } , true);
+                        }, true);
                     }
                     else
                     {
@@ -370,7 +391,15 @@ namespace Shadowsocks.Model
             CheckPort(server.server_port);
             if (server.server_udp_port != 0)
                 CheckPort(server.server_udp_port);
-            CheckPassword(server.password);
+            try
+            {
+                CheckPassword(server.password);
+            }
+            catch (ConfigurationWarning cw)
+            {
+                server.password = "";
+                MessageBox.Show(cw.Message, cw.Message, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
             CheckServer(server.server);
         }
 
@@ -619,7 +648,7 @@ namespace Shadowsocks.Model
         {
             if (port <= 0 || port > 65535)
             {
-                throw new ArgumentException(I18N.GetString("Port out of range"));
+                throw new ConfigurationException(I18N.GetString("Port out of range"));
             }
         }
 
@@ -627,7 +656,8 @@ namespace Shadowsocks.Model
         {
             if (string.IsNullOrEmpty(password))
             {
-                throw new ArgumentException(I18N.GetString("Password can not be blank"));
+                throw new ConfigurationWarning(I18N.GetString("Password are blank"));
+                //throw new ConfigurationException(I18N.GetString("Password can not be blank"));
             }
         }
 
@@ -635,7 +665,7 @@ namespace Shadowsocks.Model
         {
             if (string.IsNullOrEmpty(server))
             {
-                throw new ArgumentException(I18N.GetString("Server IP can not be blank"));
+                throw new ConfigurationException(I18N.GetString("Server IP can not be blank"));
             }
         }
 
@@ -777,7 +807,7 @@ namespace Shadowsocks.Model
             if (--saveCounter <= 0)
             {
                 saveCounter = 256;
-                if ((DateTime.Now - saveTime).TotalMinutes > 10 )
+                if ((DateTime.Now - saveTime).TotalMinutes > 10)
                 {
                     lock (servers)
                     {
@@ -798,7 +828,7 @@ namespace Shadowsocks.Model
             if (--saveCounter <= 0)
             {
                 saveCounter = 256;
-                if ((DateTime.Now - saveTime).TotalMinutes > 10 )
+                if ((DateTime.Now - saveTime).TotalMinutes > 10)
                 {
                     lock (servers)
                     {

@@ -204,6 +204,7 @@ Illegal port number format=非法連接埠格式
 Please add at least one server=請添加至少一個伺服器
 Server IP can not be blank=伺服器 IP 不能為空
 Password can not be blank=密碼不能為空
+Password are blank=密碼為空
 Port out of range=連接埠超出範圍
 {0} {1} Update Found={0} {1} 更新
 Click menu to download=點擊菜單項下載
