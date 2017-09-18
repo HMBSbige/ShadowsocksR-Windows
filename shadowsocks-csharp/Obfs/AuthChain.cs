@@ -810,7 +810,7 @@ namespace Shadowsocks.Obfs
         {
 
         }
-        
+
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
             {"auth_chain_e", new int[]{1, 0, 1}},
         };
@@ -824,7 +824,7 @@ namespace Shadowsocks.Obfs
         {
             return _obfs;
         }
-        
+
         protected override int GetRandLen(int datalength, xorshift128plus random, byte[] last_hash)
         {
             int other_data_size = datalength + Server.overhead;
@@ -833,9 +833,90 @@ namespace Shadowsocks.Obfs
             {
                 return 0;
             }
-            
+
             int pos = FindPos(data_size_list0, other_data_size);
             return data_size_list0[pos] - other_data_size;
+        }
+
+    }
+
+    class AuthChain_f : AuthChain_e
+    {
+        public AuthChain_f(string method)
+            : base(method)
+        {
+
+        }
+
+        private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
+            {"auth_chain_f", new int[]{1, 0, 1}},
+        };
+
+        public static new List<string> SupportedObfs()
+        {
+            return new List<string>(_obfs.Keys);
+        }
+
+        public override Dictionary<string, int[]> GetObfs()
+        {
+            return _obfs;
+        }
+
+        protected long key_change_interval = 60 * 60 * 24;    // a day
+        protected long key_change_datetime_key;
+        protected List<byte> key_change_datetime_key_bytes = new List<byte>();
+
+        protected new void InitDataSizeList()
+        {
+            xorshift128plus random = new xorshift128plus();
+            byte[] newKey = new byte[Server.key.Length];
+            Server.key.CopyTo(newKey, 0);
+            for (int i = 0; i < 8; i++)
+            {
+                newKey[i] ^= key_change_datetime_key_bytes[i];
+            }
+            random.init_from_bin(newKey);
+            int len = (int)(random.next() % (8 + 16) + (4 + 8));
+            List<int> data_list = new List<int>();
+            for (int i = 0; i < len; ++i)
+            {
+                data_list.Add((int)(random.next() % 2340 % 2040 % 1440));
+            }
+            data_list.Sort();
+            int old_len = data_list.Count;
+            CheckAndPatchDataSize(data_list, random);
+            if (old_len != data_list.Count)
+            {
+                data_list.Sort();
+            }
+            data_size_list0 = data_list.ToArray();
+        }
+
+        public override void SetServerInfo(ServerInfo serverInfo)
+        {
+            Server = serverInfo;
+            string protocalParams = serverInfo.param;
+            if (protocalParams != "")
+            {
+                if (-1 != protocalParams.IndexOf("#", StringComparison.Ordinal))
+                {
+                    protocalParams = protocalParams.Split('#')[1];
+                }
+                Int64 interval;
+                if (Int64.TryParse(protocalParams, out interval))
+                {
+                    key_change_interval = interval;
+                }
+            }
+            // https://stackoverflow.com/a/17632585/3548568
+            Int64 unixTimestamp = (Int64)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds);
+            key_change_datetime_key = unixTimestamp / key_change_interval;
+            for (int i = 7; i > -1; --i)
+            {
+                byte b = (byte)(key_change_datetime_key >> (8 * i) & 0xFF);
+                key_change_datetime_key_bytes.Add(b);
+            }
+            InitDataSizeList();
         }
 
     }
