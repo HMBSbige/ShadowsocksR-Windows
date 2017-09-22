@@ -862,8 +862,8 @@ namespace Shadowsocks.Obfs
             return _obfs;
         }
 
-        protected long key_change_interval = 60 * 60 * 24;    // a day
-        protected long key_change_datetime_key;
+        protected UInt64 key_change_interval = 60 * 60 * 24;    // a day by second
+        protected UInt64 key_change_datetime_key;
         protected List<byte> key_change_datetime_key_bytes = new List<byte>();
 
         protected new void InitDataSizeList()
@@ -902,14 +902,14 @@ namespace Shadowsocks.Obfs
                 {
                     protocalParams = protocalParams.Split('#')[1];
                 }
-                Int64 interval;
-                if (Int64.TryParse(protocalParams, out interval))
+                UInt64 interval;
+                if (UInt64.TryParse(protocalParams, out interval))
                 {
                     key_change_interval = interval;
                 }
             }
             // https://stackoverflow.com/a/17632585/3548568
-            Int64 unixTimestamp = (Int64)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds);
+            UInt64 unixTimestamp = (UInt64)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds);
             key_change_datetime_key = unixTimestamp / key_change_interval;
             for (int i = 7; i > -1; --i)
             {
