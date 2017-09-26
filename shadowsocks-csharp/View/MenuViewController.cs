@@ -194,8 +194,10 @@ namespace Shadowsocks.View
 
             // we want to show more details but notify icon title is limited to 63 characters
             string text = (enabled ?
-                    I18N.GetString("System Proxy On: ") + (global ? I18N.GetString("Global") : I18N.GetString("PAC")) :
-                    String.Format(I18N.GetString("Running: Port {0}"), config.localPort))  // this feedback is very important because they need to know Shadowsocks is running
+                    (global ? I18N.GetString("Global") : I18N.GetString("PAC")) :
+                    I18N.GetString("Disable system proxy"))
+                    + "\r\n"
+                    + String.Format(I18N.GetString("Running: Port {0}"), config.localPort)  // this feedback is very important because they need to know Shadowsocks is running
                     ;
             _notifyIcon.Text = text.Substring(0, Math.Min(63, text.Length));
         }
