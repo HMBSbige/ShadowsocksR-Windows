@@ -478,7 +478,9 @@
             "auth_chain_a",
             "auth_chain_b",
             "auth_chain_c",
-            "auth_chain_d"});
+            "auth_chain_d",
+            "auth_chain_e",
+            "auth_chain_f"});
             this.TCPProtocolComboBox.Location = new System.Drawing.Point(108, 117);
             this.TCPProtocolComboBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 7);
             this.TCPProtocolComboBox.Name = "TCPProtocolComboBox";
