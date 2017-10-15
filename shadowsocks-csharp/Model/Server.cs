@@ -384,30 +384,21 @@ namespace Shadowsocks.Model
             Dictionary<string, string> params_dict = new Dictionary<string, string>();
 
             Match match = null;
-            for (int nTry = 0; nTry < 2; ++nTry)
-            {
-                int param_start_pos = data.IndexOf("?");
-                if (param_start_pos > 0)
-                {
-                    params_dict = ParseParam(data.Substring(param_start_pos + 1));
-                    data = data.Substring(0, param_start_pos);
-                }
-                if (data.IndexOf("/") >= 0)
-                {
-                    data = data.Substring(0, data.LastIndexOf("/"));
-                }
 
-                Regex UrlFinder = new Regex("^(.+):([^:]+):([^:]*):([^:]+):([^:]*):([^:]+)");
-                match = UrlFinder.Match(data);
-                if (match.Success)
-                    break;
-                // try match which not encode to base64
-                //ssr = Regex.Match(ssrURL, @"ssr://([A-Za-z0-9-_.:=?&/\[\]]+)", RegexOptions.IgnoreCase);
-                //if (ssr.Success)
-                //    data = ssr.Groups[1].Value;
-                //else
-                    throw new FormatException();
+            int param_start_pos = data.IndexOf("?");
+            if (param_start_pos > 0)
+            {
+                params_dict = ParseParam(data.Substring(param_start_pos + 1));
+                data = data.Substring(0, param_start_pos);
             }
+            if (data.IndexOf("/") >= 0)
+            {
+                data = data.Substring(0, data.LastIndexOf("/"));
+            }
+
+            Regex UrlFinder = new Regex("^(.+):([^:]+):([^:]*):([^:]+):([^:]*):([^:]+)");
+            match = UrlFinder.Match(data);
+
             if (match == null || !match.Success)
                 throw new FormatException();
 
