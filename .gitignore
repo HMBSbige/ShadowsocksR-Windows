@@ -11,3 +11,4 @@ TestResults
 *.exe
 
 /templates
+.vs/
