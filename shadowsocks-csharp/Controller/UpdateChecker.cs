@@ -47,7 +47,10 @@ namespace Shadowsocks.Controller
             try
             {
                 WebClient http = new WebClient();
-                http.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.3319.102 Safari/537.36");
+                http.Headers.Add("User-Agent",
+                String.IsNullOrEmpty(config.proxyUserAgent) ?
+                "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.3319.102 Safari/537.36"
+                : config.proxyUserAgent);
                 if (UseProxy)
                 {
                     WebProxy proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
