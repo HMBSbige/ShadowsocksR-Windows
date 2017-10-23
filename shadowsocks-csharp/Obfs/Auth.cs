@@ -962,13 +962,13 @@ namespace Shadowsocks.Obfs
 
                 byte[] encrypt_key = user_key;
 
-                Encryption.IEncryptor encryptor = Encryption.EncryptorFactory.GetEncryptor("aes-128-cbc", System.Convert.ToBase64String(encrypt_key) + SALT);
+                Encryption.IEncryptor encryptor = Encryption.EncryptorFactory.GetEncryptor("aes-128-cbc", System.Convert.ToBase64String(encrypt_key) + SALT, false);
                 int enc_outlen;
 
                 encryptor.SetIV(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
                 encryptor.Encrypt(encrypt, 16, encrypt_data, out enc_outlen);
                 encryptor.Dispose();
-                Array.Copy(encrypt_data, 16, encrypt, 4, 16);
+                Array.Copy(encrypt_data, 0, encrypt, 4, 16);
                 uid.CopyTo(encrypt, 0);
             }
             {

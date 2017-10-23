@@ -16,8 +16,8 @@ namespace Shadowsocks.Encryption
         private IntPtr _encryptCtx = IntPtr.Zero;
         private IntPtr _decryptCtx = IntPtr.Zero;
 
-        public LibcryptoEncryptor(string method, string password)
-            : base(method, password)
+        public LibcryptoEncryptor(string method, string password, bool cache)
+            : base(method, password, cache)
         {
             InitKey(method, password);
         }

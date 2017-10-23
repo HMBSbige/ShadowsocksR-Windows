@@ -560,7 +560,7 @@ namespace Shadowsocks.Model
                     string jsonString = SimpleJson.SimpleJson.SerializeObject(config);
                     if (GlobalConfiguration.config_password.Length > 0)
                     {
-                        IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
+                        IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password, false);
                         byte[] cfg_data = UTF8Encoding.UTF8.GetBytes(jsonString);
                         byte[] cfg_encrypt = new byte[cfg_data.Length + 128];
                         int data_len;
@@ -584,7 +584,7 @@ namespace Shadowsocks.Model
                 if (GlobalConfiguration.config_password.Length > 0)
                 {
                     byte[] cfg_encrypt = System.Convert.FromBase64String(config_str);
-                    IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
+                    IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password, false);
                     byte[] cfg_data = new byte[cfg_encrypt.Length];
                     int data_len;
                     encryptor.Decrypt(cfg_encrypt, cfg_encrypt.Length, cfg_data, out data_len);
@@ -725,7 +725,7 @@ namespace Shadowsocks.Model
                     if (GlobalConfiguration.config_password.Length > 0)
                     {
                         byte[] cfg_encrypt = System.Convert.FromBase64String(config_str);
-                        IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
+                        IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password, false);
                         byte[] cfg_data = new byte[cfg_encrypt.Length];
                         int data_len;
                         encryptor.Decrypt(cfg_encrypt, cfg_encrypt.Length, cfg_data, out data_len);
@@ -767,7 +767,7 @@ namespace Shadowsocks.Model
                     string jsonString = SimpleJson.SimpleJson.SerializeObject(config.servers);
                     if (GlobalConfiguration.config_password.Length > 0)
                     {
-                        IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
+                        IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password, false);
                         byte[] cfg_data = UTF8Encoding.UTF8.GetBytes(jsonString);
                         byte[] cfg_encrypt = new byte[cfg_data.Length + 128];
                         int data_len;

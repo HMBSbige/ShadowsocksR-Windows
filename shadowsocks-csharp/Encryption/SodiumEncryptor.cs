@@ -25,8 +25,8 @@ namespace Shadowsocks.Encryption
         private delegate void crypto_stream(byte[] c, byte[] m, ulong mlen, byte[] n, ulong ic, byte[] k);
         private crypto_stream encryptor_delegate;
 
-        public SodiumEncryptor(string method, string password)
-            : base(method, password)
+        public SodiumEncryptor(string method, string password, bool cache)
+            : base(method, password, cache)
         {
             InitKey(method, password);
             _encryptBuf = new byte[MAX_INPUT_SIZE + SODIUM_BLOCK_SIZE];
