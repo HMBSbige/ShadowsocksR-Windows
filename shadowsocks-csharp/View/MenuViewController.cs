@@ -480,7 +480,16 @@ namespace Shadowsocks.View
                                 }
                                 if (!match)
                                 {
-                                    config.configs.Add(server);
+                                    int insert_index = config.configs.Count;
+                                    for (int index = config.configs.Count - 1; index >= 0; --index)
+                                    {
+                                        if (config.configs[index].group == curGroup)
+                                        {
+                                            insert_index = index + 1;
+                                            break;
+                                        }
+                                    }
+                                    config.configs.Insert(insert_index, server);
                                     ++count;
                                 }
                             }
