@@ -182,6 +182,7 @@
     </Compile>
     <Compile Include="Util\Base64.cs" />
     <Compile Include="Util\CRC.cs" />
+    <Compile Include="Util\ServerName.cs" />
     <Compile Include="Util\Util.cs" />
     <Compile Include="View\ConfigForm.cs">
       <SubType>Form</SubType>
