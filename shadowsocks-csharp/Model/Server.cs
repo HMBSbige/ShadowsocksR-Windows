@@ -244,7 +244,17 @@ namespace Shadowsocks.Model
                 bool parsed = IPAddress.TryParse(server, out ipAddress);
                 if (parsed)
                 {
-                    int pos = server.LastIndexOf('.');
+                    int pos = -1;
+                    if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        pos = server.LastIndexOf('.');
+
+                    }
+                    else if (ipAddress.AddressFamily == AddressFamily.InterNetworkV6)
+                    {
+                        pos = server.LastIndexOf(':');
+                    }
+
                     if (pos > 0)
                     {
                         server_alter_name = "*" + server.Substring(pos);
