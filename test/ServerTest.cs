@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shadowsocks.Model;
+using Shadowsocks.Util;
 
 namespace test
 {
@@ -38,6 +39,27 @@ namespace test
 
             Assert.AreEqual<string>(server.remarks, "测试中文");
             Assert.AreEqual<string>(server.group, "firewallAirport");
+        }
+
+        [TestMethod]
+        public void TestHideServerName()
+        {
+            string addr4 = "127.0.0.1";
+            string addr6_type_1 = "2001:da8::1020";
+            string addr6_type_2 = "::f001:1020";
+            string addr6_type_3 = "2001:da8::";
+
+            string addr4_h = ServerName.HideServerAddr(addr4);
+            Assert.AreEqual(addr4_h, "*.1");
+
+            string addr6_type_1_h = ServerName.HideServerAddrV6(addr6_type_1);
+            Assert.AreEqual(addr6_type_1_h, "20**::**20");
+
+            string addr6_type_2_h = ServerName.HideServerAddrV6(addr6_type_2);
+            Assert.AreEqual(addr6_type_2_h, "::**20");
+
+            string addr6_type_3_h = ServerName.HideServerAddrV6(addr6_type_3);
+            Assert.AreEqual(addr6_type_3_h, "20**::");
         }
     }
 }
