@@ -8,44 +8,49 @@ namespace Shadowsocks.Util
     {
         public static string HideServerAddr(string addr)
         {
-            string server_alter_name = addr;
-            int pos = addr.LastIndexOf('.');
-            if (pos > 0)
+            System.Net.IPAddress ipAddr;
+            string serverAlterName = addr;
+
+            bool parsed = System.Net.IPAddress.TryParse(addr, out ipAddr);
+            if (parsed)
             {
-                server_alter_name = "*" + addr.Substring(pos);
+                char separator;
+                if (System.Net.Sockets.AddressFamily.InterNetwork == ipAddr.AddressFamily)
+                    separator = '.';  // IPv4
+                else
+                    separator = ':';  // IPv6
+
+                serverAlterName = HideAddr(addr, separator);
+            }
+            else
+            {
+                int pos = addr.IndexOf('.', 1);
+                if (pos > 0)
+                {
+                    serverAlterName = ("*" + addr.Substring(pos));
+                }
             }
 
-            return server_alter_name;
+            return serverAlterName;
         }
 
-        public static string HideServerAddrV6(string addr)
+        private static string HideAddr(string addr, char separator)
         {
-            string server_alter_name = addr;
+            string result = "";
 
-            int lpos = addr.IndexOf(':');
-            int rpos = addr.LastIndexOf(':');
+            string[] splited = addr.Split(separator);
+            string prefix = splited[0];
+            string suffix = splited[splited.Length - 1];
 
-            string san_prefix = addr.Substring(0, lpos);
-            string san_suffix = "";
-            if (rpos < addr.Length - 1)
-            {
-                san_suffix = addr.Substring(rpos + 1);
-            }
+            if (0 < prefix.Length)
+                result = (prefix + separator);
 
-            if (san_prefix.Length > 2)
-            {
-                string sub = san_prefix.Substring(0, 2);
-                san_prefix = sub + "**";
-            }
+            result += "**";
 
-            if (san_suffix.Length > 2)
-            {
-                string sub = san_suffix.Substring(2);
-                san_suffix = "**" + sub;
-            }
+            if (0 < suffix.Length)
+                result += (separator + suffix);
 
-            server_alter_name = san_prefix + "::" + san_suffix;
-            return server_alter_name;
+            return result;
         }
     }
 }
