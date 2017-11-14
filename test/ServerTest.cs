@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
@@ -44,22 +45,17 @@ namespace test
         [TestMethod]
         public void TestHideServerName()
         {
-            string addr4 = "127.0.0.1";
-            string addr6_type_1 = "2001:da8::1020";
-            string addr6_type_2 = "::f001:1020";
-            string addr6_type_3 = "2001:da8::";
+            Dictionary<string, string> addrs = new Dictionary<string, string>();
+            addrs.Add("127.0.0.1", "127.**.1");
+            addrs.Add("2001:db8:85a3:8d3:1319:8a2e:370:7348", "2001:**:7348");
+            addrs.Add("::1319:8a2e:370:7348", "**:7348");
+            addrs.Add("::1", "**:1");
 
-            string addr4_h = ServerName.HideServerAddr(addr4);
-            Assert.AreEqual(addr4_h, "*.1");
-
-            string addr6_type_1_h = ServerName.HideServerAddrV6(addr6_type_1);
-            Assert.AreEqual(addr6_type_1_h, "20**::**20");
-
-            string addr6_type_2_h = ServerName.HideServerAddrV6(addr6_type_2);
-            Assert.AreEqual(addr6_type_2_h, "::**20");
-
-            string addr6_type_3_h = ServerName.HideServerAddrV6(addr6_type_3);
-            Assert.AreEqual(addr6_type_3_h, "20**::");
+            foreach (string key in addrs.Keys)
+            {
+                string val = ServerName.HideServerAddr(key);
+                Assert.AreEqual(addrs[key], val);
+            }
         }
     }
 }
