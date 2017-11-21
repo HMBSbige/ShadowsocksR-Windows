@@ -112,7 +112,7 @@ namespace Shadowsocks.Model
 
         public string dnsServer;
         public int reconnectTimes;
-        public int randomAlgorithm;
+        public string balanceAlgorithm;
         public bool randomInGroup;
         public int TTL;
         public int connectTimeout;
@@ -235,7 +235,7 @@ namespace Shadowsocks.Model
                     int index;
                     if (filter == null && randomInGroup)
                     {
-                        index = serverStrategy.Select(configs, this.index, randomAlgorithm, delegate (Server server, Server selServer)
+                        index = serverStrategy.Select(configs, this.index, balanceAlgorithm, delegate (Server server, Server selServer)
                         {
                             if (selServer != null)
                                 return selServer.group == server.group;
@@ -244,7 +244,7 @@ namespace Shadowsocks.Model
                     }
                     else
                     {
-                        index = serverStrategy.Select(configs, this.index, randomAlgorithm, filter, true);
+                        index = serverStrategy.Select(configs, this.index, balanceAlgorithm, filter, true);
                     }
                     if (index == -1) return GetErrorServer();
                     return configs[index];
@@ -254,7 +254,7 @@ namespace Shadowsocks.Model
                     int index;
                     if (filter == null && randomInGroup)
                     {
-                        index = serverStrategy.Select(configs, this.index, randomAlgorithm, delegate (Server server, Server selServer)
+                        index = serverStrategy.Select(configs, this.index, balanceAlgorithm, delegate (Server server, Server selServer)
                         {
                             if (selServer != null)
                                 return selServer.group == server.group;
@@ -263,7 +263,7 @@ namespace Shadowsocks.Model
                     }
                     else
                     {
-                        index = serverStrategy.Select(configs, this.index, randomAlgorithm, filter);
+                        index = serverStrategy.Select(configs, this.index, balanceAlgorithm, filter);
                     }
                     if (index == -1) return GetErrorServer();
                     if (targetAddr != null)
@@ -413,7 +413,7 @@ namespace Shadowsocks.Model
             connectTimeout = 5;
             dnsServer = "";
 
-            randomAlgorithm = (int)ServerSelectStrategy.SelectAlgorithm.LowException;
+            balanceAlgorithm = "LowException";
             random = true;
             sysProxyMode = (int)ProxyMode.Global;
             proxyRuleMode = (int)ProxyRuleMode.BypassLanAndChina;
@@ -439,7 +439,7 @@ namespace Shadowsocks.Model
             shareOverLan = config.shareOverLan;
             localPort = config.localPort;
             reconnectTimes = config.reconnectTimes;
-            randomAlgorithm = config.randomAlgorithm;
+            balanceAlgorithm = config.balanceAlgorithm;
             randomInGroup = config.randomInGroup;
             TTL = config.TTL;
             connectTimeout = config.connectTimeout;

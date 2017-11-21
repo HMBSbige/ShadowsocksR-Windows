@@ -16,6 +16,7 @@ namespace Shadowsocks.View
         private ShadowsocksController controller;
         // this is a copy of configuration that we are working on
         private Configuration _modifiedConfiguration;
+        private Dictionary<int, string> _balanceIndexMap = new Dictionary<int, string>();
 
         public SettingsForm(ShadowsocksController controller)
         {
@@ -100,6 +101,7 @@ namespace Shadowsocks.View
             checkBalanceInGroup.Text = I18N.GetString("Balance in group");
             for (int i = 0; i < RandomComboBox.Items.Count; ++i)
             {
+                _balanceIndexMap[i] = RandomComboBox.Items[i].ToString();
                 RandomComboBox.Items[i] = I18N.GetString(RandomComboBox.Items[i].ToString());
             }
 
@@ -134,7 +136,7 @@ namespace Shadowsocks.View
                     MessageBox.Show(I18N.GetString("Failed to update registry"));
                 }
                 _modifiedConfiguration.random = checkRandom.Checked;
-                _modifiedConfiguration.randomAlgorithm = RandomComboBox.SelectedIndex;
+                _modifiedConfiguration.balanceAlgorithm = RandomComboBox.SelectedIndex >= 0 && RandomComboBox.SelectedIndex < _balanceIndexMap.Count ? _balanceIndexMap[RandomComboBox.SelectedIndex] : "OneByOne";
                 _modifiedConfiguration.randomInGroup = checkBalanceInGroup.Checked;
                 _modifiedConfiguration.TTL = Convert.ToInt32(NumTTL.Value);
                 _modifiedConfiguration.connectTimeout = Convert.ToInt32(NumTimeout.Value);
@@ -169,14 +171,16 @@ namespace Shadowsocks.View
 
             checkAutoStartup.Checked = AutoStartup.Check();
             checkRandom.Checked = _modifiedConfiguration.random;
-            if (_modifiedConfiguration.randomAlgorithm >= 0 && _modifiedConfiguration.randomAlgorithm < RandomComboBox.Items.Count)
+            int selectedIndex = 0;
+            for (int i = 0; i < _balanceIndexMap.Count; ++i)
             {
-                RandomComboBox.SelectedIndex = _modifiedConfiguration.randomAlgorithm;
+                if (_modifiedConfiguration.balanceAlgorithm == _balanceIndexMap[i])
+                {
+                    selectedIndex = i;
+                    break;
+                }
             }
-            else
-            {
-                RandomComboBox.SelectedIndex = (int)ServerSelectStrategy.SelectAlgorithm.LowException;
-            }
+            RandomComboBox.SelectedIndex = selectedIndex;
             checkBalanceInGroup.Checked = _modifiedConfiguration.randomInGroup;
             NumTTL.Value = _modifiedConfiguration.TTL;
             NumTimeout.Value = _modifiedConfiguration.connectTimeout;

@@ -27,6 +27,8 @@ namespace Shadowsocks.Controller
         private List<TransLog> sizeTransfer = new List<TransLog>();
         public string server;
         public ServerTransferTotal transfer;
+        public int upload_cnt = 0;
+        public int download_cnt = 0;
 
         public void BeginConnect()
         {
@@ -64,6 +66,8 @@ namespace Shadowsocks.Controller
             {
                 transfer.AddDownload(server, size);
             }
+            upload_cnt = 0;
+            download_cnt += 1;
 #if DEBUG
             if (sizeTransfer.Count < 1024 * 128)
             {
@@ -73,7 +77,8 @@ namespace Shadowsocks.Controller
                 }
             }
 #endif
-            return sizeDownload > 1024 * 256 && sizeDownload > (DateTime.Now - timeConnectEnd).TotalSeconds * 1024 * 16;
+            return download_cnt > 30;
+            //return sizeDownload > 1024 * 256 && sizeDownload > (DateTime.Now - timeConnectEnd).TotalSeconds * 1024 * 16;
         }
         public void AddProtocolRecvSize(int size)
         {
@@ -92,6 +97,8 @@ namespace Shadowsocks.Controller
             {
                 transfer.AddUpload(server, size);
             }
+            upload_cnt = 1;
+            download_cnt = 0;
 #if DEBUG
             if (sizeTransfer.Count < 1024 * 128)
             {
@@ -101,7 +108,8 @@ namespace Shadowsocks.Controller
                 }
             }
 #endif
-            return sizeUpload > 1024 * 256 && sizeUpload > (DateTime.Now - timeConnectEnd).TotalSeconds * 1024 * 16;
+            return upload_cnt > 30;
+            //return sizeUpload > 1024 * 256 && sizeUpload > (DateTime.Now - timeConnectEnd).TotalSeconds * 1024 * 16;
         }
 
         public string TransferLog()

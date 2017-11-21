@@ -704,7 +704,7 @@ namespace Shadowsocks.Controller
             Thread.Sleep(200);
             CloseSocket(ref remote);
             CloseSocket(ref remoteUDP);
-            if (connection != null && cfg != null)
+            if (connection != null && cfg != null && connection.GetSocket() != null)
             {
                 Logging.Debug("Close   " + cfg.targetHost + ":" + cfg.targetPort.ToString() + " " + connection.GetSocket().Handle.ToString());
             }

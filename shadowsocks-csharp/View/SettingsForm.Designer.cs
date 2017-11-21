@@ -150,8 +150,9 @@
             this.RandomComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.RandomComboBox.FormattingEnabled = true;
             this.RandomComboBox.Items.AddRange(new object[] {
-            "Order",
+            "OneByOne",
             "Random",
+            "FastDownloadSpeed",
             "LowLatency",
             "LowException",
             "SelectedFirst",

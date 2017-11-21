@@ -88,8 +88,9 @@ Original=原版
 Verify all=校驗所有數據
 
 Balance=負載均衡
-Order=按次序
+OneByOne=按次序
 Random=隨機
+FastDownloadSpeed=下載速度優先
 LowLatency=低延遲優先
 LowException=低錯誤優先
 SelectedFirst=選中優先
