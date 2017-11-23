@@ -451,6 +451,7 @@ namespace Shadowsocks.View
                     // import all, find difference
                     {
                         Dictionary<string, Server> old_servers = new Dictionary<string, Server>();
+                        Dictionary<string, Server> old_insert_servers = new Dictionary<string, Server>();
                         if (!String.IsNullOrEmpty(lastGroup))
                         {
                             for (int i = config.configs.Count - 1; i >= 0; --i)
@@ -467,15 +468,30 @@ namespace Shadowsocks.View
                             {
                                 Server server = new Server(url, curGroup);
                                 bool match = false;
-                                foreach (KeyValuePair<string, Server> pair in old_servers)
+                                if (!match)
                                 {
-                                    if (server.isMatchServer(pair.Value))
+                                    foreach (KeyValuePair<string, Server> pair in old_insert_servers)
                                     {
-                                        match = true;
-                                        old_servers.Remove(pair.Key);
-                                        pair.Value.CopyServerInfo(server);
-                                        ++count;
-                                        break;
+                                        if (server.isMatchServer(pair.Value))
+                                        {
+                                            match = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                old_insert_servers[server.id] = server;
+                                if (!match)
+                                {
+                                    foreach (KeyValuePair<string, Server> pair in old_servers)
+                                    {
+                                        if (server.isMatchServer(pair.Value))
+                                        {
+                                            match = true;
+                                            old_servers.Remove(pair.Key);
+                                            pair.Value.CopyServerInfo(server);
+                                            ++count;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (!match)
