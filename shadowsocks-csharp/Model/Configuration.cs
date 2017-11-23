@@ -71,6 +71,7 @@ namespace Shadowsocks.Model
 
         public string URL = DEFAULT_FEED_URL;
         public string Group;
+        public UInt64 LastUpdateTime;
     }
 
     public class GlobalConfiguration

@@ -335,6 +335,7 @@ namespace Shadowsocks.View
 
         void updateFreeNodeChecker_NewFreeNodeFound(object sender, EventArgs e)
         {
+            string lastGroup = null;
             int count = 0;
             if (!String.IsNullOrEmpty(updateFreeNodeChecker.FreeNodeResult))
             {
@@ -389,7 +390,6 @@ namespace Shadowsocks.View
                         if (!config.isDefaultConfig())
                             keep_selected_server = true;
                     }
-                    string lastGroup = null;
                     string curGroup = null;
                     foreach (string url in urls)
                     {
@@ -556,19 +556,28 @@ namespace Shadowsocks.View
                     {
                         config.index = config.configs.Count - 1;
                     }
+                    if (count > 0)
+                    {
+                        for (int i = 0; i < config.serverSubscribes.Count; ++i)
+                        {
+                            if (config.serverSubscribes[i].URL == updateFreeNodeChecker.subscribeTask.URL)
+                            {
+                                config.serverSubscribes[i].LastUpdateTime = (UInt64)Math.Floor(DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
+                            }
+                        }
+                    }
                     controller.SaveServersConfig(config);
-
                 }
             }
             if (count > 0)
             {
                 ShowBalloonTip(I18N.GetString("Success"),
-                    I18N.GetString("Update subscribe SSR node success"), ToolTipIcon.Info, 10000);
+                    String.Format(I18N.GetString("Update subscribe {0} success"), lastGroup), ToolTipIcon.Info, 10000);
             }
             else
             {
                 ShowBalloonTip(I18N.GetString("Error"),
-                    I18N.GetString("Update subscribe SSR node failure"), ToolTipIcon.Info, 10000);
+                    String.Format(I18N.GetString("Update subscribe {0} failure"), lastGroup), ToolTipIcon.Info, 10000);
             }
             if (updateSubscribeManager.Next())
             {

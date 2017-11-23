@@ -207,6 +207,7 @@ Proxy With Rule=规则代理
 Subscribe Settings=订阅设置
 URL=网址
 Group name=组名
+Last Update=最近更新
 Auto update=自动更新
 
 # Messages
@@ -238,6 +239,6 @@ Failed to update registry=无法修改注册表
 System Proxy On: =系统代理已启用：
 Running: Port {0}=正在运行：端口 {0}
 Password NOT match=密码不匹配
-Update subscribe SSR node success=SSR服务器订阅更新成功
-Update subscribe SSR node failure=SSR服务器订阅更新失败
+Update subscribe {0} success=服务器订阅 {0} 更新成功
+Update subscribe {0} failure=服务器订阅 {0} 更新失败
 Success=成功

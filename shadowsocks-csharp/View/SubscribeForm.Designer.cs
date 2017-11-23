@@ -29,11 +29,11 @@
         private void InitializeComponent()
         {
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.checkBoxAutoUpdate = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.textBoxURL = new System.Windows.Forms.TextBox();
             this.textBoxGroup = new System.Windows.Forms.TextBox();
+            this.checkBoxAutoUpdate = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
@@ -42,6 +42,8 @@
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.buttonAdd = new System.Windows.Forms.Button();
             this.buttonDel = new System.Windows.Forms.Button();
+            this.label3 = new System.Windows.Forms.Label();
+            this.textUpdate = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -58,14 +60,51 @@
             this.tableLayoutPanel1.Controls.Add(this.label2, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.textBoxURL, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.textBoxGroup, 1, 1);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(352, 3);
+            this.tableLayoutPanel1.Controls.Add(this.label3, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.textUpdate, 1, 2);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(353, 3);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 3;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(263, 74);
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(269, 81);
             this.tableLayoutPanel1.TabIndex = 0;
+            // 
+            // label1
+            // 
+            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(51, 7);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(23, 12);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "URL";
+            // 
+            // label2
+            // 
+            this.label2.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(9, 34);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(65, 12);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "Group name";
+            // 
+            // textBoxURL
+            // 
+            this.textBoxURL.Location = new System.Drawing.Point(80, 3);
+            this.textBoxURL.Name = "textBoxURL";
+            this.textBoxURL.Size = new System.Drawing.Size(186, 21);
+            this.textBoxURL.TabIndex = 1;
+            // 
+            // textBoxGroup
+            // 
+            this.textBoxGroup.Location = new System.Drawing.Point(80, 30);
+            this.textBoxGroup.Name = "textBoxGroup";
+            this.textBoxGroup.ReadOnly = true;
+            this.textBoxGroup.Size = new System.Drawing.Size(186, 21);
+            this.textBoxGroup.TabIndex = 1;
             // 
             // checkBoxAutoUpdate
             // 
@@ -77,42 +116,6 @@
             this.checkBoxAutoUpdate.Text = "Auto update";
             this.checkBoxAutoUpdate.UseVisualStyleBackColor = true;
             // 
-            // label1
-            // 
-            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(45, 7);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(23, 12);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "URL";
-            // 
-            // label2
-            // 
-            this.label2.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(3, 34);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(65, 12);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "Group name";
-            // 
-            // textBoxURL
-            // 
-            this.textBoxURL.Location = new System.Drawing.Point(74, 3);
-            this.textBoxURL.Name = "textBoxURL";
-            this.textBoxURL.Size = new System.Drawing.Size(186, 21);
-            this.textBoxURL.TabIndex = 1;
-            this.textBoxURL.TextChanged += new System.EventHandler(this.textBoxURL_TextChanged);
-            // 
-            // textBoxGroup
-            // 
-            this.textBoxGroup.Location = new System.Drawing.Point(74, 30);
-            this.textBoxGroup.Name = "textBoxGroup";
-            this.textBoxGroup.ReadOnly = true;
-            this.textBoxGroup.Size = new System.Drawing.Size(186, 21);
-            this.textBoxGroup.TabIndex = 1;
-            // 
             // tableLayoutPanel2
             // 
             this.tableLayoutPanel2.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
@@ -121,11 +124,11 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel2.Controls.Add(this.buttonOK, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.buttonCancel, 1, 0);
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(352, 264);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(353, 264);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(291, 60);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(290, 60);
             this.tableLayoutPanel2.TabIndex = 2;
             // 
             // buttonOK
@@ -142,7 +145,7 @@
             // buttonCancel
             // 
             this.buttonCancel.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonCancel.Location = new System.Drawing.Point(167, 10);
+            this.buttonCancel.Location = new System.Drawing.Point(166, 10);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(102, 39);
             this.buttonCancel.TabIndex = 0;
@@ -215,6 +218,24 @@
             this.buttonDel.UseVisualStyleBackColor = true;
             this.buttonDel.Click += new System.EventHandler(this.buttonDel_Click);
             // 
+            // label3
+            // 
+            this.label3.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(3, 61);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(71, 12);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "Last Update";
+            // 
+            // textUpdate
+            // 
+            this.textUpdate.Location = new System.Drawing.Point(80, 57);
+            this.textUpdate.Name = "textUpdate";
+            this.textUpdate.ReadOnly = true;
+            this.textUpdate.Size = new System.Drawing.Size(186, 21);
+            this.textUpdate.TabIndex = 1;
+            // 
             // SubscribeForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -254,5 +275,7 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.Button buttonAdd;
         private System.Windows.Forms.Button buttonDel;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox textUpdate;
     }
 }
