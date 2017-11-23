@@ -1,0 +1,19 @@
+version: 1.0.{build}
+image: Visual Studio 2015
+environment:
+  matrix:
+    - platform: Any CPU
+      configuration: Debug
+    - platform: Any CPU
+      configuration: Release
+matrix:
+  fast_finish: false
+build:
+  parallel: true
+  verbosity: normal
+artifacts:
+- path: shadowsocks-csharp\bin\2.0\Release\ShadowsocksR.exe
+  name: ShadowsocksR-dotnet2.0.exe
+- path: shadowsocks-csharp\bin\4.0\Release\ShadowsocksR.exe
+  name: ShadowsocksR-dotnet4.0.exe
+
