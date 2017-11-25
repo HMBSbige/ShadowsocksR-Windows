@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using Shadowsocks.Model;
 
 namespace Shadowsocks.Encryption
 {
@@ -10,7 +11,7 @@ namespace Shadowsocks.Encryption
     {
         protected Dictionary<string, EncryptorInfo> ciphers;
 
-        private static readonly Dictionary<string, byte[]> CachedKeys = new Dictionary<string, byte[]>();
+        private static readonly LRUCache<string, byte[]> CachedKeys = new LRUCache<string, byte[]>(600);
         protected byte[] _encryptIV;
         protected byte[] _decryptIV;
         protected int _decryptIVReceived;
@@ -28,7 +29,7 @@ namespace Shadowsocks.Encryption
         protected byte[] encbuf = new byte[MAX_INPUT_SIZE];
         protected byte[] decbuf = new byte[MAX_INPUT_SIZE];
 
-        public IVEncryptor(string method, string password)
+        public IVEncryptor(string method, string password, bool cache)
             : base(method, password)
         {
             InitKey(method, password);
@@ -41,6 +42,8 @@ namespace Shadowsocks.Encryption
             if (iv != null && iv.Length == ivLen)
             {
                 iv.CopyTo(_iv, 0);
+                _encryptIVSent = true;
+                initCipher(iv, true);
                 return true;
             }
             return false;
@@ -84,12 +87,13 @@ namespace Shadowsocks.Encryption
                         _key = new byte[32];
                         byte[] iv = new byte[16];
                         bytesToKey(passbuf, _key);
-                        CachedKeys[k] = _key;
+                        CachedKeys.Set(k, _key);
+                        CachedKeys.Sweep();
                     }
                 }
             }
             if (_key == null)
-                _key = CachedKeys[k];
+                _key = CachedKeys.Get(k);
             Array.Resize(ref _iv, ivLen);
             randBytes(_iv, ivLen);
         }
@@ -150,10 +154,9 @@ namespace Shadowsocks.Encryption
                 _encryptIVSent = true;
                 Buffer.BlockCopy(_iv, 0, outbuf, 0, ivLen);
                 initCipher(outbuf, true);
-                outlength = length + ivLen;
 
-                cipherUpdate(true, length, buf, encbuf);
                 outlength = length + ivLen;
+                cipherUpdate(true, length, buf, encbuf);
                 Buffer.BlockCopy(encbuf, 0, outbuf, ivLen, length);
             }
             else
@@ -227,8 +230,8 @@ namespace Shadowsocks.Encryption
     public class NoneEncryptor
         : IVEncryptor
     {
-        public NoneEncryptor(string method, string password)
-            : base(method, password)
+        public NoneEncryptor(string method, string password, bool cache)
+            : base(method, password, cache)
         {
             InitKey(method, password);
         }

@@ -10,10 +10,12 @@ namespace Shadowsocks.Obfs
     class xorshift128plus
     {
         protected UInt64 v0, v1;
+        protected int init_loop;
 
-        public xorshift128plus()
+        public xorshift128plus(int init_loop_ = 4)
         {
             v0 = v1 = 0;
+            init_loop = init_loop_;
         }
 
         public UInt64 next()
@@ -42,7 +44,7 @@ namespace Shadowsocks.Obfs
             BitConverter.GetBytes((ushort)datalength).CopyTo(fill_bytes, 0);
             v0 = BitConverter.ToUInt64(fill_bytes, 0);
             v1 = BitConverter.ToUInt64(fill_bytes, 8);
-            for (int i = 0; i < 4; ++i)
+            for (int i = 0; i < init_loop; ++i)
             {
                 next();
             }
@@ -202,6 +204,11 @@ namespace Shadowsocks.Obfs
             }
         }
 
+        public virtual void OnInitAuthData(UInt64 unixTimestamp)
+        {
+
+        }
+
         public void PackAuthData(byte[] data, int datalength, byte[] outdata, out int outlength)
         {
             const int authhead_len = 4 + 8 + 4 + 16 + 4;
@@ -234,6 +241,7 @@ namespace Shadowsocks.Obfs
             UInt64 utc_time_second = (UInt64)Math.Floor(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
             UInt32 utc_time = (UInt32)(utc_time_second);
             Array.Copy(BitConverter.GetBytes(utc_time), 0, encrypt, 0, 4);
+            OnInitAuthData(utc_time_second);
 
             encrypt[12] = (byte)(Server.overhead);
             encrypt[13] = (byte)(Server.overhead >> 8);
@@ -277,13 +285,13 @@ namespace Shadowsocks.Obfs
 
                 byte[] encrypt_key = user_key;
 
-                Encryption.IEncryptor encryptor = Encryption.EncryptorFactory.GetEncryptor("aes-128-cbc", System.Convert.ToBase64String(encrypt_key) + SALT);
+                Encryption.IEncryptor encryptor = Encryption.EncryptorFactory.GetEncryptor("aes-128-cbc", System.Convert.ToBase64String(encrypt_key) + SALT, false);
                 int enc_outlen;
 
                 encryptor.SetIV(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
                 encryptor.Encrypt(encrypt, 16, encrypt_data, out enc_outlen);
                 encryptor.Dispose();
-                Array.Copy(encrypt_data, 16, encrypt, 4, 16);
+                Array.Copy(encrypt_data, 0, encrypt, 4, 16);
                 uid.CopyTo(encrypt, 0);
             }
             // final HMAC
@@ -294,7 +302,7 @@ namespace Shadowsocks.Obfs
                 Array.Copy(md5data, 0, encrypt, 20, 4);
             }
             encrypt.CopyTo(outdata, 12);
-            encryptor = EncryptorFactory.GetEncryptor("rc4", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(last_client_hash, 0, 16));
+            encryptor = EncryptorFactory.GetEncryptor("rc4", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(last_client_hash, 0, 16), false);
 
             // combine first chunk
             {
@@ -505,7 +513,7 @@ namespace Shadowsocks.Obfs
             byte[] rand_data = new byte[rand_len];
             random.NextBytes(rand_data);
             outlength = datalength + rand_len + 8;
-            encryptor = EncryptorFactory.GetEncryptor("rc4", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(md5data, 0, 16));
+            encryptor = EncryptorFactory.GetEncryptor("rc4", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(md5data, 0, 16), false);
             encryptor.Encrypt(plaindata, datalength, outdata, out datalength);
             rand_data.CopyTo(outdata, datalength);
             auth_data.CopyTo(outdata, outlength - 8);
@@ -541,7 +549,7 @@ namespace Shadowsocks.Obfs
             md5data = md5.ComputeHash(plaindata, datalength - 8, 7);
             int rand_len = UdpGetRandLen(random_server, md5data);
             outlength = datalength - rand_len - 8;
-            encryptor = EncryptorFactory.GetEncryptor("rc4", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(md5data, 0, 16));
+            encryptor = EncryptorFactory.GetEncryptor("rc4", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(md5data, 0, 16), false);
             encryptor.Decrypt(plaindata, outlength, plaindata, out outlength);
             return plaindata;
         }
@@ -572,7 +580,7 @@ namespace Shadowsocks.Obfs
             return _obfs;
         }
 
-        protected void InitDataSizeList()
+        protected virtual void InitDataSizeList()
         {
             xorshift128plus random = new xorshift128plus();
             random.init_from_bin(Server.key);
@@ -683,7 +691,7 @@ namespace Shadowsocks.Obfs
             return _obfs;
         }
 
-        protected new void InitDataSizeList()
+        protected override void InitDataSizeList()
         {
             xorshift128plus random = new xorshift128plus();
             random.init_from_bin(Server.key);
@@ -760,7 +768,7 @@ namespace Shadowsocks.Obfs
             }
         }
 
-        protected new void InitDataSizeList()
+        protected override void InitDataSizeList()
         {
             xorshift128plus random = new xorshift128plus();
             random.init_from_bin(Server.key);
@@ -866,7 +874,7 @@ namespace Shadowsocks.Obfs
         protected UInt64 key_change_datetime_key;
         protected List<byte> key_change_datetime_key_bytes = new List<byte>();
 
-        protected new void InitDataSizeList()
+        protected override void InitDataSizeList()
         {
             xorshift128plus random = new xorshift128plus();
             byte[] newKey = new byte[Server.key.Length];
@@ -908,8 +916,10 @@ namespace Shadowsocks.Obfs
                     key_change_interval = interval;
                 }
             }
-            // https://stackoverflow.com/a/17632585/3548568
-            UInt64 unixTimestamp = (UInt64)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds);
+        }
+
+        public override void OnInitAuthData(UInt64 unixTimestamp)
+        {
             key_change_datetime_key = unixTimestamp / key_change_interval;
             for (int i = 7; i > -1; --i)
             {

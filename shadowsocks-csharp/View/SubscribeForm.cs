@@ -40,6 +40,7 @@ namespace Shadowsocks.View
             checkBoxAutoUpdate.Text = I18N.GetString("Auto update");
             buttonOK.Text = I18N.GetString("OK");
             buttonCancel.Text = I18N.GetString("Cancel");
+            label3.Text = I18N.GetString("Last Update");
         }
 
         private void SubscribeForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -98,11 +99,6 @@ namespace Shadowsocks.View
             this.Close();
         }
 
-        private void textBoxURL_TextChanged(object sender, EventArgs e)
-        {
-            textBoxGroup.Text = "";
-        }
-
         private void UpdateList()
         {
             listServerSubscribe.Items.Clear();
@@ -129,6 +125,16 @@ namespace Shadowsocks.View
                 textBoxURL.Text = ss.URL;
                 textBoxGroup.Text = ss.Group;
                 _old_select_index = index;
+                if (ss.LastUpdateTime != 0)
+                {
+                    DateTime now = new DateTime(1970, 1, 1, 0, 0, 0);
+                    now = now.AddSeconds(ss.LastUpdateTime);
+                    textUpdate.Text = now.ToLongDateString() + " " + now.ToLongTimeString();
+                }
+                else
+                {
+                    textUpdate.Text = "(｢･ω･)｢";
+                }
             }
         }
 
@@ -137,8 +143,12 @@ namespace Shadowsocks.View
             if (index >= 0 && index < _modifiedConfiguration.serverSubscribes.Count)
             {
                 ServerSubscribe ss = _modifiedConfiguration.serverSubscribes[index];
-                ss.URL = textBoxURL.Text;
-                ss.Group = textBoxGroup.Text;
+                if (ss.URL != textBoxURL.Text)
+                {
+                    ss.URL = textBoxURL.Text;
+                    ss.Group = "";
+                    ss.LastUpdateTime = 0;
+                }
             }
         }
 

@@ -240,24 +240,7 @@ namespace Shadowsocks.Model
             string server_alter_name = server;
             if (hide)
             {
-                IPAddress ipAddress;
-                bool parsed = IPAddress.TryParse(server, out ipAddress);
-                if (parsed)
-                {
-                    int pos = server.LastIndexOf('.');
-                    if (pos > 0)
-                    {
-                        server_alter_name = "*" + server.Substring(pos);
-                    }
-                }
-                else
-                {
-                    int pos = server.IndexOf('.', 1);
-                    if (pos > 0)
-                    {
-                        server_alter_name = "*" + server.Substring(pos);
-                    }
-                }
+                server_alter_name = Util.ServerName.HideServerAddr(server);
             }
             if (string.IsNullOrEmpty(remarks_base64))
             {

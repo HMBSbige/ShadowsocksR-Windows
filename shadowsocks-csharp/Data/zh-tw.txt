@@ -88,8 +88,9 @@ Original=原版
 Verify all=校驗所有數據
 
 Balance=負載均衡
-Order=按次序
+OneByOne=按次序
 Random=隨機
+FastDownloadSpeed=下載速度優先
 LowLatency=低延遲優先
 LowException=低錯誤優先
 SelectedFirst=選中優先
@@ -194,6 +195,7 @@ Proxy With Rule=規則代理
 Subscribe Settings=訂閱設置
 URL=網址
 Group name=組名
+Last Update=最近更新
 Auto update=自動更新
 
 # Messages
@@ -225,6 +227,6 @@ Failed to update registry=無法修改註冊表
 System Proxy On: =系統代理已啟用：
 Running: Port {0}=正在運行：連接埠 {0}
 Password NOT match=密碼不匹配
-Update subscribe SSR node success=SSR伺服器訂閱更新成功
-Update subscribe SSR node failure=SSR伺服器訂閱更新失敗
+Update subscribe {0} success=伺服器訂閱 {0} 更新成功
+Update subscribe {0} failure=伺服器訂閱 {0} 更新失敗
 Success=成功

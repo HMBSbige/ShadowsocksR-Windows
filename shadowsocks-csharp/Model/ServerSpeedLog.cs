@@ -88,6 +88,12 @@ namespace Shadowsocks.Model
             }
         }
 
+        public void GetTransSpeed(out long upload, out long download)
+        {
+            upload = maxTransUpload;
+            download = maxTransDownload;
+        }
+
         public void ClearTrans()
         {
             lock (this)

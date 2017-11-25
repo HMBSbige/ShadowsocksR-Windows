@@ -335,6 +335,7 @@ namespace Shadowsocks.View
 
         void updateFreeNodeChecker_NewFreeNodeFound(object sender, EventArgs e)
         {
+            string lastGroup = null;
             int count = 0;
             if (!String.IsNullOrEmpty(updateFreeNodeChecker.FreeNodeResult))
             {
@@ -389,7 +390,6 @@ namespace Shadowsocks.View
                         if (!config.isDefaultConfig())
                             keep_selected_server = true;
                     }
-                    string lastGroup = null;
                     string curGroup = null;
                     foreach (string url in urls)
                     {
@@ -451,6 +451,7 @@ namespace Shadowsocks.View
                     // import all, find difference
                     {
                         Dictionary<string, Server> old_servers = new Dictionary<string, Server>();
+                        Dictionary<string, Server> old_insert_servers = new Dictionary<string, Server>();
                         if (!String.IsNullOrEmpty(lastGroup))
                         {
                             for (int i = config.configs.Count - 1; i >= 0; --i)
@@ -467,20 +468,44 @@ namespace Shadowsocks.View
                             {
                                 Server server = new Server(url, curGroup);
                                 bool match = false;
-                                foreach (KeyValuePair<string, Server> pair in old_servers)
+                                if (!match)
                                 {
-                                    if (server.isMatchServer(pair.Value))
+                                    foreach (KeyValuePair<string, Server> pair in old_insert_servers)
                                     {
-                                        match = true;
-                                        old_servers.Remove(pair.Key);
-                                        pair.Value.CopyServerInfo(server);
-                                        ++count;
-                                        break;
+                                        if (server.isMatchServer(pair.Value))
+                                        {
+                                            match = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                old_insert_servers[server.id] = server;
+                                if (!match)
+                                {
+                                    foreach (KeyValuePair<string, Server> pair in old_servers)
+                                    {
+                                        if (server.isMatchServer(pair.Value))
+                                        {
+                                            match = true;
+                                            old_servers.Remove(pair.Key);
+                                            pair.Value.CopyServerInfo(server);
+                                            ++count;
+                                            break;
+                                        }
                                     }
                                 }
                                 if (!match)
                                 {
-                                    config.configs.Add(server);
+                                    int insert_index = config.configs.Count;
+                                    for (int index = config.configs.Count - 1; index >= 0; --index)
+                                    {
+                                        if (config.configs[index].group == curGroup)
+                                        {
+                                            insert_index = index + 1;
+                                            break;
+                                        }
+                                    }
+                                    config.configs.Insert(insert_index, server);
                                     ++count;
                                 }
                             }
@@ -531,19 +556,28 @@ namespace Shadowsocks.View
                     {
                         config.index = config.configs.Count - 1;
                     }
+                    if (count > 0)
+                    {
+                        for (int i = 0; i < config.serverSubscribes.Count; ++i)
+                        {
+                            if (config.serverSubscribes[i].URL == updateFreeNodeChecker.subscribeTask.URL)
+                            {
+                                config.serverSubscribes[i].LastUpdateTime = (UInt64)Math.Floor(DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
+                            }
+                        }
+                    }
                     controller.SaveServersConfig(config);
-
                 }
             }
             if (count > 0)
             {
                 ShowBalloonTip(I18N.GetString("Success"),
-                    I18N.GetString("Update subscribe SSR node success"), ToolTipIcon.Info, 10000);
+                    String.Format(I18N.GetString("Update subscribe {0} success"), lastGroup), ToolTipIcon.Info, 10000);
             }
             else
             {
                 ShowBalloonTip(I18N.GetString("Error"),
-                    I18N.GetString("Update subscribe SSR node failure"), ToolTipIcon.Info, 10000);
+                    String.Format(I18N.GetString("Update subscribe {0} failure"), lastGroup), ToolTipIcon.Info, 10000);
             }
             if (updateSubscribeManager.Next())
             {

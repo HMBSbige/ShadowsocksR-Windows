@@ -704,7 +704,7 @@ namespace Shadowsocks.Controller
             Thread.Sleep(200);
             CloseSocket(ref remote);
             CloseSocket(ref remoteUDP);
-            if (connection != null && cfg != null)
+            if (connection != null && cfg != null && connection.GetSocket() != null)
             {
                 Logging.Debug("Close   " + cfg.targetHost + ":" + cfg.targetPort.ToString() + " " + connection.GetSocket().Handle.ToString());
             }
@@ -997,8 +997,8 @@ namespace Shadowsocks.Controller
             if (connection != null && connectionTCPIdle)
             {
                 connectionTCPIdle = false;
-                byte[] buffer = new byte[BufferSize];
                 int recv_size = remote == null ? RecvSize : remote.TcpMSS - remote.OverHead;
+                byte[] buffer = new byte[recv_size];
                 connection.BeginReceive(buffer, recv_size, 0,
                     new AsyncCallback(PipeConnectionReceiveCallback), null);
             }

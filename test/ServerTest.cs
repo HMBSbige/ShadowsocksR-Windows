@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shadowsocks.Model;
+using Shadowsocks.Util;
 
 namespace test
 {
@@ -38,6 +40,22 @@ namespace test
 
             Assert.AreEqual<string>(server.remarks, "测试中文");
             Assert.AreEqual<string>(server.group, "firewallAirport");
+        }
+
+        [TestMethod]
+        public void TestHideServerName()
+        {
+            Dictionary<string, string> addrs = new Dictionary<string, string>();
+            addrs.Add("127.0.0.1", "127.**.1");
+            addrs.Add("2001:db8:85a3:8d3:1319:8a2e:370:7348", "2001:**:7348");
+            addrs.Add("::1319:8a2e:370:7348", "**:7348");
+            addrs.Add("::1", "**:1");
+
+            foreach (string key in addrs.Keys)
+            {
+                string val = ServerName.HideServerAddr(key);
+                Assert.AreEqual(addrs[key], val);
+            }
         }
     }
 }

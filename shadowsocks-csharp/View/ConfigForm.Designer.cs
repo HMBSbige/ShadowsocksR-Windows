@@ -136,6 +136,7 @@
             // 
             // ServersListBox
             // 
+            this.ServersListBox.HorizontalScrollbar = true;
             this.ServersListBox.ItemHeight = 12;
             this.ServersListBox.Location = new System.Drawing.Point(0, 0);
             this.ServersListBox.Margin = new System.Windows.Forms.Padding(0);

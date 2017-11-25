@@ -70,6 +70,7 @@ namespace Shadowsocks.Model
 
         public string URL = DEFAULT_FEED_URL;
         public string Group;
+        public UInt64 LastUpdateTime;
     }
 
     public class GlobalConfiguration
@@ -111,7 +112,7 @@ namespace Shadowsocks.Model
 
         public string dnsServer;
         public int reconnectTimes;
-        public int randomAlgorithm;
+        public string balanceAlgorithm;
         public bool randomInGroup;
         public int TTL;
         public int connectTimeout;
@@ -234,7 +235,7 @@ namespace Shadowsocks.Model
                     int index;
                     if (filter == null && randomInGroup)
                     {
-                        index = serverStrategy.Select(configs, this.index, randomAlgorithm, delegate (Server server, Server selServer)
+                        index = serverStrategy.Select(configs, this.index, balanceAlgorithm, delegate (Server server, Server selServer)
                         {
                             if (selServer != null)
                                 return selServer.group == server.group;
@@ -243,7 +244,7 @@ namespace Shadowsocks.Model
                     }
                     else
                     {
-                        index = serverStrategy.Select(configs, this.index, randomAlgorithm, filter, true);
+                        index = serverStrategy.Select(configs, this.index, balanceAlgorithm, filter, true);
                     }
                     if (index == -1) return GetErrorServer();
                     return configs[index];
@@ -253,7 +254,7 @@ namespace Shadowsocks.Model
                     int index;
                     if (filter == null && randomInGroup)
                     {
-                        index = serverStrategy.Select(configs, this.index, randomAlgorithm, delegate (Server server, Server selServer)
+                        index = serverStrategy.Select(configs, this.index, balanceAlgorithm, delegate (Server server, Server selServer)
                         {
                             if (selServer != null)
                                 return selServer.group == server.group;
@@ -262,7 +263,7 @@ namespace Shadowsocks.Model
                     }
                     else
                     {
-                        index = serverStrategy.Select(configs, this.index, randomAlgorithm, filter);
+                        index = serverStrategy.Select(configs, this.index, balanceAlgorithm, filter);
                     }
                     if (index == -1) return GetErrorServer();
                     if (targetAddr != null)
@@ -412,7 +413,7 @@ namespace Shadowsocks.Model
             connectTimeout = 5;
             dnsServer = "";
 
-            randomAlgorithm = (int)ServerSelectStrategy.SelectAlgorithm.LowException;
+            balanceAlgorithm = "LowException";
             random = true;
             sysProxyMode = (int)ProxyMode.Global;
             proxyRuleMode = (int)ProxyRuleMode.BypassLanAndChina;
@@ -438,7 +439,7 @@ namespace Shadowsocks.Model
             shareOverLan = config.shareOverLan;
             localPort = config.localPort;
             reconnectTimes = config.reconnectTimes;
-            randomAlgorithm = config.randomAlgorithm;
+            balanceAlgorithm = config.balanceAlgorithm;
             randomInGroup = config.randomInGroup;
             TTL = config.TTL;
             connectTimeout = config.connectTimeout;
@@ -559,7 +560,7 @@ namespace Shadowsocks.Model
                     string jsonString = SimpleJson.SimpleJson.SerializeObject(config);
                     if (GlobalConfiguration.config_password.Length > 0)
                     {
-                        IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
+                        IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password, false);
                         byte[] cfg_data = UTF8Encoding.UTF8.GetBytes(jsonString);
                         byte[] cfg_encrypt = new byte[cfg_data.Length + 128];
                         int data_len;
@@ -583,7 +584,7 @@ namespace Shadowsocks.Model
                 if (GlobalConfiguration.config_password.Length > 0)
                 {
                     byte[] cfg_encrypt = System.Convert.FromBase64String(config_str);
-                    IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
+                    IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password, false);
                     byte[] cfg_data = new byte[cfg_encrypt.Length];
                     int data_len;
                     encryptor.Decrypt(cfg_encrypt, cfg_encrypt.Length, cfg_data, out data_len);
@@ -724,7 +725,7 @@ namespace Shadowsocks.Model
                     if (GlobalConfiguration.config_password.Length > 0)
                     {
                         byte[] cfg_encrypt = System.Convert.FromBase64String(config_str);
-                        IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
+                        IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password, false);
                         byte[] cfg_data = new byte[cfg_encrypt.Length];
                         int data_len;
                         encryptor.Decrypt(cfg_encrypt, cfg_encrypt.Length, cfg_data, out data_len);
@@ -766,7 +767,7 @@ namespace Shadowsocks.Model
                     string jsonString = SimpleJson.SimpleJson.SerializeObject(config.servers);
                     if (GlobalConfiguration.config_password.Length > 0)
                     {
-                        IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
+                        IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password, false);
                         byte[] cfg_data = UTF8Encoding.UTF8.GetBytes(jsonString);
                         byte[] cfg_encrypt = new byte[cfg_data.Length + 128];
                         int data_len;
