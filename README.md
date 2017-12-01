@@ -21,7 +21,7 @@ _Optionally_, download and install [Gpg4win](https://www.gpg4win.org/).
 From the Windows start menu, launch program **Kleopatra**. 
 Do **File** > **New Certificate** to create a personal OpenPGP key pair. 
 Save the signing key from
-[breakwa11/pubkey](https://github.com/breakwa11/pubkey) as a text file. 
+[Akkariiin/pubkey](https://github.com/Akkariiin/pubkey) as a text file. 
 Then do **File** > **Import Certificates** to import the signing key text file.
 After import, select the signing key and do 
 **Certificates** > **Certify Certificates**. 
@@ -54,14 +54,14 @@ to proxy to tunnel over ShadowsocksR
 
 ### Develop
 
-Visual Studio Express 2012 is recommended.
+Visual Studio Express 2017 is recommended.
 
 #### License
 
 GPLv3
 
-Copyright © BreakWa11 2017. Fork from Shadowsocks by clowwindy
+Copyright © Akkariiin 2018. Fork from ShadowsocksR by BreakWa11
 
-[Appveyor]:       https://ci.appveyor.com/project/breakwa11/shadowsocksr-csharp
-[Build Status]:   https://ci.appveyor.com/api/projects/status/itcxnad1y95gf2x5/branch/master?svg=true
+[Appveyor]:       https://ci.appveyor.com/project/Akkariiin/shadowsocksr-csharp
+[Build Status]:   https://ci.appveyor.com/api/projects/status/ey901turnakim5nv/branch/master?svg=true
 [latest release]: https://github.com/shadowsocksrr/shadowsocksr-csharp/releases
