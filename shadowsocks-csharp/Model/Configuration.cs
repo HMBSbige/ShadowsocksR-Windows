@@ -221,7 +221,7 @@ namespace Shadowsocks.Model
                 if (sameHostForSameTarget && !forceRandom && targetAddr != null && uri2time.ContainsKey(targetAddr))
                 {
                     UriVisitTime visit = uri2time[targetAddr];
-                    if (visit.index < configs.Count && configs[visit.index].enable)
+                    if (visit.index < configs.Count && configs[visit.index].enable && configs[visit.index].ServerSpeedLog().ErrorContinurousTimes == 0)
                     {
                         //uri2time.Remove(targetURI);
                         time2uri.Remove(visit);
@@ -556,18 +556,29 @@ namespace Shadowsocks.Model
             }
             try
             {
+                string jsonString = SimpleJson.SimpleJson.SerializeObject(config);
+                if (GlobalConfiguration.config_password.Length > 0)
+                {
+                    IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password, false);
+                    byte[] cfg_data = UTF8Encoding.UTF8.GetBytes(jsonString);
+                    byte[] cfg_encrypt = new byte[cfg_data.Length + 128];
+                    int data_len = 0;
+                    const int buffer_size = 32768;
+                    byte[] input = new byte[buffer_size];
+                    byte[] ouput = new byte[buffer_size + 128];
+                    for (int start_pos = 0; start_pos < cfg_data.Length; start_pos += buffer_size)
+                    {
+                        int len = Math.Min(cfg_data.Length - start_pos, buffer_size);
+                        int out_len;
+                        Buffer.BlockCopy(cfg_data, start_pos, input, 0, len);
+                        encryptor.Encrypt(input, len, ouput, out out_len);
+                        Buffer.BlockCopy(ouput, 0, cfg_encrypt, data_len, out_len);
+                        data_len += out_len;
+                    }
+                    jsonString = System.Convert.ToBase64String(cfg_encrypt, 0, data_len);
+                }
                 using (StreamWriter sw = new StreamWriter(File.Open(CONFIG_FILE, FileMode.Create)))
                 {
-                    string jsonString = SimpleJson.SimpleJson.SerializeObject(config);
-                    if (GlobalConfiguration.config_password.Length > 0)
-                    {
-                        IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password, false);
-                        byte[] cfg_data = UTF8Encoding.UTF8.GetBytes(jsonString);
-                        byte[] cfg_encrypt = new byte[cfg_data.Length + 128];
-                        int data_len;
-                        encryptor.Encrypt(cfg_data, cfg_data.Length, cfg_encrypt, out data_len);
-                        jsonString = System.Convert.ToBase64String(cfg_encrypt, 0, data_len);
-                    }
                     sw.Write(jsonString);
                     sw.Flush();
                 }
@@ -587,8 +598,19 @@ namespace Shadowsocks.Model
                     byte[] cfg_encrypt = System.Convert.FromBase64String(config_str);
                     IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password, false);
                     byte[] cfg_data = new byte[cfg_encrypt.Length];
-                    int data_len;
-                    encryptor.Decrypt(cfg_encrypt, cfg_encrypt.Length, cfg_data, out data_len);
+                    int data_len = 0;
+                    const int buffer_size = 32768;
+                    byte[] input = new byte[buffer_size];
+                    byte[] ouput = new byte[buffer_size + 128];
+                    for (int start_pos = 0; start_pos < cfg_encrypt.Length; start_pos += buffer_size)
+                    {
+                        int len = Math.Min(cfg_encrypt.Length - start_pos, buffer_size);
+                        int out_len;
+                        Buffer.BlockCopy(cfg_encrypt, start_pos, input, 0, len);
+                        encryptor.Decrypt(input, len, ouput, out out_len);
+                        Buffer.BlockCopy(ouput, 0, cfg_data, data_len, out_len);
+                        data_len += out_len;
+                    }
                     config_str = UTF8Encoding.UTF8.GetString(cfg_data, 0, data_len);
                 }
             }
