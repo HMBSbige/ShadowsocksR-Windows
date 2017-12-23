@@ -121,7 +121,6 @@ namespace Shadowsocks.Model
         private object obfsdata;
         private ServerSpeedLog serverSpeedLog = new ServerSpeedLog();
         private DnsBuffer dnsBuffer = new DnsBuffer();
-        private DnsBuffer dnsTargetBuffer = new DnsBuffer();
         private Connections Connections = new Connections();
         private static Server forwardServer = new Server();
 
@@ -131,7 +130,6 @@ namespace Shadowsocks.Model
             obfsdata = Server.obfsdata;
             serverSpeedLog = Server.serverSpeedLog;
             dnsBuffer = Server.dnsBuffer;
-            dnsTargetBuffer = Server.dnsTargetBuffer;
             Connections = Server.Connections;
             enable = Server.enable;
         }
@@ -160,11 +158,6 @@ namespace Shadowsocks.Model
         public DnsBuffer DnsBuffer()
         {
             return dnsBuffer;
-        }
-
-        public DnsBuffer DnsTargetBuffer()
-        {
-            return dnsTargetBuffer;
         }
 
         public ServerSpeedLog ServerSpeedLog()

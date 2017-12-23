@@ -272,27 +272,7 @@ namespace Shadowsocks.Controller
                 dataSock5Send.Add(0);
 
                 IPAddress ipAdd;
-                //bool ForceRemoteDnsResolve = false;
                 bool parsed = IPAddress.TryParse(strRemoteHost, out ipAdd);
-                //if (!parsed && !ForceRemoteDnsResolve)
-                //{
-                //    if (server.DnsTargetBuffer().isExpired(strRemoteHost))
-                //    {
-                //        try
-                //        {
-                //            IPHostEntry ipHostInfo = Dns.GetHostEntry(strRemoteHost);
-                //            ipAdd = ipHostInfo.AddressList[0];
-                //            server.DnsTargetBuffer().UpdateDns(strRemoteHost, ipAdd);
-                //        }
-                //        catch (Exception)
-                //        {
-                //        }
-                //    }
-                //    else
-                //    {
-                //        ipAdd = server.DnsTargetBuffer().ip;
-                //    }
-                //}
                 if (ipAdd == null)
                 {
                     dataSock5Send.Add(3); // remote DNS resolve
@@ -421,27 +401,7 @@ namespace Shadowsocks.Controller
             _proxy = true;
 
             IPAddress ipAdd;
-            //bool ForceRemoteDnsResolve = true;
             bool parsed = IPAddress.TryParse(strRemoteHost, out ipAdd);
-            //if (!parsed && !ForceRemoteDnsResolve)
-            //{
-            //    if (server.DnsTargetBuffer().isExpired(strRemoteHost))
-            //    {
-            //        try
-            //        {
-            //            IPHostEntry ipHostInfo = Dns.GetHostEntry(strRemoteHost);
-            //            ipAdd = ipHostInfo.AddressList[0];
-            //            server.DnsTargetBuffer().UpdateDns(strRemoteHost, ipAdd);
-            //        }
-            //        catch (Exception)
-            //        {
-            //        }
-            //    }
-            //    else
-            //    {
-            //        ipAdd = server.DnsTargetBuffer().ip;
-            //    }
-            //}
             if (ipAdd != null)
             {
                 strRemoteHost = ipAdd.ToString();
@@ -1146,27 +1106,7 @@ namespace Shadowsocks.Controller
                 dataSock5Send.Add(0);
 
                 IPAddress ipAdd;
-                //bool ForceRemoteDnsResolve = false;
                 bool parsed = IPAddress.TryParse(strRemoteHost, out ipAdd);
-                //if (!parsed && !ForceRemoteDnsResolve)
-                //{
-                //    if (server.DnsTargetBuffer().isExpired(strRemoteHost))
-                //    {
-                //        try
-                //        {
-                //            IPHostEntry ipHostInfo = Dns.GetHostEntry(strRemoteHost);
-                //            ipAdd = ipHostInfo.AddressList[0];
-                //            server.DnsTargetBuffer().UpdateDns(strRemoteHost, ipAdd);
-                //        }
-                //        catch (Exception)
-                //        {
-                //        }
-                //    }
-                //    else
-                //    {
-                //        ipAdd = server.DnsTargetBuffer().ip;
-                //    }
-                //}
                 if (ipAdd == null)
                 {
                     dataSock5Send.Add(3); // remote DNS resolve
@@ -1295,27 +1235,7 @@ namespace Shadowsocks.Controller
             _proxy = true;
 
             IPAddress ipAdd;
-            //bool ForceRemoteDnsResolve = true;
             bool parsed = IPAddress.TryParse(strRemoteHost, out ipAdd);
-            //if (!parsed && !ForceRemoteDnsResolve)
-            //{
-            //    if (server.DnsTargetBuffer().isExpired(strRemoteHost))
-            //    {
-            //        try
-            //        {
-            //            IPHostEntry ipHostInfo = Dns.GetHostEntry(strRemoteHost);
-            //            ipAdd = ipHostInfo.AddressList[0];
-            //            server.DnsTargetBuffer().UpdateDns(strRemoteHost, ipAdd);
-            //        }
-            //        catch (Exception)
-            //        {
-            //        }
-            //    }
-            //    else
-            //    {
-            //        ipAdd = server.DnsTargetBuffer().ip;
-            //    }
-            //}
             if (ipAdd != null)
             {
                 strRemoteHost = ipAdd.ToString();
