@@ -12,6 +12,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using OpenDNS;
+using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.Model;
 
@@ -319,6 +320,14 @@ namespace Shadowsocks.Util
         }
 
         public static IPAddress QueryDns(string host, string dns_servers, bool IPv6_first = false)
+        {
+            IPAddress ret_ipAddress = null;
+            ret_ipAddress = _QueryDns(host, dns_servers, IPv6_first);
+            Logging.Info($"DNS query {host} answer {ret_ipAddress.ToString()}");
+            return ret_ipAddress;
+        }
+
+        public static IPAddress _QueryDns(string host, string dns_servers, bool IPv6_first = false)
         {
             IPAddress ret_ipAddress = null;
             {

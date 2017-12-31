@@ -42,8 +42,8 @@ namespace Shadowsocks.Util
 
         public static string DecodeStandardSSRUrlSafeBase64(string val)
         {
-            if (val.IndexOf('=') >= 0)
-                throw new FormatException();
+            //if (val.IndexOf('=') >= 0)
+            //    throw new FormatException();
             return Encoding.UTF8.GetString(DecodeUrlSafeBase64ToBytes(val));
         }
     }
