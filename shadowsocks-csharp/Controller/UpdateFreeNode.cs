@@ -18,12 +18,14 @@ namespace Shadowsocks.Controller
         public event EventHandler NewFreeNodeFound;
         public string FreeNodeResult;
         public ServerSubscribe subscribeTask;
+        public bool noitify;
 
         public const string Name = "ShadowsocksR";
 
-        public void CheckUpdate(Configuration config, ServerSubscribe subscribeTask, bool use_proxy)
+        public void CheckUpdate(Configuration config, ServerSubscribe subscribeTask, bool use_proxy, bool noitify)
         {
             FreeNodeResult = null;
+            this.noitify = noitify;
             try
             {
                 WebClient http = new WebClient();
@@ -87,19 +89,21 @@ namespace Shadowsocks.Controller
 
     public class UpdateSubscribeManager
     {
-        Configuration _config;
-        List<ServerSubscribe> _serverSubscribes;
-        UpdateFreeNode _updater;
-        string _URL;
-        bool _use_proxy;
+        private Configuration _config;
+        private List<ServerSubscribe> _serverSubscribes;
+        private UpdateFreeNode _updater;
+        private string _URL;
+        private bool _use_proxy;
+        public bool _noitify;
 
-        public void CreateTask(Configuration config, UpdateFreeNode updater, int index, bool use_proxy)
+        public void CreateTask(Configuration config, UpdateFreeNode updater, int index, bool use_proxy, bool noitify)
         {
             if (_config == null)
             {
                 _config = config;
                 _updater = updater;
                 _use_proxy = use_proxy;
+                _noitify = noitify;
                 if (index < 0)
                 {
                     _serverSubscribes = new List<ServerSubscribe>();
@@ -127,7 +131,7 @@ namespace Shadowsocks.Controller
             else
             {
                 _URL = _serverSubscribes[0].URL;
-                _updater.CheckUpdate(_config, _serverSubscribes[0], _use_proxy);
+                _updater.CheckUpdate(_config, _serverSubscribes[0], _use_proxy, _noitify);
                 _serverSubscribes.RemoveAt(0);
                 return true;
             }

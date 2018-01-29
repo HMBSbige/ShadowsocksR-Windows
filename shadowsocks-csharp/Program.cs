@@ -56,9 +56,6 @@ namespace Shadowsocks
                 }
 #endif
                 Directory.SetCurrentDirectory(Application.StartupPath);
-                //#if !DEBUG
-                Logging.OpenLogFile();
-                //#endif
 #if !_CONSOLE
                 int try_times = 0;
                 while (Configuration.Load() == null)
@@ -75,6 +72,11 @@ namespace Shadowsocks
                     try_times += 1;
                 }
 #endif
+                //#if !DEBUG
+                if (try_times > 0)
+                    Logging.save_to_file = false;
+                Logging.OpenLogFile();
+                //#endif
                 _controller = new ShadowsocksController();
                 HostMap.Instance().LoadHostFile();
 #if !_CONSOLE

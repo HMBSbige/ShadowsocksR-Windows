@@ -835,6 +835,7 @@ namespace Shadowsocks.Obfs
 
         protected override int GetRandLen(int datalength, xorshift128plus random, byte[] last_hash)
         {
+            random.init_from_bin(last_hash, datalength);
             int other_data_size = datalength + Server.overhead;
 
             if (other_data_size >= data_size_list0[data_size_list0.Length - 1])

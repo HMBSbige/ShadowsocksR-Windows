@@ -91,12 +91,6 @@ namespace Shadowsocks.View
 
             LoadCurrentConfiguration();
 
-            Configuration cfg = controller.GetCurrentConfiguration();
-            if (cfg.isDefaultConfig() || cfg.nodeFeedAutoUpdate)
-            {
-                updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, !cfg.isDefaultConfig());
-            }
-
             timerDelayCheckUpdate = new System.Timers.Timer(1000.0 * 10);
             timerDelayCheckUpdate.Elapsed += timer_Elapsed;
             timerDelayCheckUpdate.Start();
@@ -116,6 +110,12 @@ namespace Shadowsocks.View
                 }
             }
             updateChecker.CheckUpdate(controller.GetCurrentConfiguration());
+
+            Configuration cfg = controller.GetCurrentConfiguration();
+            if (cfg.isDefaultConfig() || cfg.nodeFeedAutoUpdate)
+            {
+                updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, !cfg.isDefaultConfig(), false);
+            }
         }
 
         void controller_Errored(object sender, System.IO.ErrorEventArgs e)
@@ -569,10 +569,16 @@ namespace Shadowsocks.View
                     controller.SaveServersConfig(config);
                 }
             }
+            else
+            {
+                lastGroup = updateFreeNodeChecker.subscribeTask.Group;
+            }
+            
             if (count > 0)
             {
-                ShowBalloonTip(I18N.GetString("Success"),
-                    String.Format(I18N.GetString("Update subscribe {0} success"), lastGroup), ToolTipIcon.Info, 10000);
+                if (updateFreeNodeChecker.noitify)
+                    ShowBalloonTip(I18N.GetString("Success"),
+                        String.Format(I18N.GetString("Update subscribe {0} success"), lastGroup), ToolTipIcon.Info, 10000);
             }
             else
             {
@@ -1123,12 +1129,12 @@ namespace Shadowsocks.View
 
         private void CheckNodeUpdate_Click(object sender, EventArgs e)
         {
-            updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, true);
+            updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, true, true);
         }
 
         private void CheckNodeUpdateBypassProxy_Click(object sender, EventArgs e)
         {
-            updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, false);
+            updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, false, true);
         }
 
         private void ShowLogItem_Click(object sender, EventArgs e)

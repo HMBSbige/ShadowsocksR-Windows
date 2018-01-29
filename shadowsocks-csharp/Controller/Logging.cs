@@ -27,6 +27,7 @@ namespace Shadowsocks.Controller
         private static FileStream _logFileStream;
         private static StreamWriterWithTimestamp _logStreamWriter;
         private static object _lock = new object();
+        public static bool save_to_file = true;
 
         public static bool OpenLogFile()
         {
@@ -34,21 +35,29 @@ namespace Shadowsocks.Controller
             {
                 CloseLogFile();
 
-                string curpath = Path.Combine(System.Windows.Forms.Application.StartupPath, @"temp");// Path.GetFullPath(".");//Path.GetTempPath();
-                LogFilePath = curpath;
-                if (!Directory.Exists(curpath))
+                if (save_to_file)
                 {
-                    Directory.CreateDirectory(curpath);
+                    string curpath = Path.Combine(System.Windows.Forms.Application.StartupPath, @"temp");// Path.GetFullPath(".");//Path.GetTempPath();
+                    LogFilePath = curpath;
+                    if (!Directory.Exists(curpath))
+                    {
+                        Directory.CreateDirectory(curpath);
+                    }
+                    string new_date = DateTime.Now.ToString("yyyy-MM");
+                    LogFileName = "shadowsocks_" + new_date + ".log";
+                    LogFile = Path.Combine(curpath, LogFileName);
+                    _logFileStream = new FileStream(LogFile, FileMode.Append);
+                    _logStreamWriter = new StreamWriterWithTimestamp(_logFileStream);
+                    _logStreamWriter.AutoFlush = true;
+                    Console.SetOut(_logStreamWriter);
+                    Console.SetError(_logStreamWriter);
+                    date = new_date;
                 }
-                string new_date = DateTime.Now.ToString("yyyy-MM");
-                LogFileName = "shadowsocks_" + new_date + ".log";
-                LogFile = Path.Combine(curpath, LogFileName);
-                _logFileStream = new FileStream(LogFile, FileMode.Append);
-                _logStreamWriter = new StreamWriterWithTimestamp(_logFileStream);
-                _logStreamWriter.AutoFlush = true;
-                Console.SetOut(_logStreamWriter);
-                Console.SetError(_logStreamWriter);
-                date = new_date;
+                else
+                {
+                    Console.SetOut(Console.Out);
+                    Console.SetError(Console.Error);
+                }
 
                 return true;
             }
