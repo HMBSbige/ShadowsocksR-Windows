@@ -43,7 +43,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\4.0\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;_DOTNET_4_0, PROTOCOL_STATISTICS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;_DOTNET_CURRENT, PROTOCOL_STATISTICS</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -181,6 +181,7 @@
     </Compile>
     <Compile Include="Util\Base64.cs" />
     <Compile Include="Util\CRC.cs" />
+    <Compile Include="Util\EnvCheck.cs" />
     <Compile Include="Util\ServerName.cs" />
     <Compile Include="Util\Util.cs" />
     <Compile Include="View\ConfigForm.cs">
