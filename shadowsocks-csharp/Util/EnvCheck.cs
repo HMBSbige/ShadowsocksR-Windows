@@ -8,7 +8,7 @@ namespace Shadowsocks.Util
     {
         // According to https://docs.microsoft.com/en-us/dotnet/framework/migration-guide/how-to-determine-which-versions-are-installed
         // Hard code the path in Registry.
-        private static string dotNet45Registry = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\x1";
+        private static string dotNet45Registry = @"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full";
 
         public static bool CheckDotNet45()
         {
