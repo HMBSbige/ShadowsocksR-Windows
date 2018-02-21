@@ -36,6 +36,7 @@
             this.checkRandom = new System.Windows.Forms.CheckBox();
             this.checkAutoStartup = new System.Windows.Forms.CheckBox();
             this.checkBalanceInGroup = new System.Windows.Forms.CheckBox();
+            this.checkSwitchAutoCloseAll = new System.Windows.Forms.CheckBox();
             this.Socks5ProxyGroup = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel9 = new System.Windows.Forms.TableLayoutPanel();
             this.LabelS5Password = new System.Windows.Forms.Label();
@@ -107,7 +108,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(657, 478);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(731, 478);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // tableLayoutPanel2
@@ -116,28 +117,30 @@
             this.tableLayoutPanel2.ColumnCount = 2;
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Controls.Add(this.LabelRandom, 0, 2);
-            this.tableLayoutPanel2.Controls.Add(this.RandomComboBox, 1, 2);
-            this.tableLayoutPanel2.Controls.Add(this.CheckAutoBan, 1, 4);
-            this.tableLayoutPanel2.Controls.Add(this.checkRandom, 1, 1);
+            this.tableLayoutPanel2.Controls.Add(this.LabelRandom, 0, 3);
+            this.tableLayoutPanel2.Controls.Add(this.RandomComboBox, 1, 3);
+            this.tableLayoutPanel2.Controls.Add(this.CheckAutoBan, 1, 5);
+            this.tableLayoutPanel2.Controls.Add(this.checkRandom, 1, 2);
             this.tableLayoutPanel2.Controls.Add(this.checkAutoStartup, 1, 0);
-            this.tableLayoutPanel2.Controls.Add(this.checkBalanceInGroup, 1, 3);
+            this.tableLayoutPanel2.Controls.Add(this.checkBalanceInGroup, 1, 4);
+            this.tableLayoutPanel2.Controls.Add(this.checkSwitchAutoCloseAll, 1, 1);
             this.tableLayoutPanel2.Location = new System.Drawing.Point(408, 3);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 5;
+            this.tableLayoutPanel2.RowCount = 6;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(232, 133);
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(320, 158);
             this.tableLayoutPanel2.TabIndex = 2;
             // 
             // LabelRandom
             // 
             this.LabelRandom.AutoSize = true;
             this.LabelRandom.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.LabelRandom.Location = new System.Drawing.Point(3, 50);
+            this.LabelRandom.Location = new System.Drawing.Point(3, 75);
             this.LabelRandom.Name = "LabelRandom";
             this.LabelRandom.Size = new System.Drawing.Size(63, 33);
             this.LabelRandom.TabIndex = 12;
@@ -157,7 +160,7 @@
             "LowException",
             "SelectedFirst",
             "Timer"});
-            this.RandomComboBox.Location = new System.Drawing.Point(77, 53);
+            this.RandomComboBox.Location = new System.Drawing.Point(121, 78);
             this.RandomComboBox.Margin = new System.Windows.Forms.Padding(3, 3, 3, 7);
             this.RandomComboBox.Name = "RandomComboBox";
             this.RandomComboBox.Size = new System.Drawing.Size(147, 23);
@@ -167,7 +170,7 @@
             // 
             this.CheckAutoBan.AutoSize = true;
             this.CheckAutoBan.Enabled = false;
-            this.CheckAutoBan.Location = new System.Drawing.Point(72, 111);
+            this.CheckAutoBan.Location = new System.Drawing.Point(72, 136);
             this.CheckAutoBan.Name = "CheckAutoBan";
             this.CheckAutoBan.Size = new System.Drawing.Size(85, 19);
             this.CheckAutoBan.TabIndex = 15;
@@ -177,7 +180,7 @@
             // checkRandom
             // 
             this.checkRandom.AutoSize = true;
-            this.checkRandom.Location = new System.Drawing.Point(72, 28);
+            this.checkRandom.Location = new System.Drawing.Point(72, 53);
             this.checkRandom.Name = "checkRandom";
             this.checkRandom.Size = new System.Drawing.Size(125, 19);
             this.checkRandom.TabIndex = 13;
@@ -197,12 +200,22 @@
             // checkBalanceInGroup
             // 
             this.checkBalanceInGroup.AutoSize = true;
-            this.checkBalanceInGroup.Location = new System.Drawing.Point(72, 86);
+            this.checkBalanceInGroup.Location = new System.Drawing.Point(72, 111);
             this.checkBalanceInGroup.Name = "checkBalanceInGroup";
             this.checkBalanceInGroup.Size = new System.Drawing.Size(157, 19);
             this.checkBalanceInGroup.TabIndex = 15;
             this.checkBalanceInGroup.Text = "Balance in group";
             this.checkBalanceInGroup.UseVisualStyleBackColor = true;
+            // 
+            // checkSwitchAutoCloseAll
+            // 
+            this.checkSwitchAutoCloseAll.AutoSize = true;
+            this.checkSwitchAutoCloseAll.Location = new System.Drawing.Point(72, 28);
+            this.checkSwitchAutoCloseAll.Name = "checkSwitchAutoCloseAll";
+            this.checkSwitchAutoCloseAll.Size = new System.Drawing.Size(245, 19);
+            this.checkSwitchAutoCloseAll.TabIndex = 16;
+            this.checkSwitchAutoCloseAll.Text = "Switch auto close TCP links";
+            this.checkSwitchAutoCloseAll.UseVisualStyleBackColor = true;
             // 
             // Socks5ProxyGroup
             // 
@@ -489,7 +502,7 @@
             this.tableLayoutPanel10.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel10.Controls.Add(this.tableLayoutPanel3, 0, 2);
             this.tableLayoutPanel10.Controls.Add(this.tableLayoutPanel5, 0, 1);
-            this.tableLayoutPanel10.Location = new System.Drawing.Point(408, 268);
+            this.tableLayoutPanel10.Location = new System.Drawing.Point(445, 268);
             this.tableLayoutPanel10.Name = "tableLayoutPanel10";
             this.tableLayoutPanel10.RowCount = 3;
             this.tableLayoutPanel10.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -763,5 +776,6 @@
         private System.Windows.Forms.NumericUpDown NumTimeout;
         private System.Windows.Forms.Button buttonDefault;
         private System.Windows.Forms.CheckBox checkBalanceInGroup;
+        private System.Windows.Forms.CheckBox checkSwitchAutoCloseAll;
     }
 }

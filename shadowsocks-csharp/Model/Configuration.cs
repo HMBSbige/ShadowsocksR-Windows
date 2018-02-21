@@ -133,6 +133,7 @@ namespace Shadowsocks.Model
         public string authPass;
 
         public bool autoBan;
+        public bool checkSwitchAutoCloseAll;
         public bool sameHostForSameTarget;
 
         public int keepVisitTime;
@@ -456,6 +457,7 @@ namespace Shadowsocks.Model
             authUser = config.authUser;
             authPass = config.authPass;
             autoBan = config.autoBan;
+            checkSwitchAutoCloseAll = config.checkSwitchAutoCloseAll;
             sameHostForSameTarget = config.sameHostForSameTarget;
             keepVisitTime = config.keepVisitTime;
             isHideTips = config.isHideTips;
