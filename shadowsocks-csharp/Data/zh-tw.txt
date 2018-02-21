@@ -109,8 +109,9 @@ Username=用戶名
 Local proxy=本地代理
 Build-in http proxy=內置http代理(目前有bug)
 Proxy Port=本地連接埠
+Set Default=重置缺省值
 Reconnect Times=重連次數
- Timeout=連接超時
+ConnectTimeout=連接超時
 TTL=空閒斷開秒數
 
 OK=確定
