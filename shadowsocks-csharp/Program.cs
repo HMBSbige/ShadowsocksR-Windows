@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Win32;
@@ -56,8 +57,9 @@ namespace Shadowsocks
                 }
 #endif
                 Directory.SetCurrentDirectory(Application.StartupPath);
-#if !_CONSOLE
+
                 int try_times = 0;
+#if !_CONSOLE
                 while (Configuration.Load() == null)
                 {
                     if (try_times >= 5)
@@ -79,6 +81,13 @@ namespace Shadowsocks
                 //#endif
                 _controller = new ShadowsocksController();
                 HostMap.Instance().LoadHostFile();
+
+#if _DOTNET_CURRENT
+                // Enable Modern TLS when .NET 4.5+ installed.
+                if (Util.EnvCheck.CheckDotNet45())
+                    ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
+#endif
+
 #if !_CONSOLE
                 _viewController = new MenuViewController(_controller);
 #endif
