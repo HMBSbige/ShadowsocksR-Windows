@@ -79,6 +79,7 @@
     <Compile Include="3rd\opendns\RR\SOA.cs" />
     <Compile Include="3rd\SimpleJson.cs" />
     <Compile Include="Controller\APIServer.cs" />
+    <Compile Include="Controller\ChnDomainsAndIPUpdater.cs" />
     <Compile Include="Controller\FileManager.cs" />
     <Compile Include="Controller\GFWListUpdater.cs" />
     <Compile Include="Controller\HttpProxy.cs" />

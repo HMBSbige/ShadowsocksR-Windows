@@ -20,6 +20,8 @@ namespace Shadowsocks.Controller
 
         public static string USER_ABP_FILE = "abp.txt";
 
+        public static string WHITELIST_FILE = @"whitelist.txt";
+
         FileSystemWatcher PACFileWatcher;
         FileSystemWatcher UserRuleFileWatcher;
         private Configuration _config;

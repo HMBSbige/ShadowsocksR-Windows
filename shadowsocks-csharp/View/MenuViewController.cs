@@ -249,8 +249,8 @@ namespace Shadowsocks.View
                     CreateMenuItem("Edit servers...", new EventHandler(this.Config_Click)),
                     CreateMenuItem("Import servers from file...", new EventHandler(this.Import_Click)),
                     new MenuItem("-"),
-		            SelectRandomItem = CreateMenuItem("Load balance", new EventHandler(this.SelectRandomItem_Click)),
-					sameHostForSameTargetItem = CreateMenuItem("Same host for same address", new EventHandler(this.SelectSameHostForSameTargetItem_Click)),
+                    SelectRandomItem = CreateMenuItem("Load balance", new EventHandler(this.SelectRandomItem_Click)),
+                    sameHostForSameTargetItem = CreateMenuItem("Same host for same address", new EventHandler(this.SelectSameHostForSameTargetItem_Click)),
                     new MenuItem("-"),
                     CreateMenuItem("Server statistic...", new EventHandler(this.ShowServerLogItem_Click)),
                     CreateMenuItem("Disconnect current", new EventHandler(this.DisconnectCurrent_Click)),
@@ -277,7 +277,7 @@ namespace Shadowsocks.View
                     CreateMenuItem("Reset password...", new EventHandler(this.ResetPasswordItem_Click)),
                     new MenuItem("-"),
                     CreateMenuItem("About...", new EventHandler(this.AboutItem_Click)),
-                    CreateMenuItem("Donate...", new EventHandler(this.DonateItem_Click)),
+                    //CreateMenuItem("Donate...", new EventHandler(this.DonateItem_Click)),
                 }),
                 CreateMenuItem("Quit", new EventHandler(this.Quit_Click))
             });
