@@ -1,6 +1,7 @@
 # translation for Simplified Chinese
 
 Shadowsocks=Shadowsocks
+ShadowsocksR=ShadowsocksR
 
 # Menu items
 
@@ -228,8 +229,10 @@ System Proxy Enabled=系统代理已启用
 System Proxy Disabled=系统代理未启用
 Failed to update PAC file =更新 PAC 文件失败
 PAC updated=更新 PAC 成功
+GFWList PAC updated=更新 GFWList PAC 成功
 Domain white list list updated=更新域名白名单成功
 No updates found. Please report to GFWList if you have problems with it.=未发现更新。如有问题请提交给 GFWList。
+No updates found.=未发现更新。
 No QRCode found. Try to zoom in or move it to the center of the screen.=未发现二维码，尝试把它放大或移动到靠近屏幕中间的位置
 ShadowsocksR is already running.=ShadowsocksR 已经在运行。
 Find Shadowsocks icon in your notify tray.=请在任务栏里寻找 ShadowsocksR 图标。
