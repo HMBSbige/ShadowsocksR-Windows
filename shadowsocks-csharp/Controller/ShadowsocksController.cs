@@ -350,9 +350,9 @@ namespace Shadowsocks.Controller
 			gfwListUpdater?.UpdatePACFromGFWList(_config);
 		}
 
-		public void UpdatePACFromChnDomainsAndIP()
+		public void UpdatePACFromChnDomainsAndIP(ChnDomainsAndIPUpdater.Templates template)
 		{
-			chnDomainsAndIPUpdater?.UpdatePACFromChnDomainsAndIP(_config);
+			chnDomainsAndIPUpdater?.UpdatePACFromChnDomainsAndIP(_config, template);
 		}
 
 		public void UpdatePACFromOnlinePac(string url)

@@ -1,5 +1,5 @@
 version: 1.0.{build}
-image: Visual Studio 2015
+image: Visual Studio 2017
 environment:
   matrix:
     - platform: Any CPU
@@ -12,8 +12,6 @@ build:
   parallel: true
   verbosity: normal
 artifacts:
-- path: shadowsocks-csharp\bin\2.0\Release\ShadowsocksR.exe
-  name: ShadowsocksR-dotnet2.0.exe
 - path: shadowsocks-csharp\bin\4.0\Release\ShadowsocksR.exe
   name: ShadowsocksR-dotnet4.0.exe
-
+  

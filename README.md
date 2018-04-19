@@ -10,30 +10,7 @@ to extract the ShadowsocksR archive.
 
 Download the [latest release] for ShadowsocksR for Windows.
 
-_Optionally_, right-click on the downloaded 7z file and select 
-**CRC SHA** > **SHA-256**. Verify that the SHA-256 checksum displayed 
-matches the expected checksum which was shown on the releases page.
-
-Right-click on the downloaded 7z file and do **7-Zip** > **Extract Here** 
-or extract to a new folder.
-
-_Optionally_, download and install [Gpg4win](https://www.gpg4win.org/). 
-From the Windows start menu, launch program **Kleopatra**. 
-Do **File** > **New Certificate** to create a personal OpenPGP key pair. 
-Save the signing key from
-[Akkariiin/pubkey](https://github.com/Akkariiin/pubkey) as a text file. 
-Then do **File** > **Import Certificates** to import the signing key text file.
-After import, select the signing key and do 
-**Certificates** > **Certify Certificates**. 
-You will need to enter the passphrase for your own key. 
-Finally, do **File** > **Decrypt/Verify Files** for the executable 
-you propose to use (see below). A message confirming successful verification 
-of the signature appears against a green background. 
-Close program **Kleopatra**.
-
 For >= Windows 8 or with .Net 4.0, using ShadowsocksR-dotnet4.0.exe.
-
-For <= Windows 7 or with .Net 2.0, using ShadowsocksR-dotnet2.0.exe.
 
 #### Usage
 
@@ -60,8 +37,8 @@ Visual Studio Community 2017 is recommended.
 
 GPLv3
 
-Copyright © Akkariiin 2018. Forked from ShadowsocksR by BreakWa11
+Copyright © HMBSbige 2018. Forked from ShadowsocksR by BreakWa11
 
-[Appveyor]:       https://ci.appveyor.com/project/Akkariiin/shadowsocksr-csharp
-[Build Status]:   https://ci.appveyor.com/api/projects/status/ey901turnakim5nv/branch/master?svg=true
-[latest release]: https://github.com/shadowsocksrr/shadowsocksr-csharp/releases
+[Appveyor]:       https://ci.appveyor.com/project/HMBSbige/shadowsocksr-windows
+[Build Status]:   https://ci.appveyor.com/api/projects/status/b9jgwdfvn20ithj1/branch/master?svg=true
+[latest release]: https://github.com/HMBSbige/ShadowsocksR-Windows/releases

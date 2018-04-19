@@ -226,8 +226,8 @@ namespace Shadowsocks.View
 				CreateMenuGroup("PAC ", new MenuItem[] {
 					CreateMenuItem("Update local PAC from Lan IP list", new EventHandler(this.UpdatePACFromLanIPListItem_Click)),
 					new MenuItem("-"),
-					CreateMenuItem("Update local PAC from Chn White list", new EventHandler(this.UpdatePACFromCNWhiteListItem_Click)),
-					CreateMenuItem("Update local PAC from Chn IP list", new EventHandler(this.UpdatePACFromCNIPListItem_Click)),
+					CreateMenuItem(@"Update local PAC from Chn Domain list", new EventHandler(this.UpdatePACFromCNWhiteListItem_Click)),
+					CreateMenuItem(@"Update local PAC from Chn Domain and IP list", new EventHandler(this.UpdatePACFromCNIPListItem_Click)),
 					CreateMenuItem("Update local PAC from GFWList", new EventHandler(this.UpdatePACFromGFWListItem_Click)),
 					new MenuItem("-"),
 					CreateMenuItem("Update local PAC from Chn Only list", new EventHandler(this.UpdatePACFromCNOnlyListItem_Click)),
@@ -962,7 +962,7 @@ namespace Shadowsocks.View
 
 		private void FeedbackItem_Click(object sender, EventArgs e)
 		{
-			Process.Start("https://github.com/HMBSbige/shadowsocksr-csharp/issues/new");
+			Process.Start("https://github.com/HMBSbige/ShadowsocksR-Windows/issues/new");
 		}
 
 		private void ResetPasswordItem_Click(object sender, EventArgs e)
@@ -1099,23 +1099,25 @@ namespace Shadowsocks.View
 
 		private void UpdatePACFromLanIPListItem_Click(object sender, EventArgs e)
 		{
-			controller.UpdatePACFromOnlinePac("https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_lanip.pac");
+			controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_lanip.pac");
 		}
 
 		private void UpdatePACFromCNWhiteListItem_Click(object sender, EventArgs e)
 		{
-			controller.UpdatePACFromOnlinePac("https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white.pac");
+			//controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white.pac");
+			controller.UpdatePACFromChnDomainsAndIP(ChnDomainsAndIPUpdater.Templates.ss_white);
 		}
 
 		private void UpdatePACFromCNOnlyListItem_Click(object sender, EventArgs e)
 		{
-			controller.UpdatePACFromOnlinePac("https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white_r.pac");
+			//controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white_r.pac");
+			controller.UpdatePACFromChnDomainsAndIP(ChnDomainsAndIPUpdater.Templates.ss_white_r);
 		}
 
 		private void UpdatePACFromCNIPListItem_Click(object sender, EventArgs e)
 		{
-			//controller.UpdatePACFromOnlinePac("https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_cnip.pac");
-			controller.UpdatePACFromChnDomainsAndIP();
+			//controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_cnip.pac");
+			controller.UpdatePACFromChnDomainsAndIP(ChnDomainsAndIPUpdater.Templates.ss_cnip);
 		}
 
 		private void EditUserRuleFileForGFWListItem_Click(object sender, EventArgs e)
