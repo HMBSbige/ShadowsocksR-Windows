@@ -22,6 +22,7 @@ namespace Shadowsocks.Controller
 
 		private static readonly string PAC_FILE = PACServer.PAC_FILE;
 		private static readonly string USER_RULE_FILE = PACServer.WHITELIST_FILE;
+		private static readonly string USER_TEMPLATE_FILE = PACServer.USER_WHITELIST_TEMPLATE_FILE;
 
 		private static string SS_template = null;
 		private static string cnIpRange = null;
@@ -58,7 +59,24 @@ namespace Shadowsocks.Controller
 		{
 			try
 			{
-				var result = e.Result;
+				string result;
+				if (File.Exists(USER_TEMPLATE_FILE))
+				{
+					result = File.ReadAllText(USER_TEMPLATE_FILE, Encoding.UTF8);
+					if (result.IndexOf(@"__cnIpRange__", StringComparison.Ordinal) > 0
+						&& result.IndexOf(@"__cnIp16Range__", StringComparison.Ordinal) > 0
+						&& result.IndexOf(@"__white_domains__", StringComparison.Ordinal) > 0
+						&& result.IndexOf(@"FindProxyForURL", StringComparison.Ordinal) > 0)
+					{
+						SS_template = result;
+						if (lastConfig != null && lastTemplate != Templates.None)
+						{
+							UpdatePACFromChnDomainsAndIP(lastConfig, lastTemplate);
+						}
+						return;
+					}
+				}
+				result = e.Result;
 				if (result.IndexOf(@"__cnIpRange__", StringComparison.Ordinal) > 0
 					&& result.IndexOf(@"__cnIp16Range__", StringComparison.Ordinal) > 0
 					&& result.IndexOf(@"__white_domains__", StringComparison.Ordinal) > 0
@@ -72,7 +90,7 @@ namespace Shadowsocks.Controller
 				}
 				else
 				{
-					Error?.Invoke(this, new ErrorEventArgs(new Exception(@"Download ERROR")));
+					Error?.Invoke(this, new ErrorEventArgs(new Exception(@"WhiteList Template ERROR")));
 				}
 			}
 			catch (Exception ex)

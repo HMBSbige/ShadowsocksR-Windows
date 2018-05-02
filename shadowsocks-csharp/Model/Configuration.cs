@@ -414,9 +414,9 @@ namespace Shadowsocks.Model
             dnsServer = "";
 
             balanceAlgorithm = "LowException";
-            random = true;
-            sysProxyMode = (int)ProxyMode.Global;
-            proxyRuleMode = (int)ProxyRuleMode.BypassLanAndChina;
+            random = false;
+            sysProxyMode = (int)ProxyMode.NoModify;
+            proxyRuleMode = (int)ProxyRuleMode.Disable;
 
             nodeFeedAutoUpdate = true;
 
