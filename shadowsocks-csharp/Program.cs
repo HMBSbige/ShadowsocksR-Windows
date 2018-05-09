@@ -50,7 +50,7 @@ namespace Shadowsocks
 
                 if (!mutex.WaitOne(0, false))
                 {
-                    MessageBox.Show(I18N.GetString("Find Shadowsocks icon in your notify tray.") + "\n" +
+                    MessageBox.Show(I18N.GetString("Find Shadowsocks icon in your notify tray.") + Environment.NewLine +
                         I18N.GetString("If you want to start multiple Shadowsocks, make a copy in another directory."),
                         I18N.GetString("ShadowsocksR is already running."));
                     return;

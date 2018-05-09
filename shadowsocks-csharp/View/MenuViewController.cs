@@ -84,6 +84,7 @@ namespace Shadowsocks.View
 
 			updateChecker = new UpdateChecker();
 			updateChecker.NewVersionFound += updateChecker_NewVersionFound;
+			updateChecker.NewVersionNotFound += updateChecker_NewVersionNotFound;
 
 			updateFreeNodeChecker = new UpdateFreeNode();
 			updateFreeNodeChecker.NewFreeNodeFound += updateFreeNodeChecker_NewFreeNodeFound;
@@ -110,7 +111,7 @@ namespace Shadowsocks.View
 					timerDelayCheckUpdate.Interval = 1000.0 * 60 * 60 * 2;
 				}
 			}
-			updateChecker.CheckUpdate(controller.GetCurrentConfiguration());
+			//updateChecker.CheckUpdate(controller.GetCurrentConfiguration());
 
 			Configuration cfg = controller.GetCurrentConfiguration();
 			if (cfg.isDefaultConfig() || cfg.nodeFeedAutoUpdate)
@@ -263,6 +264,7 @@ namespace Shadowsocks.View
 				}),
 				CreateMenuItem("Global settings...", new EventHandler(this.Setting_Click)),
 				CreateMenuItem("Port settings...", new EventHandler(this.ShowPortMapItem_Click)),
+				CreateMenuItem("Show logs...", new EventHandler(this.ShowLogItem_Click)),
 				UpdateItem = CreateMenuItem("Update available", new EventHandler(this.UpdateItem_Clicked)),
 				new MenuItem("-"),
 				CreateMenuItem("Scan QRCode from screen...", new EventHandler(this.ScanQRCodeItem_Click)),
@@ -270,7 +272,6 @@ namespace Shadowsocks.View
 				new MenuItem("-"),
 				CreateMenuGroup("Help", new MenuItem[] {
 					CreateMenuItem("Check update", new EventHandler(this.CheckUpdate_Click)),
-					CreateMenuItem("Show logs...", new EventHandler(this.ShowLogItem_Click)),
 					CreateMenuItem("Open wiki...", new EventHandler(this.OpenWiki_Click)),
 					CreateMenuItem("Feedback...", new EventHandler(this.FeedbackItem_Click)),
 					new MenuItem("-"),
@@ -579,7 +580,7 @@ namespace Shadowsocks.View
 			{
 				lastGroup = updateFreeNodeChecker.subscribeTask.Group;
 			}
-			
+
 			if (count > 0)
 			{
 				if (updateFreeNodeChecker.noitify)
@@ -618,6 +619,14 @@ namespace Shadowsocks.View
 				this.UpdateItem.Visible = true;
 				this.UpdateItem.Text = String.Format(I18N.GetString("New version {0} {1} available"), UpdateChecker.Name, updateChecker.LatestVersionNumber);
 			}
+		}
+
+		void updateChecker_NewVersionNotFound(object sender, EventArgs e)
+		{
+			ShowBalloonTip(I18N.GetString(@"ShadowsocksR"), I18N.GetString(@"No updates found."), ToolTipIcon.Info, 10000);
+			timerDelayCheckUpdate.Elapsed -= timer_Elapsed;
+			timerDelayCheckUpdate.Stop();
+			timerDelayCheckUpdate = null;
 		}
 
 		void UpdateItem_Clicked(object sender, EventArgs e)
@@ -974,7 +983,7 @@ namespace Shadowsocks.View
 
 		private void AboutItem_Click(object sender, EventArgs e)
 		{
-			Process.Start("https://github.com/HMBSbige/shadowsocksr-csharp");
+			Process.Start("https://github.com/HMBSbige/ShadowsocksR-Windows");
 		}
 
 		private void DonateItem_Click(object sender, EventArgs e)
