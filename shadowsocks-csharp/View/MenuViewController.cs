@@ -18,6 +18,18 @@ using System.Text.RegularExpressions;
 
 namespace Shadowsocks.View
 {
+    public class EventParams
+    {
+        public object sender;
+        public EventArgs e;
+
+        public EventParams(object sender, EventArgs e)
+        {
+            this.sender = sender;
+            this.e = e;
+        }
+    }
+
     public class MenuViewController
     {
         // yes this is just a menu view controller
@@ -57,6 +69,9 @@ namespace Shadowsocks.View
         private LogForm logForm;
         private string _urlToOpen;
         private System.Timers.Timer timerDelayCheckUpdate;
+
+        private bool configfrom_open = false;
+        private List<EventParams> eventList = new List<EventParams>();
 
         public MenuViewController(ShadowsocksController controller)
         {
@@ -335,6 +350,11 @@ namespace Shadowsocks.View
 
         void updateFreeNodeChecker_NewFreeNodeFound(object sender, EventArgs e)
         {
+            if (configfrom_open)
+            {
+                eventList.Add(new EventParams(sender, e));
+                return;
+            }
             string lastGroup = null;
             int count = 0;
             if (!String.IsNullOrEmpty(updateFreeNodeChecker.FreeNodeResult))
@@ -419,7 +439,7 @@ namespace Shadowsocks.View
                             break;
                         }
                     }
-                    if (lastGroup == null)
+                    if (String.IsNullOrEmpty(lastGroup))
                     {
                         lastGroup = curGroup;
                     }
@@ -569,10 +589,6 @@ namespace Shadowsocks.View
                     controller.SaveServersConfig(config);
                 }
             }
-            else
-            {
-                lastGroup = updateFreeNodeChecker.subscribeTask.Group;
-            }
             
             if (count > 0)
             {
@@ -582,6 +598,11 @@ namespace Shadowsocks.View
             }
             else
             {
+                if (lastGroup == null)
+                {
+                    lastGroup = updateFreeNodeChecker.subscribeTask.Group;
+                    //lastGroup = updateSubscribeManager.LastGroup;
+                }
                 ShowBalloonTip(I18N.GetString("Error"),
                     String.Format(I18N.GetString("Update subscribe {0} failure"), lastGroup), ToolTipIcon.Info, 10000);
             }
@@ -728,6 +749,7 @@ namespace Shadowsocks.View
             }
             else
             {
+                configfrom_open = true;
                 configForm = new ConfigForm(controller, updateChecker, addNode ? -1 : -2);
                 configForm.Show();
                 configForm.Activate();
@@ -744,6 +766,7 @@ namespace Shadowsocks.View
             }
             else
             {
+                configfrom_open = true;
                 configForm = new ConfigForm(controller, updateChecker, index);
                 configForm.Show();
                 configForm.Activate();
@@ -855,7 +878,16 @@ namespace Shadowsocks.View
         void configForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             configForm = null;
+            configfrom_open = false;
             Util.Utils.ReleaseMemory();
+            if (eventList.Count > 0)
+            {
+                foreach (EventParams p in eventList)
+                {
+                    updateFreeNodeChecker_NewFreeNodeFound(p.sender, p.e);
+                }
+                eventList.Clear();
+            }
         }
 
         void settingsForm_FormClosed(object sender, FormClosedEventArgs e)
