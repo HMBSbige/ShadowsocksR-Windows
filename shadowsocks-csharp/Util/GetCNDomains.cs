@@ -54,8 +54,8 @@ namespace Shadowsocks.Util
 
 		public static IEnumerable<string> ReadFromString(string str)
 		{
-			var domains=new List<string>();
-			
+			var domains = new List<string>();
+
 			var lines = str.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 			foreach (var line in lines)
 			{

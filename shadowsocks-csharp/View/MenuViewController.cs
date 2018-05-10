@@ -111,7 +111,7 @@ namespace Shadowsocks.View
 					timerDelayCheckUpdate.Interval = 1000.0 * 60 * 60 * 2;
 				}
 			}
-			//updateChecker.CheckUpdate(controller.GetCurrentConfiguration());
+			updateChecker.CheckUpdate(controller.GetCurrentConfiguration(), false);
 
 			Configuration cfg = controller.GetCurrentConfiguration();
 			if (cfg.isDefaultConfig() || cfg.nodeFeedAutoUpdate)
@@ -623,7 +623,7 @@ namespace Shadowsocks.View
 
 		void updateChecker_NewVersionNotFound(object sender, EventArgs e)
 		{
-			ShowBalloonTip(I18N.GetString(@"ShadowsocksR"), I18N.GetString(@"No updates found."), ToolTipIcon.Info, 10000);
+			ShowBalloonTip($@"{I18N.GetString(@"ShadowsocksR")} {UpdateChecker.FullVersion}", I18N.GetString(@"No newer version was found"), ToolTipIcon.Info, 10000);
 			timerDelayCheckUpdate.Elapsed -= timer_Elapsed;
 			timerDelayCheckUpdate.Stop();
 			timerDelayCheckUpdate = null;

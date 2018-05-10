@@ -138,7 +138,7 @@ namespace Shadowsocks.Controller
 					if (File.Exists(USER_RULE_FILE))
 					{
 						var local = File.ReadAllText(USER_RULE_FILE, Encoding.UTF8);
-						var rules = local.Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+						var rules = local.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 						domains.AddRange(rules.Where(domain => !string.IsNullOrWhiteSpace(domain)));
 					}
 
@@ -178,7 +178,7 @@ namespace Shadowsocks.Controller
 
 		#region public
 
-		public void UpdatePACFromChnDomainsAndIP(Configuration config,Templates template)
+		public void UpdatePACFromChnDomainsAndIP(Configuration config, Templates template)
 		{
 			if (SS_template == null)
 			{
@@ -209,7 +209,7 @@ namespace Shadowsocks.Controller
 				}
 				http.DownloadStringAsync(new Uri(TEMPLATE_URL + @"?rnd=" + Utils.RandUInt32()));
 			}
-			else if(cnIpRange == null || cnIp16Range == null)
+			else if (cnIpRange == null || cnIp16Range == null)
 			{
 				var http = new WebClient();
 				http.Headers.Add(@"User-Agent", string.IsNullOrEmpty(config.proxyUserAgent) ? USER_AGENT : config.proxyUserAgent);

@@ -43,7 +43,7 @@ namespace Shadowsocks.Controller
 
 		private static bool UseProxy = true;
 
-		public void CheckUpdate(Configuration config)
+		public void CheckUpdate(Configuration config, bool notifyNoFound = true)
 		{
 			try
 			{
@@ -63,7 +63,14 @@ namespace Shadowsocks.Controller
 					http.Proxy = null;
 				}
 				//UseProxy = !UseProxy;
-				http.DownloadStringCompleted += http_DownloadStringCompleted;
+				if (notifyNoFound)
+				{
+					http.DownloadStringCompleted += http_DownloadStringCompleted;
+				}
+				else
+				{
+					http.DownloadStringCompleted += http_DownloadStringCompleted2;
+				}
 				http.DownloadStringAsync(new Uri(UpdateURL + @"?rnd=" + Util.Utils.RandUInt32().ToString()));
 			}
 			catch (Exception e)
@@ -203,6 +210,54 @@ namespace Shadowsocks.Controller
 				{
 					Logging.Debug(e.Error.ToString());
 				}
+				Logging.Debug(ex.ToString());
+				NewVersionFound?.Invoke(this, new EventArgs());
+			}
+		}
+
+		private void http_DownloadStringCompleted2(object sender, DownloadStringCompletedEventArgs e)
+		{
+			try
+			{
+				string response = e.Result;
+
+				XmlDocument xmlDoc = new XmlDocument();
+				xmlDoc.LoadXml(response);
+				XmlNodeList elements = xmlDoc.GetElementsByTagName(@"media:content");
+				List<string> versions = new List<string>();
+				foreach (XmlNode el in elements)
+				{
+					if (el.Attributes != null)
+						foreach (XmlAttribute attr in el.Attributes)
+						{
+							if (attr.Name == @"url")
+							{
+								if (IsNewVersion(attr.Value))
+								{
+									versions.Add(attr.Value);
+								}
+							}
+						}
+				}
+
+				if (versions.Count == 0)
+				{
+					return;
+				}
+
+				// sort versions
+				SortVersions(versions);
+				LatestVersionURL = versions[versions.Count - 1];
+				LatestVersionNumber = ParseVersionFromURL(LatestVersionURL);
+				NewVersionFound?.Invoke(this, new EventArgs());
+			}
+			catch (Exception ex)
+			{
+				if (e.Error != null)
+				{
+					Logging.Debug(e.Error.ToString());
+				}
+
 				Logging.Debug(ex.ToString());
 				NewVersionFound?.Invoke(this, new EventArgs());
 			}

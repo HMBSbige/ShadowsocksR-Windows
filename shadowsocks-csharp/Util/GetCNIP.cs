@@ -31,7 +31,7 @@ namespace Shadowsocks.Util
 
 		private static IPAddress IPv4BinStrToIPv4(string str)
 		{
-			var bytesAddress = new []
+			var bytesAddress = new[]
 			{
 					Convert.ToByte(str.Substring(0, 8),2),
 					Convert.ToByte(str.Substring(8, 8),2),
@@ -40,11 +40,11 @@ namespace Shadowsocks.Util
 			};
 			return new IPAddress(bytesAddress);
 		}
-		
+
 		private static string IPv4ToIPv4BinStr(IPAddress ipv4)
 		{
 			var bytesAddress = ipv4.GetAddressBytes();
-			
+
 			return $@"{Convert.ToString(bytesAddress[0], 2).PadLeft(8, '0')}{
 					   Convert.ToString(bytesAddress[1], 2).PadLeft(8, '0')}{
 					   Convert.ToString(bytesAddress[2], 2).PadLeft(8, '0')}{
@@ -144,9 +144,9 @@ namespace Shadowsocks.Util
 
 			var strA = str.Split('|');
 			//apnic|CN|ipv4|
-			if (strA.Length > 4 && strA[0]== @"apnic" && strA[1] == @"CN" && strA[2] == @"ipv4")
+			if (strA.Length > 4 && strA[0] == @"apnic" && strA[1] == @"CN" && strA[2] == @"ipv4")
 			{
-				return new KeyValuePair<IPAddress, int>(IPAddress.Parse(strA[3]),Convert.ToInt32(strA[4]));
+				return new KeyValuePair<IPAddress, int>(IPAddress.Parse(strA[3]), Convert.ToInt32(strA[4]));
 			}
 
 			return null;
@@ -154,7 +154,7 @@ namespace Shadowsocks.Util
 
 		public static Dictionary<IPAddress, int> ReadFromString(string str)
 		{
-			var ipv4Subnet=new Dictionary<IPAddress,int>();
+			var ipv4Subnet = new Dictionary<IPAddress, int>();
 			var lines = str.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 			foreach (var line in lines)
 			{
