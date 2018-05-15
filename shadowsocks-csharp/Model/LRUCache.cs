@@ -23,6 +23,16 @@ namespace Shadowsocks.Model
             _sweep_time = time;
         }
 
+        public void Clear()
+        {
+            lock (_lock)
+            {
+                _store.Clear();
+                _key_2_time.Clear();
+                _time_2_key.Clear();
+            }
+        }
+
         public bool isTimeout(K key)
         {
             lock (_lock)
