@@ -465,7 +465,10 @@ namespace Shadowsocks.View
             else
             {
                 var items = ServersListBox.SelectedIndices;
-                index = (style == 1 ? items[0] : items[items.Count - 1]);
+                if (0 == items.Count)
+                    index = 0;
+                else
+                    index = (style == 1 ? items[0] : items[items.Count - 1]);
             }
             int topIndex = Math.Max(index - visibleItems / 2, 0);
             ServersListBox.TopIndex = topIndex;
@@ -585,6 +588,13 @@ namespace Shadowsocks.View
                     LoadSelectedServer();
                 }
             }
+            else if (0 == items.Count)
+            {
+                // Handle when server list is empty.
+                _oldSelectedIndex = -1;
+                ServersListBox.ClearSelected();
+                LoadSelectedServer();
+            }
             else
             {
                 List<int> all_items = new List<int>();
@@ -600,7 +610,9 @@ namespace Shadowsocks.View
                 }
                 _allowSave = false;
                 _ignoreLoad = true;
+
                 ServersListBox.SelectedIndex = _oldSelectedIndex = index - 1;
+
                 LoadConfiguration(_modifiedConfiguration);
                 ServersListBox.ClearSelected();
                 foreach (int item in all_items)
@@ -608,7 +620,9 @@ namespace Shadowsocks.View
                     if (item != index)
                         ServersListBox.SelectedIndex = _oldSelectedIndex = item - 1;
                 }
+
                 ServersListBox.SelectedIndex = _oldSelectedIndex = index - 1;
+
                 _ignoreLoad = false;
                 _allowSave = true;
                 LoadSelectedServer();
@@ -635,6 +649,13 @@ namespace Shadowsocks.View
                     LoadSelectedServer();
                 }
             }
+            else if (0 == items.Count)
+            {
+                // Handle when server list is empty.
+                _oldSelectedIndex = -1;
+                ServersListBox.ClearSelected();
+                LoadSelectedServer();
+            }
             else
             {
                 List<int> rev_items = new List<int>();
@@ -651,7 +672,9 @@ namespace Shadowsocks.View
                 }
                 _allowSave = false;
                 _ignoreLoad = true;
+
                 ServersListBox.SelectedIndex = _oldSelectedIndex = index + 1;
+
                 LoadConfiguration(_modifiedConfiguration);
                 ServersListBox.ClearSelected();
                 foreach (int item in rev_items)
@@ -659,7 +682,9 @@ namespace Shadowsocks.View
                     if (item != index)
                         ServersListBox.SelectedIndex = _oldSelectedIndex = item + 1;
                 }
+
                 ServersListBox.SelectedIndex = _oldSelectedIndex = index + 1;
+
                 _ignoreLoad = false;
                 _allowSave = true;
                 LoadSelectedServer();
