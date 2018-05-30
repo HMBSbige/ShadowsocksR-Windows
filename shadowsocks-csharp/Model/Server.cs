@@ -19,10 +19,12 @@ namespace Shadowsocks.Model
         public IPAddress ip;
         public DateTime updateTime;
         public string host;
-        public bool isExpired(string host)
+        public bool force_expired;
+         public bool isExpired(string host)
         {
             if (updateTime == null) return true;
             if (this.host != host) return true;
+            if (force_expired && (DateTime.Now - updateTime).TotalMinutes > 1) return true;
             return (DateTime.Now - updateTime).TotalMinutes > 30;
         }
         public void UpdateDns(string host, IPAddress ip)
@@ -30,6 +32,7 @@ namespace Shadowsocks.Model
             updateTime = DateTime.Now;
             this.ip = new IPAddress(ip.GetAddressBytes());
             this.host = host;
+            force_expired = false;
         }
     }
 

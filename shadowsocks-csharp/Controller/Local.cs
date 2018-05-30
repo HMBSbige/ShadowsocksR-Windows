@@ -103,7 +103,7 @@ namespace Shadowsocks.Controller
         }
     }
 
-    class HandlerConfig
+    class HandlerConfig : ICloneable
     {
         public string targetHost;
         public int targetPort;
@@ -127,6 +127,30 @@ namespace Shadowsocks.Controller
         public int reconnectTimes = 0;
         public bool random = false;
         public bool forceRandom = false;
+
+        public object Clone()
+        {
+            HandlerConfig obj = new HandlerConfig();
+            obj.targetHost = targetHost;
+            obj.targetPort = targetPort;
+            obj.TTL = TTL;
+            obj.connect_timeout = connect_timeout;
+            obj.try_keep_alive = try_keep_alive;
+            obj.dns_servers = dns_servers;
+            obj.fouce_local_dns_query = fouce_local_dns_query;
+            obj.proxyType = proxyType;
+            obj.socks5RemoteHost = socks5RemoteHost;
+            obj.socks5RemotePort = socks5RemotePort;
+            obj.socks5RemoteUsername = socks5RemoteUsername;
+            obj.socks5RemotePassword = socks5RemotePassword;
+            obj.proxyUserAgent = proxyUserAgent;
+            obj.autoSwitchOff = autoSwitchOff;
+            obj.reconnectTimesRemain = reconnectTimesRemain;
+            obj.reconnectTimes = reconnectTimes;
+            obj.random = random;
+            obj.forceRandom = forceRandom;
+            return obj;
+        }
     }
 
     class Handler
@@ -230,7 +254,7 @@ namespace Shadowsocks.Controller
                     }
                 }
             }
-            else
+            else if (!closed)
             {
                 if (lastTimerSetTime != null && (DateTime.Now - lastTimerSetTime).TotalMilliseconds > 500)
                 {
@@ -459,7 +483,7 @@ namespace Shadowsocks.Controller
                 handler.select_server = select_server;
                 handler.connection = connection;
                 handler.connectionUDP = connectionUDP;
-                handler.cfg = cfg;
+                handler.cfg = cfg.Clone() as HandlerConfig;
                 handler.cfg.reconnectTimesRemain = cfg.reconnectTimesRemain - 1;
                 handler.cfg.reconnectTimes = cfg.reconnectTimes + 1;
 
@@ -505,7 +529,15 @@ namespace Shadowsocks.Controller
                 connectionSendBufferList.Add(data);
                 remoteHeaderSendBuffer = data;
 
-                Connect();
+                if (cfg.reconnectTimes > 0)
+                {
+                    InvokeHandler handler = () => Connect();
+                    handler.BeginInvoke(null, null);
+                }
+                else
+                {
+                    Connect();
+                }
             }
             else
             {
@@ -745,8 +777,6 @@ namespace Shadowsocks.Controller
                         }
                         this.State = ConnectState.END;
                     }
-                    getCurrentServer = null;
-                    keepCurrentServer = null;
                 }
 
                 if (!reconnect)
@@ -761,19 +791,24 @@ namespace Shadowsocks.Controller
                     connection = null;
                     connectionUDP = null;
                 }
-
-                detector = null;
-                speedTester = null;
-                random = null;
-                remoteUDPRecvBuffer = null;
-
-                server = null;
-                select_server = null;
             }
             catch (Exception e)
             {
                 Logging.LogUsefulException(e);
             }
+
+            getCurrentServer = null;
+            keepCurrentServer = null;
+
+            detector = null;
+            speedTester = null;
+            random = null;
+            remoteUDPRecvBuffer = null;
+
+            server = null;
+            select_server = null;
+
+            cfg = null;
         }
 
         private bool ConnectProxyServer(string strRemoteHost, int iRemotePort)
@@ -835,7 +870,7 @@ namespace Shadowsocks.Controller
                 }
             }
             speedTester.server = server.server;
-            Logging.Info($"Connect {cfg.targetHost}:{cfg.targetPort.ToString()}");
+            Logging.Info($"Connect {cfg.targetHost}:{cfg.targetPort.ToString()} via {server.server}:{server.server_port}");
 
             ResetTimeout(cfg.TTL);
             if (cfg.fouce_local_dns_query && cfg.targetHost != null)
@@ -858,6 +893,7 @@ namespace Shadowsocks.Controller
                             ipAddress = Utils.QueryDns(host, null);
                         }
                     }
+                    Logging.Info($"DNS nolock query {host} answer {ipAddress.ToString()}");
                     if (ipAddress != null)
                     {
                         Utils.DnsBuffer.Set(host, new IPAddress(ipAddress.GetAddressBytes()));
@@ -899,12 +935,14 @@ namespace Shadowsocks.Controller
                 bool parsed = IPAddress.TryParse(serverHost, out ipAddress);
                 if (!parsed)
                 {
+                    if (server.ServerSpeedLog().ErrorContinurousTimes > 10)
+                        server.DnsBuffer().force_expired = true;
                     if (server.DnsBuffer().isExpired(serverHost))
                     {
                         bool dns_ok = false;
                         {
                             DnsBuffer buf = server.DnsBuffer();
-                            lock (buf)
+                            if (Monitor.TryEnter(buf, buf.ip != null ? 100 : 1000000))
                             {
                                 if (buf.isExpired(serverHost))
                                 {
@@ -923,6 +961,15 @@ namespace Shadowsocks.Controller
                                     }
                                 }
                                 else
+                                {
+                                    ipAddress = buf.ip;
+                                    dns_ok = true;
+                                }
+                                Monitor.Exit(buf);
+                            }
+                            else
+                            {
+                                if (buf.ip != null)
                                 {
                                     ipAddress = buf.ip;
                                     dns_ok = true;
