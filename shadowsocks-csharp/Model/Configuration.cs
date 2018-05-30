@@ -110,6 +110,7 @@ namespace Shadowsocks.Model
         public int localPort;
         public string localAuthPassword;
 
+        public string localDnsServer;
         public string dnsServer;
         public int reconnectTimes;
         public string balanceAlgorithm;
@@ -388,6 +389,7 @@ namespace Shadowsocks.Model
             keepVisitTime = 180;
             connectTimeout = 5;
             dnsServer = "";
+            localDnsServer = "";
 
             balanceAlgorithm = "LowException";
             random = false;
@@ -420,6 +422,7 @@ namespace Shadowsocks.Model
             TTL = config.TTL;
             connectTimeout = config.connectTimeout;
             dnsServer = config.dnsServer;
+            localDnsServer = config.localDnsServer;
             proxyEnable = config.proxyEnable;
             pacDirectGoProxy = config.pacDirectGoProxy;
             proxyType = config.proxyType;

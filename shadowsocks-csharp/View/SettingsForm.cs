@@ -52,6 +52,7 @@ namespace Shadowsocks.View
             buttonDefault.Height = buttonDefault.Height * dpi_mul / 4;
             buttonDefault.Width = buttonDefault.Width * dpi_mul / 4;
             DNSText.Width = DNSText.Width * dpi_mul / 4;
+            LocalDNSText.Width = LocalDNSText.Width * dpi_mul / 4;
             NumReconnect.Width = NumReconnect.Width * dpi_mul / 4;
             NumTimeout.Width = NumTimeout.Width * dpi_mul / 4;
             NumTTL.Width = NumTTL.Width * dpi_mul / 4;
@@ -141,6 +142,7 @@ namespace Shadowsocks.View
                 _modifiedConfiguration.TTL = Convert.ToInt32(NumTTL.Value);
                 _modifiedConfiguration.connectTimeout = Convert.ToInt32(NumTimeout.Value);
                 _modifiedConfiguration.dnsServer = DNSText.Text;
+                _modifiedConfiguration.localDnsServer = LocalDNSText.Text;
                 _modifiedConfiguration.proxyEnable = CheckSockProxy.Checked;
                 _modifiedConfiguration.pacDirectGoProxy = checkBoxPacProxy.Checked;
                 _modifiedConfiguration.proxyType = comboProxyType.SelectedIndex;
@@ -185,6 +187,7 @@ namespace Shadowsocks.View
             NumTTL.Value = _modifiedConfiguration.TTL;
             NumTimeout.Value = _modifiedConfiguration.connectTimeout;
             DNSText.Text = _modifiedConfiguration.dnsServer;
+            LocalDNSText.Text = _modifiedConfiguration.localDnsServer;
 
             CheckSockProxy.Checked = _modifiedConfiguration.proxyEnable;
             checkBoxPacProxy.Checked = _modifiedConfiguration.pacDirectGoProxy;

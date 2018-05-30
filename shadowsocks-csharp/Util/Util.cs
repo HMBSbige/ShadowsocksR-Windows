@@ -32,6 +32,14 @@ namespace Shadowsocks.Util
             }
         }
 
+        public static LRUCache<string, IPAddress> LocalDnsBuffer
+        {
+            get
+            {
+                return dnsBuffer;
+            }
+        }
+
         static Process current_process = Process.GetCurrentProcess();
 
         public static void ReleaseMemory()
