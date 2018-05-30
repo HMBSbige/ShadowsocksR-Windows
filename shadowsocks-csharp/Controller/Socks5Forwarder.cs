@@ -302,14 +302,14 @@ namespace Shadowsocks.Controller
                                     }
                                     if (ipAddress == null)
                                     {
-                                        ipAddress = Utils.DnsBuffer.Get(_remote_host);
+                                        ipAddress = Utils.LocalDnsBuffer.Get(_remote_host);
                                     }
                                 }
                                 if (ipAddress == null)
                                 {
                                     if (_remote_host.IndexOf('.') >= 0)
                                     {
-                                        ipAddress = Util.Utils.QueryDns(_remote_host, _config.dnsServer);
+                                        ipAddress = Util.Utils.QueryDns(_remote_host, _config.localDnsServer);
                                     }
                                     else
                                     {
@@ -318,8 +318,8 @@ namespace Shadowsocks.Controller
                                 }
                                 if (ipAddress != null)
                                 {
-                                    Utils.DnsBuffer.Set(_remote_host, new IPAddress(ipAddress.GetAddressBytes()));
-                                    Utils.DnsBuffer.Sweep();
+                                    Utils.LocalDnsBuffer.Set(_remote_host, new IPAddress(ipAddress.GetAddressBytes()));
+                                    Utils.LocalDnsBuffer.Sweep();
                                 }
                                 else
                                 {

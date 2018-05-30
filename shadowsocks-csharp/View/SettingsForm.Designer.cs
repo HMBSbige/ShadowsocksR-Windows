@@ -74,6 +74,8 @@
             this.DNSText = new System.Windows.Forms.TextBox();
             this.buttonDefault = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.LocalDNSText = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.Socks5ProxyGroup.SuspendLayout();
@@ -107,7 +109,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(581, 452);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(581, 479);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // tableLayoutPanel2
@@ -495,7 +497,7 @@
             this.tableLayoutPanel10.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel10.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel10.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel10.Size = new System.Drawing.Size(186, 191);
+            this.tableLayoutPanel10.Size = new System.Drawing.Size(186, 218);
             this.tableLayoutPanel10.TabIndex = 3;
             // 
             // tableLayoutPanel3
@@ -509,7 +511,7 @@
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 23F));
             this.tableLayoutPanel3.Controls.Add(this.MyCancelButton, 1, 0);
             this.tableLayoutPanel3.Controls.Add(this.OKButton, 0, 0);
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 146);
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 173);
             this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
@@ -551,34 +553,37 @@
             this.tableLayoutPanel5.ColumnCount = 2;
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel5.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel5.Controls.Add(this.ReconnectLabel, 0, 3);
-            this.tableLayoutPanel5.Controls.Add(this.NumReconnect, 1, 3);
-            this.tableLayoutPanel5.Controls.Add(this.TTLLabel, 0, 5);
-            this.tableLayoutPanel5.Controls.Add(this.NumTTL, 1, 5);
-            this.tableLayoutPanel5.Controls.Add(this.labelTimeout, 0, 4);
-            this.tableLayoutPanel5.Controls.Add(this.NumTimeout, 1, 4);
+            this.tableLayoutPanel5.Controls.Add(this.ReconnectLabel, 0, 4);
+            this.tableLayoutPanel5.Controls.Add(this.NumReconnect, 1, 4);
+            this.tableLayoutPanel5.Controls.Add(this.TTLLabel, 0, 6);
+            this.tableLayoutPanel5.Controls.Add(this.NumTTL, 1, 6);
+            this.tableLayoutPanel5.Controls.Add(this.labelTimeout, 0, 5);
+            this.tableLayoutPanel5.Controls.Add(this.NumTimeout, 1, 5);
             this.tableLayoutPanel5.Controls.Add(this.DNSText, 1, 1);
             this.tableLayoutPanel5.Controls.Add(this.buttonDefault, 1, 0);
             this.tableLayoutPanel5.Controls.Add(this.label2, 0, 1);
+            this.tableLayoutPanel5.Controls.Add(this.label3, 0, 2);
+            this.tableLayoutPanel5.Controls.Add(this.LocalDNSText, 1, 2);
             this.tableLayoutPanel5.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel5.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel5.Name = "tableLayoutPanel5";
             this.tableLayoutPanel5.Padding = new System.Windows.Forms.Padding(3);
-            this.tableLayoutPanel5.RowCount = 6;
+            this.tableLayoutPanel5.RowCount = 7;
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(186, 143);
+            this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(186, 170);
             this.tableLayoutPanel5.TabIndex = 3;
             // 
             // ReconnectLabel
             // 
             this.ReconnectLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.ReconnectLabel.AutoSize = true;
-            this.ReconnectLabel.Location = new System.Drawing.Point(6, 66);
+            this.ReconnectLabel.Location = new System.Drawing.Point(6, 93);
             this.ReconnectLabel.Name = "ReconnectLabel";
             this.ReconnectLabel.Size = new System.Drawing.Size(59, 12);
             this.ReconnectLabel.TabIndex = 3;
@@ -587,7 +592,7 @@
             // NumReconnect
             // 
             this.NumReconnect.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.NumReconnect.Location = new System.Drawing.Point(71, 62);
+            this.NumReconnect.Location = new System.Drawing.Point(71, 89);
             this.NumReconnect.Maximum = new decimal(new int[] {
             20,
             0,
@@ -601,7 +606,7 @@
             // 
             this.TTLLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.TTLLabel.AutoSize = true;
-            this.TTLLabel.Location = new System.Drawing.Point(42, 120);
+            this.TTLLabel.Location = new System.Drawing.Point(42, 147);
             this.TTLLabel.Name = "TTLLabel";
             this.TTLLabel.Size = new System.Drawing.Size(23, 12);
             this.TTLLabel.TabIndex = 3;
@@ -610,7 +615,7 @@
             // NumTTL
             // 
             this.NumTTL.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.NumTTL.Location = new System.Drawing.Point(71, 116);
+            this.NumTTL.Location = new System.Drawing.Point(71, 143);
             this.NumTTL.Maximum = new decimal(new int[] {
             600,
             0,
@@ -624,7 +629,7 @@
             // 
             this.labelTimeout.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.labelTimeout.AutoSize = true;
-            this.labelTimeout.Location = new System.Drawing.Point(12, 93);
+            this.labelTimeout.Location = new System.Drawing.Point(12, 120);
             this.labelTimeout.Name = "labelTimeout";
             this.labelTimeout.Size = new System.Drawing.Size(53, 12);
             this.labelTimeout.TabIndex = 3;
@@ -633,7 +638,7 @@
             // NumTimeout
             // 
             this.NumTimeout.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.NumTimeout.Location = new System.Drawing.Point(71, 89);
+            this.NumTimeout.Location = new System.Drawing.Point(71, 116);
             this.NumTimeout.Maximum = new decimal(new int[] {
             60,
             0,
@@ -672,6 +677,26 @@
             this.label2.Size = new System.Drawing.Size(23, 12);
             this.label2.TabIndex = 3;
             this.label2.Text = "DNS";
+            // 
+            // label3
+            // 
+            this.label3.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(6, 66);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(59, 12);
+            this.label3.TabIndex = 3;
+            this.label3.Text = "Local DNS";
+            // 
+            // LocalDNSText
+            // 
+            this.LocalDNSText.ImeMode = System.Windows.Forms.ImeMode.Off;
+            this.LocalDNSText.Location = new System.Drawing.Point(71, 62);
+            this.LocalDNSText.MaxLength = 0;
+            this.LocalDNSText.Name = "LocalDNSText";
+            this.LocalDNSText.Size = new System.Drawing.Size(109, 21);
+            this.LocalDNSText.TabIndex = 17;
+            this.LocalDNSText.WordWrap = false;
             // 
             // SettingsForm
             // 
@@ -763,5 +788,7 @@
         private System.Windows.Forms.NumericUpDown NumTimeout;
         private System.Windows.Forms.Button buttonDefault;
         private System.Windows.Forms.CheckBox checkBalanceInGroup;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox LocalDNSText;
     }
 }

@@ -111,6 +111,7 @@ namespace Shadowsocks.Controller
         public Double TTL = 0; // Second
         public Double connect_timeout = 0;
         public int try_keep_alive = 0;
+        public string local_dns_servers;
         public string dns_servers;
         public bool fouce_local_dns_query = false;
         // Server proxy
@@ -136,6 +137,7 @@ namespace Shadowsocks.Controller
             obj.TTL = TTL;
             obj.connect_timeout = connect_timeout;
             obj.try_keep_alive = try_keep_alive;
+            obj.local_dns_servers = local_dns_servers;
             obj.dns_servers = dns_servers;
             obj.fouce_local_dns_query = fouce_local_dns_query;
             obj.proxyType = proxyType;
@@ -873,7 +875,7 @@ namespace Shadowsocks.Controller
             Logging.Info($"Connect {cfg.targetHost}:{cfg.targetPort.ToString()} via {server.server}:{server.server_port}");
 
             ResetTimeout(cfg.TTL);
-            if (cfg.fouce_local_dns_query && cfg.targetHost != null)
+            if (cfg.targetHost != null)
             {
                 IPAddress ipAddress;
 
@@ -948,7 +950,7 @@ namespace Shadowsocks.Controller
                                 {
                                     if (serverHost.IndexOf('.') >= 0)
                                     {
-                                        ipAddress = Util.Utils.QueryDns(serverHost, cfg.dns_servers);
+                                        ipAddress = Util.Utils.QueryDns(serverHost, cfg.local_dns_servers);
                                     }
                                     else
                                     {
