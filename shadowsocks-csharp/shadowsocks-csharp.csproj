@@ -168,6 +168,7 @@
     <Compile Include="Model\ServerSelectStrategy.cs" />
     <Compile Include="Model\ServerSpeedLog.cs" />
     <Compile Include="Obfs\Auth.cs" />
+    <Compile Include="Obfs\AuthAkarin.cs" />
     <Compile Include="Obfs\AuthChain.cs" />
     <Compile Include="Obfs\HttpSimpleObfs.cs" />
     <Compile Include="Obfs\IObfs.cs" />
