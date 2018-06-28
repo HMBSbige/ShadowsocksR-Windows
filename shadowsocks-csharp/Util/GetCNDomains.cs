@@ -48,6 +48,10 @@ namespace Shadowsocks.Util
 
         private static string GetDomainFromLine(string str)
         {
+            if (str.Length > 0 && str[0] == '#')
+            {
+                return null;
+            }
             var sArray = str.Split('/');
             return sArray[1];
         }
