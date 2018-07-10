@@ -51,12 +51,12 @@ namespace Shadowsocks.Util
         {
             var reg = new Regex("^server=/(.+)/(.+)$");
             var match = reg.Match(str);
-            return match.Groups[1].Value;
+            return match.Groups[1].Value.ToLower();
         }
 
         public static IEnumerable<string> ReadFromString(string str)
         {
-            var domains = new List<string>();
+            var domains = new HashSet<string>();
 
             var lines = str.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var line in lines)
@@ -67,6 +67,7 @@ namespace Shadowsocks.Util
                     domains.Add(domain);
                 }
             }
+
             return domains.Count == 0 ? null : domains;
         }
     }

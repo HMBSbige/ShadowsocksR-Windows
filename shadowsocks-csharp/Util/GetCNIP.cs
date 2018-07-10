@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Shadowsocks.Util
 {
@@ -51,10 +52,20 @@ namespace Shadowsocks.Util
                        Convert.ToString(bytesAddress[3], 2).PadLeft(8, '0')}";
         }
 
+        public static int Hosts2CIDR(int hosts)
+        {
+            return 32 - Convert.ToInt32(Math.Log(hosts, 2));
+        }
+
+        public static int CIDR2Hosts(int CIDR)
+        {
+            return Convert.ToInt32(Math.Pow(2, 32 - Convert.ToInt32(CIDR)));
+        }
+
         public IPv4Subnet(IPAddress ipv4, int hosts)
         {
             Hosts = hosts;
-            CIDR = 32 - Convert.ToInt32(Math.Log(hosts, 2));
+            CIDR = Hosts2CIDR(hosts);
 
             var netmaskStr = new string('1', CIDR) + new string('0', 32 - CIDR);
             Netmask = IPv4BinStrToIPv4(netmaskStr);
@@ -142,11 +153,13 @@ namespace Shadowsocks.Util
                 return null;
             }
 
-            var strA = str.Split('|');
-            //apnic|CN|ipv4|
-            if (strA.Length > 4 && strA[0] == @"apnic" && strA[1] == @"CN" && strA[2] == @"ipv4")
+            var reg = new Regex("^(.+)/(.+)$");
+            var match = reg.Match(str);
+            if (match.Groups.Count == 3)
             {
-                return new KeyValuePair<IPAddress, int>(IPAddress.Parse(strA[3]), Convert.ToInt32(strA[4]));
+                var ipv4 = IPAddress.Parse(match.Groups[1].Value);
+                var hosts = IPv4Subnet.CIDR2Hosts(Convert.ToInt32(match.Groups[2].Value));
+                return new KeyValuePair<IPAddress, int>(ipv4, hosts);
             }
 
             return null;
