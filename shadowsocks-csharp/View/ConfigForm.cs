@@ -208,8 +208,8 @@ namespace Shadowsocks.View
                 Server server = new Server
                 {
                     server = IPTextBox.Text.Trim(),
-                    server_port = Convert.ToInt32(NumServerPort.Value),
-                    server_udp_port = Convert.ToInt32(NumUDPPort.Value),
+                    server_port = Convert.ToUInt16(NumServerPort.Value),
+                    server_udp_port = Convert.ToUInt16(NumUDPPort.Value),
                     password = PasswordTextBox.Text,
                     method = EncryptionSelect.Text,
                     protocol = TCPProtocolComboBox.Text,
