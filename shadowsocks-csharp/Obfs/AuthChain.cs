@@ -103,6 +103,15 @@ namespace Shadowsocks.Obfs
             return _obfs;
         }
 
+        protected override void Disposing()
+        {
+            if (encryptor != null)
+            {
+                encryptor.Dispose();
+                encryptor = null;
+            }
+        }
+
         public override object InitData()
         {
             return new AuthDataAesChain();
