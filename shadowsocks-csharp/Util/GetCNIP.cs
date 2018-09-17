@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Shadowsocks.Util
 {
@@ -153,13 +152,11 @@ namespace Shadowsocks.Util
                 return null;
             }
 
-            var reg = new Regex("^(.+)/(.+)$");
-            var match = reg.Match(str);
-            if (match.Groups.Count == 3)
+            var strA = str.Split('|');
+            //apnic|CN|ipv4|
+            if (strA.Length > 4 && strA[0] == @"apnic" && strA[1] == @"CN" && strA[2] == @"ipv4")
             {
-                var ipv4 = IPAddress.Parse(match.Groups[1].Value);
-                var hosts = IPv4Subnet.CIDR2Hosts(Convert.ToInt32(match.Groups[2].Value));
-                return new KeyValuePair<IPAddress, int>(ipv4, hosts);
+                return new KeyValuePair<IPAddress, int>(IPAddress.Parse(strA[3]), Convert.ToInt32(strA[4]));
             }
 
             return null;
