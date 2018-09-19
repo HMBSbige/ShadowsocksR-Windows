@@ -118,11 +118,6 @@ namespace Shadowsocks.Encryption
             GC.SuppressFinalize(this);
         }
 
-        ~MbedTLSEncryptor()
-        {
-            Dispose(false);
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             lock (this)

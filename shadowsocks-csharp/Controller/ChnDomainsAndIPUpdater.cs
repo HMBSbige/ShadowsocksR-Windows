@@ -1,16 +1,16 @@
-﻿using System;
+﻿using Shadowsocks.Model;
+using Shadowsocks.Util;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
-using Shadowsocks.Model;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller
 {
     public class ChnDomainsAndIPUpdater
     {
-        private const string CNIP_URL = @"https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt";
+        private const string CNIP_URL = @"https://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest";
         private const string CNDOMAINS_URL = @"https://raw.githubusercontent.com/felixonmars/dnsmasq-china-list/master/accelerated-domains.china.conf";
         private const string SS_CNIP_TEMPLATE_URL = @"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_cnip_temp.pac";
         private const string SS_WHITE_TEMPLATE_URL = @"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white_temp.pac";

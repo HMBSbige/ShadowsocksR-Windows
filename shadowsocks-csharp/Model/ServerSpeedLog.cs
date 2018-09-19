@@ -432,6 +432,12 @@ namespace Shadowsocks.Model
                 const int base_time_diff = 100;
                 const int max_time_diff = 3 * base_time_diff;
                 int time_diff = (int)(now - transLog[transLog.Count - 1].recvTime).TotalMilliseconds;
+                if (time_diff < 0)
+                {
+                    transLog.Clear();
+                    transLog.Add(new TransLog(bytes, now));
+                    return;
+                }
                 if (time_diff < base_time_diff)
                 {
                     transLog[transLog.Count - 1].times++;

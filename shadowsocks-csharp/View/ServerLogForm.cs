@@ -258,7 +258,7 @@ namespace Shadowsocks.View
             {
                 Configuration config = controller.GetCurrentConfiguration();
                 ServerSpeedLogShow[] _ServerSpeedLogList = new ServerSpeedLogShow[config.configs.Count];
-                for (int i = 0; i < config.configs.Count; ++i)
+                for (int i = 0; i < config.configs.Count && i < _ServerSpeedLogList.Length; ++i)
                 {
                     _ServerSpeedLogList[i] = config.configs[i].ServerSpeedLog().Translate();
                 }

@@ -62,6 +62,15 @@ namespace Shadowsocks.Obfs
             return _obfs;
         }
 
+        protected override void Disposing()
+        {
+            if (encryptor != null)
+            {
+                encryptor.Dispose();
+                encryptor = null;
+            }
+        }
+
         public override object InitData()
         {
             return new AuthDataAesChain();
@@ -167,17 +176,13 @@ namespace Shadowsocks.Obfs
             {
                 byte[] rnd_data = new byte[rand_len];
                 random.NextBytes(rnd_data);
-                encryptor.Encrypt(data, datalength, data, out datalength);
                 if (datalength > 0)
                 {
+                    encryptor.Encrypt(data, datalength, data, out datalength);
+                    Array.Copy(data, 0, outdata, start_pos, datalength);
                     if (rand_len > 0)
                     {
-                        Array.Copy(data, 0, outdata, start_pos, datalength);
-                        Array.Copy(rnd_data, 0, outdata, start_pos + datalength, rand_len);
-                    }
-                    else
-                    {
-                        Array.Copy(data, 0, outdata, start_pos, datalength);
+                        rnd_data.CopyTo(outdata, start_pos + datalength);
                     }
                 }
                 else
