@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using OpenDNS;
+using Shadowsocks.Controller;
+using Shadowsocks.Model;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -6,15 +10,9 @@ using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using System.Text;
 using System.Windows.Forms;
-using OpenDNS;
-using Shadowsocks.Controller;
-using Shadowsocks.Encryption;
-using Shadowsocks.Model;
 
 namespace Shadowsocks.Util
 {
@@ -454,6 +452,14 @@ namespace Shadowsocks.Util
         public static string GetExecutablePath()
         {
             return System.Reflection.Assembly.GetExecutingAssembly().Location;
+        }
+
+        public static RegistryKey OpenRegKey(string name, bool writable, RegistryHive hive = RegistryHive.CurrentUser)
+        {
+            var userKey = RegistryKey.OpenBaseKey(hive,
+                            Environment.Is64BitProcess ? RegistryView.Registry64 : RegistryView.Registry32)
+                    .OpenSubKey(name, writable);
+            return userKey;
         }
 
         public static int RunAsAdmin(string Arguments)
