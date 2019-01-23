@@ -2,16 +2,19 @@
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using System.Threading;
+using System.Text;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
+
 using ZXing;
 using ZXing.Common;
 using ZXing.QrCode;
+using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace Shadowsocks.View
 {
@@ -142,7 +145,7 @@ namespace Shadowsocks.View
 
         private void UpdateTrayIcon()
         {
-            int dpi;
+            int dpi = 96;
             using (Graphics graphics = Graphics.FromHwnd(IntPtr.Zero))
             {
                 dpi = (int)graphics.DpiX;
@@ -152,19 +155,12 @@ namespace Shadowsocks.View
             bool global = config.sysProxyMode == (int)ProxyMode.Global;
             bool random = config.random;
 
-            //The GetHicon method creates an icon in unmanaged memory.
-            //It may cause a memory leak.
-            //Use DestroyIcon(), https://stackoverflow.com/a/33801377
             try
             {
-                using (var icon = new Bitmap(@"icon.png"))
-                {
-                    var iconHandle = icon.GetHicon();
-                    var newIcon = Icon.FromHandle(iconHandle);
-                    _notifyIcon.Icon = (Icon)newIcon.Clone();
-                    newIcon.Dispose();
-                    DestroyIcon(iconHandle);
-                }
+                Bitmap icon = new Bitmap("icon.png");
+                Icon newIcon = Icon.FromHandle(icon.GetHicon());
+                _notifyIcon.Icon = newIcon;
+                DestroyIcon(newIcon.Handle);
             }
             catch
             {
@@ -198,13 +194,13 @@ namespace Shadowsocks.View
                     mul_r = 0.4;
                 }
 
-                using (var iconCopy = new Bitmap(icon))
+                Bitmap iconCopy = new Bitmap(icon);
                 {
-                    for (var x = 0; x < iconCopy.Width; ++x)
+                    for (int x = 0; x < iconCopy.Width; x++)
                     {
-                        for (var y = 0; y < iconCopy.Height; ++y)
+                        for (int y = 0; y < iconCopy.Height; y++)
                         {
-                            var color = icon.GetPixel(x, y);
+                            Color color = icon.GetPixel(x, y);
                             iconCopy.SetPixel(x, y,
                                 Color.FromArgb((byte)(color.A * mul_a),
                                 ((byte)(color.R * mul_r)),
@@ -212,11 +208,9 @@ namespace Shadowsocks.View
                                 ((byte)(color.B * mul_b))));
                         }
                     }
-                    var iconHandle = iconCopy.GetHicon();
-                    var newIcon = Icon.FromHandle(iconHandle);
-                    _notifyIcon.Icon = (Icon)newIcon.Clone();
-                    newIcon.Dispose();
-                    DestroyIcon(iconHandle);
+                    Icon newIcon = Icon.FromHandle(iconCopy.GetHicon());
+                    _notifyIcon.Icon = newIcon;
+                    DestroyIcon(newIcon.Handle);
                 }
             }
 
