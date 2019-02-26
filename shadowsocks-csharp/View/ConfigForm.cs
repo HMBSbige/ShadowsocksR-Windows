@@ -46,7 +46,7 @@ namespace Shadowsocks.View
             if (updateChecker.LatestVersionURL == null)
                 LinkUpdate.Visible = false;
 
-            foreach (string name in EncryptorFactory.GetEncryptor())
+            foreach (string name in EncryptorFactory.GetEncryptor().Keys)
             {
                 EncryptorInfo info = EncryptorFactory.GetEncryptorInfo(name);
                 if (info.display)

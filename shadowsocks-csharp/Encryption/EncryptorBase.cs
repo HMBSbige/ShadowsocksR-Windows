@@ -1,9 +1,6 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-
-namespace Shadowsocks.Encryption
+﻿namespace Shadowsocks.Encryption
 {
-    public struct EncryptorInfo
+    public class EncryptorInfo
     {
         public int key_size;
         public int iv_size;
@@ -20,10 +17,26 @@ namespace Shadowsocks.Encryption
             this.name = name;
         }
     }
-    public abstract class EncryptorBase
-        : IEncryptor
+    public abstract class EncryptorBase : IEncryptor
     {
-        public const int MAX_INPUT_SIZE = 65536;
+        public const int MAX_INPUT_SIZE = 32768;
+
+        public const int MD5_LEN = 16;
+
+        public const int CHUNK_LEN_BYTES = 2;
+
+        public const uint CHUNK_LEN_MASK = 0x3FFFu;
+
+        public const int RecvSize = 2048;
+
+        // overhead of one chunk, reserved for AEAD ciphers
+        public const int ChunkOverheadSize = 16 * 2 /* two tags */ + CHUNK_LEN_BYTES;
+
+        // max chunk size
+        public const uint MaxChunkSize = CHUNK_LEN_MASK + CHUNK_LEN_BYTES + 16 * 2;
+
+        // In general, the ciphertext length, we should take overhead into account
+        public const int BufferSize = RecvSize + (int)MaxChunkSize + 32 /* max salt len */;
 
         protected EncryptorBase(string method, string password)
         {
@@ -34,13 +47,6 @@ namespace Shadowsocks.Encryption
         protected string Method;
         protected string Password;
 
-        protected byte[] GetPasswordHash()
-        {
-            byte[] inputBytes = Encoding.UTF8.GetBytes(Password);
-            byte[] hash = MbedTLS.MD5(inputBytes);
-            return hash;
-        }
-        public abstract bool SetIV(byte[] iv);
         public abstract void Encrypt(byte[] buf, int length, byte[] outbuf, out int outlength);
 
         public abstract void Decrypt(byte[] buf, int length, byte[] outbuf, out int outlength);

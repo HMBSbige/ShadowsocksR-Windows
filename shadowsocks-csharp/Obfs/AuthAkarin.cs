@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Shadowsocks.Controller;
+using Shadowsocks.Encryption;
+using Shadowsocks.Encryption.Stream;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using System.Text;
-using Shadowsocks.Controller;
-using Shadowsocks.Encryption;
 
 namespace Shadowsocks.Obfs
 {
@@ -45,7 +45,7 @@ namespace Shadowsocks.Obfs
         protected byte[] last_server_hash;
         protected xorshift128plus random_client = new xorshift128plus(0);
         protected xorshift128plus random_server = new xorshift128plus(0);
-        protected IEncryptor encryptor;
+        protected StreamEncryptor encryptor;
         protected int send_tcp_mss = 2000;
         protected int recv_tcp_mss = 2000;
         protected List<int> send_back_cmd = new List<int>();
@@ -284,7 +284,7 @@ namespace Shadowsocks.Obfs
 
                 byte[] encrypt_key = user_key;
 
-                Encryption.IEncryptor encryptor = Encryption.EncryptorFactory.GetEncryptor("aes-128-cbc", System.Convert.ToBase64String(encrypt_key) + SALT, false);
+                var encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("aes-128-cbc", System.Convert.ToBase64String(encrypt_key) + SALT);
                 int enc_outlen;
 
                 encryptor.SetIV(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
@@ -301,7 +301,7 @@ namespace Shadowsocks.Obfs
                 Array.Copy(md5data, 0, encrypt, 20, 4);
             }
             encrypt.CopyTo(outdata, 12);
-            encryptor = EncryptorFactory.GetEncryptor("chacha20", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(last_client_hash, 0, 16), false);
+            encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("chacha20", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(last_client_hash, 0, 16));
             {
                 byte[] iv = new byte[8];
                 Array.Copy(last_client_hash, iv, 8);
@@ -514,7 +514,7 @@ namespace Shadowsocks.Obfs
             byte[] rand_data = new byte[rand_len];
             random.NextBytes(rand_data);
             outlength = datalength + rand_len + 8;
-            encryptor = EncryptorFactory.GetEncryptor("chacha20", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(md5data, 0, 16), false);
+            encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("chacha20", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(md5data, 0, 16));
             {
                 byte[] iv = new byte[8];
                 Array.Copy(Server.key, iv, 8);
@@ -555,7 +555,7 @@ namespace Shadowsocks.Obfs
             md5data = md5.ComputeHash(plaindata, datalength - 8, 7);
             int rand_len = UdpGetRandLen(random_server, md5data);
             outlength = datalength - rand_len - 8;
-            encryptor = EncryptorFactory.GetEncryptor("chacha20", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(md5data, 0, 16), false);
+            encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("chacha20", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(md5data, 0, 16));
             {
                 int temp;
                 byte[] iv = new byte[8];

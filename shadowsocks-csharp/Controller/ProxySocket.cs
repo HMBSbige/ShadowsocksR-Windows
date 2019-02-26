@@ -633,7 +633,7 @@ namespace Shadowsocks.Controller
 
         public void CreateEncryptor(string method, string password)
         {
-            _encryptor = EncryptorFactory.GetEncryptor(method, password, true);
+            _encryptor = EncryptorFactory.GetEncryptor(method, password);
             _method = method;
             _password = password;
         }

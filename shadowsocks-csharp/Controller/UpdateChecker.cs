@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Xml;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace Shadowsocks.Controller
 {
@@ -79,7 +79,7 @@ namespace Shadowsocks.Controller
             }
         }
 
-        private static int CompareVersion(string l, string r)
+        public static int CompareVersion(string l, string r)
         {
             var ls = l.Split('.');
             var rs = r.Split('.');

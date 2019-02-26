@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Shadowsocks.Controller;
+using Shadowsocks.Encryption;
+using Shadowsocks.Encryption.Stream;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using System.Text;
-using Shadowsocks.Controller;
-using Shadowsocks.Encryption;
 
 namespace Shadowsocks.Obfs
 {
@@ -294,7 +294,7 @@ namespace Shadowsocks.Obfs
 
                 byte[] encrypt_key = user_key;
 
-                Encryption.IEncryptor encryptor = Encryption.EncryptorFactory.GetEncryptor("aes-128-cbc", System.Convert.ToBase64String(encrypt_key) + SALT, false);
+                var encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("aes-128-cbc", System.Convert.ToBase64String(encrypt_key) + SALT);
                 int enc_outlen;
 
                 encryptor.SetIV(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
@@ -311,7 +311,7 @@ namespace Shadowsocks.Obfs
                 Array.Copy(md5data, 0, encrypt, 20, 4);
             }
             encrypt.CopyTo(outdata, 12);
-            encryptor = EncryptorFactory.GetEncryptor("rc4", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(last_client_hash, 0, 16), false);
+            encryptor = EncryptorFactory.GetEncryptor("rc4", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(last_client_hash, 0, 16));
 
             // combine first chunk
             {
@@ -522,7 +522,7 @@ namespace Shadowsocks.Obfs
             byte[] rand_data = new byte[rand_len];
             random.NextBytes(rand_data);
             outlength = datalength + rand_len + 8;
-            encryptor = EncryptorFactory.GetEncryptor("rc4", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(md5data, 0, 16), false);
+            encryptor = EncryptorFactory.GetEncryptor("rc4", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(md5data, 0, 16));
             encryptor.Encrypt(plaindata, datalength, outdata, out datalength);
             rand_data.CopyTo(outdata, datalength);
             auth_data.CopyTo(outdata, outlength - 8);
@@ -558,7 +558,7 @@ namespace Shadowsocks.Obfs
             md5data = md5.ComputeHash(plaindata, datalength - 8, 7);
             int rand_len = UdpGetRandLen(random_server, md5data);
             outlength = datalength - rand_len - 8;
-            encryptor = EncryptorFactory.GetEncryptor("rc4", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(md5data, 0, 16), false);
+            encryptor = EncryptorFactory.GetEncryptor("rc4", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(md5data, 0, 16));
             encryptor.Decrypt(plaindata, outlength, plaindata, out outlength);
             return plaindata;
         }
