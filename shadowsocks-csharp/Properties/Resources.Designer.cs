@@ -47,7 +47,7 @@ namespace Shadowsocks.Properties {
         }
         
         /// <summary>
-        ///   使用此强类型资源类，为所有资源查找
+        ///   重写当前线程的 CurrentUICulture 属性
         ///   重写当前线程的 CurrentUICulture 属性。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -64,6 +64,7 @@ namespace Shadowsocks.Properties {
         ///   查找类似 # translation for Simplified Chinese
         ///
         ///Shadowsocks=Shadowsocks
+        ///ShadowsocksR=ShadowsocksR
         ///
         ///# Menu items
         ///
@@ -83,8 +84,7 @@ namespace Shadowsocks.Properties {
         ///Import servers from file...=从文件导入服务器...
         ///Servers Subscribe=服务器订阅
         ///Subscribe setting...=SSR服务器订阅设置...
-        ///Update subscribe SSR node=更新SSR服务器订阅
-        ///Update subscr [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///Update subscribe SSR nod [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string cn {
             get {
@@ -119,16 +119,6 @@ namespace Shadowsocks.Properties {
             get {
                 object obj = ResourceManager.GetObject("mgwz_dll", resourceCulture);
                 return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap ngnl {
-            get {
-                object obj = ResourceManager.GetObject("ngnl", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -223,6 +213,7 @@ namespace Shadowsocks.Properties {
         ///   查找类似 # translation for Traditional Chinese
         ///
         ///Shadowsocks=Shadowsocks
+        ///ShadowsocksR=ShadowsocksR
         ///
         ///# Menu items
         ///
@@ -242,8 +233,7 @@ namespace Shadowsocks.Properties {
         ///Import servers from file...=從文件導入伺服器...
         ///Servers Subscribe=伺服器訂閱
         ///Subscribe setting...=SSR伺服器訂閱設置...
-        ///Update subscribe SSR node=更新SSR伺服器訂閱
-        ///Update su [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///Update subscribe SSR [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string zh_tw {
             get {

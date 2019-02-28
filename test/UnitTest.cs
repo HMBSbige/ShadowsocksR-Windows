@@ -157,6 +157,10 @@ namespace test
             var tasks = new List<Task>();
             foreach (var cipher in StreamSodiumEncryptor.SupportedCiphers())
             {
+                if (cipher.StartsWith(@"x"))
+                {
+                    continue;
+                }
                 var t = new Task(() =>
                 {
                     try
