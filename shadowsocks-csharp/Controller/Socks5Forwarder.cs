@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Shadowsocks.Model;
+using Shadowsocks.Proxy;
+using Shadowsocks.Util;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Timers;
-using OpenDNS;
-using Shadowsocks.Model;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller
 {

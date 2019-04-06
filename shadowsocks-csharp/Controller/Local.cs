@@ -1,15 +1,13 @@
-﻿using System;
+﻿using Shadowsocks.Model;
+using Shadowsocks.Obfs;
+using Shadowsocks.Proxy;
+using Shadowsocks.Util;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Net;
 using System.Net.Sockets;
-using Shadowsocks.Encryption;
-using Shadowsocks.Obfs;
-using Shadowsocks.Model;
-using System.Timers;
 using System.Threading;
-using OpenDNS;
-using Shadowsocks.Util;
+using System.Timers;
 
 namespace Shadowsocks.Controller
 {
@@ -1697,7 +1695,7 @@ namespace Shadowsocks.Controller
                         ResetTimeout(cfg.TTL);
                     }
                     int send_len = RemoteSend(connetionRecvBuffer, bytesRead);
-                    if (!( send_len == 0 && bytesRead > 0) )
+                    if (!(send_len == 0 && bytesRead > 0))
                         doConnectionRecv();
                 }
                 else
