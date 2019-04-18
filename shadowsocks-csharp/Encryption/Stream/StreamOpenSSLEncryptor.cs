@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
+using System.Diagnostics;
 
-namespace Shadowsocks.Encryption
+namespace Shadowsocks.Encryption.Stream
 {
-    public class LibcryptoEncryptor
-        : IVEncryptor, IDisposable
+    public sealed class StreamOpenSSLEncryptor : StreamEncryptor
     {
         const int CIPHER_AES = 1;
         const int CIPHER_RC4 = 2;
@@ -16,29 +14,12 @@ namespace Shadowsocks.Encryption
         private IntPtr _encryptCtx = IntPtr.Zero;
         private IntPtr _decryptCtx = IntPtr.Zero;
 
-        public LibcryptoEncryptor(string method, string password, bool cache)
-            : base(method, password, cache)
+        public StreamOpenSSLEncryptor(string method, string password) : base(method, password)
         {
-            InitKey(method, password);
+
         }
 
-        public static void InitAviable()
-        {
-            List<string> remove_ciphers = new List<string>();
-            foreach (string cipher in _ciphers.Keys)
-            {
-                if (!Libcrypto.is_cipher(cipher))
-                {
-                    remove_ciphers.Add(cipher);
-                }
-            }
-            foreach (string cipher in remove_ciphers)
-            {
-                _ciphers.Remove(cipher);
-            }
-        }
-
-        private static Dictionary<string, EncryptorInfo> _ciphers = new Dictionary<string, EncryptorInfo> {
+        private static readonly Dictionary<string, EncryptorInfo> _ciphers = new Dictionary<string, EncryptorInfo> {
                 {"aes-128-cbc", new EncryptorInfo(16, 16, false, CIPHER_AES)},
                 {"aes-192-cbc", new EncryptorInfo(24, 16, false, CIPHER_AES)},
                 {"aes-256-cbc", new EncryptorInfo(32, 16, false, CIPHER_AES)},
@@ -49,6 +30,7 @@ namespace Shadowsocks.Encryption
                 {"aes-128-cfb", new EncryptorInfo(16, 16, true, CIPHER_AES)},
                 {"aes-192-cfb", new EncryptorInfo(24, 16, true, CIPHER_AES)},
                 {"aes-256-cfb", new EncryptorInfo(32, 16, true, CIPHER_AES)},
+
                 {"aes-128-cfb8", new EncryptorInfo(16, 16, true, CIPHER_AES)},
                 {"aes-192-cfb8", new EncryptorInfo(24, 16, true, CIPHER_AES)},
                 {"aes-256-cfb8", new EncryptorInfo(32, 16, true, CIPHER_AES)},
@@ -60,24 +42,17 @@ namespace Shadowsocks.Encryption
                 {"camellia-256-cfb", new EncryptorInfo(32, 16, false, CIPHER_CAMELLIA)},
                 {"bf-cfb", new EncryptorInfo(16, 8, false, CIPHER_OTHER_CFB)},
                 {"cast5-cfb", new EncryptorInfo(16, 8, false, CIPHER_OTHER_CFB)},
-                //{"des-cfb", new EncryptorInfo(8, 8, true, CIPHER_OTHER_CFB)}, // weak
-                //{"des-ede3-cfb", new EncryptorInfo(24, 8, true, CIPHER_OTHER_CFB)},
                 {"idea-cfb", new EncryptorInfo(16, 8, false, CIPHER_OTHER_CFB)},
                 {"rc2-cfb", new EncryptorInfo(16, 8, false, CIPHER_OTHER_CFB)},
                 {"rc4", new EncryptorInfo(16, 0, true, CIPHER_RC4)}, // weak
-                {"rc4-md5", new EncryptorInfo(16, 16, true, CIPHER_RC4)}, // weak
-                {"rc4-md5-6", new EncryptorInfo(16, 6, true, CIPHER_RC4)}, // weak
+                {"rc4-md5", new EncryptorInfo(16, 16, true, CIPHER_RC4, "RC4")}, // weak
+                {"rc4-md5-6", new EncryptorInfo(16, 6, true, CIPHER_RC4, "RC4")}, // weak
                 {"seed-cfb", new EncryptorInfo(16, 16, false, CIPHER_OTHER_CFB)},
         };
 
-        public static List<string> SupportedCiphers()
+        public static IEnumerable<string> SupportedCiphers()
         {
             return new List<string>(_ciphers.Keys);
-        }
-
-        public static bool isSupport()
-        {
-            return Libcrypto.isSupport();
         }
 
         protected override Dictionary<string, EncryptorInfo> getCiphers()
@@ -89,52 +64,56 @@ namespace Shadowsocks.Encryption
         {
             base.initCipher(iv, isCipher);
 
-            IntPtr ctx;
-            byte[] realkey;
-            if (_method.StartsWith("rc4-md5"))
-            {
-                byte[] temp = new byte[keyLen + ivLen];
-                realkey = new byte[keyLen];
-                Array.Copy(_key, 0, temp, 0, keyLen);
-                Array.Copy(iv, 0, temp, keyLen, ivLen);
-                realkey = MbedTLS.MD5(temp);
-            }
-            else
-            {
-                realkey = _key;
-            }
+            IntPtr cipherInfo = OpenSSL.GetCipherInfo(_innerLibName);
+            if (cipherInfo == IntPtr.Zero) throw new System.Exception("openssl: cipher not found");
+            IntPtr ctx = OpenSSL.EVP_CIPHER_CTX_new();
+            if (ctx == IntPtr.Zero) throw new System.Exception("fail to create ctx");
+
             if (isCipher)
             {
-                if (_encryptCtx == IntPtr.Zero)
-                {
-                    ctx = Libcrypto.init(Method, realkey, iv, 1);
-                    _encryptCtx = ctx;
-                }
-                else
-                {
-                    ctx = _encryptCtx;
-                }
+                _encryptCtx = ctx;
             }
             else
             {
-                if (_decryptCtx == IntPtr.Zero)
-                {
-                    ctx = Libcrypto.init(Method, realkey, iv, 0);
-                    _decryptCtx = ctx;
-                }
-                else
-                {
-                    ctx = _decryptCtx;
-                }
+                _decryptCtx = ctx;
             }
+
+            byte[] realKey;
+            if (_method.StartsWith(@"rc4-md5"))
+            {
+                byte[] temp = new byte[keyLen + ivLen];
+                Array.Copy(_key, 0, temp, 0, keyLen);
+                Array.Copy(iv, 0, temp, keyLen, ivLen);
+                realKey = MbedTLS.MD5(temp);
+            }
+            else
+            {
+                realKey = _key;
+            }
+
+            var ret = OpenSSL.EVP_CipherInit_ex(ctx, cipherInfo, IntPtr.Zero, null, null, isCipher ? OpenSSL.OPENSSL_ENCRYPT : OpenSSL.OPENSSL_DECRYPT);
+            if (ret != 1) throw new System.Exception("openssl: fail to set key length");
+            ret = OpenSSL.EVP_CIPHER_CTX_set_key_length(ctx, keyLen);
+            if (ret != 1) throw new System.Exception("openssl: fail to set key length");
+            ret = OpenSSL.EVP_CipherInit_ex(ctx, IntPtr.Zero, IntPtr.Zero, realKey, _method == "rc4-md5" ? null : iv, isCipher ? OpenSSL.OPENSSL_ENCRYPT : OpenSSL.OPENSSL_DECRYPT);
+            if (ret != 1) throw new System.Exception("openssl: cannot set key and iv");
+            OpenSSL.EVP_CIPHER_CTX_set_padding(ctx, 0);
         }
+
         protected override void cipherUpdate(bool isCipher, int length, byte[] buf, byte[] outbuf)
         {
             if (_disposed)
             {
                 throw new ObjectDisposedException(this.ToString());
             }
-            int len = Libcrypto.update(isCipher ? _encryptCtx : _decryptCtx, buf, length, outbuf);
+
+            var ret = OpenSSL.EVP_CipherUpdate(isCipher ? _encryptCtx : _decryptCtx, outbuf, out var outlen, buf, length);
+            if (ret != 1)
+            {
+                throw new Exception($@"ret is {ret}");
+            }
+
+            Debug.Assert(outlen == length);
         }
 
         #region IDisposable
@@ -146,12 +125,12 @@ namespace Shadowsocks.Encryption
             GC.SuppressFinalize(this);
         }
 
-        ~LibcryptoEncryptor()
+        ~StreamOpenSSLEncryptor()
         {
             Dispose(false);
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             lock (this)
             {
@@ -164,11 +143,19 @@ namespace Shadowsocks.Encryption
 
             if (disposing)
             {
-                if (_encryptCtx != IntPtr.Zero)
-                    Libcrypto.clean(_encryptCtx);
-                if (_decryptCtx != IntPtr.Zero)
-                    Libcrypto.clean(_decryptCtx);
+                // free managed objects
+            }
+
+            // free unmanaged objects
+            if (_encryptCtx != IntPtr.Zero)
+            {
+                OpenSSL.EVP_CIPHER_CTX_free(_encryptCtx);
                 _encryptCtx = IntPtr.Zero;
+            }
+
+            if (_decryptCtx != IntPtr.Zero)
+            {
+                OpenSSL.EVP_CIPHER_CTX_free(_decryptCtx);
                 _decryptCtx = IntPtr.Zero;
             }
         }

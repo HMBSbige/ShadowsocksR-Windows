@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using OpenDNS;
+using Shadowsocks.Controller;
+using Shadowsocks.Model;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -6,15 +10,9 @@ using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using System.Text;
 using System.Windows.Forms;
-using OpenDNS;
-using Shadowsocks.Controller;
-using Shadowsocks.Encryption;
-using Shadowsocks.Model;
 
 namespace Shadowsocks.Util
 {
@@ -24,13 +22,7 @@ namespace Shadowsocks.Util
 
         private static LRUCache<string, IPAddress> dnsBuffer = new LRUCache<string, IPAddress>();
 
-        public static LRUCache<string, IPAddress> DnsBuffer
-        {
-            get
-            {
-                return dnsBuffer;
-            }
-        }
+        public static LRUCache<string, IPAddress> DnsBuffer => dnsBuffer;
 
         public static LRUCache<string, IPAddress> LocalDnsBuffer
         {
@@ -40,7 +32,7 @@ namespace Shadowsocks.Util
             }
         }
 
-        static Process current_process = Process.GetCurrentProcess();
+        private static Process current_process => Process.GetCurrentProcess();
 
         public static void ReleaseMemory()
         {
@@ -95,7 +87,7 @@ namespace Shadowsocks.Util
             temp.CopyTo(buf, 0);
         }
 
-        public static UInt32 RandUInt32()
+        public static uint RandUInt32()
         {
             byte[] temp = new byte[4];
             RNGCryptoServiceProvider rngServiceProvider = new RNGCryptoServiceProvider();
@@ -276,7 +268,7 @@ namespace Shadowsocks.Util
             return isLAN(((IPEndPoint)socket.RemoteEndPoint).Address);
         }
 
-        public static String GetTimestamp(DateTime value)
+        public static string GetTimestamp(DateTime value)
         {
             return value.ToString("yyyyMMddHHmmssffff");
         }
@@ -456,6 +448,14 @@ namespace Shadowsocks.Util
             return System.Reflection.Assembly.GetExecutingAssembly().Location;
         }
 
+        public static RegistryKey OpenRegKey(string name, bool writable, RegistryHive hive = RegistryHive.CurrentUser)
+        {
+            var userKey = RegistryKey.OpenBaseKey(hive,
+                            Environment.Is64BitProcess ? RegistryView.Registry64 : RegistryView.Registry32)
+                    .OpenSubKey(name, writable);
+            return userKey;
+        }
+
         public static int RunAsAdmin(string Arguments)
         {
             Process process = null;
@@ -490,6 +490,30 @@ namespace Shadowsocks.Util
             return (dpi * 4 + 48) / 96;
         }
 
+        private static string _tempPath = null;
+        // return path to store temporary files
+        public static string GetTempPath()
+        {
+            if (_tempPath == null)
+            {
+                try
+                {
+                    _tempPath = Directory.CreateDirectory(Path.Combine(Application.StartupPath, @"temp")).FullName;
+                }
+                catch (Exception e)
+                {
+                    Logging.Error(e);
+                    throw;
+                }
+            }
+            return _tempPath;
+        }
+
+        public static string GetTempPath(string filename)
+        {
+            return Path.Combine(GetTempPath(), filename);
+        }
+
 #if !_CONSOLE
         public enum DeviceCap
         {
@@ -514,8 +538,7 @@ namespace Shadowsocks.Util
 
         [DllImport("kernel32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool SetProcessWorkingSetSize(IntPtr process,
-            UIntPtr minimumWorkingSetSize, UIntPtr maximumWorkingSetSize);
+        private static extern bool SetProcessWorkingSetSize(IntPtr process, UIntPtr minimumWorkingSetSize, UIntPtr maximumWorkingSetSize);
 #endif
     }
 }

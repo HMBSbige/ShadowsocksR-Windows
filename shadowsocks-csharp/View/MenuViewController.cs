@@ -2,19 +2,16 @@
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
 using System.Runtime.InteropServices;
-
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Windows.Forms;
 using ZXing;
 using ZXing.Common;
 using ZXing.QrCode;
-using System.Threading;
-using System.Text.RegularExpressions;
 
 namespace Shadowsocks.View
 {
@@ -73,6 +70,9 @@ namespace Shadowsocks.View
         private bool configfrom_open = false;
         private List<EventParams> eventList = new List<EventParams>();
 
+        [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = CharSet.Auto)]
+        extern static bool DestroyIcon(IntPtr handle);
+
         public MenuViewController(ShadowsocksController controller)
         {
             this.controller = controller;
@@ -117,13 +117,13 @@ namespace Shadowsocks.View
         {
             if (timerDelayCheckUpdate != null)
             {
-                if (timerDelayCheckUpdate.Interval <= 1000.0 * 30)
+                //if (timerDelayCheckUpdate.Interval <= 1000.0 * 30)
+                //{
+                //    timerDelayCheckUpdate.Interval = 1000.0 * 60 * 5;
+                //}
+                //else
                 {
-                    timerDelayCheckUpdate.Interval = 1000.0 * 60 * 5;
-                }
-                else
-                {
-                    timerDelayCheckUpdate.Interval = 1000.0 * 60 * 60 * 2;
+                    timerDelayCheckUpdate.Interval = 1000.0 * 60 * 60 * 6;
                 }
             }
             updateChecker.CheckUpdate(controller.GetCurrentConfiguration(), false);
@@ -152,11 +152,18 @@ namespace Shadowsocks.View
             bool global = config.sysProxyMode == (int)ProxyMode.Global;
             bool random = config.random;
 
+            //The GetHicon method creates an icon in unmanaged memory.
+            //It may cause a memory leak.
+            //Use DestroyIcon(), https://stackoverflow.com/a/33801377
             try
             {
-                using (Bitmap icon = new Bitmap("icon.png"))
+                using (var icon = new Bitmap(@"icon.png"))
                 {
-                    _notifyIcon.Icon = Icon.FromHandle(icon.GetHicon());
+                    var iconHandle = icon.GetHicon();
+                    var newIcon = Icon.FromHandle(iconHandle);
+                    _notifyIcon.Icon = (Icon)newIcon.Clone();
+                    newIcon.Dispose();
+                    DestroyIcon(iconHandle);
                 }
             }
             catch
@@ -191,13 +198,13 @@ namespace Shadowsocks.View
                     mul_r = 0.4;
                 }
 
-                using (Bitmap iconCopy = new Bitmap(icon))
+                using (var iconCopy = new Bitmap(icon))
                 {
-                    for (int x = 0; x < iconCopy.Width; x++)
+                    for (var x = 0; x < iconCopy.Width; ++x)
                     {
-                        for (int y = 0; y < iconCopy.Height; y++)
+                        for (var y = 0; y < iconCopy.Height; ++y)
                         {
-                            Color color = icon.GetPixel(x, y);
+                            var color = icon.GetPixel(x, y);
                             iconCopy.SetPixel(x, y,
                                 Color.FromArgb((byte)(color.A * mul_a),
                                 ((byte)(color.R * mul_r)),
@@ -205,7 +212,11 @@ namespace Shadowsocks.View
                                 ((byte)(color.B * mul_b))));
                         }
                     }
-                    _notifyIcon.Icon = Icon.FromHandle(iconCopy.GetHicon());
+                    var iconHandle = iconCopy.GetHicon();
+                    var newIcon = Icon.FromHandle(iconHandle);
+                    _notifyIcon.Icon = (Icon)newIcon.Clone();
+                    newIcon.Dispose();
+                    DestroyIcon(iconHandle);
                 }
             }
 

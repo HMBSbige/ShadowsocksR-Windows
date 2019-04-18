@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Windows.Forms;
-using Microsoft.Win32;
 
 namespace Shadowsocks.Controller
 {
     class AutoStartup
     {
         static string Key = "ShadowsocksR_" + Application.StartupPath.GetHashCode();
-        static string RegistryRunPath = (IntPtr.Size == 4 ? @"Software\Microsoft\Windows\CurrentVersion\Run" : @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Run");
+        static string RegistryRunPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
 
         public static bool Set(bool enabled)
         {
@@ -15,7 +15,7 @@ namespace Shadowsocks.Controller
             try
             {
                 string path = Util.Utils.GetExecutablePath();
-                runKey = Registry.LocalMachine.OpenSubKey(RegistryRunPath, true);
+                runKey = Util.Utils.OpenRegKey(RegistryRunPath, true);
                 if (enabled)
                 {
                     runKey.SetValue(Key, path);
@@ -55,7 +55,7 @@ namespace Shadowsocks.Controller
             try
             {
                 string path = Util.Utils.GetExecutablePath();
-                runKey = Registry.LocalMachine.OpenSubKey(RegistryRunPath, true);
+                runKey = Util.Utils.OpenRegKey(RegistryRunPath, true);
                 if (enabled)
                 {
                     runKey.SetValue(Key, path);
@@ -93,8 +93,7 @@ namespace Shadowsocks.Controller
             RegistryKey runKey = null;
             try
             {
-                string path = Util.Utils.GetExecutablePath();
-                runKey = Registry.LocalMachine.OpenSubKey(RegistryRunPath, false);
+                runKey = Util.Utils.OpenRegKey(RegistryRunPath, false);
                 string[] runList = runKey.GetValueNames();
                 runKey.Close();
                 foreach (string item in runList)

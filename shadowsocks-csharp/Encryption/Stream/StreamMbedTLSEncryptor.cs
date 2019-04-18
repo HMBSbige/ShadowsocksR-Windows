@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Shadowsocks.Encryption
+namespace Shadowsocks.Encryption.Stream
 {
-    public class MbedTLSEncryptor
-        : IVEncryptor, IDisposable
+    public sealed class StreamMbedTLSEncryptor : StreamEncryptor
     {
         const int CIPHER_RC4 = 1;
         const int CIPHER_AES = 2;
@@ -15,8 +14,7 @@ namespace Shadowsocks.Encryption
         private IntPtr _encryptCtx = IntPtr.Zero;
         private IntPtr _decryptCtx = IntPtr.Zero;
 
-        public MbedTLSEncryptor(string method, string password, bool cache)
-            : base(method, password, cache)
+        public StreamMbedTLSEncryptor(string method, string password) : base(method, password)
         {
         }
 
@@ -75,7 +73,7 @@ namespace Shadowsocks.Encryption
                 realkey = _key;
             }
             MbedTLS.cipher_init(ctx);
-            if (MbedTLS.cipher_setup( ctx, MbedTLS.cipher_info_from_string( getInfo().name ) ) != 0 )
+            if (MbedTLS.cipher_setup(ctx, MbedTLS.cipher_info_from_string(getInfo().name)) != 0)
                 throw new Exception("Cannot initialize mbed TLS cipher context");
             /*
              * MbedTLS takes key length by bit
@@ -89,7 +87,7 @@ namespace Shadowsocks.Encryption
              *  
              */
             if (MbedTLS.cipher_setkey(ctx, realkey, keyLen * 8,
-                isCipher ? MbedTLS.MBEDTLS_ENCRYPT : MbedTLS.MBEDTLS_DECRYPT) != 0 )
+                isCipher ? MbedTLS.MBEDTLS_ENCRYPT : MbedTLS.MBEDTLS_DECRYPT) != 0)
                 throw new Exception("Cannot set mbed TLS cipher key");
             if (MbedTLS.cipher_set_iv(ctx, iv, ivLen) != 0)
                 throw new Exception("Cannot set mbed TLS cipher IV");
@@ -105,7 +103,7 @@ namespace Shadowsocks.Encryption
                 throw new ObjectDisposedException(this.ToString());
             }
             if (MbedTLS.cipher_update(isCipher ? _encryptCtx : _decryptCtx,
-                buf, length, outbuf, ref length) != 0 )
+                buf, length, outbuf, ref length) != 0)
                 throw new Exception("Cannot update mbed TLS cipher context");
         }
 
@@ -118,7 +116,7 @@ namespace Shadowsocks.Encryption
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             lock (this)
             {

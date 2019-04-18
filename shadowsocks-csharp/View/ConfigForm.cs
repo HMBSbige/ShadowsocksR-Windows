@@ -46,7 +46,7 @@ namespace Shadowsocks.View
             if (updateChecker.LatestVersionURL == null)
                 LinkUpdate.Visible = false;
 
-            foreach (string name in EncryptorFactory.GetEncryptor())
+            foreach (string name in EncryptorFactory.GetEncryptor().Keys)
             {
                 EncryptorInfo info = EncryptorFactory.GetEncryptorInfo(name);
                 if (info.display)
@@ -208,8 +208,8 @@ namespace Shadowsocks.View
                 Server server = new Server
                 {
                     server = IPTextBox.Text.Trim(),
-                    server_port = Convert.ToInt32(NumServerPort.Value),
-                    server_udp_port = Convert.ToInt32(NumUDPPort.Value),
+                    server_port = Convert.ToUInt16(NumServerPort.Value),
+                    server_udp_port = Convert.ToUInt16(NumUDPPort.Value),
                     password = PasswordTextBox.Text,
                     method = EncryptionSelect.Text,
                     protocol = TCPProtocolComboBox.Text,
@@ -260,8 +260,6 @@ namespace Shadowsocks.View
             using (Graphics g = Graphics.FromImage(drawArea))
             {
                 g.Clear(Color.White);
-                Bitmap ngnl = Resources.ngnl;
-                g.DrawImage(ngnl, new Rectangle(0, 0, width, width));
                 if (!_modifiedConfiguration.isHideTips)
                     g.DrawString("Click the 'Link' text box", new Font("Arial", 14), new SolidBrush(Color.Black), new RectangleF(0, 0, 300, 300));
             }
@@ -296,10 +294,8 @@ namespace Shadowsocks.View
                             }
                         }
                     }
-                    Bitmap ngnl = Resources.ngnl;
                     int div = 13, div_l = 5, div_r = 8;
                     int l = (m.Width * div_l + div - 1) / div * blockSize, r = (m.Width * div_r + div - 1) / div * blockSize;
-                    g.DrawImage(ngnl, new Rectangle(l + blockSize, l + blockSize, r - l, r - l));
                 }
                 PictureQRcode.Image = drawArea;
                 PictureQRcode.Visible = true;

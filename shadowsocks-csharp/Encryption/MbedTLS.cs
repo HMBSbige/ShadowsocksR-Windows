@@ -1,16 +1,15 @@
-﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
-
-using Shadowsocks.Controller;
+﻿using Shadowsocks.Controller;
 using Shadowsocks.Properties;
 using Shadowsocks.Util;
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Shadowsocks.Encryption
 {
     public class MbedTLS
     {
-        const string DLLNAME = "libsscrypto";
+        const string DLLNAME = "libsscrypto.dll";
 
         public const int MBEDTLS_ENCRYPT = 1;
         public const int MBEDTLS_DECRYPT = 0;
@@ -58,30 +57,18 @@ namespace Shadowsocks.Encryption
             public byte[] ComputeHash(byte[] buffer, int offset, int count)
             {
                 byte[] output = new byte[64];
-                ss_hmac_ex(MBEDTLS_MD_SHA1, key, key.Length, buffer,offset, count, output);
+                ss_hmac_ex(MBEDTLS_MD_SHA1, key, key.Length, buffer, offset, count, output);
                 return output;
             }
         }
 
         static MbedTLS()
         {
-            string path = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string runningPath = Path.Combine(new Uri(path).LocalPath, @"temp"); // Path.GetTempPath();
-            if (!Directory.Exists(runningPath))
-            {
-                Directory.CreateDirectory(runningPath);
-            }
-            string dllPath = Path.Combine(runningPath, "libsscrypto.dll");
+            var dllPath = Utils.GetTempPath(DLLNAME);
             try
             {
-                if (IntPtr.Size == 4)
-                {
-                    FileManager.UncompressFile(dllPath, Resources.libsscrypto_dll);
-                }
-                else
-                {
-                    FileManager.UncompressFile(dllPath, Resources.libsscrypto64_dll);
-                }
+                FileManager.UncompressFile(dllPath, Environment.Is64BitProcess ? Resources.libsscrypto64_dll : Resources.libsscrypto_dll);
+                LoadLibrary(dllPath);
             }
             catch (IOException)
             {
@@ -90,7 +77,6 @@ namespace Shadowsocks.Encryption
             {
                 Logging.LogUsefulException(e);
             }
-            IntPtr module = LoadLibrary(dllPath);
         }
 
         public static byte[] MD5(byte[] input)

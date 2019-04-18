@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Xml;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace Shadowsocks.Controller
 {
@@ -22,7 +22,7 @@ namespace Shadowsocks.Controller
 
         public const string Name = @"ShadowsocksR";
         public const string Copyright = @"Copyright © BreakWa11 2017. Fork from Shadowsocks by clowwindy";
-        public const string Version = @"4.9.0";
+        public const string Version = @"4.9.1";
 #if !_DOTNET_4_0
         public const string NetVer = @"2.0";
 #elif !_CONSOLE
@@ -79,7 +79,7 @@ namespace Shadowsocks.Controller
             }
         }
 
-        private static int CompareVersion(string l, string r)
+        public static int CompareVersion(string l, string r)
         {
             var ls = l.Split('.');
             var rs = r.Split('.');
