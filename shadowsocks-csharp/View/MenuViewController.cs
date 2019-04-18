@@ -2,19 +2,16 @@
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
 using System.Runtime.InteropServices;
-
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Windows.Forms;
 using ZXing;
 using ZXing.Common;
 using ZXing.QrCode;
-using System.Threading;
-using System.Text.RegularExpressions;
 
 namespace Shadowsocks.View
 {
@@ -73,8 +70,8 @@ namespace Shadowsocks.View
         private bool configfrom_open = false;
         private List<EventParams> eventList = new List<EventParams>();
 
-        [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = CharSet.Auto)]
-        extern static bool DestroyIcon(IntPtr handle);
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        static extern bool DestroyIcon(IntPtr handle);
 
         public MenuViewController(ShadowsocksController controller)
         {
@@ -155,64 +152,64 @@ namespace Shadowsocks.View
             bool global = config.sysProxyMode == (int)ProxyMode.Global;
             bool random = config.random;
 
-            try
+            //try
+            //{
+            //    Bitmap icon = new Bitmap("icon.png");
+            //    Icon newIcon = Icon.FromHandle(icon.GetHicon());
+            //    _notifyIcon.Icon = newIcon;
+            //    DestroyIcon(newIcon.Handle);
+            //}
+            //catch
+            //{
+            Bitmap icon = null;
+            if (dpi < 97)
             {
-                Bitmap icon = new Bitmap("icon.png");
-                Icon newIcon = Icon.FromHandle(icon.GetHicon());
+                // dpi = 96;
+                icon = Resources.ss16;
+            }
+            else if (dpi < 121)
+            {
+                // dpi = 120;
+                icon = Resources.ss20;
+            }
+            else
+            {
+                icon = Resources.ss24;
+            }
+            double mul_a = 1.0, mul_r = 1.0, mul_g = 1.0, mul_b = 1.0;
+            if (!enabled)
+            {
+                mul_g = 0.4;
+            }
+            else if (!global)
+            {
+                mul_b = 0.4;
+                mul_g = 0.8;
+            }
+            if (!random)
+            {
+                mul_r = 0.4;
+            }
+
+            Bitmap iconCopy = new Bitmap(icon);
+            {
+                for (int x = 0; x < iconCopy.Width; x++)
+                {
+                    for (int y = 0; y < iconCopy.Height; y++)
+                    {
+                        Color color = icon.GetPixel(x, y);
+                        iconCopy.SetPixel(x, y,
+                            Color.FromArgb((byte)(color.A * mul_a),
+                            (byte)(color.R * mul_r),
+                            (byte)(color.G * mul_g),
+                            (byte)(color.B * mul_b)));
+                    }
+                }
+                Icon newIcon = Icon.FromHandle(iconCopy.GetHicon());
                 _notifyIcon.Icon = newIcon;
                 DestroyIcon(newIcon.Handle);
             }
-            catch
-            {
-                Bitmap icon = null;
-                if (dpi < 97)
-                {
-                    // dpi = 96;
-                    icon = Resources.ss16;
-                }
-                else if (dpi < 121)
-                {
-                    // dpi = 120;
-                    icon = Resources.ss20;
-                }
-                else
-                {
-                    icon = Resources.ss24;
-                }
-                double mul_a = 1.0, mul_r = 1.0, mul_g = 1.0, mul_b = 1.0;
-                if (!enabled)
-                {
-                    mul_g = 0.4;
-                }
-                else if (!global)
-                {
-                    mul_b = 0.4;
-                    mul_g = 0.8;
-                }
-                if (!random)
-                {
-                    mul_r = 0.4;
-                }
-
-                Bitmap iconCopy = new Bitmap(icon);
-                {
-                    for (int x = 0; x < iconCopy.Width; x++)
-                    {
-                        for (int y = 0; y < iconCopy.Height; y++)
-                        {
-                            Color color = icon.GetPixel(x, y);
-                            iconCopy.SetPixel(x, y,
-                                Color.FromArgb((byte)(color.A * mul_a),
-                                ((byte)(color.R * mul_r)),
-                                ((byte)(color.G * mul_g)),
-                                ((byte)(color.B * mul_b))));
-                        }
-                    }
-                    Icon newIcon = Icon.FromHandle(iconCopy.GetHicon());
-                    _notifyIcon.Icon = newIcon;
-                    DestroyIcon(newIcon.Handle);
-                }
-            }
+            //}
 
             // we want to show more details but notify icon title is limited to 63 characters
             string text = (enabled ?
@@ -316,12 +313,14 @@ namespace Shadowsocks.View
         {
             Configuration config = controller.GetCurrentConfiguration();
             UpdateSysProxyMode(config);
+            UpdateTrayIcon();
         }
 
         private void controller_ToggleRuleModeChanged(object sender, EventArgs e)
         {
             Configuration config = controller.GetCurrentConfiguration();
             UpdateProxyRule(config);
+            UpdateTrayIcon();
         }
 
         void controller_FileReadyToOpen(object sender, ShadowsocksController.PathEventArgs e)
