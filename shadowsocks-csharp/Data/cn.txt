@@ -65,7 +65,8 @@ Global Settings=选项设置
 &Delete=删除(&D)
 Up=上移
 Down=下移
-
+Verion=版本
+local=本地端口
 New server=未配置的服务器
 
 Server=服务器(截图打码)
