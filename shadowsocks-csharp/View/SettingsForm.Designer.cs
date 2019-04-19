@@ -176,7 +176,6 @@
             // CheckAutoBan
             // 
             this.CheckAutoBan.AutoSize = true;
-            this.CheckAutoBan.Enabled = false;
             this.CheckAutoBan.Location = new System.Drawing.Point(72, 136);
             this.CheckAutoBan.Name = "CheckAutoBan";
             this.CheckAutoBan.Size = new System.Drawing.Size(85, 19);
