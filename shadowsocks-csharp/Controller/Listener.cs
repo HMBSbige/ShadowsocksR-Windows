@@ -260,7 +260,11 @@ namespace Shadowsocks.Controller
                     conn.Close();
                 }
 
-                if ((_authUser ?? "").Length == 0 && !Util.Utils.isLAN(conn))
+                int local_port = ((IPEndPoint)conn.LocalEndPoint).Port;
+
+                if ((_authUser ?? "").Length == 0 && !Util.Utils.isLAN(conn)
+                    && !(_config.GetPortMapCache().ContainsKey(local_port)
+                    || _config.GetPortMapCache()[local_port].type == PortMapType.Forward))
                 {
                     conn.Shutdown(SocketShutdown.Both);
                     conn.Close();
@@ -273,7 +277,6 @@ namespace Shadowsocks.Controller
                         buf
                     };
 
-                    int local_port = ((IPEndPoint)conn.LocalEndPoint).Port;
                     if (!_config.GetPortMapCache().ContainsKey(local_port) || _config.GetPortMapCache()[local_port].type != PortMapType.Forward)
                     {
                         conn.BeginReceive(buf, 0, buf.Length, 0,
