@@ -1,4 +1,4 @@
-# translation for Traditional Chinese
+﻿# translation for Traditional Chinese
 
 Shadowsocks=Shadowsocks
 ShadowsocksR=ShadowsocksR
@@ -82,8 +82,8 @@ Group=群組名
 Adv. Setting=高級選項
 Obfs UDP=混淆UDP協議
 NOT all server support belows=以下選項不是所有伺服器都支持
-TCP over TCP if not checked=不打勾使用原生 TCP(暫不能用)
-UDP over UDP if not checked=不打勾使用原生 UDP
+TCP over UDP if not checked=不打勾使用原生 TCP(暫不能用)
+UDP over TCP if not checked=不打勾使用原生 UDP
 Recommend checked=保留功能
 Protocol=協議
 Protocol param=協議參數
