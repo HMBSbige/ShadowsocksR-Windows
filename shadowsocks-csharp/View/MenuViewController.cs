@@ -152,64 +152,65 @@ namespace Shadowsocks.View
             bool global = config.sysProxyMode == (int)ProxyMode.Global;
             bool random = config.random;
 
-            //try
-            //{
-            //    Bitmap icon = new Bitmap("icon.png");
-            //    Icon newIcon = Icon.FromHandle(icon.GetHicon());
-            //    _notifyIcon.Icon = newIcon;
-            //    DestroyIcon(newIcon.Handle);
-            //}
-            //catch
-            //{
-            Bitmap icon = null;
-            if (dpi < 97)
+            try
             {
-                // dpi = 96;
-                icon = Resources.ss16;
+                Bitmap icon = new Bitmap("icon.png");
+                Icon newIcon = Icon.FromHandle(icon.GetHicon());
+                icon.Dispose();
+                _notifyIcon.Icon = newIcon;
             }
-            else if (dpi < 121)
+            catch
             {
-                // dpi = 120;
-                icon = Resources.ss20;
-            }
-            else
-            {
-                icon = Resources.ss24;
-            }
-            double mul_a = 1.0, mul_r = 1.0, mul_g = 1.0, mul_b = 1.0;
-            if (!enabled)
-            {
-                mul_g = 0.4;
-            }
-            else if (!global)
-            {
-                mul_b = 0.4;
-                mul_g = 0.8;
-            }
-            if (!random)
-            {
-                mul_r = 0.4;
-            }
+                Bitmap icon = null;
+                if (dpi < 97)
+                {
+                    // dpi = 96;
+                    icon = Resources.ss16;
+                }
+                else if (dpi < 121)
+                {
+                    // dpi = 120;
+                    icon = Resources.ss20;
+                }
+                else
+                {
+                    icon = Resources.ss24;
+                }
+                double mul_a = 1.0, mul_r = 1.0, mul_g = 1.0, mul_b = 1.0;
+                if (!enabled)
+                {
+                    mul_g = 0.4;
+                }
+                else if (!global)
+                {
+                    mul_b = 0.4;
+                    mul_g = 0.8;
+                }
+                if (!random)
+                {
+                    mul_r = 0.4;
+                }
 
-            Bitmap iconCopy = new Bitmap(icon);
-            {
+                Bitmap iconCopy = new Bitmap(icon);
                 for (int x = 0; x < iconCopy.Width; x++)
                 {
                     for (int y = 0; y < iconCopy.Height; y++)
                     {
                         Color color = icon.GetPixel(x, y);
                         iconCopy.SetPixel(x, y,
+
                             Color.FromArgb((byte)(color.A * mul_a),
-                            (byte)(color.R * mul_r),
-                            (byte)(color.G * mul_g),
-                            (byte)(color.B * mul_b)));
+                            ((byte)(color.R * mul_r)),
+                            ((byte)(color.G * mul_g)),
+                            ((byte)(color.B * mul_b))));
                     }
                 }
                 Icon newIcon = Icon.FromHandle(iconCopy.GetHicon());
+                icon.Dispose();
+                iconCopy.Dispose();
+
                 _notifyIcon.Icon = newIcon;
-                DestroyIcon(newIcon.Handle);
             }
-            //}
 
             // we want to show more details but notify icon title is limited to 63 characters
             string text = (enabled ?
@@ -313,14 +314,12 @@ namespace Shadowsocks.View
         {
             Configuration config = controller.GetCurrentConfiguration();
             UpdateSysProxyMode(config);
-            UpdateTrayIcon();
         }
 
         private void controller_ToggleRuleModeChanged(object sender, EventArgs e)
         {
             Configuration config = controller.GetCurrentConfiguration();
             UpdateProxyRule(config);
-            UpdateTrayIcon();
         }
 
         void controller_FileReadyToOpen(object sender, ShadowsocksController.PathEventArgs e)
