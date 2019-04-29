@@ -21,8 +21,8 @@ namespace Shadowsocks.Controller
         public event EventHandler NewVersionNotFound;
 
         public const string Name = @"ShadowsocksR";
-        public const string Copyright = @"Copyright © BreakWa11 2017. Fork from Shadowsocks by clowwindy";
-        public const string Version = @"4.9.1";
+        public const string Copyright = @"Copyright © HMBSbige 2019 & BreakWa11 2017. Fork from Shadowsocks by clowwindy";
+        public const string Version = @"4.9.2";
 #if !_DOTNET_4_0
         public const string NetVer = @"2.0";
 #elif !_CONSOLE
