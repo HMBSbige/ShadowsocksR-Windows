@@ -771,12 +771,7 @@ namespace Shadowsocks.View
 
         private void Disconnect_Click(object sender, EventArgs e)
         {
-            Configuration config = controller.GetCurrentConfiguration();
-            for (int id = 0; id < config.configs.Count; ++id)
-            {
-                Server server = config.configs[id];
-                server.GetConnections().CloseAll();
-            }
+            controller.DisconnectAllConnections();
             Model.Server.GetForwardServerRef().GetConnections().CloseAll();
         }
 
@@ -911,6 +906,11 @@ namespace Shadowsocks.View
                 if (ServerDataGrid.Columns[e.ColumnIndex].Name == "Server")
                 {
                     Configuration config = controller.GetCurrentConfiguration();
+                    Console.WriteLine("config.checkSwitchAutoCloseAll:" + config.checkSwitchAutoCloseAll);
+                    if (config.checkSwitchAutoCloseAll)
+                    {
+                        controller.DisconnectAllConnections();
+                    }
                     controller.SelectServerIndex(id);
                 }
                 if (ServerDataGrid.Columns[e.ColumnIndex].Name == "Group")

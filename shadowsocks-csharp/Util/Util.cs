@@ -22,23 +22,11 @@ namespace Shadowsocks.Util
 
         private static LRUCache<string, IPAddress> dnsBuffer = new LRUCache<string, IPAddress>();
 
-        public static LRUCache<string, IPAddress> DnsBuffer
-        {
-            get
-            {
-                return dnsBuffer;
-            }
-        }
+        public static LRUCache<string, IPAddress> DnsBuffer => dnsBuffer;
 
-        public static LRUCache<string, IPAddress> LocalDnsBuffer
-        {
-            get
-            {
-                return dnsBuffer;
-            }
-        }
+        public static LRUCache<string, IPAddress> LocalDnsBuffer => dnsBuffer;
 
-        static Process current_process = Process.GetCurrentProcess();
+        private static Process current_process => Process.GetCurrentProcess();
 
         public static void ReleaseMemory()
         {
@@ -93,7 +81,7 @@ namespace Shadowsocks.Util
             temp.CopyTo(buf, 0);
         }
 
-        public static UInt32 RandUInt32()
+        public static uint RandUInt32()
         {
             byte[] temp = new byte[4];
             RNGCryptoServiceProvider rngServiceProvider = new RNGCryptoServiceProvider();
@@ -274,7 +262,7 @@ namespace Shadowsocks.Util
             return isLAN(((IPEndPoint)socket.RemoteEndPoint).Address);
         }
 
-        public static String GetTimestamp(DateTime value)
+        public static string GetTimestamp(DateTime value)
         {
             return value.ToString("yyyyMMddHHmmssffff");
         }
@@ -329,7 +317,14 @@ namespace Shadowsocks.Util
         {
             IPAddress ret_ipAddress = null;
             ret_ipAddress = _QueryDns(host, dns_servers, IPv6_first);
-            Logging.Info($"DNS query {host} answer {ret_ipAddress.ToString()}");
+            if (ret_ipAddress == null)
+            {
+                Logging.Info($"DNS query {host} failed.");
+            }
+            else
+            {
+                Logging.Info($"DNS query {host} answer {ret_ipAddress.ToString()}");
+            }
             return ret_ipAddress;
         }
 
@@ -496,6 +491,30 @@ namespace Shadowsocks.Util
             return (dpi * 4 + 48) / 96;
         }
 
+        private static string _tempPath = null;
+        // return path to store temporary files
+        public static string GetTempPath()
+        {
+            if (_tempPath == null)
+            {
+                try
+                {
+                    _tempPath = Directory.CreateDirectory(Path.Combine(Application.StartupPath, @"temp")).FullName;
+                }
+                catch (Exception e)
+                {
+                    Logging.Error(e);
+                    throw;
+                }
+            }
+            return _tempPath;
+        }
+
+        public static string GetTempPath(string filename)
+        {
+            return Path.Combine(GetTempPath(), filename);
+        }
+
 #if !_CONSOLE
         public enum DeviceCap
         {
@@ -520,8 +539,7 @@ namespace Shadowsocks.Util
 
         [DllImport("kernel32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool SetProcessWorkingSetSize(IntPtr process,
-            UIntPtr minimumWorkingSetSize, UIntPtr maximumWorkingSetSize);
+        private static extern bool SetProcessWorkingSetSize(IntPtr process, UIntPtr minimumWorkingSetSize, UIntPtr maximumWorkingSetSize);
 #endif
     }
 }

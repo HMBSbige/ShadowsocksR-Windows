@@ -70,8 +70,8 @@ namespace Shadowsocks.View
         private bool configfrom_open = false;
         private List<EventParams> eventList = new List<EventParams>();
 
-        [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = CharSet.Auto)]
-        extern static bool DestroyIcon(IntPtr handle);
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        static extern bool DestroyIcon(IntPtr handle);
 
         public MenuViewController(ShadowsocksController controller)
         {
@@ -142,7 +142,7 @@ namespace Shadowsocks.View
 
         private void UpdateTrayIcon()
         {
-            int dpi;
+            int dpi = 96;
             using (Graphics graphics = Graphics.FromHwnd(IntPtr.Zero))
             {
                 dpi = (int)graphics.DpiX;
@@ -152,19 +152,12 @@ namespace Shadowsocks.View
             bool global = config.sysProxyMode == (int)ProxyMode.Global;
             bool random = config.random;
 
-            //The GetHicon method creates an icon in unmanaged memory.
-            //It may cause a memory leak.
-            //Use DestroyIcon(), https://stackoverflow.com/a/33801377
             try
             {
-                using (var icon = new Bitmap(@"icon.png"))
-                {
-                    var iconHandle = icon.GetHicon();
-                    var newIcon = Icon.FromHandle(iconHandle);
-                    _notifyIcon.Icon = (Icon)newIcon.Clone();
-                    newIcon.Dispose();
-                    DestroyIcon(iconHandle);
-                }
+                Bitmap icon = new Bitmap("icon.png");
+                Icon newIcon = Icon.FromHandle(icon.GetHicon());
+                icon.Dispose();
+                _notifyIcon.Icon = newIcon;
             }
             catch
             {
@@ -198,26 +191,25 @@ namespace Shadowsocks.View
                     mul_r = 0.4;
                 }
 
-                using (var iconCopy = new Bitmap(icon))
+                Bitmap iconCopy = new Bitmap(icon);
+                for (int x = 0; x < iconCopy.Width; x++)
                 {
-                    for (var x = 0; x < iconCopy.Width; ++x)
+                    for (int y = 0; y < iconCopy.Height; y++)
                     {
-                        for (var y = 0; y < iconCopy.Height; ++y)
-                        {
-                            var color = icon.GetPixel(x, y);
-                            iconCopy.SetPixel(x, y,
-                                Color.FromArgb((byte)(color.A * mul_a),
-                                ((byte)(color.R * mul_r)),
-                                ((byte)(color.G * mul_g)),
-                                ((byte)(color.B * mul_b))));
-                        }
+                        Color color = icon.GetPixel(x, y);
+                        iconCopy.SetPixel(x, y,
+
+                            Color.FromArgb((byte)(color.A * mul_a),
+                            ((byte)(color.R * mul_r)),
+                            ((byte)(color.G * mul_g)),
+                            ((byte)(color.B * mul_b))));
                     }
-                    var iconHandle = iconCopy.GetHicon();
-                    var newIcon = Icon.FromHandle(iconHandle);
-                    _notifyIcon.Icon = (Icon)newIcon.Clone();
-                    newIcon.Dispose();
-                    DestroyIcon(iconHandle);
                 }
+                Icon newIcon = Icon.FromHandle(iconCopy.GetHicon());
+                icon.Dispose();
+                iconCopy.Dispose();
+
+                _notifyIcon.Icon = newIcon;
             }
 
             // we want to show more details but notify icon title is limited to 63 characters
@@ -1179,6 +1171,12 @@ namespace Shadowsocks.View
 
         private void AServerItem_Click(object sender, EventArgs e)
         {
+            Configuration config = controller.GetCurrentConfiguration();
+            Console.WriteLine("config.checkSwitchAutoCloseAll:" + config.checkSwitchAutoCloseAll);
+            if (config.checkSwitchAutoCloseAll)
+            {
+                controller.DisconnectAllConnections();
+            }
             MenuItem item = (MenuItem)sender;
             controller.SelectServerIndex((int)item.Tag);
         }
@@ -1220,12 +1218,7 @@ namespace Shadowsocks.View
 
         private void DisconnectCurrent_Click(object sender, EventArgs e)
         {
-            Configuration config = controller.GetCurrentConfiguration();
-            for (int id = 0; id < config.configs.Count; ++id)
-            {
-                Server server = config.configs[id];
-                server.GetConnections().CloseAll();
-            }
+            controller.DisconnectAllConnections();
         }
 
         private void URL_Split(string text, ref List<string> out_urls)

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Shadowsocks</RootNamespace>
     <AssemblyName>ShadowsocksR</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartupObject>Shadowsocks.Program</StartupObject>
     <ApplicationIcon>shadowsocks.ico</ApplicationIcon>
@@ -37,13 +37,11 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-  </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\4.0\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;_DOTNET_4_0, _DOTNET_CURRENT, PROTOCOL_STATISTICS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;_DOTNET_4_0, PROTOCOL_STATISTICS</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -53,13 +51,16 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\4.0\Release\</OutputPath>
-    <DefineConstants>TRACE;PROTOCOL_STATISTICS</DefineConstants>
+    <DefineConstants>TRACE;_DOTNET_4_0, PROTOCOL_STATISTICS</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
@@ -142,24 +143,25 @@
     <Compile Include="Controller\I18N.cs" />
     <Compile Include="Controller\Listener.cs" />
     <Compile Include="Controller\Logging.cs" />
-    <Compile Include="Controller\ProxyAuth.cs" />
-    <Compile Include="Controller\ProxySocket.cs" />
+    <Compile Include="Proxy\ProxyAuth.cs" />
+    <Compile Include="Proxy\ProxySocket.cs" />
     <Compile Include="Controller\Socks5Forwarder.cs" />
     <Compile Include="Controller\SpeedTest.cs" />
     <Compile Include="Controller\UpdateChecker.cs" />
     <Compile Include="Controller\UpdateFreeNode.cs" />
     <Compile Include="Encryption\EncryptorBase.cs" />
     <Compile Include="Encryption\EncryptorFactory.cs" />
-    <Compile Include="Encryption\IVEncryptor.cs" />
-    <Compile Include="Encryption\Libcrypto.cs" />
-    <Compile Include="Encryption\LibcryptoEncryptor.cs" />
+    <Compile Include="Encryption\Stream\NoneEncryptor.cs" />
+    <Compile Include="Encryption\Stream\StreamEncryptor.cs" />
+    <Compile Include="Encryption\OpenSSL.cs" />
+    <Compile Include="Encryption\Stream\StreamOpenSSLEncryptor.cs" />
     <Compile Include="Encryption\MbedTLS.cs" />
-    <Compile Include="Encryption\MbedTLSEncryptor.cs" />
-    <Compile Include="Encryption\RSA.cs" />
+    <Compile Include="Encryption\Stream\StreamMbedTLSEncryptor.cs" />
     <Compile Include="Encryption\Sodium.cs" />
-    <Compile Include="Encryption\SodiumEncryptor.cs" />
+    <Compile Include="Encryption\Stream\StreamSodiumEncryptor.cs" />
     <Compile Include="Encryption\IEncryptor.cs" />
     <Compile Include="Controller\PACServer.cs" />
+    <Compile Include="Model\ByteCircularBuffer.cs" />
     <Compile Include="Model\Host.cs" />
     <Compile Include="Model\IPRangeSet.cs" />
     <Compile Include="Model\IPSegment.cs" />
@@ -183,6 +185,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Proxy\ProxyEncryptSocket.cs" />
+    <Compile Include="Proxy\ProxySocketTun.cs" />
+    <Compile Include="Proxy\ProxySocketTunLocal.cs" />
     <Compile Include="Util\Base64.cs" />
     <Compile Include="Util\CRC.cs" />
     <Compile Include="Util\EnvCheck.cs" />
@@ -286,10 +291,8 @@
     <EmbeddedResource Include="View\SubscribeForm.resx">
       <DependentUpon>SubscribeForm.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="app.config" />
-    <None Include="app.manifest">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="App.config" />
+    <None Include="app.manifest" />
     <None Include="Data\libsscrypto.dll.gz" />
     <None Include="Data\mgwz.dll.gz" />
     <None Include="Data\privoxy.exe.gz" />
@@ -302,7 +305,7 @@
     <Content Include="Data\cn.txt" />
     <None Include="Data\privoxy_conf.txt" />
     <Content Include="Data\user-rule.txt" />
-    <Content Include="Data\zh-tw.txt" />
+    <None Include="Data\zh-tw.txt" />
     <Content Include="shadowsocks.ico" />
   </ItemGroup>
   <ItemGroup>

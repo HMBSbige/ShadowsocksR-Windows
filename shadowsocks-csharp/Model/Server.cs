@@ -1,16 +1,12 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.IO;
-using System.Diagnostics;
 #if !_CONSOLE
-using SimpleJson;
 #endif
 using Shadowsocks.Controller;
 using System.Text.RegularExpressions;
 using System.Net;
-using System.Net.Sockets;
-using Shadowsocks.Encryption;
+using Shadowsocks.Proxy;
 
 namespace Shadowsocks.Model
 {
@@ -20,7 +16,7 @@ namespace Shadowsocks.Model
         public DateTime updateTime;
         public string host;
         public bool force_expired;
-         public bool isExpired(string host)
+        public bool isExpired(string host)
         {
             if (updateTime == null) return true;
             if (this.host != host) return true;

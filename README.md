@@ -37,7 +37,7 @@ Visual Studio Community 2017 is recommended.
 
 GPLv3
 
-Copyright © HMBSbige 2018. Forked from ShadowsocksR by BreakWa11
+Copyright © HMBSbige 2019. Forked from ShadowsocksR by BreakWa11
 
 [Appveyor]:       https://ci.appveyor.com/project/HMBSbige/shadowsocksr-windows
 [Build Status]:   https://ci.appveyor.com/api/projects/status/b9jgwdfvn20ithj1/branch/master?svg=true

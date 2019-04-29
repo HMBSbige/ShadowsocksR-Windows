@@ -1,27 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27428.2037
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shadowsocks-csharp", "shadowsocks-csharp\shadowsocks-csharp.csproj", "{8C02D2F7-7CDB-4D55-9F25-CD03EF4AA062}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test", "test\test.csproj", "{45913187-0685-4903-B250-DCEF0479CD86}"
 	ProjectSection(ProjectDependencies) = postProject
 		{0F2A0C8A-6C06-485B-AA13-AEEC19CA9637} = {0F2A0C8A-6C06-485B-AA13-AEEC19CA9637}
-		{8C02D2F7-7CDB-4D55-9F25-CD03EF4AA062} = {8C02D2F7-7CDB-4D55-9F25-CD03EF4AA062}
 		{DC8929F9-CAC8-4286-8CFE-6A70EF0EF835} = {DC8929F9-CAC8-4286-8CFE-6A70EF0EF835}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shadowsocks-csharp4.0", "shadowsocks-csharp\shadowsocks-csharp4.0.csproj", "{0F2A0C8A-6C06-485B-AA13-AEEC19CA9637}"
 	ProjectSection(ProjectDependencies) = postProject
-		{8C02D2F7-7CDB-4D55-9F25-CD03EF4AA062} = {8C02D2F7-7CDB-4D55-9F25-CD03EF4AA062}
 		{DC8929F9-CAC8-4286-8CFE-6A70EF0EF835} = {DC8929F9-CAC8-4286-8CFE-6A70EF0EF835}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shadowsocks-csharp-console", "shadowsocks-csharp\shadowsocks-csharp-console.csproj", "{DC8929F9-CAC8-4286-8CFE-6A70EF0EF835}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8C02D2F7-7CDB-4D55-9F25-CD03EF4AA062} = {8C02D2F7-7CDB-4D55-9F25-CD03EF4AA062}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +22,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8C02D2F7-7CDB-4D55-9F25-CD03EF4AA062}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8C02D2F7-7CDB-4D55-9F25-CD03EF4AA062}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45913187-0685-4903-B250-DCEF0479CD86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45913187-0685-4903-B250-DCEF0479CD86}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45913187-0685-4903-B250-DCEF0479CD86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45913187-0685-4903-B250-DCEF0479CD86}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0F2A0C8A-6C06-485B-AA13-AEEC19CA9637}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0F2A0C8A-6C06-485B-AA13-AEEC19CA9637}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F2A0C8A-6C06-485B-AA13-AEEC19CA9637}.Release|Any CPU.ActiveCfg = Release|Any CPU
