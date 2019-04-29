@@ -58,8 +58,8 @@ namespace Shadowsocks
 #endif
                 Directory.SetCurrentDirectory(Application.StartupPath);
 
-                int try_times = 0;
 #if !_CONSOLE
+                int try_times = 0;
                 while (Configuration.Load() == null)
                 {
                     if (try_times >= 5)
@@ -88,12 +88,11 @@ namespace Shadowsocks
                 Logging.OpenLogFile();
                 //#endif
 
-#if _DOTNET_CURRENT
+#if _DOTNET_4_0
                 // Enable Modern TLS when .NET 4.5+ installed.
                 if (Util.EnvCheck.CheckDotNet45())
                     ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
 #endif
-
 #if !_CONSOLE
                 _viewController = new MenuViewController(_controller);
 #endif

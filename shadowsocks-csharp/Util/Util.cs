@@ -24,13 +24,7 @@ namespace Shadowsocks.Util
 
         public static LRUCache<string, IPAddress> DnsBuffer => dnsBuffer;
 
-        public static LRUCache<string, IPAddress> LocalDnsBuffer
-        {
-            get
-            {
-                return dnsBuffer;
-            }
-        }
+        public static LRUCache<string, IPAddress> LocalDnsBuffer => dnsBuffer;
 
         private static Process current_process => Process.GetCurrentProcess();
 

@@ -1172,6 +1172,12 @@ namespace Shadowsocks.View
 
         private void AServerItem_Click(object sender, EventArgs e)
         {
+            Configuration config = controller.GetCurrentConfiguration();
+            Console.WriteLine("config.checkSwitchAutoCloseAll:" + config.checkSwitchAutoCloseAll);
+            if (config.checkSwitchAutoCloseAll)
+            {
+                controller.DisconnectAllConnections();
+            }
             MenuItem item = (MenuItem)sender;
             controller.SelectServerIndex((int)item.Tag);
         }
@@ -1213,12 +1219,7 @@ namespace Shadowsocks.View
 
         private void DisconnectCurrent_Click(object sender, EventArgs e)
         {
-            Configuration config = controller.GetCurrentConfiguration();
-            for (int id = 0; id < config.configs.Count; ++id)
-            {
-                Server server = config.configs[id];
-                server.GetConnections().CloseAll();
-            }
+            controller.DisconnectAllConnections();
         }
 
         private void URL_Split(string text, ref List<string> out_urls)

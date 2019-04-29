@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Shadowsocks</RootNamespace>
     <AssemblyName>ShadowsocksR</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartupObject>Shadowsocks.Program</StartupObject>
     <ApplicationIcon>shadowsocks.ico</ApplicationIcon>
@@ -43,7 +43,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\4.0\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;_DOTNET_4_0, _DOTNET_CURRENT, PROTOCOL_STATISTICS</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;_DOTNET_4_0, PROTOCOL_STATISTICS</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -53,7 +53,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\4.0\Release\</OutputPath>
-    <DefineConstants>TRACE;PROTOCOL_STATISTICS</DefineConstants>
+    <DefineConstants>TRACE;_DOTNET_4_0, PROTOCOL_STATISTICS</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -306,7 +306,7 @@
     <Content Include="Data\cn.txt" />
     <None Include="Data\privoxy_conf.txt" />
     <Content Include="Data\user-rule.txt" />
-    <Content Include="Data\zh-tw.txt" />
+    <None Include="Data\zh-tw.txt" />
     <Content Include="shadowsocks.ico" />
   </ItemGroup>
   <ItemGroup>

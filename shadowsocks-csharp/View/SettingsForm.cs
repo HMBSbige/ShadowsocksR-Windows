@@ -74,11 +74,13 @@ namespace Shadowsocks.View
             ListenGroup.Text = I18N.GetString(ListenGroup.Text);
             checkShareOverLan.Text = I18N.GetString(checkShareOverLan.Text);
             ProxyPortLabel.Text = I18N.GetString("Proxy Port");
+            buttonDefault.Text = I18N.GetString("Set Default");
             ReconnectLabel.Text = I18N.GetString("Reconnect Times");
             TTLLabel.Text = I18N.GetString("TTL");
             labelTimeout.Text = I18N.GetString(labelTimeout.Text);
 
             checkAutoStartup.Text = I18N.GetString(checkAutoStartup.Text);
+            checkSwitchAutoCloseAll.Text = I18N.GetString(checkSwitchAutoCloseAll.Text);
             checkRandom.Text = I18N.GetString(checkRandom.Text);
             CheckAutoBan.Text = I18N.GetString("AutoBan");
             CheckLogEnable.Text = I18N.GetString("Enable Log");
@@ -156,6 +158,7 @@ namespace Shadowsocks.View
                 _modifiedConfiguration.authPass = TextAuthPass.Text;
 
                 _modifiedConfiguration.autoBan = CheckAutoBan.Checked;
+                _modifiedConfiguration.checkSwitchAutoCloseAll = checkSwitchAutoCloseAll.Checked;
                 _modifiedConfiguration.logEnable = CheckLogEnable.Checked;
 
                 return ret;
@@ -203,6 +206,7 @@ namespace Shadowsocks.View
             TextAuthPass.Text = _modifiedConfiguration.authPass;
 
             CheckAutoBan.Checked = _modifiedConfiguration.autoBan;
+            checkSwitchAutoCloseAll.Checked = _modifiedConfiguration.checkSwitchAutoCloseAll;
             CheckLogEnable.Checked = _modifiedConfiguration.logEnable;
         }
 
