@@ -13,7 +13,7 @@ namespace Shadowsocks.Controller
     {
         private const string UpdateURL = @"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ssr-win-4.0.xml";
 
-        private const string USER_AGENT = @"Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.3319.102 Safari/537.36";
+        private const string USER_AGENT = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36";
 
         public string LatestVersionNumber;
         public string LatestVersionURL;

@@ -17,7 +17,7 @@ namespace Shadowsocks.Controller
         private const string SS_WHITER_TEMPLATE_URL = @"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white_r_temp.pac";
         private string TEMPLATE_URL = null;
 
-        private const string USER_AGENT = @"Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.3319.102 Safari/537.36";
+        private const string USER_AGENT = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36";
 
         private static readonly string PAC_FILE = PACServer.PAC_FILE;
         private static readonly string USER_RULE_FILE = PACServer.WHITELIST_FILE;
