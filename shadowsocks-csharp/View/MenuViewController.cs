@@ -149,6 +149,16 @@ namespace Shadowsocks.View
             }
             Configuration config = controller.GetCurrentConfiguration();
             bool enabled = config.sysProxyMode != (int)ProxyMode.NoModify && config.sysProxyMode != (int)ProxyMode.Direct;
+            string server;
+            if (config.random)
+            {
+                server = config.balanceAlgorithm;
+            }
+            else
+            {
+                int server_current = config.index;
+                server = config.configs[server_current].remarks;
+            }
             bool global = config.sysProxyMode == (int)ProxyMode.Global;
             bool random = config.random;
 
@@ -212,10 +222,51 @@ namespace Shadowsocks.View
                 _notifyIcon.Icon = newIcon;
             }
 
+            /*Balance = 负载均衡
+            OneByOne = 按次序
+            Random = 随机
+            FastDownloadSpeed = 下载速度优先
+            LowLatency = 低延迟优先
+            LowException = 低错误优先
+            SelectedFirst = 选中优先
+            Timer = 定时切换*/
+
+            string strServer = server;
+
+            switch (strServer)
+            {
+                case "OneByOne":
+                    strServer = "负载均衡 : 按次序";
+                    break;
+                case "Random":
+                    strServer = "负载均衡 : 随机";
+                    break;
+                case "FastDownloadSpeed":
+                    strServer = "负载均衡 : 下载速度优先";
+                    break;
+                case "LowLatency":
+                    strServer = "负载均衡 : 低延迟优先";
+                    break;
+                case "LowException":
+                    strServer = "负载均衡 : 低错误优先";
+                    break;
+                case "SelectedFirst":
+                    strServer = "负载均衡 : 选中优先";
+                    break;
+                case "Timer":
+                    strServer = "负载均衡 : 定时切换";
+                    break;
+                default:
+                    strServer = server;
+                    break;
+
+            }
             // we want to show more details but notify icon title is limited to 63 characters
             string text = (enabled ?
                     (global ? I18N.GetString("Global") : I18N.GetString("PAC")) :
                     I18N.GetString("Disable system proxy"))
+                    + "\r\n"
+                    + strServer
                     + "\r\n"
                     + String.Format(I18N.GetString("Running: Port {0}"), config.localPort)  // this feedback is very important because they need to know Shadowsocks is running
                     ;
