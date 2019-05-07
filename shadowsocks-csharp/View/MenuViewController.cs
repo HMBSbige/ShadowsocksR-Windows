@@ -222,44 +222,33 @@ namespace Shadowsocks.View
                 _notifyIcon.Icon = newIcon;
             }
 
-            /*Balance = 负载均衡
-            OneByOne = 按次序
-            Random = 随机
-            FastDownloadSpeed = 下载速度优先
-            LowLatency = 低延迟优先
-            LowException = 低错误优先
-            SelectedFirst = 选中优先
-            Timer = 定时切换*/
-
             string strServer = server;
-
             switch (strServer)
             {
                 case "OneByOne":
-                    strServer = "负载均衡 : 按次序";
+                    strServer = I18N.GetString("Balance") + " : " + I18N.GetString("OneByOne");
                     break;
                 case "Random":
-                    strServer = "负载均衡 : 随机";
+                    strServer = I18N.GetString("Balance") + " : " + I18N.GetString("Random");
                     break;
                 case "FastDownloadSpeed":
-                    strServer = "负载均衡 : 下载速度优先";
+                    strServer = I18N.GetString("Balance") + " : " + I18N.GetString("FastDownloadSpeed");
                     break;
                 case "LowLatency":
-                    strServer = "负载均衡 : 低延迟优先";
+                    strServer = I18N.GetString("Balance") + " : " + I18N.GetString("LowLatency");
                     break;
                 case "LowException":
-                    strServer = "负载均衡 : 低错误优先";
+                    strServer = I18N.GetString("Balance") + " : " + I18N.GetString("LowException");
                     break;
                 case "SelectedFirst":
-                    strServer = "负载均衡 : 选中优先";
+                    strServer = I18N.GetString("Balance") + " : " + I18N.GetString("SelectedFirst");
                     break;
                 case "Timer":
-                    strServer = "负载均衡 : 定时切换";
+                    strServer = I18N.GetString("Balance") + " : " + I18N.GetString("OneByOne");
                     break;
                 default:
                     strServer = server;
                     break;
-
             }
             // we want to show more details but notify icon title is limited to 63 characters
             string text = (enabled ?
