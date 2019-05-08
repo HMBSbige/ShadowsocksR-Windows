@@ -1,11 +1,9 @@
-﻿using System.IO;
-using Shadowsocks.Model;
+﻿using Shadowsocks.Model;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+using System.IO;
 using System.Net.Sockets;
-using System.Net;
+using System.Threading;
 
 namespace Shadowsocks.Controller
 {
@@ -414,7 +412,7 @@ namespace Shadowsocks.Controller
                 _firstRun = false;
                 try
                 {
-                    if (_listener != null && !_listener.isConfigChange(_config))
+                    if (_listener != null && !_listener.IsConfigChange(_config))
                     {
                         Local local = new Local(_config, _transfer, _rangeSet);
                         _listener.GetServices()[0] = local;

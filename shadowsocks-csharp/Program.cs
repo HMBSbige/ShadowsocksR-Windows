@@ -1,8 +1,5 @@
 ﻿using Shadowsocks.Controller;
-using Shadowsocks.Properties;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading;
@@ -91,13 +88,13 @@ namespace Shadowsocks
 #if _DOTNET_4_0
                 // Enable Modern TLS when .NET 4.5+ installed.
                 if (Util.EnvCheck.CheckDotNet45())
-                    ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 #endif
 #if !_CONSOLE
                 _viewController = new MenuViewController(_controller);
 #endif
 
-            _controller.Start();
+                _controller.Start();
 
 #if !_CONSOLE
                 //Util.Utils.ReleaseMemory();

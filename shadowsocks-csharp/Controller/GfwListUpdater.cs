@@ -1,12 +1,9 @@
-﻿using System;
+﻿using Shadowsocks.Model;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Net;
 using System.IO;
-using Shadowsocks.Properties;
-using SimpleJson;
-using Shadowsocks.Util;
-using Shadowsocks.Model;
+using System.Net;
+using System.Text;
 
 namespace Shadowsocks.Controller
 {
@@ -18,7 +15,7 @@ namespace Shadowsocks.Controller
 
         private const string GFWLIST_TEMPLATE_URL = "https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_gfw.pac";
 
-        private const string USER_AGENT = @"Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.3319.102 Safari/537.36";
+        private const string USER_AGENT = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36";
 
         private static string PAC_FILE = PACServer.PAC_FILE;
 
@@ -87,7 +84,7 @@ namespace Shadowsocks.Controller
                 {
                     string local = File.ReadAllText(USER_RULE_FILE, Encoding.UTF8);
                     string[] rules = local.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach(string rule in rules)
+                    foreach (string rule in rules)
                     {
                         if (rule.StartsWith("!") || rule.StartsWith("["))
                             continue;
@@ -198,7 +195,7 @@ namespace Shadowsocks.Controller
             {
                 WebClient http = new WebClient();
                 http.Headers.Add("User-Agent", String.IsNullOrEmpty(config.proxyUserAgent) ? USER_AGENT : config.proxyUserAgent);
-				WebProxy proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
+                WebProxy proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
                 if (!string.IsNullOrEmpty(config.authPass))
                 {
                     proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);
