@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -139,7 +140,15 @@ namespace Shadowsocks.View
         {
             MessageBox.Show(e.GetException().ToString(), String.Format(I18N.GetString("Shadowsocks Error: {0}"), e.GetException().Message));
         }
-
+        public static void SetNotifyIconText(NotifyIcon ni, string text)
+        {
+            if (text.Length >= 128) throw new ArgumentOutOfRangeException("Text limited to 127 characters");
+            Type t = typeof(NotifyIcon);
+            BindingFlags hidden = BindingFlags.NonPublic | BindingFlags.Instance;
+            t.GetField("text", hidden).SetValue(ni, text);
+            if ((bool)t.GetField("added", hidden).GetValue(ni))
+                t.GetMethod("UpdateIcon", hidden).Invoke(ni, new object[] { true });
+        }
         private void UpdateTrayIcon()
         {
             int dpi = 96;
@@ -259,7 +268,8 @@ namespace Shadowsocks.View
                     + "\r\n"
                     + String.Format(I18N.GetString("Running: Port {0}"), config.localPort)  // this feedback is very important because they need to know Shadowsocks is running
                     ;
-            _notifyIcon.Text = text.Substring(0, Math.Min(63, text.Length));
+            //_notifyIcon.Text = text.Substring(0, Math.Min(63, text.Length));
+            SetNotifyIconText(_notifyIcon, text);
         }
 
         private MenuItem CreateMenuItem(string text, EventHandler click)
