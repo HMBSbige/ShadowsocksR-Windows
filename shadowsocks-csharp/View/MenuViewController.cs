@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Runtime.InteropServices;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
@@ -140,15 +140,23 @@ namespace Shadowsocks.View
         {
             MessageBox.Show(e.GetException().ToString(), String.Format(I18N.GetString("Shadowsocks Error: {0}"), e.GetException().Message));
         }
-        public static void SetNotifyIconText(NotifyIcon ni, string text)
+
+        private static void SetNotifyIconText(NotifyIcon ni, string text)
         {
-            if (text.Length >= 128) throw new ArgumentOutOfRangeException("Text limited to 127 characters");
-            Type t = typeof(NotifyIcon);
-            BindingFlags hidden = BindingFlags.NonPublic | BindingFlags.Instance;
-            t.GetField("text", hidden).SetValue(ni, text);
-            if ((bool)t.GetField("added", hidden).GetValue(ni))
-                t.GetMethod("UpdateIcon", hidden).Invoke(ni, new object[] { true });
+            if (text.Length > 127)
+            {
+                text = text.Substring(0, 127);
+            }
+
+            var t = typeof(NotifyIcon);
+            const BindingFlags hidden = BindingFlags.NonPublic | BindingFlags.Instance;
+            t.GetField(@"text", hidden)?.SetValue(ni, text);
+            if (t.GetField(@"added", hidden)?.GetValue(ni) is bool b && b)
+            {
+                t.GetMethod(@"UpdateIcon", hidden)?.Invoke(ni, new object[] { true });
+            }
         }
+
         private void UpdateTrayIcon()
         {
             int dpi = 96;
@@ -158,16 +166,6 @@ namespace Shadowsocks.View
             }
             Configuration config = controller.GetCurrentConfiguration();
             bool enabled = config.sysProxyMode != (int)ProxyMode.NoModify && config.sysProxyMode != (int)ProxyMode.Direct;
-            string server;
-            if (config.random)
-            {
-                server = config.balanceAlgorithm;
-            }
-            else
-            {
-                int server_current = config.index;
-                server = config.configs[server_current].remarks;
-            }
             bool global = config.sysProxyMode == (int)ProxyMode.Global;
             bool random = config.random;
 
@@ -231,44 +229,40 @@ namespace Shadowsocks.View
                 _notifyIcon.Icon = newIcon;
             }
 
-            string strServer = server;
+            var strServer = random ? config.balanceAlgorithm : config.configs[config.index].remarks;
             switch (strServer)
             {
                 case "OneByOne":
-                    strServer = I18N.GetString("Balance") + " : " + I18N.GetString("OneByOne");
+                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("OneByOne")}";
                     break;
                 case "Random":
-                    strServer = I18N.GetString("Balance") + " : " + I18N.GetString("Random");
+                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("Random")}";
                     break;
                 case "FastDownloadSpeed":
-                    strServer = I18N.GetString("Balance") + " : " + I18N.GetString("FastDownloadSpeed");
+                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("FastDownloadSpeed")}";
                     break;
                 case "LowLatency":
-                    strServer = I18N.GetString("Balance") + " : " + I18N.GetString("LowLatency");
+                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("LowLatency")}";
                     break;
                 case "LowException":
-                    strServer = I18N.GetString("Balance") + " : " + I18N.GetString("LowException");
+                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("LowException")}";
                     break;
                 case "SelectedFirst":
-                    strServer = I18N.GetString("Balance") + " : " + I18N.GetString("SelectedFirst");
+                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("SelectedFirst")}";
                     break;
                 case "Timer":
-                    strServer = I18N.GetString("Balance") + " : " + I18N.GetString("OneByOne");
-                    break;
-                default:
-                    strServer = server;
+                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("OneByOne")}";
                     break;
             }
-            // we want to show more details but notify icon title is limited to 63 characters
-            string text = (enabled ?
-                    (global ? I18N.GetString("Global") : I18N.GetString("PAC")) :
+            // we want to show more details but notify icon title is limited to 127 characters
+            var text = (enabled ?
+                    global ? I18N.GetString("Global") : I18N.GetString("PAC") :
                     I18N.GetString("Disable system proxy"))
-                    + "\r\n"
+                    + Environment.NewLine
                     + strServer
-                    + "\r\n"
-                    + String.Format(I18N.GetString("Running: Port {0}"), config.localPort)  // this feedback is very important because they need to know Shadowsocks is running
+                    + Environment.NewLine
+                    + string.Format(I18N.GetString("Running: Port {0}"), config.localPort)  // this feedback is very important because they need to know Shadowsocks is running
                     ;
-            //_notifyIcon.Text = text.Substring(0, Math.Min(63, text.Length));
             SetNotifyIconText(_notifyIcon, text);
         }
 
