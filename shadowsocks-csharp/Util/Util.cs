@@ -315,133 +315,133 @@ namespace Shadowsocks.Util
 
         public static IPAddress QueryDns(string host, string dns_servers, bool IPv6_first = false)
         {
-            IPAddress ret_ipAddress = null;
-            ret_ipAddress = _QueryDns(host, dns_servers, IPv6_first);
+            var ret_ipAddress = _QueryDns(host, dns_servers, IPv6_first);
             if (ret_ipAddress == null)
             {
-                Logging.Info($"DNS query {host} failed.");
+                Logging.Info($@"DNS query {host} failed.");
             }
             else
             {
-                Logging.Info($"DNS query {host} answer {ret_ipAddress.ToString()}");
+                Logging.Info($@"DNS query {host} answer {ret_ipAddress}");
             }
             return ret_ipAddress;
         }
 
-        public static IPAddress _QueryDns(string host, string dns_servers, bool IPv6_first = false)
+        private static IPAddress _QueryDns(string host, string dnsServers, bool IPv6_first = false)
         {
-            IPAddress ret_ipAddress = null;
+            if (!string.IsNullOrEmpty(dnsServers))
             {
-                if (!string.IsNullOrEmpty(dns_servers))
+                var types = IPv6_first ? new[] { Types.AAAA, Types.A } : new[] { Types.A, Types.AAAA };
+                var dnsServerStr = dnsServers.Split(',');
+                var dnsServer = new List<IPEndPoint>();
+                foreach (var serverStr in dnsServerStr)
                 {
-                    OpenDNS.Types[] types;
-                    if (IPv6_first)
-                        types = new Types[] { Types.AAAA, Types.A };
-                    else
-                        types = new Types[] { Types.A, Types.AAAA };
-                    string[] _dns_server = dns_servers.Split(',');
-                    List<IPEndPoint> dns_server = new List<IPEndPoint>();
-                    List<IPEndPoint> local_dns_server = new List<IPEndPoint>();
-                    foreach (string server_str in _dns_server)
+                    var server = serverStr.Trim(' ');
+                    var index = server.IndexOf(':');
+                    string ip = null;
+                    string port = null;
+                    if (index >= 0)
                     {
-                        IPAddress ipAddress = null;
-                        string server = server_str.Trim(' ');
-                        int index = server.IndexOf(':');
-                        string ip = null;
-                        string port = null;
-                        if (index >= 0)
+                        if (server.StartsWith("["))
                         {
-                            if (server.StartsWith("["))
+                            var ipv6_end = server.IndexOf(']', 1);
+                            if (ipv6_end >= 0)
                             {
-                                int ipv6_end = server.IndexOf(']', 1);
-                                if (ipv6_end >= 0)
-                                {
-                                    ip = server.Substring(1, ipv6_end - 1);
+                                ip = server.Substring(1, ipv6_end - 1);
 
-                                    index = server.IndexOf(':', ipv6_end);
-                                    if (index == ipv6_end + 1)
-                                    {
-                                        port = server.Substring(index + 1);
-                                    }
+                                index = server.IndexOf(':', ipv6_end);
+                                if (index == ipv6_end + 1)
+                                {
+                                    port = server.Substring(index + 1);
                                 }
-                            }
-                            else
-                            {
-                                ip = server.Substring(0, index);
-                                port = server.Substring(index + 1);
                             }
                         }
                         else
                         {
-                            index = server.IndexOf(' ');
-                            if (index >= 0)
-                            {
-                                ip = server.Substring(0, index);
-                                port = server.Substring(index + 1);
-                            }
-                            else
-                            {
-                                ip = server;
-                            }
-                        }
-                        if (ip != null && IPAddress.TryParse(ip, out ipAddress))
-                        {
-                            int i_port = 53;
-                            if (port != null)
-                                int.TryParse(port, out i_port);
-                            dns_server.Add(new IPEndPoint(ipAddress, i_port));
-                            //dns_server.Add(port == null ? ip : ip + " " + port);
+                            ip = server.Substring(0, index);
+                            port = server.Substring(index + 1);
                         }
                     }
-                    for (int query_i = 0; query_i < types.Length; ++query_i)
+                    else
                     {
-                        DnsQuery dns = new DnsQuery(host, types[query_i]);
-                        dns.RecursionDesired = true;
-                        foreach (IPEndPoint server in dns_server)
+                        index = server.IndexOf(' ');
+                        if (index >= 0)
                         {
-                            dns.Servers.Add(server);
+                            ip = server.Substring(0, index);
+                            port = server.Substring(index + 1);
                         }
-                        if (dns.Send())
+                        else
                         {
-                            int count = dns.Response.Answers.Count;
-                            if (count > 0)
-                            {
-                                for (int i = 0; i < count; ++i)
-                                {
-                                    if (((ResourceRecord)dns.Response.Answers[i]).Type != types[query_i])
-                                        continue;
-                                    return ((OpenDNS.Address)dns.Response.Answers[i]).IP;
-                                }
-                            }
+                            ip = server;
                         }
+                    }
+
+                    if (ip != null && IPAddress.TryParse(ip, out var ipAddress))
+                    {
+                        var iPort = 53;
+                        if (port != null)
+                        {
+                            int.TryParse(port, out iPort);
+                        }
+
+                        dnsServer.Add(new IPEndPoint(ipAddress, iPort));
                     }
                 }
+
+                foreach (var type in types)
                 {
-                    try
+                    var dns = new DnsQuery(host, type) { RecursionDesired = true };
+                    foreach (var server in dnsServer)
                     {
-                        GetHostEntryHandler callback = new GetHostEntryHandler(Dns.GetHostEntry);
-                        IAsyncResult result = callback.BeginInvoke(host, null, null);
-                        if (result.AsyncWaitHandle.WaitOne(10000, true))
+                        dns.Servers.Add(server);
+                    }
+
+                    if (dns.Send())
+                    {
+                        var count = dns.Response.Answers.Count;
+                        if (count > 0)
                         {
-                            IPHostEntry ipHostEntry = callback.EndInvoke(result);
-                            foreach (IPAddress ad in ipHostEntry.AddressList)
+                            for (var i = 0; i < count; ++i)
                             {
-                                if (ad.AddressFamily == AddressFamily.InterNetwork)
-                                    return ad;
-                            }
-                            foreach (IPAddress ad in ipHostEntry.AddressList)
-                            {
-                                return ad;
+                                if (((ResourceRecord)dns.Response.Answers[i]).Type != type)
+                                {
+                                    continue;
+                                }
+
+                                return ((Address)dns.Response.Answers[i]).IP;
                             }
                         }
-                    }
-                    catch
-                    {
-
                     }
                 }
             }
-            return ret_ipAddress;
+
+            try
+            {
+                var callback = new GetHostEntryHandler(Dns.GetHostEntry);
+                var result = callback.BeginInvoke(host, null, null);
+                if (result.AsyncWaitHandle.WaitOne(10000, true))
+                {
+                    var ipHostEntry = callback.EndInvoke(result);
+                    foreach (var ad in ipHostEntry.AddressList)
+                    {
+                        if (ad.AddressFamily == AddressFamily.InterNetwork)
+                        {
+                            return ad;
+                        }
+                    }
+
+                    foreach (var ad in ipHostEntry.AddressList)
+                    {
+                        return ad;
+                    }
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+
+            return null;
         }
 
         public static string GetExecutablePath()
