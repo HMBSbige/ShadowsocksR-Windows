@@ -5,12 +5,7 @@ ShadowsocksR for Windows
 
 #### Download
 
-You will need to download and install [7-Zip](http://www.7-zip.org/) in order 
-to extract the ShadowsocksR archive.
-
 Download the [latest release] for ShadowsocksR for Windows.
-
-For >= Windows 8 or with .Net 4.0, using ShadowsocksR-dotnet4.0.exe.
 
 #### Usage
 
@@ -31,7 +26,7 @@ to proxy to tunnel over ShadowsocksR.
 
 ### Develop
 
-Visual Studio Community 2017 is recommended.
+Visual Studio Community 2019 is recommended.
 
 #### License
 
