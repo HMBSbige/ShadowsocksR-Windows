@@ -529,29 +529,29 @@ namespace Shadowsocks.Proxy
             handler.keepCurrentServer = keepCurrentServer;
             handler.connection = new ProxySocketTunLocal(_connection);
             handler.connectionUDP = _connectionUDP;
-            handler.cfg.reconnectTimesRemain = _config.reconnectTimes;
-            handler.cfg.random = _config.random;
-            handler.cfg.forceRandom = _config.random;
+            handler.cfg.ReconnectTimesRemain = _config.reconnectTimes;
+            handler.cfg.Random = _config.random;
+            handler.cfg.ForceRandom = _config.random;
             handler.setServerTransferTotal(_transfer);
             if (_config.proxyEnable)
             {
-                handler.cfg.proxyType = _config.proxyType;
-                handler.cfg.socks5RemoteHost = _config.proxyHost;
-                handler.cfg.socks5RemotePort = _config.proxyPort;
-                handler.cfg.socks5RemoteUsername = _config.proxyAuthUser;
-                handler.cfg.socks5RemotePassword = _config.proxyAuthPass;
-                handler.cfg.proxyUserAgent = _config.proxyUserAgent;
+                handler.cfg.ProxyType = _config.proxyType;
+                handler.cfg.Socks5RemoteHost = _config.proxyHost;
+                handler.cfg.Socks5RemotePort = _config.proxyPort;
+                handler.cfg.Socks5RemoteUsername = _config.proxyAuthUser;
+                handler.cfg.Socks5RemotePassword = _config.proxyAuthPass;
+                handler.cfg.ProxyUserAgent = _config.proxyUserAgent;
             }
-            handler.cfg.TTL = _config.TTL;
-            handler.cfg.connect_timeout = _config.connectTimeout;
-            handler.cfg.autoSwitchOff = _config.autoBan;
+            handler.cfg.Ttl = _config.TTL;
+            handler.cfg.ConnectTimeout = _config.connectTimeout;
+            handler.cfg.AutoSwitchOff = _config.autoBan;
             if (!string.IsNullOrEmpty(_config.localDnsServer))
             {
-                handler.cfg.local_dns_servers = _config.localDnsServer;
+                handler.cfg.LocalDnsServers = _config.localDnsServer;
             }
             if (!string.IsNullOrEmpty(_config.dnsServer))
             {
-                handler.cfg.dns_servers = _config.dnsServer;
+                handler.cfg.DnsServers = _config.dnsServer;
             }
             if (_config.GetPortMapCache().ContainsKey(local_port))
             {

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -140,6 +141,22 @@ namespace Shadowsocks.View
             MessageBox.Show(e.GetException().ToString(), String.Format(I18N.GetString("Shadowsocks Error: {0}"), e.GetException().Message));
         }
 
+        private static void SetNotifyIconText(NotifyIcon ni, string text)
+        {
+            if (text.Length > 127)
+            {
+                text = text.Substring(0, 127);
+            }
+
+            var t = typeof(NotifyIcon);
+            const BindingFlags hidden = BindingFlags.NonPublic | BindingFlags.Instance;
+            t.GetField(@"text", hidden)?.SetValue(ni, text);
+            if (t.GetField(@"added", hidden)?.GetValue(ni) is bool b && b)
+            {
+                t.GetMethod(@"UpdateIcon", hidden)?.Invoke(ni, new object[] { true });
+            }
+        }
+
         private void UpdateTrayIcon()
         {
             int dpi = 96;
@@ -212,14 +229,41 @@ namespace Shadowsocks.View
                 _notifyIcon.Icon = newIcon;
             }
 
-            // we want to show more details but notify icon title is limited to 63 characters
-            string text = (enabled ?
-                    (global ? I18N.GetString("Global") : I18N.GetString("PAC")) :
+            var strServer = random ? config.balanceAlgorithm : config.configs[config.index].remarks;
+            switch (strServer)
+            {
+                case "OneByOne":
+                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("OneByOne")}";
+                    break;
+                case "Random":
+                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("Random")}";
+                    break;
+                case "FastDownloadSpeed":
+                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("FastDownloadSpeed")}";
+                    break;
+                case "LowLatency":
+                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("LowLatency")}";
+                    break;
+                case "LowException":
+                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("LowException")}";
+                    break;
+                case "SelectedFirst":
+                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("SelectedFirst")}";
+                    break;
+                case "Timer":
+                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("OneByOne")}";
+                    break;
+            }
+            // we want to show more details but notify icon title is limited to 127 characters
+            var text = (enabled ?
+                    global ? I18N.GetString("Global") : I18N.GetString("PAC") :
                     I18N.GetString("Disable system proxy"))
-                    + "\r\n"
-                    + String.Format(I18N.GetString("Running: Port {0}"), config.localPort)  // this feedback is very important because they need to know Shadowsocks is running
+                    + Environment.NewLine
+                    + strServer
+                    + Environment.NewLine
+                    + string.Format(I18N.GetString("Running: Port {0}"), config.localPort)  // this feedback is very important because they need to know Shadowsocks is running
                     ;
-            _notifyIcon.Text = text.Substring(0, Math.Min(63, text.Length));
+            SetNotifyIconText(_notifyIcon, text);
         }
 
         private MenuItem CreateMenuItem(string text, EventHandler click)
