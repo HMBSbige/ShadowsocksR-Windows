@@ -3,6 +3,7 @@ using Shadowsocks.Model;
 using System;
 using System.Dynamic;
 using System.Net;
+using System.Text;
 
 namespace Shadowsocks.Controller
 {
@@ -44,7 +45,7 @@ namespace Shadowsocks.Controller
         {
             try
             {
-                var http = new WebClient();
+                var http = new WebClient { Encoding = Encoding.UTF8 };
                 http.Headers.Add(@"User-Agent", string.IsNullOrEmpty(config.proxyUserAgent) ? USER_AGENT : config.proxyUserAgent);
                 if (UseProxy)
                 {
