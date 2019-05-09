@@ -251,7 +251,7 @@ namespace Shadowsocks.View
                     strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("SelectedFirst")}";
                     break;
                 case "Timer":
-                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("OneByOne")}";
+                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("Timer")}";
                     break;
             }
             // we want to show more details but notify icon title is limited to 127 characters
