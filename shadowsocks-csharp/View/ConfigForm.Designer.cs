@@ -1,6 +1,6 @@
 ﻿namespace Shadowsocks.View
 {
-    partial class ConfigForm
+    sealed partial class ConfigForm
     {
         /// <summary>
         /// 必需的设计器变量。
@@ -589,7 +589,6 @@
             this.chkSSRLink.TabIndex = 26;
             this.chkSSRLink.Text = "SSR Link";
             this.chkSSRLink.UseVisualStyleBackColor = true;
-            this.chkSSRLink.CheckedChanged += new System.EventHandler(this.checkSSRLink_CheckedChanged);
             // 
             // lblRemarks
             // 
