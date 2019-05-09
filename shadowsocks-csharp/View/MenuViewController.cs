@@ -1065,11 +1065,6 @@ namespace Shadowsocks.View
             Process.Start("https://github.com/HMBSbige/ShadowsocksR-Windows");
         }
 
-        private void DonateItem_Click(object sender, EventArgs e)
-        {
-            ShowBalloonTip(I18N.GetString("Donate"), I18N.GetString("Please contract to breakwa11 to get more infomation"), ToolTipIcon.Info, 10000);
-        }
-
         [DllImport("user32.dll")]
         private static extern short GetAsyncKeyState(System.Windows.Forms.Keys vKey);
 
