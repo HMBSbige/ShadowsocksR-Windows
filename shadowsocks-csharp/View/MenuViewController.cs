@@ -130,9 +130,9 @@ namespace Shadowsocks.View
             updateChecker.CheckUpdate(controller.GetCurrentConfiguration(), false);
 
             Configuration cfg = controller.GetCurrentConfiguration();
-            if (cfg.isDefaultConfig() || cfg.nodeFeedAutoUpdate)
+            if (cfg.IsDefaultConfig() || cfg.nodeFeedAutoUpdate)
             {
-                updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, !cfg.isDefaultConfig(), false);
+                updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, !cfg.IsDefaultConfig(), false);
             }
         }
 
@@ -461,7 +461,7 @@ namespace Shadowsocks.View
                         Random r = new Random();
                         Util.Utils.Shuffle(urls, r);
                         urls.RemoveRange(max_node_num, urls.Count - max_node_num);
-                        if (!config.isDefaultConfig())
+                        if (!config.IsDefaultConfig())
                             keep_selected_server = true;
                     }
                     string curGroup = null;
