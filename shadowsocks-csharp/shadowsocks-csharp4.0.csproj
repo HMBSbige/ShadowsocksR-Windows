@@ -69,11 +69,17 @@
     <Reference Include="Costura, Version=4.0.0.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
       <HintPath>..\packages\Costura.Fody.4.0.0\lib\net40\Costura.dll</HintPath>
     </Reference>
+    <Reference Include="DnsClient, Version=1.2.0.0, Culture=neutral, PublicKeyToken=4574bb5573c51424, processorArchitecture=MSIL">
+      <HintPath>..\packages\DnsClient.1.2.0\lib\net471\DnsClient.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="zxing, Version=0.16.4.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
@@ -84,14 +90,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="3rd\opendns\DnsQuery.cs" />
-    <Compile Include="3rd\opendns\DnsResponse.cs" />
-    <Compile Include="3rd\opendns\Enum.cs" />
-    <Compile Include="3rd\opendns\RR\Address.cs" />
-    <Compile Include="3rd\opendns\RR\MX.cs" />
-    <Compile Include="3rd\opendns\RR\ResourceRecord.cs" />
-    <Compile Include="3rd\opendns\RR\ResourceRecordCollection.cs" />
-    <Compile Include="3rd\opendns\RR\SOA.cs" />
     <Compile Include="Controller\APIServer.cs" />
     <Compile Include="Controller\AutoStartup.cs" />
     <Compile Include="Controller\ChnDomainsAndIPUpdater.cs" />
