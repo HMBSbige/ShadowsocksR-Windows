@@ -143,11 +143,6 @@ namespace Shadowsocks.View
 
         private static void SetNotifyIconText(NotifyIcon ni, string text)
         {
-            if (text.Length > 127)
-            {
-                text = text.Substring(0, 127);
-            }
-
             var t = typeof(NotifyIcon);
             const BindingFlags hidden = BindingFlags.NonPublic | BindingFlags.Instance;
             t.GetField(@"text", hidden)?.SetValue(ni, text);
@@ -261,7 +256,12 @@ namespace Shadowsocks.View
                                 + Environment.NewLine;
             var line2 = string.IsNullOrWhiteSpace(strServer) ? null : strServer + Environment.NewLine;
             var line3 = string.Format(I18N.GetString("Running: Port {0}"), config.localPort); // this feedback is very important because they need to know Shadowsocks is running
+
             var text = $@"{line1}{line2}{line3}";
+            if (text.Length > 127 && line1.Length + line3.Length + Environment.NewLine.Length < 128)
+            {
+                text = $@"{line1}{strServer?.Substring(0, 127 - line1.Length - line3.Length - Environment.NewLine.Length)}{Environment.NewLine}{line3}";
+            }
             SetNotifyIconText(_notifyIcon, text);
         }
 
