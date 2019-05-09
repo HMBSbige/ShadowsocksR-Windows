@@ -1,12 +1,12 @@
-﻿using Shadowsocks.Controller;
+﻿using Newtonsoft.Json;
+using Shadowsocks.Controller;
+using Shadowsocks.Encryption;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Windows.Forms;
-using System.Threading;
-using Shadowsocks.Encryption;
 
 namespace Shadowsocks.Model
 {
@@ -20,21 +20,19 @@ namespace Shadowsocks.Model
         {
             if (!(other is UriVisitTime))
                 throw new InvalidOperationException("CompareTo: Not a UriVisitTime");
-            if (Equals(other))
-                return 0;
-            return visitTime.CompareTo(((UriVisitTime)other).visitTime);
+            return Equals(other) ? 0 : visitTime.CompareTo(((UriVisitTime)other).visitTime);
         }
 
     }
 
-    public enum PortMapType : int
+    public enum PortMapType
     {
         Forward = 0,
         ForceProxy,
         RuleProxy
     }
 
-    public enum ProxyRuleMode : int
+    public enum ProxyRuleMode
     {
         Disable = 0,
         BypassLan,
@@ -66,34 +64,35 @@ namespace Shadowsocks.Model
     [Serializable]
     public class ServerSubscribe
     {
-        private static string DEFAULT_FEED_URL = "https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/freenodeplain.txt";
+        private static string DEFAULT_FEED_URL = @"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/freenodeplain.txt";
 
         public string URL = DEFAULT_FEED_URL;
         public string Group;
-        public UInt64 LastUpdateTime;
+        public ulong LastUpdateTime;
     }
 
-    public class GlobalConfiguration
+    public static class GlobalConfiguration
     {
-        public static string config_password = "";
+        public static string config_password = string.Empty;
     }
 
-    [Serializable()]
-    class ConfigurationException : System.Exception
+    [Serializable]
+    class ConfigurationException : Exception
     {
         public ConfigurationException() : base() { }
         public ConfigurationException(string message) : base(message) { }
-        public ConfigurationException(string message, System.Exception inner) : base(message, inner) { }
+        public ConfigurationException(string message, Exception inner) : base(message, inner) { }
         protected ConfigurationException(System.Runtime.Serialization.SerializationInfo info,
             System.Runtime.Serialization.StreamingContext context)
         { }
     }
-    [Serializable()]
-    class ConfigurationWarning : System.Exception
+
+    [Serializable]
+    class ConfigurationWarning : Exception
     {
         public ConfigurationWarning() : base() { }
         public ConfigurationWarning(string message) : base(message) { }
-        public ConfigurationWarning(string message, System.Exception inner) : base(message, inner) { }
+        public ConfigurationWarning(string message, Exception inner) : base(message, inner) { }
         protected ConfigurationWarning(System.Runtime.Serialization.SerializationInfo info,
             System.Runtime.Serialization.StreamingContext context)
         { }
@@ -102,6 +101,8 @@ namespace Shadowsocks.Model
     [Serializable]
     public class Configuration
     {
+        #region Data
+
         public List<Server> configs;
         public int index;
         public bool random;
@@ -147,12 +148,14 @@ namespace Shadowsocks.Model
         public Dictionary<string, string> token = new Dictionary<string, string>();
         public Dictionary<string, PortMapConfig> portMap = new Dictionary<string, PortMapConfig>();
 
+        #endregion
+
         private Dictionary<int, ServerSelectStrategy> serverStrategyMap = new Dictionary<int, ServerSelectStrategy>();
         private Dictionary<int, PortMapConfigCache> portMapCache = new Dictionary<int, PortMapConfigCache>();
         private LRUCache<string, UriVisitTime> uricache = new LRUCache<string, UriVisitTime>(180);
 
-        private static string CONFIG_FILE = "gui-config.json";
-        private static string CONFIG_FILE_BACKUP = "gui-config.json.backup";
+        private const string CONFIG_FILE = @"gui-config.json";
+        private const string CONFIG_FILE_BACKUP = @"gui-config.json.backup";
 
         public static void SetPassword(string password)
         {
@@ -161,34 +164,31 @@ namespace Shadowsocks.Model
 
         public static bool SetPasswordTry(string old_password, string password)
         {
-            if (old_password != GlobalConfiguration.config_password)
-                return false;
-            return true;
+            return old_password == GlobalConfiguration.config_password;
         }
 
-        public bool KeepCurrentServer(int localPort, string targetAddr, string id)
+        public bool KeepCurrentServer(int port, string targetAddr, string id)
         {
             if (sameHostForSameTarget && targetAddr != null)
             {
                 lock (serverStrategyMap)
                 {
-                    if (!serverStrategyMap.ContainsKey(localPort))
-                        serverStrategyMap[localPort] = new ServerSelectStrategy();
-                    ServerSelectStrategy serverStrategy = serverStrategyMap[localPort];
+                    if (!serverStrategyMap.ContainsKey(port))
+                        serverStrategyMap[port] = new ServerSelectStrategy();
 
                     if (uricache.ContainsKey(targetAddr))
                     {
-                        UriVisitTime visit = uricache.Get(targetAddr);
-                        int index = -1;
-                        for (int i = 0; i < configs.Count; ++i)
+                        var visit = uricache.Get(targetAddr);
+                        var j = -1;
+                        for (var i = 0; i < configs.Count; ++i)
                         {
                             if (configs[i].id == id)
                             {
-                                index = i;
+                                j = i;
                                 break;
                             }
                         }
-                        if (index >= 0 && visit.index == index && configs[index].enable)
+                        if (j >= 0 && visit.index == j && configs[j].enable)
                         {
                             uricache.Del(targetAddr);
                             return true;
@@ -199,19 +199,19 @@ namespace Shadowsocks.Model
             return false;
         }
 
-        public Server GetCurrentServer(int localPort, ServerSelectStrategy.FilterFunc filter, string targetAddr = null, bool cfgRandom = false, bool usingRandom = false, bool forceRandom = false)
+        public Server GetCurrentServer(int port, ServerSelectStrategy.FilterFunc filter, string targetAddr = null, bool cfgRandom = false, bool usingRandom = false, bool forceRandom = false)
         {
             lock (serverStrategyMap)
             {
-                if (!serverStrategyMap.ContainsKey(localPort))
-                    serverStrategyMap[localPort] = new ServerSelectStrategy();
-                ServerSelectStrategy serverStrategy = serverStrategyMap[localPort];
+                if (!serverStrategyMap.ContainsKey(port))
+                    serverStrategyMap[port] = new ServerSelectStrategy();
+                var serverStrategy = serverStrategyMap[port];
 
                 uricache.SetTimeout(keepVisitTime);
                 uricache.Sweep();
                 if (sameHostForSameTarget && !forceRandom && targetAddr != null && uricache.ContainsKey(targetAddr))
                 {
-                    UriVisitTime visit = uricache.Get(targetAddr);
+                    var visit = uricache.Get(targetAddr);
                     if (visit.index < configs.Count && configs[visit.index].enable && configs[visit.index].ServerSpeedLog().ErrorContinurousTimes == 0)
                     {
                         uricache.Del(targetAddr);
@@ -220,10 +220,10 @@ namespace Shadowsocks.Model
                 }
                 if (forceRandom)
                 {
-                    int index;
+                    int i;
                     if (filter == null && randomInGroup)
                     {
-                        index = serverStrategy.Select(configs, this.index, balanceAlgorithm, delegate (Server server, Server selServer)
+                        i = serverStrategy.Select(configs, index, balanceAlgorithm, delegate (Server server, Server selServer)
                         {
                             if (selServer != null)
                                 return selServer.group == server.group;
@@ -232,17 +232,16 @@ namespace Shadowsocks.Model
                     }
                     else
                     {
-                        index = serverStrategy.Select(configs, this.index, balanceAlgorithm, filter, true);
+                        i = serverStrategy.Select(configs, index, balanceAlgorithm, filter, true);
                     }
-                    if (index == -1) return GetErrorServer();
-                    return configs[index];
+                    return i == -1 ? GetErrorServer() : configs[i];
                 }
                 else if (usingRandom && cfgRandom)
                 {
-                    int index;
+                    int i;
                     if (filter == null && randomInGroup)
                     {
-                        index = serverStrategy.Select(configs, this.index, balanceAlgorithm, delegate (Server server, Server selServer)
+                        i = serverStrategy.Select(configs, index, balanceAlgorithm, delegate (Server server, Server selServer)
                         {
                             if (selServer != null)
                                 return selServer.group == server.group;
@@ -251,27 +250,29 @@ namespace Shadowsocks.Model
                     }
                     else
                     {
-                        index = serverStrategy.Select(configs, this.index, balanceAlgorithm, filter);
+                        i = serverStrategy.Select(configs, index, balanceAlgorithm, filter);
                     }
-                    if (index == -1) return GetErrorServer();
+                    if (i == -1) return GetErrorServer();
                     if (targetAddr != null)
                     {
-                        UriVisitTime visit = new UriVisitTime();
-                        visit.uri = targetAddr;
-                        visit.index = index;
-                        visit.visitTime = DateTime.Now;
+                        var visit = new UriVisitTime
+                        {
+                            uri = targetAddr,
+                            index = i,
+                            visitTime = DateTime.Now
+                        };
                         uricache.Set(targetAddr, visit);
                     }
-                    return configs[index];
+                    return configs[i];
                 }
                 else
                 {
                     if (index >= 0 && index < configs.Count)
                     {
-                        int selIndex = index;
+                        var selIndex = index;
                         if (usingRandom)
                         {
-                            for (int i = 0; i < configs.Count; ++i)
+                            foreach (var unused in configs)
                             {
                                 if (configs[selIndex].isEnable())
                                 {
@@ -286,10 +287,12 @@ namespace Shadowsocks.Model
 
                         if (targetAddr != null)
                         {
-                            UriVisitTime visit = new UriVisitTime();
-                            visit.uri = targetAddr;
-                            visit.index = selIndex;
-                            visit.visitTime = DateTime.Now;
+                            var visit = new UriVisitTime
+                            {
+                                uri = targetAddr,
+                                index = selIndex,
+                                visitTime = DateTime.Now
+                            };
                             uricache.Set(targetAddr, visit);
                         }
                         return configs[selIndex];
@@ -305,9 +308,9 @@ namespace Shadowsocks.Model
         public void FlushPortMapCache()
         {
             portMapCache = new Dictionary<int, PortMapConfigCache>();
-            Dictionary<string, Server> id2server = new Dictionary<string, Server>();
-            Dictionary<string, int> server_group = new Dictionary<string, int>();
-            foreach (Server s in configs)
+            var id2server = new Dictionary<string, Server>();
+            var server_group = new Dictionary<string, int>();
+            foreach (var s in configs)
             {
                 id2server[s.id] = s;
                 if (!string.IsNullOrEmpty(s.group))
@@ -315,10 +318,10 @@ namespace Shadowsocks.Model
                     server_group[s.group] = 1;
                 }
             }
-            foreach (KeyValuePair<string, PortMapConfig> pair in portMap)
+            foreach (var pair in portMap)
             {
-                int key = 0;
-                PortMapConfig pm = pair.Value;
+                int key;
+                var pm = pair.Value;
                 if (!pm.enable)
                     continue;
                 if (id2server.ContainsKey(pm.id) || server_group.ContainsKey(pm.id) || pm.id == null || pm.id.Length == 0)
@@ -344,13 +347,13 @@ namespace Shadowsocks.Model
             }
             lock (serverStrategyMap)
             {
-                List<int> remove_ports = new List<int>();
-                foreach (KeyValuePair<int, ServerSelectStrategy> pair in serverStrategyMap)
+                var remove_ports = new List<int>();
+                foreach (var pair in serverStrategyMap)
                 {
                     if (portMapCache.ContainsKey(pair.Key)) continue;
                     remove_ports.Add(pair.Key);
                 }
-                foreach (int port in remove_ports)
+                foreach (var port in remove_ports)
                 {
                     serverStrategyMap.Remove(port);
                 }
@@ -377,7 +380,7 @@ namespace Shadowsocks.Model
             }
             catch (ConfigurationWarning cw)
             {
-                server.password = "";
+                server.password = string.Empty;
                 MessageBox.Show(cw.Message, cw.Message, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             CheckServer(server.server);
@@ -391,24 +394,19 @@ namespace Shadowsocks.Model
             reconnectTimes = 2;
             keepVisitTime = 180;
             connectTimeout = 5;
-            dnsServer = "";
-            localDnsServer = "";
+            dnsServer = string.Empty;
+            localDnsServer = string.Empty;
 
-            balanceAlgorithm = "LowException";
+            balanceAlgorithm = @"LowException";
             random = false;
             sysProxyMode = (int)ProxyMode.NoModify;
             proxyRuleMode = (int)ProxyRuleMode.Disable;
 
             nodeFeedAutoUpdate = true;
 
-            serverSubscribes = new List<ServerSubscribe>()
-            {
-            };
+            serverSubscribes = new List<ServerSubscribe>();
 
-            configs = new List<Server>()
-            {
-                GetDefaultServer()
-            };
+            configs = new List<Server>();
         }
 
         public void CopyFrom(Configuration config)
@@ -446,7 +444,7 @@ namespace Shadowsocks.Model
             serverSubscribes = config.serverSubscribes;
         }
 
-        public void FixConfiguration()
+        private void FixConfiguration()
         {
             if (localPort == 0)
             {
@@ -473,18 +471,22 @@ namespace Shadowsocks.Model
             }
             if (localAuthPassword == null || localAuthPassword.Length < 16)
             {
-                localAuthPassword = randString(20);
+                localAuthPassword = RandString(20);
             }
 
-            Dictionary<string, int> id = new Dictionary<string, int>();
+            var id = new Dictionary<string, int>();
             if (index < 0 || index >= configs.Count) index = 0;
-            foreach (Server server in configs)
+            if (configs.Count == 0)
+            {
+                configs.Add(GetDefaultServer());
+            }
+            foreach (var server in configs)
             {
                 if (id.ContainsKey(server.id))
                 {
-                    byte[] new_id = new byte[16];
-                    Util.Utils.RandBytes(new_id, new_id.Length);
-                    server.id = BitConverter.ToString(new_id).Replace("-", "");
+                    var newId = new byte[16];
+                    Util.Utils.RandBytes(newId, newId.Length);
+                    server.id = BitConverter.ToString(newId).Replace("-", string.Empty);
                 }
                 else
                 {
@@ -493,12 +495,12 @@ namespace Shadowsocks.Model
             }
         }
 
-        private static string randString(int len)
+        private static string RandString(int len)
         {
-            string set = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
-            string ret = "";
-            Random random = new Random();
-            for (int i = 0; i < len; ++i)
+            const string set = @"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+            var ret = string.Empty;
+            var random = new Random();
+            for (var i = 0; i < len; ++i)
             {
                 ret += set[random.Next(set.Length)];
             }
@@ -509,7 +511,7 @@ namespace Shadowsocks.Model
         {
             try
             {
-                string configContent = File.ReadAllText(filename);
+                var configContent = File.ReadAllText(filename);
                 return Load(configContent);
             }
             catch (Exception e)
@@ -539,28 +541,27 @@ namespace Shadowsocks.Model
             }
             try
             {
-                string jsonString = SimpleJson.SimpleJson.SerializeObject(config);
+                var jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
                 if (GlobalConfiguration.config_password.Length > 0)
                 {
-                    IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
-                    byte[] cfg_data = UTF8Encoding.UTF8.GetBytes(jsonString);
-                    byte[] cfg_encrypt = new byte[cfg_data.Length + 128];
-                    int data_len = 0;
+                    var encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
+                    var cfgData = Encoding.UTF8.GetBytes(jsonString);
+                    var cfgEncrypt = new byte[cfgData.Length + 128];
+                    var dataLen = 0;
                     const int buffer_size = 32768;
-                    byte[] input = new byte[buffer_size];
-                    byte[] ouput = new byte[buffer_size + 128];
-                    for (int start_pos = 0; start_pos < cfg_data.Length; start_pos += buffer_size)
+                    var input = new byte[buffer_size];
+                    var output = new byte[buffer_size + 128];
+                    for (var start_pos = 0; start_pos < cfgData.Length; start_pos += buffer_size)
                     {
-                        int len = Math.Min(cfg_data.Length - start_pos, buffer_size);
-                        int out_len;
-                        Buffer.BlockCopy(cfg_data, start_pos, input, 0, len);
-                        encryptor.Encrypt(input, len, ouput, out out_len);
-                        Buffer.BlockCopy(ouput, 0, cfg_encrypt, data_len, out_len);
-                        data_len += out_len;
+                        var len = Math.Min(cfgData.Length - start_pos, buffer_size);
+                        Buffer.BlockCopy(cfgData, start_pos, input, 0, len);
+                        encryptor.Encrypt(input, len, output, out var out_len);
+                        Buffer.BlockCopy(output, 0, cfgEncrypt, dataLen, out_len);
+                        dataLen += out_len;
                     }
-                    jsonString = System.Convert.ToBase64String(cfg_encrypt, 0, data_len);
+                    jsonString = Convert.ToBase64String(cfgEncrypt, 0, dataLen);
                 }
-                using (StreamWriter sw = new StreamWriter(File.Open(CONFIG_FILE, FileMode.Create)))
+                using (var sw = new StreamWriter(File.Open(CONFIG_FILE, FileMode.Create)))
                 {
                     sw.Write(jsonString);
                     sw.Flush();
@@ -568,8 +569,8 @@ namespace Shadowsocks.Model
 
                 if (File.Exists(CONFIG_FILE_BACKUP))
                 {
-                    DateTime dt = File.GetLastWriteTimeUtc(CONFIG_FILE_BACKUP);
-                    DateTime now = DateTime.Now;
+                    var dt = File.GetLastWriteTimeUtc(CONFIG_FILE_BACKUP);
+                    var now = DateTime.Now;
                     if ((now - dt).TotalHours > 4)
                     {
                         File.Copy(CONFIG_FILE, CONFIG_FILE_BACKUP, true);
@@ -592,38 +593,40 @@ namespace Shadowsocks.Model
             {
                 if (GlobalConfiguration.config_password.Length > 0)
                 {
-                    byte[] cfg_encrypt = System.Convert.FromBase64String(config_str);
-                    IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
-                    byte[] cfg_data = new byte[cfg_encrypt.Length];
-                    int data_len = 0;
+                    var cfg_encrypt = Convert.FromBase64String(config_str);
+                    var encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
+                    var cfg_data = new byte[cfg_encrypt.Length];
+                    var data_len = 0;
                     const int buffer_size = 32768;
-                    byte[] input = new byte[buffer_size];
-                    byte[] ouput = new byte[buffer_size + 128];
-                    for (int start_pos = 0; start_pos < cfg_encrypt.Length; start_pos += buffer_size)
+                    var input = new byte[buffer_size];
+                    var output = new byte[buffer_size + 128];
+                    for (var start_pos = 0; start_pos < cfg_encrypt.Length; start_pos += buffer_size)
                     {
-                        int len = Math.Min(cfg_encrypt.Length - start_pos, buffer_size);
-                        int out_len;
+                        var len = Math.Min(cfg_encrypt.Length - start_pos, buffer_size);
                         Buffer.BlockCopy(cfg_encrypt, start_pos, input, 0, len);
-                        encryptor.Decrypt(input, len, ouput, out out_len);
-                        Buffer.BlockCopy(ouput, 0, cfg_data, data_len, out_len);
+                        encryptor.Decrypt(input, len, output, out var out_len);
+                        Buffer.BlockCopy(output, 0, cfg_data, data_len, out_len);
                         data_len += out_len;
                     }
-                    config_str = UTF8Encoding.UTF8.GetString(cfg_data, 0, data_len);
+                    config_str = Encoding.UTF8.GetString(cfg_data, 0, data_len);
                 }
             }
             catch
             {
-
+                // ignored
             }
+
             try
             {
-                Configuration config = SimpleJson.SimpleJson.DeserializeObject<Configuration>(config_str, new JsonSerializerStrategy());
+                var config = JsonConvert.DeserializeObject<Configuration>(config_str);
                 config.FixConfiguration();
                 return config;
             }
             catch
             {
+                // ignored
             }
+
             return null;
         }
 
@@ -632,41 +635,40 @@ namespace Shadowsocks.Model
             return new Server();
         }
 
-        public bool isDefaultConfig()
+        public bool IsDefaultConfig()
         {
-            if (configs.Count == 1 && configs[0].server == Configuration.GetDefaultServer().server)
-                return true;
-            return false;
+            return configs.Count == 1 && configs[0].server == GetDefaultServer().server;
         }
 
         public static Server CopyServer(Server server)
         {
-            Server s = new Server();
-            s.server = server.server;
-            s.server_port = server.server_port;
-            s.method = server.method;
-            s.protocol = server.protocol;
-            s.protocolparam = server.protocolparam ?? "";
-            s.obfs = server.obfs;
-            s.obfsparam = server.obfsparam ?? "";
-            s.password = server.password;
-            s.remarks = server.remarks;
-            s.group = server.group;
-            s.udp_over_tcp = server.udp_over_tcp;
-            s.server_udp_port = server.server_udp_port;
+            var s = new Server
+            {
+                server = server.server,
+                server_port = server.server_port,
+                method = server.method,
+                protocol = server.protocol,
+                protocolparam = server.protocolparam ?? string.Empty,
+                obfs = server.obfs,
+                obfsparam = server.obfsparam ?? string.Empty,
+                password = server.password,
+                remarks = server.remarks,
+                group = server.group,
+                udp_over_tcp = server.udp_over_tcp,
+                server_udp_port = server.server_udp_port
+            };
             return s;
         }
 
-        public static Server GetErrorServer()
+        private static Server GetErrorServer()
         {
-            Server server = new Server();
-            server.server = "invalid";
+            var server = new Server { server = "invalid" };
             return server;
         }
 
         public static void CheckPort(int port)
         {
-            if (port <= 0 || port > 65535)
+            if (port <= IPEndPoint.MinPort || port > IPEndPoint.MaxPort)
             {
                 throw new ConfigurationException(I18N.GetString("Port out of range"));
             }
@@ -677,7 +679,6 @@ namespace Shadowsocks.Model
             if (string.IsNullOrEmpty(password))
             {
                 throw new ConfigurationWarning(I18N.GetString("Password are blank"));
-                //throw new ConfigurationException(I18N.GetString("Password can not be blank"));
             }
         }
 
@@ -689,18 +690,6 @@ namespace Shadowsocks.Model
             }
         }
 
-        private class JsonSerializerStrategy : SimpleJson.PocoJsonSerializerStrategy
-        {
-            // convert string to int
-            public override object DeserializeObject(object value, Type type)
-            {
-                if (type == typeof(Int32) && value.GetType() == typeof(string))
-                {
-                    return Int32.Parse(value.ToString());
-                }
-                return base.DeserializeObject(value, type);
-            }
-        }
     }
 
     [Serializable]
@@ -708,29 +697,14 @@ namespace Shadowsocks.Model
     {
         public long totalUploadBytes;
         public long totalDownloadBytes;
-
-        void AddUpload(long bytes)
-        {
-            //lock (this)
-            {
-                totalUploadBytes += bytes;
-            }
-        }
-        void AddDownload(long bytes)
-        {
-            //lock (this)
-            {
-                totalDownloadBytes += bytes;
-            }
-        }
     }
 
     [Serializable]
     public class ServerTransferTotal
     {
-        private static string LOG_FILE = "transfer_log.json";
+        private const string LOG_FILE = @"transfer_log.json";
 
-        public Dictionary<string, object> servers = new Dictionary<string, object>();
+        public Dictionary<string, ServerTrans> servers = new Dictionary<string, ServerTrans>();
         private int saveCounter;
         private DateTime saveTime;
 
@@ -738,25 +712,25 @@ namespace Shadowsocks.Model
         {
             try
             {
-                string config_str = File.ReadAllText(LOG_FILE);
-                ServerTransferTotal config = new ServerTransferTotal();
+                var config_str = File.ReadAllText(LOG_FILE);
+                var config = new ServerTransferTotal();
                 try
                 {
                     if (GlobalConfiguration.config_password.Length > 0)
                     {
-                        byte[] cfg_encrypt = System.Convert.FromBase64String(config_str);
-                        IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
-                        byte[] cfg_data = new byte[cfg_encrypt.Length];
-                        int data_len;
-                        encryptor.Decrypt(cfg_encrypt, cfg_encrypt.Length, cfg_data, out data_len);
-                        config_str = UTF8Encoding.UTF8.GetString(cfg_data, 0, data_len);
+                        var cfgEncrypt = Convert.FromBase64String(config_str);
+                        var encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
+                        var cfgData = new byte[cfgEncrypt.Length];
+                        encryptor.Decrypt(cfgEncrypt, cfgEncrypt.Length, cfgData, out var data_len);
+                        config_str = Encoding.UTF8.GetString(cfgData, 0, data_len);
                     }
                 }
                 catch
                 {
-
+                    // ignored
                 }
-                config.servers = SimpleJson.SimpleJson.DeserializeObject<Dictionary<string, object>>(config_str, new JsonSerializerStrategy());
+
+                config.servers = JsonConvert.DeserializeObject<Dictionary<string, ServerTrans>>(config_str);
                 config.Init();
                 return config;
             }
@@ -770,29 +744,30 @@ namespace Shadowsocks.Model
             }
         }
 
-        public void Init()
+        private void Init()
         {
             saveCounter = 256;
             saveTime = DateTime.Now;
             if (servers == null)
-                servers = new Dictionary<string, object>();
+            {
+                servers = new Dictionary<string, ServerTrans>();
+            }
         }
 
         public static void Save(ServerTransferTotal config)
         {
             try
             {
-                using (StreamWriter sw = new StreamWriter(File.Open(LOG_FILE, FileMode.Create)))
+                using (var sw = new StreamWriter(File.Open(LOG_FILE, FileMode.Create)))
                 {
-                    string jsonString = SimpleJson.SimpleJson.SerializeObject(config.servers);
+                    var jsonString = JsonConvert.SerializeObject(config.servers, Formatting.Indented);
                     if (GlobalConfiguration.config_password.Length > 0)
                     {
-                        IEncryptor encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
-                        byte[] cfg_data = UTF8Encoding.UTF8.GetBytes(jsonString);
-                        byte[] cfg_encrypt = new byte[cfg_data.Length + 128];
-                        int data_len;
-                        encryptor.Encrypt(cfg_data, cfg_data.Length, cfg_encrypt, out data_len);
-                        jsonString = System.Convert.ToBase64String(cfg_encrypt, 0, data_len);
+                        var encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
+                        var cfgData = Encoding.UTF8.GetBytes(jsonString);
+                        var cfgEncrypt = new byte[cfgData.Length + 128];
+                        encryptor.Encrypt(cfgData, cfgData.Length, cfgEncrypt, out var data_len);
+                        jsonString = Convert.ToBase64String(cfgEncrypt, 0, data_len);
                     }
                     sw.Write(jsonString);
                     sw.Flush();
@@ -810,40 +785,19 @@ namespace Shadowsocks.Model
             {
                 if (servers.ContainsKey(server))
                 {
-                    ((ServerTrans)servers[server]).totalUploadBytes = 0;
-                    ((ServerTrans)servers[server]).totalDownloadBytes = 0;
+                    servers[server].totalUploadBytes = 0;
+                    servers[server].totalDownloadBytes = 0;
                 }
             }
         }
 
-        public void AddUpload(string server, Int64 size)
+        public void AddUpload(string server, long size)
         {
             lock (servers)
             {
                 if (!servers.ContainsKey(server))
                     servers.Add(server, new ServerTrans());
-                ((ServerTrans)servers[server]).totalUploadBytes += size;
-            }
-            if (--saveCounter <= 0)
-            {
-                saveCounter = 256;
-                if ((DateTime.Now - saveTime).TotalMinutes > 10)
-                {
-                    lock (servers)
-                    {
-                        Save(this);
-                        saveTime = DateTime.Now;
-                    }
-                }
-            }
-        }
-        public void AddDownload(string server, Int64 size)
-        {
-            lock (servers)
-            {
-                if (!servers.ContainsKey(server))
-                    servers.Add(server, new ServerTrans());
-                ((ServerTrans)servers[server]).totalDownloadBytes += size;
+                servers[server].totalUploadBytes += size;
             }
             if (--saveCounter <= 0)
             {
@@ -859,21 +813,26 @@ namespace Shadowsocks.Model
             }
         }
 
-        private class JsonSerializerStrategy : SimpleJson.PocoJsonSerializerStrategy
+        public void AddDownload(string server, long size)
         {
-            public override object DeserializeObject(object value, Type type)
+            lock (servers)
             {
-                if (type == typeof(Int64) && value.GetType() == typeof(string))
+                if (!servers.ContainsKey(server))
+                    servers.Add(server, new ServerTrans());
+                servers[server].totalDownloadBytes += size;
+            }
+            if (--saveCounter <= 0)
+            {
+                saveCounter = 256;
+                if ((DateTime.Now - saveTime).TotalMinutes > 10)
                 {
-                    return Int64.Parse(value.ToString());
+                    lock (servers)
+                    {
+                        Save(this);
+                        saveTime = DateTime.Now;
+                    }
                 }
-                else if (type == typeof(object))
-                {
-                    return base.DeserializeObject(value, typeof(ServerTrans));
-                }
-                return base.DeserializeObject(value, type);
             }
         }
-
     }
 }

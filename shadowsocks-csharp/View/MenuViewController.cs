@@ -130,9 +130,9 @@ namespace Shadowsocks.View
             updateChecker.CheckUpdate(controller.GetCurrentConfiguration(), false);
 
             Configuration cfg = controller.GetCurrentConfiguration();
-            if (cfg.isDefaultConfig() || cfg.nodeFeedAutoUpdate)
+            if (cfg.IsDefaultConfig() || cfg.nodeFeedAutoUpdate)
             {
-                updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, !cfg.isDefaultConfig(), false);
+                updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, !cfg.IsDefaultConfig(), false);
             }
         }
 
@@ -255,14 +255,13 @@ namespace Shadowsocks.View
                     break;
             }
             // we want to show more details but notify icon title is limited to 127 characters
-            var text = (enabled ?
-                    global ? I18N.GetString("Global") : I18N.GetString("PAC") :
-                    I18N.GetString("Disable system proxy"))
-                    + Environment.NewLine
-                    + strServer
-                    + Environment.NewLine
-                    + string.Format(I18N.GetString("Running: Port {0}"), config.localPort)  // this feedback is very important because they need to know Shadowsocks is running
-                    ;
+            var line1 = (enabled
+                                ? global ? I18N.GetString("Global") : I18N.GetString("PAC")
+                                : I18N.GetString("Disable system proxy"))
+                                + Environment.NewLine;
+            var line2 = string.IsNullOrWhiteSpace(strServer) ? null : strServer + Environment.NewLine;
+            var line3 = string.Format(I18N.GetString("Running: Port {0}"), config.localPort); // this feedback is very important because they need to know Shadowsocks is running
+            var text = $@"{line1}{line2}{line3}";
             SetNotifyIconText(_notifyIcon, text);
         }
 
@@ -461,7 +460,7 @@ namespace Shadowsocks.View
                         Random r = new Random();
                         Util.Utils.Shuffle(urls, r);
                         urls.RemoveRange(max_node_num, urls.Count - max_node_num);
-                        if (!config.isDefaultConfig())
+                        if (!config.IsDefaultConfig())
                             keep_selected_server = true;
                     }
                     string curGroup = null;
@@ -1063,11 +1062,6 @@ namespace Shadowsocks.View
         private void AboutItem_Click(object sender, EventArgs e)
         {
             Process.Start("https://github.com/HMBSbige/ShadowsocksR-Windows");
-        }
-
-        private void DonateItem_Click(object sender, EventArgs e)
-        {
-            ShowBalloonTip(I18N.GetString("Donate"), I18N.GetString("Please contract to breakwa11 to get more infomation"), ToolTipIcon.Info, 10000);
         }
 
         [DllImport("user32.dll")]
