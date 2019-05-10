@@ -78,8 +78,8 @@ namespace test
                     catch (Exception e)
                     {
                         Console.WriteLine($@"{cipher}:{e.Message}");
-                        throw;
                         failed = true;
+                        throw;
                     }
                 });
                 tasks.Add(t);
@@ -124,8 +124,8 @@ namespace test
                     catch (Exception e)
                     {
                         Console.WriteLine($@"{cipher}:{e.Message}");
-                        throw;
                         failed = true;
+                        throw;
                     }
                 });
                 tasks.Add(t);
@@ -170,8 +170,8 @@ namespace test
                     catch (Exception e)
                     {
                         TestContext.WriteLine($@"{cipher}:{e.Message}");
-                        throw;
                         failed = true;
+                        throw;
                     }
                 });
                 tasks.Add(t);

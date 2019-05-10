@@ -1,74 +1,88 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using Shadowsocks.Properties;
+using System;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
-using Shadowsocks.Properties;
+using ZXing.Common;
+using ZXing.QrCode;
 using ZXing.QrCode.Internal;
 
 namespace Shadowsocks.View
 {
-    public partial class ShowTextForm : Form
+    public sealed partial class ShowTextForm : Form
     {
         public ShowTextForm(string title, string text)
         {
-            this.Icon = Icon.FromHandle(Resources.ssw128.GetHicon());
+            Icon = Icon.FromHandle(Resources.ssw128.GetHicon());
             InitializeComponent();
 
-            this.Text = title;
-            PictureQRcode.Height = this.ClientSize.Height - textBox.Height;
+            Text = title;
+            PictureQRcode.Height = ClientSize.Height - textBox.Height;
+
+            _options = new QrCodeEncodingOptions
+            {
+                DisableECI = true,
+                CharacterSet = @"UTF-8",
+                Margin = 0
+            };
+
+            GenQr(string.IsNullOrEmpty(text) ? string.Empty : text);
             textBox.Text = text;
         }
 
-        private void GenQR(string ssconfig)
+        private readonly EncodingOptions _options;
+
+        private void GenQr(string str)
         {
-            int dpi_mul = Util.Utils.GetDpiMul();
-            int width = Math.Min(PictureQRcode.Width, PictureQRcode.Height) * 4 / 4;
             try
             {
-                string qrText = ssconfig;
-                QRCode code = ZXing.QrCode.Internal.Encoder.encode(qrText, ErrorCorrectionLevel.M);
-                ByteMatrix m = code.Matrix;
-                int blockSize = Math.Max(width / (m.Width + 2), 1);
-                Bitmap drawArea = new Bitmap(((m.Width + 2) * blockSize), ((m.Height + 2) * blockSize));
-                using (Graphics g = Graphics.FromImage(drawArea))
+                var code = Encoder.encode(str, ErrorCorrectionLevel.H, _options.Hints);
+                var m = code.Matrix;
+                var blockSize = Math.Max(PictureQRcode.Height / (m.Height + 1), 1);
+
+                var qrWidth = m.Width * blockSize;
+                var qrHeight = m.Height * blockSize;
+                var dWidth = PictureQRcode.Width - qrWidth;
+                var dHeight = PictureQRcode.Height - qrHeight;
+                var maxD = Math.Max(dWidth, dHeight);
+                PictureQRcode.SizeMode = maxD >= 7 * blockSize ? PictureBoxSizeMode.Zoom : PictureBoxSizeMode.CenterImage;
+
+                var drawArea = new Bitmap(m.Width * blockSize, m.Height * blockSize);
+                using (var g = Graphics.FromImage(drawArea))
                 {
                     g.Clear(Color.White);
                     using (Brush b = new SolidBrush(Color.Black))
                     {
-                        for (int row = 0; row < m.Width; row++)
+                        for (var row = 0; row < m.Width; ++row)
                         {
-                            for (int col = 0; col < m.Height; col++)
+                            for (var col = 0; col < m.Height; ++col)
                             {
                                 if (m[row, col] != 0)
                                 {
-                                    g.FillRectangle(b, blockSize * (row + 1), blockSize * (col + 1),
-                                        blockSize, blockSize);
+                                    g.FillRectangle(b, blockSize * row, blockSize * col, blockSize, blockSize);
                                 }
                             }
                         }
                     }
-                    int div = 13, div_l = 5, div_r = 8;
-                    int l = (m.Width * div_l + div - 1) / div * blockSize, r = (m.Width * div_r + div - 1) / div * blockSize;
                 }
+
                 PictureQRcode.Image = drawArea;
+
             }
             catch
             {
-
+                // ignored
             }
         }
 
         private void textBox_TextChanged(object sender, EventArgs e)
         {
-            GenQR(textBox.Text);
+            GenQr(textBox.Text);
         }
 
         private void ShowTextForm_SizeChanged(object sender, EventArgs e)
         {
-            PictureQRcode.Height = this.ClientSize.Height - textBox.Height;
-            GenQR(textBox.Text);
+            PictureQRcode.Height = ClientSize.Height - textBox.Height;
+            GenQr(textBox.Text);
         }
 
         private void textBox_KeyPress(object sender, KeyPressEventArgs e)

@@ -1,4 +1,5 @@
-﻿using Shadowsocks.Model;
+﻿using Newtonsoft.Json;
+using Shadowsocks.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -100,7 +101,7 @@ namespace Shadowsocks.Controller
                 {
                     abpContent = gfwlist_template;
                 }
-                abpContent = abpContent.Replace("__RULES__", SimpleJson.SimpleJson.SerializeObject(lines));
+                abpContent = abpContent.Replace("__RULES__", JsonConvert.SerializeObject(lines, Formatting.Indented));
                 if (File.Exists(PAC_FILE))
                 {
                     string original = File.ReadAllText(PAC_FILE, Encoding.UTF8);

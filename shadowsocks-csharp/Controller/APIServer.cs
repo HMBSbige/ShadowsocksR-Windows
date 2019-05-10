@@ -1,12 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Shadowsocks.Model;
+using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Net;
 using System.Net.Sockets;
-using Shadowsocks.Model;
-using Shadowsocks.Properties;
-using Shadowsocks.Util;
-using System.Web;
+using System.Text;
 
 namespace Shadowsocks.Controller
 {
@@ -215,7 +213,7 @@ namespace Shadowsocks.Controller
                             _ServerSpeedLogList[i] = config.configs[i].ServerSpeedLog().Translate();
                             servers[config.configs[i].id] = _ServerSpeedLogList[i];
                         }
-                        string content = SimpleJson.SimpleJson.SerializeObject(servers);
+                        string content = JsonConvert.SerializeObject(servers, Formatting.Indented);
 
                         string text = String.Format(@"HTTP/1.1 200 OK
 Server: ShadowsocksR
@@ -253,7 +251,7 @@ Connection: Close
                         {
                             Dictionary<string, string> token = _config.token;
                             _config.token = new Dictionary<string, string>();
-                            string content = SimpleJson.SimpleJson.SerializeObject(_config);
+                            string content = JsonConvert.SerializeObject(_config, Formatting.Indented);
                             _config.token = token;
 
                             string text = String.Format(@"HTTP/1.1 200 OK

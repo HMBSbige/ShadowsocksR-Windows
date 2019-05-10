@@ -1,6 +1,9 @@
-﻿using Shadowsocks.Model;
+﻿using Newtonsoft.Json;
+using Shadowsocks.Model;
 using System;
+using System.Dynamic;
 using System.Net;
+using System.Text;
 
 namespace Shadowsocks.Controller
 {
@@ -17,7 +20,7 @@ namespace Shadowsocks.Controller
 
         public const string Name = @"ShadowsocksR";
         public const string Copyright = @"Copyright © HMBSbige 2019 & BreakWa11 2017. Fork from Shadowsocks by clowwindy";
-        public const string Version = @"4.9.3";
+        public const string Version = @"4.9.4";
 #if !_DOTNET_4_0
         public const string NetVer = @"2.0";
 #elif !_CONSOLE
@@ -42,7 +45,7 @@ namespace Shadowsocks.Controller
         {
             try
             {
-                var http = new WebClient();
+                var http = new WebClient { Encoding = Encoding.UTF8 };
                 http.Headers.Add(@"User-Agent", string.IsNullOrEmpty(config.proxyUserAgent) ? USER_AGENT : config.proxyUserAgent);
                 if (UseProxy)
                 {
@@ -102,13 +105,13 @@ namespace Shadowsocks.Controller
                 var response = e.Result;
                 string url = null, version = null;
 
-                dynamic result = SimpleJson.SimpleJson.DeserializeObject(response);
-                if (result[@"html_url"] is string)
+                dynamic result = JsonConvert.DeserializeObject<ExpandoObject>(response);
+                if (result.html_url is string)
                 {
-                    if (result[@"tag_name"] is string)
+                    if (result.tag_name is string)
                     {
-                        url = result[@"html_url"];
-                        version = result[@"tag_name"];
+                        url = result.html_url;
+                        version = result.tag_name;
                     }
                 }
 
@@ -140,13 +143,13 @@ namespace Shadowsocks.Controller
                 var response = e.Result;
                 string url = null, version = null;
 
-                dynamic result = SimpleJson.SimpleJson.DeserializeObject(response);
-                if (result[@"html_url"] is string)
+                dynamic result = JsonConvert.DeserializeObject<ExpandoObject>(response);
+                if (result.html_url is string)
                 {
-                    if (result[@"tag_name"] is string)
+                    if (result.tag_name is string)
                     {
-                        url = result[@"html_url"];
-                        version = result[@"tag_name"];
+                        url = result.html_url;
+                        version = result.tag_name;
                     }
                 }
 
