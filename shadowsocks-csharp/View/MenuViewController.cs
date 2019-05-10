@@ -254,7 +254,20 @@ namespace Shadowsocks.View
             }
             else
             {
-                strServer = $@"{config.configs[config.index].group}{I18N.GetString(": ")}{config.configs[config.index].remarks}";
+                var groupName = config.configs[config.index].group;
+                var serverName = config.configs[config.index].remarks;
+                if (string.IsNullOrWhiteSpace(groupName))
+                {
+                    strServer = string.IsNullOrWhiteSpace(serverName) ? null : serverName;
+                }
+                else if (string.IsNullOrWhiteSpace(serverName))
+                {
+                    strServer = $@"{groupName}";
+                }
+                else
+                {
+                    strServer = $@"{groupName}{I18N.GetString(": ")}{serverName}";
+                }
             }
 
 

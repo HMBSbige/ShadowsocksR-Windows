@@ -589,6 +589,7 @@
             this.chkSSRLink.TabIndex = 26;
             this.chkSSRLink.Text = "SSR Link";
             this.chkSSRLink.UseVisualStyleBackColor = true;
+            this.chkSSRLink.CheckedChanged += new System.EventHandler(this.checkSSRLink_CheckedChanged);
             // 
             // lblRemarks
             // 
