@@ -224,31 +224,40 @@ namespace Shadowsocks.View
                 _notifyIcon.Icon = newIcon;
             }
 
-            var strServer = random ? config.balanceAlgorithm : config.configs[config.index].remarks;
-            switch (strServer)
+            string strServer = null;
+            if (random)
             {
-                case "OneByOne":
-                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("OneByOne")}";
-                    break;
-                case "Random":
-                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("Random")}";
-                    break;
-                case "FastDownloadSpeed":
-                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("FastDownloadSpeed")}";
-                    break;
-                case "LowLatency":
-                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("LowLatency")}";
-                    break;
-                case "LowException":
-                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("LowException")}";
-                    break;
-                case "SelectedFirst":
-                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("SelectedFirst")}";
-                    break;
-                case "Timer":
-                    strServer = $@"{I18N.GetString("Balance")} : {I18N.GetString("Timer")}";
-                    break;
+                switch (config.balanceAlgorithm)
+                {
+                    case "OneByOne":
+                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("OneByOne")}";
+                        break;
+                    case "Random":
+                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("Random")}";
+                        break;
+                    case "FastDownloadSpeed":
+                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("FastDownloadSpeed")}";
+                        break;
+                    case "LowLatency":
+                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("LowLatency")}";
+                        break;
+                    case "LowException":
+                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("LowException")}";
+                        break;
+                    case "SelectedFirst":
+                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("SelectedFirst")}";
+                        break;
+                    case "Timer":
+                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("Timer")}";
+                        break;
+                }
             }
+            else
+            {
+                strServer = $@"{config.configs[config.index].group}{I18N.GetString(": ")}{config.configs[config.index].remarks}";
+            }
+
+
             // we want to show more details but notify icon title is limited to 127 characters
             var line1 = (enabled
                                 ? global ? I18N.GetString("Global") : I18N.GetString("PAC")

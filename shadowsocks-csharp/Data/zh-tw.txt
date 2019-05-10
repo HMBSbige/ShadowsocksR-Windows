@@ -2,6 +2,7 @@
 
 Shadowsocks=Shadowsocks
 ShadowsocksR=ShadowsocksR
+: =：
 
 # Menu items
 
