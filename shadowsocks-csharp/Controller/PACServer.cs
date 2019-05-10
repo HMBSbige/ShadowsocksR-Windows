@@ -140,7 +140,7 @@ namespace Shadowsocks.Controller
             }
             else
             {
-                FileManager.UncompressFile(PAC_FILE, Resources.proxy_pac_txt);
+                FileManager.DecompressFile(PAC_FILE, Resources.proxy_pac_txt);
                 return PAC_FILE;
             }
         }

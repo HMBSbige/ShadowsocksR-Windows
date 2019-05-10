@@ -81,6 +81,7 @@
       <HintPath>..\packages\System.Buffers.4.5.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="zxing, Version=0.16.4.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
       <HintPath>..\packages\ZXing.Net.0.16.4\lib\net47\zxing.dll</HintPath>
@@ -93,7 +94,7 @@
     <Compile Include="Controller\APIServer.cs" />
     <Compile Include="Controller\AutoStartup.cs" />
     <Compile Include="Controller\ChnDomainsAndIPUpdater.cs" />
-    <Compile Include="Controller\FileManager.cs" />
+    <Compile Include="Util\FileManager.cs" />
     <Compile Include="Controller\GFWListUpdater.cs" />
     <Compile Include="Controller\HttpPortForwarder.cs" />
     <Compile Include="Controller\HttpProxy.cs" />
@@ -252,10 +253,12 @@
     <None Include="App.config" />
     <None Include="app.manifest" />
     <None Include="Data\libsscrypto.dll.gz" />
+    <None Include="Data\libsscrypto64.dll.gz" />
     <None Include="Data\mgwz.dll.gz" />
     <None Include="Data\privoxy.exe.gz" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Data\proxy.pac.txt.gz" />
     <None Include="packages.config" />
     <None Include="Resources\ss20.png" />
     <None Include="Resources\ss16.png" />
