@@ -15,31 +15,22 @@ namespace Shadowsocks.Controller
 
         public string LatestVersionNumber;
         public string LatestVersionURL;
+        public bool Found;
         public event EventHandler NewVersionFound;
         public event EventHandler NewVersionNotFound;
 
         public const string Name = @"ShadowsocksR";
         public const string Copyright = @"Copyright © HMBSbige 2019 & BreakWa11 2017. Fork from Shadowsocks by clowwindy";
-        public const string Version = @"4.9.5";
-#if !_DOTNET_4_0
-        public const string NetVer = @"2.0";
-#elif !_CONSOLE
-        public const string NetVer = @"4.0";
-#else
-        public const string NetVer = "";
-#endif
+        public const string Version = @"4.9.5.1";
+
         public const string FullVersion = Version +
 #if DEBUG
         @" Debug";
 #else
-        /*
-                " Alpha";
-        /*/
         "";
-        //*/
 #endif
 
-        private static bool UseProxy = true;
+        public static bool UseProxy = true;
 
         public void CheckUpdate(Configuration config, bool notifyNoFound = true)
         {
@@ -98,41 +89,50 @@ namespace Shadowsocks.Controller
             return CompareVersion(version, Version) > 0;
         }
 
+        private void CheckUpdate(string response, bool notifyNoFound)
+        {
+            string url = null, version = null;
+
+            dynamic result = JsonConvert.DeserializeObject<ExpandoObject>(response);
+            if (result.html_url is string)
+            {
+                if (result.tag_name is string)
+                {
+                    url = result.html_url;
+                    version = result.tag_name;
+                }
+            }
+
+            if (url == null || version == null || !IsNewVersion(version))
+            {
+                if (notifyNoFound)
+                {
+                    NewVersionNotFound?.Invoke(this, new EventArgs());
+                }
+
+                return;
+            }
+
+            Found = true;
+            LatestVersionURL = url;
+            LatestVersionNumber = version;
+            NewVersionFound?.Invoke(this, new EventArgs());
+        }
+
         private void http_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
         {
             try
             {
-                var response = e.Result;
-                string url = null, version = null;
-
-                dynamic result = JsonConvert.DeserializeObject<ExpandoObject>(response);
-                if (result.html_url is string)
+                if (e.Error != null)
                 {
-                    if (result.tag_name is string)
-                    {
-                        url = result.html_url;
-                        version = result.tag_name;
-                    }
-                }
-
-                if (url == null || version == null || !IsNewVersion(version))
-                {
-                    NewVersionNotFound?.Invoke(this, new EventArgs());//notifyNoFound
+                    Logging.LogUsefulException(e.Error);
                     return;
                 }
-
-                LatestVersionURL = url;
-                LatestVersionNumber = version;
-                NewVersionFound?.Invoke(this, new EventArgs());
+                CheckUpdate(e.Result, true);
             }
             catch (Exception ex)
             {
-                if (e.Error != null)
-                {
-                    Logging.Debug(e.Error.ToString());
-                }
-                Logging.Debug(ex.ToString());
-                NewVersionFound?.Invoke(this, new EventArgs());
+                Logging.LogUsefulException(ex);
             }
         }
 
@@ -140,37 +140,16 @@ namespace Shadowsocks.Controller
         {
             try
             {
-                var response = e.Result;
-                string url = null, version = null;
-
-                dynamic result = JsonConvert.DeserializeObject<ExpandoObject>(response);
-                if (result.html_url is string)
+                if (e.Error != null)
                 {
-                    if (result.tag_name is string)
-                    {
-                        url = result.html_url;
-                        version = result.tag_name;
-                    }
-                }
-
-                if (url == null || version == null || !IsNewVersion(version))
-                {
+                    Logging.LogUsefulException(e.Error);
                     return;
                 }
-
-                LatestVersionURL = url;
-                LatestVersionNumber = version;
-                NewVersionFound?.Invoke(this, new EventArgs());
+                CheckUpdate(e.Result, false);
             }
             catch (Exception ex)
             {
-                if (e.Error != null)
-                {
-                    Logging.Debug(e.Error.ToString());
-                }
-
-                Logging.Debug(ex.ToString());
-                NewVersionFound?.Invoke(this, new EventArgs());
+                Logging.LogUsefulException(ex);
             }
         }
     }

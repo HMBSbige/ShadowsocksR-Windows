@@ -71,9 +71,6 @@ namespace Shadowsocks.View
         private bool configfrom_open = false;
         private List<EventParams> eventList = new List<EventParams>();
 
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        static extern bool DestroyIcon(IntPtr handle);
-
         public MenuViewController(ShadowsocksController controller)
         {
             this.controller = controller;
@@ -96,6 +93,7 @@ namespace Shadowsocks.View
             _notifyIcon.Visible = true;
             _notifyIcon.ContextMenu = contextMenu1;
             _notifyIcon.MouseClick += notifyIcon1_Click;
+            _notifyIcon.BalloonTipClicked += notifyIcon1_BalloonTipClicked;
             //_notifyIcon.MouseDoubleClick += notifyIcon1_DoubleClick;
 
             updateChecker = new UpdateChecker();
@@ -116,29 +114,21 @@ namespace Shadowsocks.View
 
         private void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (timerDelayCheckUpdate != null)
-            {
-                //if (timerDelayCheckUpdate.Interval <= 1000.0 * 30)
-                //{
-                //    timerDelayCheckUpdate.Interval = 1000.0 * 60 * 5;
-                //}
-                //else
-                {
-                    timerDelayCheckUpdate.Interval = 1000.0 * 60 * 60 * 6;
-                }
-            }
-            updateChecker.CheckUpdate(controller.GetCurrentConfiguration(), false);
+            timerDelayCheckUpdate.Interval = 1000.0 * 60 * 60 * 1;// 1 hours
 
-            Configuration cfg = controller.GetCurrentConfiguration();
+            var cfg = controller.GetCurrentConfiguration();
+
+            updateChecker.CheckUpdate(cfg, false);
+
             if (cfg.IsDefaultConfig() || cfg.nodeFeedAutoUpdate)
             {
-                updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, !cfg.IsDefaultConfig(), false);
+                updateSubscribeManager.CreateTask(cfg, updateFreeNodeChecker, -1, !cfg.IsDefaultConfig(), false);
             }
         }
 
         void controller_Errored(object sender, System.IO.ErrorEventArgs e)
         {
-            MessageBox.Show(e.GetException().ToString(), String.Format(I18N.GetString("Shadowsocks Error: {0}"), e.GetException().Message));
+            MessageBox.Show(e.GetException().ToString(), string.Format(I18N.GetString("Shadowsocks Error: {0}"), e.GetException().Message));
         }
 
         private static void SetNotifyIconText(NotifyIcon ni, string text)
@@ -299,74 +289,73 @@ namespace Shadowsocks.View
 
         private void LoadMenu()
         {
-            this.contextMenu1 = new ContextMenu(new MenuItem[] {
-                modeItem = CreateMenuGroup("Mode", new MenuItem[] {
-                    enableItem = CreateMenuItem("Disable system proxy", new EventHandler(this.EnableItem_Click)),
-                    PACModeItem = CreateMenuItem("PAC", new EventHandler(this.PACModeItem_Click)),
-                    globalModeItem = CreateMenuItem("Global", new EventHandler(this.GlobalModeItem_Click)),
+            contextMenu1 = new ContextMenu(new[] {
+                modeItem = CreateMenuGroup("Mode", new[] {
+                    enableItem = CreateMenuItem("Disable system proxy", EnableItem_Click),
+                    PACModeItem = CreateMenuItem("PAC", PACModeItem_Click),
+                    globalModeItem = CreateMenuItem("Global", GlobalModeItem_Click),
                     new MenuItem("-"),
-                    noModifyItem = CreateMenuItem("No modify system proxy", new EventHandler(this.NoModifyItem_Click))
+                    noModifyItem = CreateMenuItem("No modify system proxy", NoModifyItem_Click)
                 }),
-                CreateMenuGroup("PAC ", new MenuItem[] {
-                    CreateMenuItem("Update local PAC from Lan IP list", new EventHandler(this.UpdatePACFromLanIPListItem_Click)),
+                CreateMenuGroup("PAC ", new[] {
+                    CreateMenuItem("Update local PAC from Lan IP list", UpdatePACFromLanIPListItem_Click),
                     new MenuItem("-"),
-                    CreateMenuItem(@"Update local PAC from Chn Domain list", new EventHandler(this.UpdatePACFromCNWhiteListItem_Click)),
-                    CreateMenuItem(@"Update local PAC from Chn Domain and IP list", new EventHandler(this.UpdatePACFromCNIPListItem_Click)),
-                    CreateMenuItem("Update local PAC from GFWList", new EventHandler(this.UpdatePACFromGFWListItem_Click)),
+                    CreateMenuItem(@"Update local PAC from Chn Domain list", UpdatePACFromCNWhiteListItem_Click),
+                    CreateMenuItem(@"Update local PAC from Chn Domain and IP list", UpdatePACFromCNIPListItem_Click),
+                    CreateMenuItem("Update local PAC from GFWList", UpdatePACFromGFWListItem_Click),
                     new MenuItem("-"),
-                    CreateMenuItem("Update local PAC from Chn Only list", new EventHandler(this.UpdatePACFromCNOnlyListItem_Click)),
+                    CreateMenuItem("Update local PAC from Chn Only list", UpdatePACFromCNOnlyListItem_Click),
                     new MenuItem("-"),
-                    CreateMenuItem("Copy PAC URL", new EventHandler(this.CopyPACURLItem_Click)),
-                    CreateMenuItem("Edit local PAC file...", new EventHandler(this.EditPACFileItem_Click)),
-                    CreateMenuItem("Edit user rule for GFWList...", new EventHandler(this.EditUserRuleFileForGFWListItem_Click)),
+                    CreateMenuItem("Copy PAC URL", CopyPACURLItem_Click),
+                    CreateMenuItem("Edit local PAC file...", EditPACFileItem_Click),
+                    CreateMenuItem("Edit user rule for GFWList...", EditUserRuleFileForGFWListItem_Click),
                 }),
-                CreateMenuGroup("Proxy rule", new MenuItem[] {
-                    ruleBypassLan = CreateMenuItem("Bypass LAN", new EventHandler(this.RuleBypassLanItem_Click)),
-                    ruleBypassChina = CreateMenuItem("Bypass LAN && China", new EventHandler(this.RuleBypassChinaItem_Click)),
-                    ruleBypassNotChina = CreateMenuItem("Bypass LAN && not China", new EventHandler(this.RuleBypassNotChinaItem_Click)),
-                    ruleUser = CreateMenuItem("User custom", new EventHandler(this.RuleUserItem_Click)),
+                CreateMenuGroup("Proxy rule", new[] {
+                    ruleBypassLan = CreateMenuItem("Bypass LAN", RuleBypassLanItem_Click),
+                    ruleBypassChina = CreateMenuItem("Bypass LAN && China", RuleBypassChinaItem_Click),
+                    ruleBypassNotChina = CreateMenuItem("Bypass LAN && not China", RuleBypassNotChinaItem_Click),
+                    ruleUser = CreateMenuItem("User custom", RuleUserItem_Click),
                     new MenuItem("-"),
-                    ruleDisableBypass = CreateMenuItem("Disable bypass", new EventHandler(this.RuleBypassDisableItem_Click)),
+                    ruleDisableBypass = CreateMenuItem("Disable bypass", RuleBypassDisableItem_Click),
                 }),
                 new MenuItem("-"),
-                ServersItem = CreateMenuGroup("Servers", new MenuItem[] {
+                ServersItem = CreateMenuGroup("Servers", new[] {
                     SeperatorItem = new MenuItem("-"),
-                    CreateMenuItem("Edit servers...", new EventHandler(this.Config_Click)),
-                    CreateMenuItem("Import servers from file...", new EventHandler(this.Import_Click)),
+                    CreateMenuItem("Edit servers...", Config_Click),
+                    CreateMenuItem("Import servers from file...", Import_Click),
                     new MenuItem("-"),
-                    SelectRandomItem = CreateMenuItem("Load balance", new EventHandler(this.SelectRandomItem_Click)),
-                    sameHostForSameTargetItem = CreateMenuItem("Same host for same address", new EventHandler(this.SelectSameHostForSameTargetItem_Click)),
+                    SelectRandomItem = CreateMenuItem("Load balance", SelectRandomItem_Click),
+                    sameHostForSameTargetItem = CreateMenuItem("Same host for same address", SelectSameHostForSameTargetItem_Click),
                     new MenuItem("-"),
-                    CreateMenuItem("Server statistic...", new EventHandler(this.ShowServerLogItem_Click)),
-                    CreateMenuItem("Disconnect current", new EventHandler(this.DisconnectCurrent_Click)),
+                    CreateMenuItem("Server statistic...", ShowServerLogItem_Click),
+                    CreateMenuItem("Disconnect current", DisconnectCurrent_Click),
                 }),
-                CreateMenuGroup("Servers Subscribe", new MenuItem[] {
-                    CreateMenuItem("Subscribe setting...", new EventHandler(this.SubscribeSetting_Click)),
-                    CreateMenuItem("Update subscribe SSR node", new EventHandler(this.CheckNodeUpdate_Click)),
-                    CreateMenuItem("Update subscribe SSR node(bypass proxy)", new EventHandler(this.CheckNodeUpdateBypassProxy_Click)),
+                CreateMenuGroup("Servers Subscribe", new[] {
+                    CreateMenuItem("Subscribe setting...", SubscribeSetting_Click),
+                    CreateMenuItem("Update subscribe SSR node", CheckNodeUpdate_Click),
+                    CreateMenuItem("Update subscribe SSR node(bypass proxy)", CheckNodeUpdateBypassProxy_Click),
                 }),
-                CreateMenuItem("Global settings...", new EventHandler(this.Setting_Click)),
-                CreateMenuItem("Port settings...", new EventHandler(this.ShowPortMapItem_Click)),
-                CreateMenuItem("Show logs...", new EventHandler(this.ShowLogItem_Click)),
-                UpdateItem = CreateMenuItem("Update available", new EventHandler(this.UpdateItem_Clicked)),
+                CreateMenuItem("Global settings...", Setting_Click),
+                CreateMenuItem("Port settings...", ShowPortMapItem_Click),
+                CreateMenuItem("Show logs...", ShowLogItem_Click),
+                UpdateItem = CreateMenuItem("Update available", UpdateItem_Clicked),
                 new MenuItem("-"),
-                CreateMenuItem("Scan QRCode from screen...", new EventHandler(this.ScanQRCodeItem_Click)),
-                CreateMenuItem("Import SSR links from clipboard...", new EventHandler(this.CopyAddress_Click)),
+                CreateMenuItem("Scan QRCode from screen...", ScanQRCodeItem_Click),
+                CreateMenuItem("Import SSR links from clipboard...", CopyAddress_Click),
                 new MenuItem("-"),
-                CreateMenuGroup("Help", new MenuItem[] {
-                    CreateMenuItem("Check update", new EventHandler(this.CheckUpdate_Click)),
-                    CreateMenuItem("Open wiki...", new EventHandler(this.OpenWiki_Click)),
-                    CreateMenuItem("Feedback...", new EventHandler(this.FeedbackItem_Click)),
+                CreateMenuGroup("Help", new[] {
+                    CreateMenuItem("Check update", CheckUpdate_Click),
+                    CreateMenuItem("Open wiki...", OpenWiki_Click),
+                    CreateMenuItem("Feedback...", FeedbackItem_Click),
                     new MenuItem("-"),
-                    CreateMenuItem("Gen custom QRCode...", new EventHandler(this.showURLFromQRCode)),
-                    CreateMenuItem("Reset password...", new EventHandler(this.ResetPasswordItem_Click)),
+                    CreateMenuItem("Gen custom QRCode...", showURLFromQRCode),
+                    CreateMenuItem("Reset password...", ResetPasswordItem_Click),
                     new MenuItem("-"),
-                    CreateMenuItem("About...", new EventHandler(this.AboutItem_Click)),
-                    //CreateMenuItem("Donate...", new EventHandler(this.DonateItem_Click)),
+                    CreateMenuItem("About...", AboutItem_Click)
                 }),
-                CreateMenuItem("Quit", new EventHandler(this.Quit_Click))
+                CreateMenuItem("Quit", Quit_Click)
             });
-            this.UpdateItem.Visible = false;
+            UpdateItem.Visible = false;
         }
 
         private void controller_ConfigChanged(object sender, EventArgs e)
@@ -391,7 +380,7 @@ namespace Shadowsocks.View
         {
             string argument = @"/select, " + e.Path;
 
-            System.Diagnostics.Process.Start("explorer.exe", argument);
+            Process.Start("explorer.exe", argument);
         }
 
         void ShowBalloonTip(string title, string content, ToolTipIcon icon, int timeout)
@@ -432,7 +421,7 @@ namespace Shadowsocks.View
             }
             string lastGroup = null;
             int count = 0;
-            if (!String.IsNullOrEmpty(updateFreeNodeChecker.FreeNodeResult))
+            if (!string.IsNullOrEmpty(updateFreeNodeChecker.FreeNodeResult))
             {
                 List<string> urls = new List<string>();
                 updateFreeNodeChecker.FreeNodeResult = updateFreeNodeChecker.FreeNodeResult.TrimEnd('\r', '\n', ' ');
@@ -491,7 +480,7 @@ namespace Shadowsocks.View
                         try // try get group name
                         {
                             Server server = new Server(url, null);
-                            if (!String.IsNullOrEmpty(server.group))
+                            if (!string.IsNullOrEmpty(server.group))
                             {
                                 curGroup = server.group;
                                 break;
@@ -501,7 +490,7 @@ namespace Shadowsocks.View
                         { }
                     }
                     string subscribeURL = updateSubscribeManager.URL;
-                    if (String.IsNullOrEmpty(curGroup))
+                    if (string.IsNullOrEmpty(curGroup))
                     {
                         curGroup = subscribeURL;
                     }
@@ -514,7 +503,7 @@ namespace Shadowsocks.View
                             break;
                         }
                     }
-                    if (String.IsNullOrEmpty(lastGroup))
+                    if (string.IsNullOrEmpty(lastGroup))
                     {
                         lastGroup = curGroup;
                     }
@@ -547,7 +536,7 @@ namespace Shadowsocks.View
                     {
                         Dictionary<string, Server> old_servers = new Dictionary<string, Server>();
                         Dictionary<string, Server> old_insert_servers = new Dictionary<string, Server>();
-                        if (!String.IsNullOrEmpty(lastGroup))
+                        if (!string.IsNullOrEmpty(lastGroup))
                         {
                             for (int i = config.configs.Count - 1; i >= 0; --i)
                             {
@@ -657,7 +646,7 @@ namespace Shadowsocks.View
                         {
                             if (config.serverSubscribes[i].URL == updateFreeNodeChecker.subscribeTask.URL)
                             {
-                                config.serverSubscribes[i].LastUpdateTime = (UInt64)Math.Floor(DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
+                                config.serverSubscribes[i].LastUpdateTime = (ulong)Math.Floor(DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
                             }
                         }
                     }
@@ -669,7 +658,7 @@ namespace Shadowsocks.View
             {
                 if (updateFreeNodeChecker.noitify)
                     ShowBalloonTip(I18N.GetString("Success"),
-                        String.Format(I18N.GetString("Update subscribe {0} success"), lastGroup), ToolTipIcon.Info, 10000);
+                        string.Format(I18N.GetString("Update subscribe {0} success"), lastGroup), ToolTipIcon.Info, 10000);
             }
             else
             {
@@ -679,7 +668,7 @@ namespace Shadowsocks.View
                     //lastGroup = updateSubscribeManager.LastGroup;
                 }
                 ShowBalloonTip(I18N.GetString("Error"),
-                    String.Format(I18N.GetString("Update subscribe {0} failure"), lastGroup), ToolTipIcon.Info, 10000);
+                    string.Format(I18N.GetString("Update subscribe {0} failure"), lastGroup), ToolTipIcon.Info, 10000);
             }
             if (updateSubscribeManager.Next())
             {
@@ -689,44 +678,33 @@ namespace Shadowsocks.View
 
         void updateChecker_NewVersionFound(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(updateChecker.LatestVersionNumber))
+            if (updateChecker.Found)
             {
-                Logging.Log(LogLevel.Error, "connect to update server error");
-            }
-            else
-            {
-                if (!this.UpdateItem.Visible)
+                if (!UpdateItem.Visible)
                 {
-                    ShowBalloonTip(String.Format(I18N.GetString("{0} {1} Update Found"), UpdateChecker.Name, updateChecker.LatestVersionNumber),
+                    ShowBalloonTip(string.Format(I18N.GetString("{0} {1} Update Found"), UpdateChecker.Name, updateChecker.LatestVersionNumber),
                         I18N.GetString("Click menu to download"), ToolTipIcon.Info, 10000);
-                    _notifyIcon.BalloonTipClicked += notifyIcon1_BalloonTipClicked;
-
-                    timerDelayCheckUpdate.Elapsed -= timer_Elapsed;
-                    timerDelayCheckUpdate.Stop();
-                    timerDelayCheckUpdate = null;
                 }
-                this.UpdateItem.Visible = true;
-                this.UpdateItem.Text = String.Format(I18N.GetString("New version {0} {1} available"), UpdateChecker.Name, updateChecker.LatestVersionNumber);
+                UpdateItem.Visible = true;
+                UpdateItem.Text = string.Format(I18N.GetString("New version {0} {1} available"), UpdateChecker.Name, updateChecker.LatestVersionNumber);
             }
         }
 
         void updateChecker_NewVersionNotFound(object sender, EventArgs e)
         {
             ShowBalloonTip($@"{I18N.GetString(@"ShadowsocksR")} {UpdateChecker.FullVersion}", I18N.GetString(@"No newer version was found"), ToolTipIcon.Info, 10000);
-            timerDelayCheckUpdate.Elapsed -= timer_Elapsed;
-            timerDelayCheckUpdate.Stop();
-            timerDelayCheckUpdate = null;
         }
 
         void UpdateItem_Clicked(object sender, EventArgs e)
         {
-            System.Diagnostics.Process.Start(updateChecker.LatestVersionURL);
+            Process.Start(updateChecker.LatestVersionURL);
+            UpdateItem.Visible = false;
+            updateChecker.Found = false;
         }
 
         void notifyIcon1_BalloonTipClicked(object sender, EventArgs e)
         {
             //System.Diagnostics.Process.Start(updateChecker.LatestVersionURL);
-            _notifyIcon.BalloonTipClicked -= notifyIcon1_BalloonTipClicked;
         }
 
         private void UpdateSysProxyMode(Configuration config)
@@ -1018,7 +996,7 @@ namespace Shadowsocks.View
         {
             using (OpenFileDialog dlg = new OpenFileDialog())
             {
-                dlg.InitialDirectory = System.Windows.Forms.Application.StartupPath;
+                dlg.InitialDirectory = Application.StartupPath;
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
                     string name = dlg.FileName;
@@ -1087,7 +1065,7 @@ namespace Shadowsocks.View
         }
 
         [DllImport("user32.dll")]
-        private static extern short GetAsyncKeyState(System.Windows.Forms.Keys vKey);
+        private static extern short GetAsyncKeyState(Keys vKey);
 
         private void notifyIcon1_Click(object sender, MouseEventArgs e)
         {
@@ -1283,7 +1261,7 @@ namespace Shadowsocks.View
 
         private void URL_Split(string text, ref List<string> out_urls)
         {
-            if (String.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty(text))
             {
                 return;
             }
@@ -1344,7 +1322,7 @@ namespace Shadowsocks.View
                 if (result != null)
                 {
                     url = result.Text;
-                    double minX = Int32.MaxValue, minY = Int32.MaxValue, maxX = 0, maxY = 0;
+                    double minX = int.MaxValue, minY = int.MaxValue, maxX = 0, maxY = 0;
                     foreach (ResultPoint point in result.ResultPoints)
                     {
                         minX = Math.Min(minX, point.X);
@@ -1379,7 +1357,7 @@ namespace Shadowsocks.View
                 if (result != null)
                 {
                     url = result.Text;
-                    double minX = Int32.MaxValue, minY = Int32.MaxValue, maxX = 0, maxY = 0;
+                    double minX = int.MaxValue, minY = int.MaxValue, maxX = 0, maxY = 0;
                     foreach (ResultPoint point in result.ResultPoints)
                     {
                         minX = Math.Min(minX, point.X);
@@ -1556,7 +1534,7 @@ namespace Shadowsocks.View
             showURLFromQRCode();
         }
 
-        void showURLFromQRCode(object sender, System.EventArgs e)
+        void showURLFromQRCode(object sender, EventArgs e)
         {
             showURLFromQRCode();
         }
