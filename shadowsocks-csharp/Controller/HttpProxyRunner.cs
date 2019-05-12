@@ -1,15 +1,12 @@
 ﻿using Shadowsocks.Model;
 using Shadowsocks.Properties;
+using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
-using System.Text;
-using System.Net.NetworkInformation;
 using System.Net;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
+using System.Net.NetworkInformation;
 
 namespace Shadowsocks.Controller
 {
@@ -34,8 +31,8 @@ namespace Shadowsocks.Controller
             Kill();
             try
             {
-                FileManager.UncompressFile(runningPath + _exeName, Resources.privoxy_exe);
-                FileManager.UncompressFile(runningPath + "/mgwz.dll", Resources.mgwz_dll);
+                FileManager.DecompressFile(runningPath + _exeName, Resources.privoxy_exe);
+                FileManager.DecompressFile(runningPath + "/mgwz.dll", Resources.mgwz_dll);
             }
             catch (IOException e)
             {

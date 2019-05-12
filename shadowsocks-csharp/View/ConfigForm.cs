@@ -209,7 +209,7 @@ namespace Shadowsocks.View
         private void GenQr(string str)
         {
             var width = 350 * Util.Utils.GetDpiMul() / 4;
-            if (chkSSRLink.Checked)
+            if (txtLink.Focused || chkSSRLink.Focused)
             {
                 var qrText = str;
                 var code = Encoder.encode(qrText, ErrorCorrectionLevel.H);
@@ -235,11 +235,9 @@ namespace Shadowsocks.View
                 }
                 picQRcode.Image = drawArea;
                 picQRcode.Visible = true;
-                _modifiedConfiguration.isHideTips = true;
             }
             else
             {
-                _modifiedConfiguration.isHideTips = false;
                 picQRcode.Visible = false;
             }
         }
@@ -350,8 +348,6 @@ namespace Shadowsocks.View
             _modifiedConfiguration = _controller.GetConfiguration();
             LoadConfiguration();
             _allowSave = false;
-            chkSSRLink.Checked = _modifiedConfiguration.isHideTips;
-            chkSSRLink.CheckedChanged += checkSSRLink_CheckedChanged;
             SetServerListSelectedIndex(_modifiedConfiguration.index);
             _allowSave = true;
             LoadSelectedServer();

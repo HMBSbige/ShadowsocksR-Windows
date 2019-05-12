@@ -21,7 +21,7 @@ namespace Shadowsocks.Encryption
             var dllPath = Utils.GetTempPath(DLLNAME);
             try
             {
-                FileManager.UncompressFile(dllPath, Environment.Is64BitProcess ? Resources.libsscrypto64_dll : Resources.libsscrypto_dll);
+                FileManager.DecompressFile(dllPath, Environment.Is64BitProcess ? Resources.libsscrypto64_dll : Resources.libsscrypto_dll);
                 LoadLibrary(dllPath);
             }
             catch (IOException)

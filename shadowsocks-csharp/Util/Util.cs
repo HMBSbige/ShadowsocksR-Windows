@@ -517,7 +517,7 @@ namespace Shadowsocks.Util
             return (dpi * 4 + 48) / 96;
         }
 
-        private static string _tempPath = null;
+        private static string _tempPath;
         // return path to store temporary files
         public static string GetTempPath()
         {

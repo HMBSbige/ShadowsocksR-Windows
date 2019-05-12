@@ -511,17 +511,20 @@ namespace Shadowsocks.Model
         {
             try
             {
-                var configContent = File.ReadAllText(filename);
-                return Load(configContent);
+                if (File.Exists(filename))
+                {
+                    var configContent = File.ReadAllText(filename);
+                    return Load(configContent);
+                }
             }
             catch (Exception e)
             {
-                if (!(e is FileNotFoundException))
-                {
-                    Console.WriteLine(e);
-                }
-                return new Configuration();
+                Console.WriteLine(e);
             }
+
+            var config = new Configuration();
+            config.FixConfiguration();
+            return config;
         }
 
         public static Configuration Load()
