@@ -214,33 +214,10 @@ namespace Shadowsocks.View
                 _notifyIcon.Icon = newIcon;
             }
 
-            string strServer = null;
+            string strServer;
             if (random)
             {
-                switch (config.balanceAlgorithm)
-                {
-                    case "OneByOne":
-                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("OneByOne")}";
-                        break;
-                    case "Random":
-                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("Random")}";
-                        break;
-                    case "FastDownloadSpeed":
-                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("FastDownloadSpeed")}";
-                        break;
-                    case "LowLatency":
-                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("LowLatency")}";
-                        break;
-                    case "LowException":
-                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("LowException")}";
-                        break;
-                    case "SelectedFirst":
-                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("SelectedFirst")}";
-                        break;
-                    case "Timer":
-                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("Timer")}";
-                        break;
-                }
+                strServer = $@"{I18N.GetString("Load balance")}{I18N.GetString(": ")}{I18N.GetString(config.balanceAlgorithm)}";
             }
             else
             {
@@ -270,9 +247,10 @@ namespace Shadowsocks.View
             var line3 = string.Format(I18N.GetString("Running: Port {0}"), config.localPort); // this feedback is very important because they need to know Shadowsocks is running
 
             var text = $@"{line1}{line2}{line3}";
-            if (text.Length > 127 && line1.Length + line3.Length + Environment.NewLine.Length < 128)
+            var suffix = $@"...{Environment.NewLine}";
+            if (text.Length > 127 && line1.Length + line3.Length + suffix.Length < 128)
             {
-                text = $@"{line1}{strServer?.Substring(0, 127 - line1.Length - line3.Length - Environment.NewLine.Length)}{Environment.NewLine}{line3}";
+                text = $@"{line1}{strServer?.Substring(0, 127 - line1.Length - line3.Length - suffix.Length)}{suffix}{line3}";
             }
             SetNotifyIconText(_notifyIcon, text);
         }

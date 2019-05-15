@@ -114,7 +114,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(641, 451);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(599, 451);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // tableLayoutPanel2
@@ -122,7 +122,7 @@
             this.tableLayoutPanel2.AutoSize = true;
             this.tableLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.tableLayoutPanel2.ColumnCount = 2;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel2.Controls.Add(this.chkLogEnable, 1, 6);
             this.tableLayoutPanel2.Controls.Add(this.lblLogging, 0, 6);
@@ -143,14 +143,14 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(292, 127);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(245, 127);
             this.tableLayoutPanel2.TabIndex = 2;
             // 
             // chkLogEnable
             // 
             this.chkLogEnable.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.chkLogEnable.AutoSize = true;
-            this.chkLogEnable.Location = new System.Drawing.Point(103, 111);
+            this.chkLogEnable.Location = new System.Drawing.Point(56, 111);
             this.chkLogEnable.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.chkLogEnable.Name = "chkLogEnable";
             this.chkLogEnable.Size = new System.Drawing.Size(186, 16);
@@ -162,7 +162,7 @@
             // 
             this.lblLogging.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.lblLogging.AutoSize = true;
-            this.lblLogging.Location = new System.Drawing.Point(50, 112);
+            this.lblLogging.Location = new System.Drawing.Point(3, 112);
             this.lblLogging.Margin = new System.Windows.Forms.Padding(3, 0, 3, 1);
             this.lblLogging.Name = "lblLogging";
             this.lblLogging.Size = new System.Drawing.Size(47, 12);
@@ -174,7 +174,7 @@
             // 
             this.lblBalance.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.lblBalance.AutoSize = true;
-            this.lblBalance.Location = new System.Drawing.Point(50, 56);
+            this.lblBalance.Location = new System.Drawing.Point(3, 56);
             this.lblBalance.Margin = new System.Windows.Forms.Padding(3, 3, 3, 6);
             this.lblBalance.Name = "lblBalance";
             this.lblBalance.Size = new System.Drawing.Size(47, 12);
@@ -195,7 +195,7 @@
             "LowException",
             "SelectedFirst",
             "Timer"});
-            this.cmbBalance.Location = new System.Drawing.Point(103, 51);
+            this.cmbBalance.Location = new System.Drawing.Point(56, 51);
             this.cmbBalance.Margin = new System.Windows.Forms.Padding(3, 3, 3, 8);
             this.cmbBalance.Name = "cmbBalance";
             this.cmbBalance.Size = new System.Drawing.Size(186, 20);
@@ -205,7 +205,7 @@
             // 
             this.chkAutoBan.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.chkAutoBan.AutoSize = true;
-            this.chkAutoBan.Location = new System.Drawing.Point(103, 95);
+            this.chkAutoBan.Location = new System.Drawing.Point(56, 95);
             this.chkAutoBan.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.chkAutoBan.Name = "chkAutoBan";
             this.chkAutoBan.Size = new System.Drawing.Size(186, 16);
@@ -217,7 +217,7 @@
             // 
             this.chkBalance.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.chkBalance.AutoSize = true;
-            this.chkBalance.Location = new System.Drawing.Point(103, 32);
+            this.chkBalance.Location = new System.Drawing.Point(56, 32);
             this.chkBalance.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.chkBalance.Name = "chkBalance";
             this.chkBalance.Size = new System.Drawing.Size(186, 16);
@@ -229,7 +229,7 @@
             // 
             this.chkAutoStartup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.chkAutoStartup.AutoSize = true;
-            this.chkAutoStartup.Location = new System.Drawing.Point(103, 0);
+            this.chkAutoStartup.Location = new System.Drawing.Point(56, 0);
             this.chkAutoStartup.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.chkAutoStartup.Name = "chkAutoStartup";
             this.chkAutoStartup.Size = new System.Drawing.Size(186, 16);
@@ -241,7 +241,7 @@
             // 
             this.chkBalanceInGroup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.chkBalanceInGroup.AutoSize = true;
-            this.chkBalanceInGroup.Location = new System.Drawing.Point(103, 79);
+            this.chkBalanceInGroup.Location = new System.Drawing.Point(56, 79);
             this.chkBalanceInGroup.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.chkBalanceInGroup.Name = "chkBalanceInGroup";
             this.chkBalanceInGroup.Size = new System.Drawing.Size(186, 16);
@@ -253,7 +253,7 @@
             // 
             this.chkSwitchAutoCloseAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.chkSwitchAutoCloseAll.AutoSize = true;
-            this.chkSwitchAutoCloseAll.Location = new System.Drawing.Point(103, 16);
+            this.chkSwitchAutoCloseAll.Location = new System.Drawing.Point(56, 16);
             this.chkSwitchAutoCloseAll.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.chkSwitchAutoCloseAll.Name = "chkSwitchAutoCloseAll";
             this.chkSwitchAutoCloseAll.Size = new System.Drawing.Size(186, 16);
@@ -268,7 +268,7 @@
             this.gbxSocks5Proxy.Location = new System.Drawing.Point(0, 0);
             this.gbxSocks5Proxy.Margin = new System.Windows.Forms.Padding(0);
             this.gbxSocks5Proxy.Name = "gbxSocks5Proxy";
-            this.gbxSocks5Proxy.Size = new System.Drawing.Size(343, 229);
+            this.gbxSocks5Proxy.Size = new System.Drawing.Size(341, 229);
             this.gbxSocks5Proxy.TabIndex = 0;
             this.gbxSocks5Proxy.TabStop = false;
             this.gbxSocks5Proxy.Text = "Remote proxy";
@@ -278,7 +278,7 @@
             this.tableLayoutPanel9.AutoSize = true;
             this.tableLayoutPanel9.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.tableLayoutPanel9.ColumnCount = 2;
-            this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 80F));
+            this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 240F));
             this.tableLayoutPanel9.Controls.Add(this.lblS5Password, 0, 5);
             this.tableLayoutPanel9.Controls.Add(this.lblS5Username, 0, 4);
@@ -304,14 +304,14 @@
             this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel9.Size = new System.Drawing.Size(320, 182);
+            this.tableLayoutPanel9.Size = new System.Drawing.Size(318, 182);
             this.tableLayoutPanel9.TabIndex = 0;
             // 
             // lblS5Password
             // 
             this.lblS5Password.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.lblS5Password.AutoSize = true;
-            this.lblS5Password.Location = new System.Drawing.Point(24, 135);
+            this.lblS5Password.Location = new System.Drawing.Point(22, 135);
             this.lblS5Password.Margin = new System.Windows.Forms.Padding(3);
             this.lblS5Password.Name = "lblS5Password";
             this.lblS5Password.Size = new System.Drawing.Size(53, 12);
@@ -323,7 +323,7 @@
             // 
             this.lblS5Username.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.lblS5Username.AutoSize = true;
-            this.lblS5Username.Location = new System.Drawing.Point(24, 108);
+            this.lblS5Username.Location = new System.Drawing.Point(22, 108);
             this.lblS5Username.Margin = new System.Windows.Forms.Padding(3);
             this.lblS5Username.Name = "lblS5Username";
             this.lblS5Username.Size = new System.Drawing.Size(53, 12);
@@ -335,7 +335,7 @@
             // 
             this.txtS5Pass.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtS5Pass.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.txtS5Pass.Location = new System.Drawing.Point(83, 131);
+            this.txtS5Pass.Location = new System.Drawing.Point(81, 131);
             this.txtS5Pass.Name = "txtS5Pass";
             this.txtS5Pass.Size = new System.Drawing.Size(234, 21);
             this.txtS5Pass.TabIndex = 6;
@@ -344,7 +344,7 @@
             // 
             this.lblS5Port.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.lblS5Port.AutoSize = true;
-            this.lblS5Port.Location = new System.Drawing.Point(48, 81);
+            this.lblS5Port.Location = new System.Drawing.Point(46, 81);
             this.lblS5Port.Margin = new System.Windows.Forms.Padding(3);
             this.lblS5Port.Name = "lblS5Port";
             this.lblS5Port.Size = new System.Drawing.Size(29, 12);
@@ -356,7 +356,7 @@
             // 
             this.txtS5User.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtS5User.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.txtS5User.Location = new System.Drawing.Point(83, 104);
+            this.txtS5User.Location = new System.Drawing.Point(81, 104);
             this.txtS5User.Name = "txtS5User";
             this.txtS5User.Size = new System.Drawing.Size(234, 21);
             this.txtS5User.TabIndex = 5;
@@ -365,7 +365,7 @@
             // 
             this.lblS5Server.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.lblS5Server.AutoSize = true;
-            this.lblS5Server.Location = new System.Drawing.Point(18, 54);
+            this.lblS5Server.Location = new System.Drawing.Point(16, 54);
             this.lblS5Server.Margin = new System.Windows.Forms.Padding(3);
             this.lblS5Server.Name = "lblS5Server";
             this.lblS5Server.Size = new System.Drawing.Size(59, 12);
@@ -377,7 +377,7 @@
             // 
             this.nudS5Port.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.nudS5Port.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.nudS5Port.Location = new System.Drawing.Point(83, 77);
+            this.nudS5Port.Location = new System.Drawing.Point(81, 77);
             this.nudS5Port.Maximum = new decimal(new int[] {
             65535,
             0,
@@ -391,7 +391,7 @@
             // 
             this.txtS5Server.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtS5Server.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.txtS5Server.Location = new System.Drawing.Point(83, 50);
+            this.txtS5Server.Location = new System.Drawing.Point(81, 50);
             this.txtS5Server.Name = "txtS5Server";
             this.txtS5Server.Size = new System.Drawing.Size(234, 21);
             this.txtS5Server.TabIndex = 3;
@@ -405,7 +405,7 @@
             "Socks5(support UDP)",
             "Http tunnel",
             "TCP Port tunnel"});
-            this.cmbProxyType.Location = new System.Drawing.Point(83, 19);
+            this.cmbProxyType.Location = new System.Drawing.Point(81, 19);
             this.cmbProxyType.Margin = new System.Windows.Forms.Padding(3, 3, 3, 8);
             this.cmbProxyType.Name = "cmbProxyType";
             this.cmbProxyType.Size = new System.Drawing.Size(234, 20);
@@ -415,7 +415,7 @@
             // 
             this.chkSockProxy.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.chkSockProxy.AutoSize = true;
-            this.chkSockProxy.Location = new System.Drawing.Point(5, 0);
+            this.chkSockProxy.Location = new System.Drawing.Point(3, 0);
             this.chkSockProxy.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.chkSockProxy.Name = "chkSockProxy";
             this.chkSockProxy.Size = new System.Drawing.Size(72, 16);
@@ -427,7 +427,7 @@
             // 
             this.chkPacProxy.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.chkPacProxy.AutoSize = true;
-            this.chkPacProxy.Location = new System.Drawing.Point(83, 0);
+            this.chkPacProxy.Location = new System.Drawing.Point(81, 0);
             this.chkPacProxy.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
             this.chkPacProxy.Name = "chkPacProxy";
             this.chkPacProxy.Size = new System.Drawing.Size(234, 16);
@@ -439,7 +439,7 @@
             // 
             this.lblUserAgent.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.lblUserAgent.AutoSize = true;
-            this.lblUserAgent.Location = new System.Drawing.Point(12, 162);
+            this.lblUserAgent.Location = new System.Drawing.Point(10, 162);
             this.lblUserAgent.Margin = new System.Windows.Forms.Padding(3);
             this.lblUserAgent.Name = "lblUserAgent";
             this.lblUserAgent.Size = new System.Drawing.Size(65, 12);
@@ -451,7 +451,7 @@
             // 
             this.txtUserAgent.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.txtUserAgent.ImeMode = System.Windows.Forms.ImeMode.Off;
-            this.txtUserAgent.Location = new System.Drawing.Point(83, 158);
+            this.txtUserAgent.Location = new System.Drawing.Point(81, 158);
             this.txtUserAgent.Name = "txtUserAgent";
             this.txtUserAgent.Size = new System.Drawing.Size(234, 21);
             this.txtUserAgent.TabIndex = 7;
@@ -588,7 +588,7 @@
             this.tableLayoutPanel10.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel10.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel10.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel10.Size = new System.Drawing.Size(292, 166);
+            this.tableLayoutPanel10.Size = new System.Drawing.Size(250, 166);
             this.tableLayoutPanel10.TabIndex = 3;
             // 
             // tableLayoutPanel5
@@ -623,7 +623,7 @@
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel5.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel5.Size = new System.Drawing.Size(292, 166);
+            this.tableLayoutPanel5.Size = new System.Drawing.Size(250, 166);
             this.tableLayoutPanel5.TabIndex = 3;
             // 
             // lblReconnect
@@ -649,7 +649,7 @@
             0,
             0});
             this.nudReconnect.Name = "nudReconnect";
-            this.nudReconnect.Size = new System.Drawing.Size(186, 21);
+            this.nudReconnect.Size = new System.Drawing.Size(144, 21);
             this.nudReconnect.TabIndex = 18;
             // 
             // lblTtl
@@ -675,7 +675,7 @@
             0,
             0});
             this.nudTTL.Name = "nudTTL";
-            this.nudTTL.Size = new System.Drawing.Size(186, 21);
+            this.nudTTL.Size = new System.Drawing.Size(144, 21);
             this.nudTTL.TabIndex = 20;
             // 
             // lblTimeout
@@ -701,7 +701,7 @@
             0,
             0});
             this.nudTimeout.Name = "nudTimeout";
-            this.nudTimeout.Size = new System.Drawing.Size(186, 21);
+            this.nudTimeout.Size = new System.Drawing.Size(144, 21);
             this.nudTimeout.TabIndex = 19;
             // 
             // txtDNS
@@ -711,7 +711,7 @@
             this.txtDNS.Location = new System.Drawing.Point(103, 34);
             this.txtDNS.MaxLength = 0;
             this.txtDNS.Name = "txtDNS";
-            this.txtDNS.Size = new System.Drawing.Size(186, 21);
+            this.txtDNS.Size = new System.Drawing.Size(144, 21);
             this.txtDNS.TabIndex = 17;
             this.txtDNS.WordWrap = false;
             // 
@@ -720,7 +720,7 @@
             this.btnDefault.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.btnDefault.Location = new System.Drawing.Point(103, 3);
             this.btnDefault.Name = "btnDefault";
-            this.btnDefault.Size = new System.Drawing.Size(186, 25);
+            this.btnDefault.Size = new System.Drawing.Size(144, 25);
             this.btnDefault.TabIndex = 16;
             this.btnDefault.Text = "Set Default";
             this.btnDefault.UseVisualStyleBackColor = true;
@@ -757,7 +757,7 @@
             this.txtLocalDNS.Location = new System.Drawing.Point(103, 61);
             this.txtLocalDNS.MaxLength = 0;
             this.txtLocalDNS.Name = "txtLocalDNS";
-            this.txtLocalDNS.Size = new System.Drawing.Size(186, 21);
+            this.txtLocalDNS.Size = new System.Drawing.Size(144, 21);
             this.txtLocalDNS.TabIndex = 17;
             this.txtLocalDNS.WordWrap = false;
             // 
@@ -772,7 +772,7 @@
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 23F));
             this.tableLayoutPanel3.Controls.Add(this.btnCancel, 1, 0);
             this.tableLayoutPanel3.Controls.Add(this.btnOK, 0, 0);
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(455, 406);
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(413, 406);
             this.tableLayoutPanel3.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
