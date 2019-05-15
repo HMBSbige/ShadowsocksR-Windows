@@ -117,7 +117,9 @@ namespace Shadowsocks.View
                     continue;
                 width += ServerDataGrid.Columns[i].Width;
             }
-            this.Width = width + SystemInformation.VerticalScrollBarWidth + (this.Width - this.ClientSize.Width) + 1;
+            if (ExistDoubleBufferListViewVerticalScrollBar)
+                width += SystemInformation.VerticalScrollBarWidth;
+            this.Width = width + (this.Width - this.ClientSize.Width) + 1;
             ServerDataGrid.AutoResizeColumnHeadersHeight();
         }
         private MenuItem CreateMenuGroup(string text, MenuItem[] items)
@@ -134,7 +136,7 @@ namespace Shadowsocks.View
         {
             this.Text = title_perfix + I18N.GetString("ServerLog") + "("
                 + (controller.GetCurrentConfiguration().shareOverLan ? "any" : "local") + ":" + controller.GetCurrentConfiguration().localPort.ToString()
-                + "(" + Model.Server.GetForwardServerRef().GetConnections().Count.ToString()+ ")"
+                + "(" + Model.Server.GetForwardServerRef().GetConnections().Count.ToString() + ")"
                 + " " + I18N.GetString("Version") + UpdateChecker.FullVersion
                 + ")";
         }
@@ -681,7 +683,9 @@ namespace Shadowsocks.View
                     continue;
                 width += ServerDataGrid.Columns[i].Width;
             }
-            this.Width = width + SystemInformation.VerticalScrollBarWidth + (this.Width - this.ClientSize.Width) + 1;
+            if (ExistDoubleBufferListViewVerticalScrollBar)
+                width += SystemInformation.VerticalScrollBarWidth;
+            this.Width = width + (this.Width - this.ClientSize.Width) + 1;
             ServerDataGrid.AutoResizeColumnHeadersHeight();
         }
 
@@ -1139,7 +1143,9 @@ namespace Shadowsocks.View
                     continue;
                 width += ServerDataGrid.Columns[i].Width;
             }
-            width += SystemInformation.VerticalScrollBarWidth + (this.Width - this.ClientSize.Width) + 1;
+            if (ExistDoubleBufferListViewVerticalScrollBar)
+                width += SystemInformation.VerticalScrollBarWidth;
+            width += (this.Width - this.ClientSize.Width) + 1;
             ServerDataGrid.Columns[2].Width += this.Width - width;
         }
 
@@ -1152,8 +1158,12 @@ namespace Shadowsocks.View
                     continue;
                 width += ServerDataGrid.Columns[i].Width;
             }
-            this.Width = width + SystemInformation.VerticalScrollBarWidth + (this.Width - this.ClientSize.Width) + 1;
             ServerDataGrid.AutoResizeColumnHeadersHeight();
+            if (ExistDoubleBufferListViewVerticalScrollBar)
+                width += SystemInformation.VerticalScrollBarWidth;
+            this.Width = width + (this.Width - this.ClientSize.Width) + 1;
         }
+
+        private bool ExistDoubleBufferListViewVerticalScrollBar => ServerDataGrid.ColumnHeadersHeight + (controller.GetCurrentConfiguration().configs.Count * ServerDataGrid.RowTemplate.Height) >= ServerDataGrid.Height;
     }
 }

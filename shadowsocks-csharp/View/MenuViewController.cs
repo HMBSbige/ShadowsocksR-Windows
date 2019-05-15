@@ -144,26 +144,26 @@ namespace Shadowsocks.View
 
         private void UpdateTrayIcon()
         {
-            int dpi = 96;
-            using (Graphics graphics = Graphics.FromHwnd(IntPtr.Zero))
+            int dpi;
+            using (var graphics = Graphics.FromHwnd(IntPtr.Zero))
             {
                 dpi = (int)graphics.DpiX;
             }
-            Configuration config = controller.GetCurrentConfiguration();
-            bool enabled = config.sysProxyMode != (int)ProxyMode.NoModify && config.sysProxyMode != (int)ProxyMode.Direct;
-            bool global = config.sysProxyMode == (int)ProxyMode.Global;
-            bool random = config.random;
+            var config = controller.GetCurrentConfiguration();
+            var enabled = config.sysProxyMode != (int)ProxyMode.NoModify && config.sysProxyMode != (int)ProxyMode.Direct;
+            var global = config.sysProxyMode == (int)ProxyMode.Global;
+            var random = config.random;
 
             try
             {
-                Bitmap icon = new Bitmap("icon.png");
-                Icon newIcon = Icon.FromHandle(icon.GetHicon());
+                var icon = new Bitmap("icon.png");
+                var newIcon = Icon.FromHandle(icon.GetHicon());
                 icon.Dispose();
                 _notifyIcon.Icon = newIcon;
             }
             catch
             {
-                Bitmap icon = null;
+                Bitmap icon;
                 if (dpi < 97)
                 {
                     // dpi = 96;
@@ -193,12 +193,12 @@ namespace Shadowsocks.View
                     mul_r = 0.4;
                 }
 
-                Bitmap iconCopy = new Bitmap(icon);
-                for (int x = 0; x < iconCopy.Width; x++)
+                var iconCopy = new Bitmap(icon);
+                for (var x = 0; x < iconCopy.Width; ++x)
                 {
-                    for (int y = 0; y < iconCopy.Height; y++)
+                    for (var y = 0; y < iconCopy.Height; ++y)
                     {
-                        Color color = icon.GetPixel(x, y);
+                        var color = icon.GetPixel(x, y);
                         iconCopy.SetPixel(x, y,
 
                             Color.FromArgb((byte)(color.A * mul_a),
@@ -207,7 +207,7 @@ namespace Shadowsocks.View
                             ((byte)(color.B * mul_b))));
                     }
                 }
-                Icon newIcon = Icon.FromHandle(iconCopy.GetHicon());
+                var newIcon = Icon.FromHandle(iconCopy.GetHicon());
                 icon.Dispose();
                 iconCopy.Dispose();
 
@@ -215,48 +215,39 @@ namespace Shadowsocks.View
             }
 
             string strServer = null;
+            var line3 = string.Empty;
+            var line4 = string.Empty;
             if (random)
             {
-                switch (config.balanceAlgorithm)
+                strServer = $@"{I18N.GetString("Load balance")}{I18N.GetString(": ")}{I18N.GetString(config.balanceAlgorithm)}";
+                if (config.randomInGroup)
                 {
-                    case "OneByOne":
-                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("OneByOne")}";
-                        break;
-                    case "Random":
-                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("Random")}";
-                        break;
-                    case "FastDownloadSpeed":
-                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("FastDownloadSpeed")}";
-                        break;
-                    case "LowLatency":
-                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("LowLatency")}";
-                        break;
-                    case "LowException":
-                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("LowException")}";
-                        break;
-                    case "SelectedFirst":
-                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("SelectedFirst")}";
-                        break;
-                    case "Timer":
-                        strServer = $@"{I18N.GetString("Balance")}{I18N.GetString(": ")}{I18N.GetString("Timer")}";
-                        break;
+                    line3 = $@"{I18N.GetString("Balance in group")}{Environment.NewLine}";
+                }
+
+                if (config.autoBan)
+                {
+                    line4 = $@"{I18N.GetString("AutoBan")}{Environment.NewLine}";
                 }
             }
             else
             {
-                var groupName = config.configs[config.index].group;
-                var serverName = config.configs[config.index].remarks;
-                if (string.IsNullOrWhiteSpace(groupName))
+                if (config.index >= 0 && config.index < config.configs.Count)
                 {
-                    strServer = string.IsNullOrWhiteSpace(serverName) ? null : serverName;
-                }
-                else if (string.IsNullOrWhiteSpace(serverName))
-                {
-                    strServer = $@"{groupName}";
-                }
-                else
-                {
-                    strServer = $@"{groupName}{I18N.GetString(": ")}{serverName}";
+                    var groupName = config.configs[config.index].group;
+                    var serverName = config.configs[config.index].remarks;
+                    if (string.IsNullOrWhiteSpace(groupName))
+                    {
+                        strServer = string.IsNullOrWhiteSpace(serverName) ? null : serverName;
+                    }
+                    else if (string.IsNullOrWhiteSpace(serverName))
+                    {
+                        strServer = $@"{groupName}";
+                    }
+                    else
+                    {
+                        strServer = $@"{groupName}{I18N.GetString(": ")}{serverName}";
+                    }
                 }
             }
 
@@ -266,13 +257,15 @@ namespace Shadowsocks.View
                                 ? global ? I18N.GetString("Global") : I18N.GetString("PAC")
                                 : I18N.GetString("Disable system proxy"))
                                 + Environment.NewLine;
-            var line2 = string.IsNullOrWhiteSpace(strServer) ? null : strServer + Environment.NewLine;
-            var line3 = string.Format(I18N.GetString("Running: Port {0}"), config.localPort); // this feedback is very important because they need to know Shadowsocks is running
+            var line2 = string.IsNullOrWhiteSpace(strServer) ? null : $@"{strServer}{Environment.NewLine}";
+            var line5 = string.Format(I18N.GetString("Running: Port {0}"), config.localPort); // this feedback is very important because they need to know Shadowsocks is running
 
-            var text = $@"{line1}{line2}{line3}";
-            if (text.Length > 127 && line1.Length + line3.Length + Environment.NewLine.Length < 128)
+            var text = $@"{line1}{line2}{line3}{line4}{line5}";
+            var suffix = $@"...{Environment.NewLine}";
+            var l = line1.Length + line3.Length + line4.Length + line5.Length + suffix.Length;
+            if (text.Length > 127 && l < 128)
             {
-                text = $@"{line1}{strServer?.Substring(0, 127 - line1.Length - line3.Length - Environment.NewLine.Length)}{Environment.NewLine}{line3}";
+                text = $@"{line1}{strServer?.Substring(0, 127 - l)}{suffix}{line3}{line4}{line5}";
             }
             SetNotifyIconText(_notifyIcon, text);
         }
@@ -1019,7 +1012,7 @@ namespace Shadowsocks.View
             ShowSettingForm();
         }
 
-        private void Quit_Click(object sender, EventArgs e)
+        public void Quit_Click(object sender, EventArgs e)
         {
             controller.Stop();
             if (configForm != null)
