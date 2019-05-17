@@ -1,9 +1,11 @@
 ﻿using Shadowsocks.Model;
+using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Shadowsocks.Controller
 {
@@ -64,14 +66,16 @@ namespace Shadowsocks.Controller
             _config = Configuration.Load();
             _transfer = ServerTransferTotal.Load();
 
-            foreach (Server server in _config.configs)
+            foreach (var server in _config.configs)
             {
-                if (_transfer.servers.ContainsKey(server.server))
+                if (_transfer.servers.TryGetValue(server.server, out var st))
                 {
-                    ServerSpeedLog log = new ServerSpeedLog(_transfer.servers[server.server].totalUploadBytes, _transfer.servers[server.server].totalDownloadBytes);
+                    var log = new ServerSpeedLog(st.totalUploadBytes, st.totalDownloadBytes);
                     server.SetServerSpeedLog(log);
                 }
             }
+
+            StartReleasingMemory();
         }
 
         public void Start()
@@ -81,10 +85,7 @@ namespace Shadowsocks.Controller
 
         protected void ReportError(Exception e)
         {
-            if (Errored != null)
-            {
-                Errored(this, new ErrorEventArgs(e));
-            }
+            Errored?.Invoke(this, new ErrorEventArgs(e));
         }
 
         public void ReloadIPRange()
@@ -243,20 +244,14 @@ namespace Shadowsocks.Controller
         {
             _config.sysProxyMode = (int)mode;
             SaveConfig(_config);
-            if (ToggleModeChanged != null)
-            {
-                ToggleModeChanged(this, new EventArgs());
-            }
+            ToggleModeChanged?.Invoke(this, new EventArgs());
         }
 
         public void ToggleRuleMode(int mode)
         {
             _config.proxyRuleMode = mode;
             SaveConfig(_config);
-            if (ToggleRuleModeChanged != null)
-            {
-                ToggleRuleModeChanged(this, new EventArgs());
-            }
+            ToggleRuleModeChanged?.Invoke(this, new EventArgs());
         }
 
         public void ToggleSelectRandom(bool enabled)
@@ -293,15 +288,10 @@ namespace Shadowsocks.Controller
                 }
                 _port_map_listener = null;
             }
-            if (_listener != null)
-            {
-                _listener.Stop();
-            }
+
+            _listener?.Stop();
 #if !_CONSOLE
-            if (polipoRunner != null)
-            {
-                polipoRunner.Stop();
-            }
+            polipoRunner?.Stop();
             if (_config.sysProxyMode != (int)ProxyMode.NoModify && _config.sysProxyMode != (int)ProxyMode.Direct)
             {
                 SystemProxy.Update(_config, true);
@@ -327,20 +317,12 @@ namespace Shadowsocks.Controller
 
         public void TouchPACFile()
         {
-            string pacFilename = _pacServer.TouchPACFile();
-            if (PACFileReadyToOpen != null)
-            {
-                PACFileReadyToOpen(this, new PathEventArgs() { Path = pacFilename });
-            }
+            PACFileReadyToOpen?.Invoke(this, new PathEventArgs { Path = PACServer.TouchPACFile() });
         }
 
         public void TouchUserRuleFile()
         {
-            string userRuleFilename = _pacServer.TouchUserRuleFile();
-            if (UserRuleFileReadyToOpen != null)
-            {
-                UserRuleFileReadyToOpen(this, new PathEventArgs() { Path = userRuleFilename });
-            }
+            UserRuleFileReadyToOpen?.Invoke(this, new PathEventArgs { Path = PACServer.TouchUserRuleFile() });
         }
 
         public void UpdatePACFromGFWList()
@@ -355,7 +337,7 @@ namespace Shadowsocks.Controller
 
         public void UpdatePACFromOnlinePac(string url)
         {
-            gfwListUpdater?.UpdatePACFromGFWList(_config, url);
+            gfwListUpdater?.UpdateOnlinePAC(_config, url);
         }
 
         protected void Reload()
@@ -387,6 +369,7 @@ namespace Shadowsocks.Controller
             {
                 _pacServer = new PACServer();
                 _pacServer.PACFileChanged += pacServer_PACFileChanged;
+                _pacServer.UserRuleFileChanged += pacServer_UserRuleFileChanged;
             }
             _pacServer.UpdateConfiguration(_config);
             if (gfwListUpdater == null)
@@ -498,12 +481,11 @@ namespace Shadowsocks.Controller
                 {
                     // translate Microsoft language into human language
                     // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
-                    if (e is SocketException)
+                    if (e is SocketException se)
                     {
-                        SocketException se = (SocketException)e;
                         if (se.SocketErrorCode == SocketError.AccessDenied)
                         {
-                            e = new Exception(I18N.GetString("Port already in use") + string.Format(" {0}", pair.Key), e);
+                            e = new Exception(I18N.GetString("Port already in use") + string.Format(" {0}", pair.Key), se);
                         }
                     }
                     Logging.LogUsefulException(e);
@@ -514,16 +496,14 @@ namespace Shadowsocks.Controller
             ConfigChanged?.Invoke(this, new EventArgs());
 
             UpdateSystemProxy();
-            Util.Utils.ReleaseMemory();
+            Utils.ReleaseMemory();
         }
-
 
         protected void SaveConfig(Configuration newConfig)
         {
             Configuration.Save(newConfig);
             Reload();
         }
-
 
         private void UpdateSystemProxy()
         {
@@ -537,6 +517,24 @@ namespace Shadowsocks.Controller
 
         private void pacServer_PACFileChanged(object sender, EventArgs e)
         {
+            UpdateSystemProxy();
+        }
+
+        private void pacServer_UserRuleFileChanged(object sender, EventArgs e)
+        {
+            if (!Utils.IsGFWListPAC(PACServer.PAC_FILE))
+            {
+                return;
+            }
+            if (!File.Exists(Utils.GetTempPath(PACServer.gfwlist_FILE)))
+            {
+                UpdatePACFromGFWList();
+            }
+            else
+            {
+                GFWListUpdater.MergeAndWritePACFile(FileManager.NonExclusiveReadAllText(Utils.GetTempPath(PACServer.gfwlist_FILE)));
+            }
+
             UpdateSystemProxy();
         }
 
@@ -557,10 +555,7 @@ namespace Shadowsocks.Controller
 
         public void ShowConfigForm(int index)
         {
-            if (ShowConfigFormEvent != null)
-            {
-                ShowConfigFormEvent(index, new EventArgs());
-            }
+            ShowConfigFormEvent?.Invoke(index, new EventArgs());
         }
 
         /// <summary>
@@ -575,5 +570,22 @@ namespace Shadowsocks.Controller
                 server.GetConnections().CloseAll();
             }
         }
+
+        #region Memory Management
+
+        private static void StartReleasingMemory()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                while (true)
+                {
+                    Utils.ReleaseMemory(false);
+                    Task.Delay(30 * 1000).Wait();
+                }
+                // ReSharper disable once FunctionNeverReturns
+            }, TaskCreationOptions.LongRunning);
+        }
+
+        #endregion
     }
 }

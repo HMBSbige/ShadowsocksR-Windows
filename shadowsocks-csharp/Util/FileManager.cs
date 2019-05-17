@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Shadowsocks.Controller;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Shadowsocks.Util
@@ -129,6 +131,28 @@ namespace Shadowsocks.Util
             catch
             {
                 return false;
+            }
+        }
+
+        public static string NonExclusiveReadAllText(string path)
+        {
+            return NonExclusiveReadAllText(path, Encoding.UTF8);
+        }
+
+        public static string NonExclusiveReadAllText(string path, Encoding encoding)
+        {
+            try
+            {
+                using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var sr = new StreamReader(fs, encoding))
+                {
+                    return sr.ReadToEnd();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logging.Error(ex);
+                throw;
             }
         }
     }

@@ -1,8 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Shadowsocks.Model;
+using Shadowsocks.Properties;
+using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 
@@ -12,23 +15,9 @@ namespace Shadowsocks.Controller
     {
         private const string GFWLIST_URL = "https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt";
 
-        private const string GFWLIST_BACKUP_URL = "https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/gfwlist.txt";
-
-        private const string GFWLIST_TEMPLATE_URL = "https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_gfw.pac";
-
         private const string USER_AGENT = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36";
 
-        private static string PAC_FILE = PACServer.PAC_FILE;
-
-        private static string USER_RULE_FILE = PACServer.USER_RULE_FILE;
-
-        private static string USER_ABP_FILE = PACServer.USER_ABP_FILE;
-
-        private static string gfwlist_template = null;
-
-        private Configuration lastConfig;
-
-        public int update_type;
+        public int UpdateType;
 
         public event EventHandler<ResultEventArgs> UpdateCompleted;
 
@@ -36,39 +25,11 @@ namespace Shadowsocks.Controller
 
         public class ResultEventArgs : EventArgs
         {
-            public bool Success;
+            public readonly bool Success;
 
             public ResultEventArgs(bool success)
             {
-                this.Success = success;
-            }
-        }
-
-        private void http_DownloadGFWTemplateCompleted(object sender, DownloadStringCompletedEventArgs e)
-        {
-            try
-            {
-                string result = e.Result;
-                if (result.IndexOf("__RULES__") > 0 && result.IndexOf("FindProxyForURL") > 0)
-                {
-                    gfwlist_template = result;
-                    if (lastConfig != null)
-                    {
-                        UpdatePACFromGFWList(lastConfig);
-                    }
-                    lastConfig = null;
-                }
-                else
-                {
-                    Error(this, new ErrorEventArgs(new Exception("Download ERROR")));
-                }
-            }
-            catch (Exception ex)
-            {
-                if (Error != null)
-                {
-                    Error(this, new ErrorEventArgs(ex));
-                }
+                Success = success;
             }
         }
 
@@ -76,165 +37,127 @@ namespace Shadowsocks.Controller
         {
             try
             {
-                List<string> lines = ParseResult(e.Result);
-                if (lines.Count == 0)
-                {
-                    throw new Exception("Empty GFWList");
-                }
-                if (File.Exists(USER_RULE_FILE))
-                {
-                    string local = File.ReadAllText(USER_RULE_FILE, Encoding.UTF8);
-                    string[] rules = local.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string rule in rules)
-                    {
-                        if (rule.StartsWith("!") || rule.StartsWith("["))
-                            continue;
-                        lines.Add(rule);
-                    }
-                }
-                string abpContent = gfwlist_template;
-                if (File.Exists(USER_ABP_FILE))
-                {
-                    abpContent = File.ReadAllText(USER_ABP_FILE, Encoding.UTF8);
-                }
-                else
-                {
-                    abpContent = gfwlist_template;
-                }
-                abpContent = abpContent.Replace("__RULES__", JsonConvert.SerializeObject(lines, Formatting.Indented));
-                if (File.Exists(PAC_FILE))
-                {
-                    string original = File.ReadAllText(PAC_FILE, Encoding.UTF8);
-                    if (original == abpContent)
-                    {
-                        update_type = 0;
-                        UpdateCompleted(this, new ResultEventArgs(false));
-                        return;
-                    }
-                }
-                File.WriteAllText(PAC_FILE, abpContent, Encoding.UTF8);
-                if (UpdateCompleted != null)
-                {
-                    update_type = 0;
-                    UpdateCompleted(this, new ResultEventArgs(true));
-                }
+                File.WriteAllText(Utils.GetTempPath(PACServer.gfwlist_FILE), e.Result, Encoding.UTF8);
+                var pacFileChanged = MergeAndWritePACFile(e.Result);
+                UpdateType = 0;
+                UpdateCompleted?.Invoke(this, new ResultEventArgs(pacFileChanged));
             }
             catch (Exception ex)
             {
-                if (Error != null)
-                {
-                    WebClient http = sender as WebClient;
-                    if (http.BaseAddress.StartsWith(GFWLIST_URL))
-                    {
-                        http.BaseAddress = GFWLIST_BACKUP_URL;
-                        http.DownloadStringAsync(new Uri(GFWLIST_BACKUP_URL + "?rnd=" + Util.Utils.RandUInt32().ToString()));
-                    }
-                    else
-                    {
-                        if (e.Error != null)
-                        {
-                            Error(this, new ErrorEventArgs(e.Error));
-                        }
-                        else
-                        {
-                            Error(this, new ErrorEventArgs(ex));
-                        }
-                    }
-                }
+                Error?.Invoke(this, new ErrorEventArgs(ex));
             }
         }
 
-        private void http_DownloadPACCompleted(object sender, DownloadStringCompletedEventArgs e)
+        public static bool MergeAndWritePACFile(string gfwListResult)
         {
-            try
+            var abpContent = MergePACFile(gfwListResult);
+            if (File.Exists(PACServer.PAC_FILE))
             {
-                string content = e.Result;
-                if (File.Exists(PAC_FILE))
+                var original = FileManager.NonExclusiveReadAllText(PACServer.PAC_FILE, Encoding.UTF8);
+                if (original == abpContent)
                 {
-                    string original = File.ReadAllText(PAC_FILE, Encoding.UTF8);
-                    if (original == content)
-                    {
-                        update_type = 1;
-                        UpdateCompleted(this, new ResultEventArgs(false));
-                        return;
-                    }
-                }
-                File.WriteAllText(PAC_FILE, content, Encoding.UTF8);
-                if (UpdateCompleted != null)
-                {
-                    update_type = 1;
-                    UpdateCompleted(this, new ResultEventArgs(true));
-                }
-            }
-            catch (Exception ex)
-            {
-                if (Error != null)
-                {
-                    Error(this, new ErrorEventArgs(ex));
+                    return false;
                 }
             }
 
+            File.WriteAllText(PACServer.PAC_FILE, abpContent, Encoding.UTF8);
+            return true;
+        }
+
+        private static string MergePACFile(string gfwListResult)
+        {
+            var abpContent = File.Exists(PACServer.USER_ABP_FILE) ? FileManager.NonExclusiveReadAllText(PACServer.USER_ABP_FILE, Encoding.UTF8) : Utils.UnGzip(Resources.abp_js);
+
+            var userRuleLines = new List<string>();
+            if (File.Exists(PACServer.USER_RULE_FILE))
+            {
+                var userRulesString = FileManager.NonExclusiveReadAllText(PACServer.USER_RULE_FILE, Encoding.UTF8);
+                userRuleLines = ParseToValidList(userRulesString);
+            }
+
+            var gfwLines = ParseBase64ToValidList(gfwListResult);
+
+            abpContent = abpContent.Replace("__USERRULES__", JsonConvert.SerializeObject(userRuleLines, Formatting.Indented))
+                    .Replace("__RULES__", JsonConvert.SerializeObject(gfwLines, Formatting.Indented));
+            return abpContent;
         }
 
         public void UpdatePACFromGFWList(Configuration config)
         {
-            if (gfwlist_template == null)
-            {
-                lastConfig = config;
-                WebClient http = new WebClient();
-                http.Headers.Add("User-Agent", String.IsNullOrEmpty(config.proxyUserAgent) ? USER_AGENT : config.proxyUserAgent);
-                WebProxy proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
-                if (!string.IsNullOrEmpty(config.authPass))
-                {
-                    proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);
-                }
-                http.Proxy = proxy;
-                http.DownloadStringCompleted += http_DownloadGFWTemplateCompleted;
-                http.DownloadStringAsync(new Uri(GFWLIST_TEMPLATE_URL + "?rnd=" + Util.Utils.RandUInt32().ToString()));
-            }
-            else
-            {
-                WebClient http = new WebClient();
-                http.Headers.Add("User-Agent", String.IsNullOrEmpty(config.proxyUserAgent) ? USER_AGENT : config.proxyUserAgent);
-                WebProxy proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
-                if (!string.IsNullOrEmpty(config.authPass))
-                {
-                    proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);
-                }
-                http.Proxy = proxy;
-                http.BaseAddress = GFWLIST_URL;
-                http.DownloadStringCompleted += http_DownloadStringCompleted;
-                http.DownloadStringAsync(new Uri(GFWLIST_URL + "?rnd=" + Util.Utils.RandUInt32().ToString()));
-            }
-        }
-
-        public void UpdatePACFromGFWList(Configuration config, string url)
-        {
-            WebClient http = new WebClient();
-            http.Headers.Add("User-Agent", String.IsNullOrEmpty(config.proxyUserAgent) ? USER_AGENT : config.proxyUserAgent);
-            WebProxy proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
+            Logging.Info($@"Checking GFWList from {GFWLIST_URL}");
+            var http = new WebClient();
+            http.Headers.Add("User-Agent", string.IsNullOrEmpty(config.proxyUserAgent) ? USER_AGENT : config.proxyUserAgent);
+            var proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
             if (!string.IsNullOrEmpty(config.authPass))
             {
                 proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);
             }
             http.Proxy = proxy;
-            http.DownloadStringCompleted += http_DownloadPACCompleted;
-            http.DownloadStringAsync(new Uri(url + "?rnd=" + Util.Utils.RandUInt32().ToString()));
+            http.BaseAddress = GFWLIST_URL;
+            http.DownloadStringCompleted += http_DownloadStringCompleted;
+            http.DownloadStringAsync(new Uri($@"{GFWLIST_URL}?rnd={Utils.RandUInt32()}"));
         }
 
-        public List<string> ParseResult(string response)
+        #region OnlinePAC
+
+        private void http_DownloadOnlinePACCompleted(object sender, DownloadStringCompletedEventArgs e)
         {
-            byte[] bytes = Convert.FromBase64String(response);
-            string content = Encoding.ASCII.GetString(bytes);
-            string[] lines = content.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            List<string> valid_lines = new List<string>(lines.Length);
-            foreach (string line in lines)
+            try
             {
-                if (line.StartsWith("!") || line.StartsWith("["))
-                    continue;
-                valid_lines.Add(line);
+                var content = e.Result;
+                if (File.Exists(PACServer.PAC_FILE))
+                {
+                    var original = File.ReadAllText(PACServer.PAC_FILE, Encoding.UTF8);
+                    if (original == content)
+                    {
+                        UpdateType = 1;
+                        UpdateCompleted?.Invoke(this, new ResultEventArgs(false));
+                        return;
+                    }
+                }
+
+                File.WriteAllText(PACServer.PAC_FILE, content, Encoding.UTF8);
+                if (UpdateCompleted != null)
+                {
+                    UpdateType = 1;
+                    UpdateCompleted(this, new ResultEventArgs(true));
+                }
             }
-            return valid_lines;
+            catch (Exception ex)
+            {
+                Error?.Invoke(this, new ErrorEventArgs(ex));
+            }
+        }
+
+        public void UpdateOnlinePAC(Configuration config, string url)
+        {
+            var http = new WebClient();
+            http.Headers.Add(@"User-Agent", string.IsNullOrEmpty(config.proxyUserAgent) ? USER_AGENT : config.proxyUserAgent);
+            var proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
+            if (!string.IsNullOrEmpty(config.authPass))
+            {
+                proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);
+            }
+            http.Proxy = proxy;
+            http.DownloadStringCompleted += http_DownloadOnlinePACCompleted;
+            http.DownloadStringAsync(new Uri($@"{url}?rnd={Utils.RandUInt32()}"));
+        }
+
+        #endregion
+
+        private static List<string> ParseBase64ToValidList(string response)
+        {
+            var bytes = Convert.FromBase64String(response);
+            var content = Encoding.ASCII.GetString(bytes);
+            return ParseToValidList(content);
+        }
+
+        private static List<string> ParseToValidList(string content)
+        {
+            var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var validLines = new List<string>(lines.Length);
+            validLines.AddRange(lines.Where(line => !line.StartsWith("!") && !line.StartsWith("[")));
+            return validLines;
         }
     }
 }
