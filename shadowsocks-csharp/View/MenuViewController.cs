@@ -1042,7 +1042,7 @@ namespace Shadowsocks.View
 
         private void FeedbackItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/HMBSbige/ShadowsocksR-Windows/issues/new");
+            Process.Start(@"https://github.com/HMBSbige/ShadowsocksR-Windows/issues/new/choose");
         }
 
         private void ResetPasswordItem_Click(object sender, EventArgs e)
