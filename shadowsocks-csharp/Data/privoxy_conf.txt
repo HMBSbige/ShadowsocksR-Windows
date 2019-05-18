@@ -1,7 +1,8 @@
 ﻿listen-address __PRIVOXY_BIND_IP__:__PRIVOXY_BIND_PORT__
+toggle 0
+logfile ShadowsocksR.log
 show-on-task-bar 0
 activity-animation 0
 forward-socks5 / 127.0.0.1:__SOCKS_PORT__ .
+max-client-connections 2048
 hide-console
-__BYPASS_ACTION__
-

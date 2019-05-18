@@ -152,6 +152,7 @@
     <Compile Include="Util\EnvCheck.cs" />
     <Compile Include="Util\GetCNDomains.cs" />
     <Compile Include="Util\GetCNIP.cs" />
+    <Compile Include="Util\Job.cs" />
     <Compile Include="Util\ServerName.cs" />
     <Compile Include="Util\Util.cs" />
     <Compile Include="View\ConfigForm.cs">
@@ -255,7 +256,6 @@
     <None Include="Data\abp.js.gz" />
     <None Include="Data\libsscrypto.dll.gz" />
     <None Include="Data\libsscrypto64.dll.gz" />
-    <None Include="Data\mgwz.dll.gz" />
     <None Include="Data\privoxy.exe.gz" />
   </ItemGroup>
   <ItemGroup>

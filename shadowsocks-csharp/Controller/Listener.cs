@@ -33,11 +33,6 @@ namespace Shadowsocks.Controller
             _stop = false;
         }
 
-        public IList<Service> GetServices()
-        {
-            return _services;
-        }
-
         private static bool CheckIfPortInUse(int port)
         {
             try
@@ -46,27 +41,6 @@ namespace Shadowsocks.Controller
                 var ipEndPoints = ipProperties.GetActiveTcpListeners();
 
                 if (ipEndPoints.Any(endPoint => endPoint.Port == port))
-                {
-                    return true;
-                }
-            }
-            catch
-            {
-                // ignored
-            }
-
-            return false;
-        }
-
-        public bool IsConfigChange(Configuration config)
-        {
-            try
-            {
-                if (_shareOverLAN != config.shareOverLan
-                    || _authUser != config.authUser
-                    || _authPass != config.authPass
-                    || _socket == null
-                    || ((IPEndPoint)_socket.LocalEndPoint).Port != config.localPort)
                 {
                     return true;
                 }

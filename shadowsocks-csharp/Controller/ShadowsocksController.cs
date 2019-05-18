@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Shadowsocks.Controller
@@ -32,13 +31,11 @@ namespace Shadowsocks.Controller
         private ServerTransferTotal _transfer;
         public IPRangeSet _rangeSet;
 #if !_CONSOLE
-        private HttpProxyRunner polipoRunner;
+        private HttpProxyRunner privoxyRunner;
 #endif
         private GFWListUpdater gfwListUpdater;
         private ChnDomainsAndIPUpdater chnDomainsAndIPUpdater;
-        private bool stopped = false;
-        private bool firstRun = true;
-
+        private bool stopped;
 
         public class PathEventArgs : EventArgs
         {
@@ -292,7 +289,7 @@ namespace Shadowsocks.Controller
 
             _listener?.Stop();
 #if !_CONSOLE
-            polipoRunner?.Stop();
+            privoxyRunner?.Stop();
             if (_config.sysProxyMode != (int)ProxyMode.NoModify && _config.sysProxyMode != (int)ProxyMode.Direct)
             {
                 SystemProxy.Update(_config, true);
@@ -361,9 +358,9 @@ namespace Shadowsocks.Controller
             HostMap.Instance().Clear(hostMap);
 
 #if !_CONSOLE
-            if (polipoRunner == null)
+            if (privoxyRunner == null)
             {
-                polipoRunner = new HttpProxyRunner();
+                privoxyRunner = new HttpProxyRunner();
             }
 #endif
             if (_pacServer == null)
@@ -386,87 +383,52 @@ namespace Shadowsocks.Controller
                 chnDomainsAndIPUpdater.Error += pacServer_PACUpdateError;
             }
 
-            // don't put polipoRunner.Start() before pacServer.Stop()
+            _listener?.Stop();
+
+            // don't put PrivoxyRunner.Start() before pacServer.Stop()
             // or bind will fail when switching bind address from 0.0.0.0 to 127.0.0.1
             // though UseShellExecute is set to true now
             // http://stackoverflow.com/questions/10235093/socket-doesnt-close-after-application-exits-if-a-launched-process-is-open
-            var _firstRun = firstRun;
-            for (var i = 1; i <= 5; ++i)
+            try
             {
-                _firstRun = false;
-                try
+#if !_CONSOLE
+                privoxyRunner.Stop();
+                privoxyRunner.Start(_config);
+#endif
+
+                var local = new Local(_config, _transfer, _rangeSet);
+                var services = new List<Listener.Service>
                 {
-                    if (_listener != null && !_listener.IsConfigChange(_config))
-                    {
-                        var local = new Local(_config, _transfer, _rangeSet);
-                        _listener.GetServices()[0] = local;
+                    local,
+                    _pacServer,
+                    new APIServer(this, _config),
 #if !_CONSOLE
-                        if (polipoRunner.HasExited())
-                        {
-                            polipoRunner.Stop();
-                            polipoRunner.Start(_config);
-
-                            _listener.GetServices()[3] = new HttpPortForwarder(polipoRunner.RunningPort, _config);
-                        }
+                    new HttpPortForwarder(privoxyRunner.RunningPort, _config)
 #endif
-                    }
-                    else
-                    {
-                        if (_listener != null)
-                        {
-                            _listener.Stop();
-                            _listener = null;
-                        }
+                };
+                _listener = new Listener(services);
+                _listener.Start(_config, 0);
 
-#if !_CONSOLE
-                        polipoRunner.Stop();
-                        polipoRunner.Start(_config);
-#endif
-
-                        var local = new Local(_config, _transfer, _rangeSet);
-                        var services = new List<Listener.Service>();
-                        services.Add(local);
-                        services.Add(_pacServer);
-                        services.Add(new APIServer(this, _config));
-#if !_CONSOLE
-                        services.Add(new HttpPortForwarder(polipoRunner.RunningPort, _config));
-#endif
-                        _listener = new Listener(services);
-                        _listener.Start(_config, 0);
-                    }
-                    break;
-                }
-                catch (Exception e)
+            }
+            catch (Exception e)
+            {
+                // translate Microsoft language into human language
+                // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
+                if (e is SocketException se)
                 {
-                    // translate Microsoft language into human language
-                    // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
-                    if (e is SocketException se)
+                    if (se.SocketErrorCode == SocketError.AddressAlreadyInUse)
                     {
-                        if (se.SocketErrorCode == SocketError.AddressAlreadyInUse)
-                        {
-                            e = new Exception(string.Format(I18N.GetString("Port {0} already in use"), _config.localPort), se);
-                        }
-                        else if (se.SocketErrorCode == SocketError.AccessDenied)
-                        {
-                            e = new Exception(string.Format(I18N.GetString("Port {0} is reserved by system"), _config.localPort), se);
-                        }
+                        e = new Exception(string.Format(I18N.GetString("Port {0} already in use"), _config.localPort),
+                                se);
                     }
-                    Logging.LogUsefulException(e);
-                    if (!_firstRun)
+                    else if (se.SocketErrorCode == SocketError.AccessDenied)
                     {
-                        ReportError(e);
-                        break;
-                    }
-                    else
-                    {
-                        Thread.Sleep(1000 * i * i);
-                    }
-                    if (_listener != null)
-                    {
-                        _listener.Stop();
-                        _listener = null;
+                        e = new Exception(string.Format(I18N.GetString("Port {0} is reserved by system"), _config.localPort), se);
                     }
                 }
+
+                Logging.LogUsefulException(e);
+                ReportError(e);
             }
 
             _port_map_listener = new List<Listener>();
