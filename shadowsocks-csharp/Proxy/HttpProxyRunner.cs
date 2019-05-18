@@ -25,7 +25,7 @@ namespace Shadowsocks.Proxy
         {
             try
             {
-                var uid = Application.StartupPath.GetHashCode();
+                var uid = Application.StartupPath.GetDeterministicHashCode();
                 UNIQUE_CONFIG_FILE = $@"privoxy_{uid}.conf";
                 PRIVOXY_JOB = new Job();
 

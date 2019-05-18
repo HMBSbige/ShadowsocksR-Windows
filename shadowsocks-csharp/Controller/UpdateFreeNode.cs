@@ -48,7 +48,7 @@ namespace Shadowsocks.Controller
                 //add support for tls1.2+
                 if (URL.StartsWith("https", StringComparison.OrdinalIgnoreCase))
                 {
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 | SecurityProtocolType.Tls;
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
                 }
 
                 http.DownloadStringCompleted += http_DownloadStringCompleted;

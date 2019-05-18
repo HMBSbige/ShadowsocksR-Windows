@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
+using System;
+using System.Collections.Generic;
 
-namespace test
+namespace UnitTest
 {
     [TestClass]
     public class ServerTest
@@ -64,9 +64,11 @@ namespace test
             Server server = new Server();
 
             string link = "ssr://MTI3LjAuMC4xOjgwOmF1dGhfc2hhMV92NDpjaGFjaGEyMDpodHRwX3NpbXBsZTplaWZnYmVpd3ViZ3IvP29iZnNwYXJhbT0mcHJvdG9wYXJhbT0mcmVtYXJrcz0mZ3JvdXA9JnVkcHBvcnQ9NDY0MzgxMzYmdW90PTQ2MDA3MTI4";
-            try {
+            try
+            {
                 server.ServerFromSSR(link, "");
-            } catch (System.OverflowException e)
+            }
+            catch (System.OverflowException e)
             {
                 Console.Write(e.ToString());
             }

@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using ZXing;
 using ZXing.Common;
 using ZXing.QrCode;
+using ZXing.Windows.Compatibility;
 
 namespace Shadowsocks.View
 {
