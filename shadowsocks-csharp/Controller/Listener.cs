@@ -89,7 +89,7 @@ namespace Shadowsocks.Controller
 
             var localPort = port == 0 ? _config.localPort : port;
             if (CheckIfPortInUse(localPort))
-                throw new Exception(I18N.GetString("Port already in use"));
+                throw new Exception(string.Format(I18N.GetString("Port {0} already in use"), _config.localPort));
 
             try
             {

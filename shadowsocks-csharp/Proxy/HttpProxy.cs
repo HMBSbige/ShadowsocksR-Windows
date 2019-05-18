@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
-namespace Shadowsocks.Controller
+namespace Shadowsocks.Proxy
 {
     class HttpPraser
     {

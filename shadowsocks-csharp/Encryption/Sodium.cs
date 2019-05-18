@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace Shadowsocks.Encryption
 {
-    public class Sodium
+    public static class Sodium
     {
         private const string DLLNAME = @"libsscrypto.dll";
 

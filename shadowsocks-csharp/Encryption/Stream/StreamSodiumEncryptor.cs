@@ -20,8 +20,8 @@ namespace Shadowsocks.Encryption.Stream
         protected byte[] _encryptBuf;
         protected byte[] _decryptBuf;
 
-        private delegate void crypto_stream(byte[] c, byte[] m, ulong mlen, byte[] n, ulong ic, byte[] k);
-        private crypto_stream encryptor_delegate;
+        private delegate void CryptoStream(byte[] c, byte[] m, ulong mlen, byte[] n, ulong ic, byte[] k);
+        private readonly CryptoStream _encryptorDelegate;
 
         public StreamSodiumEncryptor(string method, string password) : base(method, password)
         {
@@ -30,19 +30,19 @@ namespace Shadowsocks.Encryption.Stream
             switch (_cipher)
             {
                 case CIPHER_SALSA20:
-                    encryptor_delegate = Sodium.crypto_stream_salsa20_xor_ic;
+                    _encryptorDelegate = Sodium.crypto_stream_salsa20_xor_ic;
                     break;
                 case CIPHER_CHACHA20:
-                    encryptor_delegate = Sodium.crypto_stream_chacha20_xor_ic;
+                    _encryptorDelegate = Sodium.crypto_stream_chacha20_xor_ic;
                     break;
                 case CIPHER_XSALSA20:
-                    encryptor_delegate = Sodium.crypto_stream_xsalsa20_xor_ic;
+                    _encryptorDelegate = Sodium.crypto_stream_xsalsa20_xor_ic;
                     break;
                 case CIPHER_XCHACHA20:
-                    encryptor_delegate = Sodium.crypto_stream_xchacha20_xor_ic;
+                    _encryptorDelegate = Sodium.crypto_stream_xchacha20_xor_ic;
                     break;
                 case CIPHER_CHACHA20_IETF:
-                    encryptor_delegate = crypto_stream_chacha20_ietf_xor_ic;
+                    _encryptorDelegate = crypto_stream_chacha20_ietf_xor_ic;
                     break;
             }
         }
@@ -60,7 +60,7 @@ namespace Shadowsocks.Encryption.Stream
             return _ciphers;
         }
 
-        public static List<string> SupportedCiphers()
+        public static IEnumerable<string> SupportedCiphers()
         {
             return new List<string>(_ciphers.Keys);
         }
@@ -87,7 +87,7 @@ namespace Shadowsocks.Encryption.Stream
             }
             int padding = bytesRemaining;
             Buffer.BlockCopy(buf, 0, sodiumBuf, padding, length);
-            encryptor_delegate(sodiumBuf, sodiumBuf, (ulong)(padding + length), iv, ic, _key);
+            _encryptorDelegate(sodiumBuf, sodiumBuf, (ulong)(padding + length), iv, ic, _key);
             Buffer.BlockCopy(sodiumBuf, padding, outbuf, 0, length);
             padding += length;
             ic += (ulong)padding / SODIUM_BLOCK_SIZE;

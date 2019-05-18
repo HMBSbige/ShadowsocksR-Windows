@@ -97,8 +97,8 @@
     <Compile Include="Util\FileManager.cs" />
     <Compile Include="Controller\GFWListUpdater.cs" />
     <Compile Include="Controller\HttpPortForwarder.cs" />
-    <Compile Include="Controller\HttpProxy.cs" />
-    <Compile Include="Controller\HttpProxyRunner.cs" />
+    <Compile Include="Proxy\HttpProxy.cs" />
+    <Compile Include="Proxy\HttpProxyRunner.cs" />
     <Compile Include="Controller\I18N.cs" />
     <Compile Include="Controller\Listener.cs" />
     <Compile Include="Controller\Logging.cs" />
@@ -160,7 +160,7 @@
     <Compile Include="View\ConfigForm.Designer.cs">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controller\Local.cs" />
+    <Compile Include="Proxy\Local.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controller\ShadowsocksController.cs" />

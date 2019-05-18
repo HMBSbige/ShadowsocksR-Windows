@@ -1,4 +1,5 @@
 ﻿using Shadowsocks.Model;
+using Shadowsocks.Proxy;
 using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
@@ -111,7 +112,7 @@ namespace Shadowsocks.Controller
 
         private int FindFirstMatchServer(Server server, List<Server> servers)
         {
-            for (int i = 0; i < servers.Count; ++i)
+            for (var i = 0; i < servers.Count; ++i)
             {
                 if (server.isMatchServer(servers[i]))
                 {
@@ -125,7 +126,7 @@ namespace Shadowsocks.Controller
         {
             if (servers != null)
             {
-                for (int j = 0; j < servers.Count; ++j)
+                for (var j = 0; j < servers.Count; ++j)
                 {
                     if (FindFirstMatchServer(servers[j], mergeConfig.configs) == -1)
                     {
@@ -137,23 +138,23 @@ namespace Shadowsocks.Controller
 
         public List<Server> MergeConfiguration(Configuration mergeConfig, List<Server> servers)
         {
-            List<Server> missingServers = new List<Server>();
+            var missingServers = new List<Server>();
             if (servers != null)
             {
-                for (int j = 0; j < servers.Count; ++j)
+                for (var j = 0; j < servers.Count; ++j)
                 {
-                    int i = FindFirstMatchServer(servers[j], mergeConfig.configs);
+                    var i = FindFirstMatchServer(servers[j], mergeConfig.configs);
                     if (i != -1)
                     {
-                        bool enable = servers[j].enable;
+                        var enable = servers[j].enable;
                         servers[j].CopyServer(mergeConfig.configs[i]);
                         servers[j].enable = enable;
                     }
                 }
             }
-            for (int i = 0; i < mergeConfig.configs.Count; ++i)
+            for (var i = 0; i < mergeConfig.configs.Count; ++i)
             {
-                int j = FindFirstMatchServer(mergeConfig.configs[i], servers);
+                var j = FindFirstMatchServer(mergeConfig.configs[i], servers);
                 if (j == -1)
                 {
                     missingServers.Add(mergeConfig.configs[i]);
@@ -164,7 +165,7 @@ namespace Shadowsocks.Controller
 
         public Configuration MergeGetConfiguration(Configuration mergeConfig)
         {
-            Configuration ret = Configuration.Load();
+            var ret = Configuration.Load();
             if (mergeConfig != null)
             {
                 MergeConfiguration(mergeConfig, ret.configs);
@@ -180,7 +181,7 @@ namespace Shadowsocks.Controller
 
         public bool SaveServersConfig(string config)
         {
-            Configuration new_cfg = Configuration.Load(config);
+            var new_cfg = Configuration.Load(config);
             if (new_cfg != null)
             {
                 SaveServersConfig(new_cfg);
@@ -191,9 +192,9 @@ namespace Shadowsocks.Controller
 
         public void SaveServersConfig(Configuration config)
         {
-            List<Server> missingServers = MergeConfiguration(_config, config.configs);
+            var missingServers = MergeConfiguration(_config, config.configs);
             _config.CopyFrom(config);
-            foreach (Server s in missingServers)
+            foreach (var s in missingServers)
             {
                 s.GetConnections().CloseAll();
             }
@@ -220,7 +221,7 @@ namespace Shadowsocks.Controller
                     }
                     else
                     {
-                        int index = _config.index + 1;
+                        var index = _config.index + 1;
                         if (index < 0 || index > _config.configs.Count)
                             index = _config.configs.Count;
                         _config.configs.Insert(index, server);
@@ -282,7 +283,7 @@ namespace Shadowsocks.Controller
 
             if (_port_map_listener != null)
             {
-                foreach (Listener l in _port_map_listener)
+                foreach (var l in _port_map_listener)
                 {
                     l.Stop();
                 }
@@ -303,7 +304,7 @@ namespace Shadowsocks.Controller
         public void ClearTransferTotal(string server_addr)
         {
             _transfer.Clear(server_addr);
-            foreach (Server server in _config.configs)
+            foreach (var server in _config.configs)
             {
                 if (server.server == server_addr)
                 {
@@ -344,7 +345,7 @@ namespace Shadowsocks.Controller
         {
             if (_port_map_listener != null)
             {
-                foreach (Listener l in _port_map_listener)
+                foreach (var l in _port_map_listener)
                 {
                     l.Stop();
                 }
@@ -355,7 +356,7 @@ namespace Shadowsocks.Controller
             _config.FlushPortMapCache();
             ReloadIPRange();
 
-            HostMap hostMap = new HostMap();
+            var hostMap = new HostMap();
             hostMap.LoadHostFile();
             HostMap.Instance().Clear(hostMap);
 
@@ -389,15 +390,15 @@ namespace Shadowsocks.Controller
             // or bind will fail when switching bind address from 0.0.0.0 to 127.0.0.1
             // though UseShellExecute is set to true now
             // http://stackoverflow.com/questions/10235093/socket-doesnt-close-after-application-exits-if-a-launched-process-is-open
-            bool _firstRun = firstRun;
-            for (int i = 1; i <= 5; ++i)
+            var _firstRun = firstRun;
+            for (var i = 1; i <= 5; ++i)
             {
                 _firstRun = false;
                 try
                 {
                     if (_listener != null && !_listener.IsConfigChange(_config))
                     {
-                        Local local = new Local(_config, _transfer, _rangeSet);
+                        var local = new Local(_config, _transfer, _rangeSet);
                         _listener.GetServices()[0] = local;
 #if !_CONSOLE
                         if (polipoRunner.HasExited())
@@ -422,8 +423,8 @@ namespace Shadowsocks.Controller
                         polipoRunner.Start(_config);
 #endif
 
-                        Local local = new Local(_config, _transfer, _rangeSet);
-                        List<Listener.Service> services = new List<Listener.Service>();
+                        var local = new Local(_config, _transfer, _rangeSet);
+                        var services = new List<Listener.Service>();
                         services.Add(local);
                         services.Add(_pacServer);
                         services.Add(new APIServer(this, _config));
@@ -439,12 +440,15 @@ namespace Shadowsocks.Controller
                 {
                     // translate Microsoft language into human language
                     // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
-                    if (e is SocketException)
+                    if (e is SocketException se)
                     {
-                        SocketException se = (SocketException)e;
-                        if (se.SocketErrorCode == SocketError.AccessDenied)
+                        if (se.SocketErrorCode == SocketError.AddressAlreadyInUse)
                         {
-                            e = new Exception(I18N.GetString("Port already in use") + string.Format(" {0}", _config.localPort), e);
+                            e = new Exception(string.Format(I18N.GetString("Port {0} already in use"), _config.localPort), se);
+                        }
+                        else if (se.SocketErrorCode == SocketError.AccessDenied)
+                        {
+                            e = new Exception(string.Format(I18N.GetString("Port {0} is reserved by system"), _config.localPort), se);
                         }
                     }
                     Logging.LogUsefulException(e);
@@ -466,14 +470,13 @@ namespace Shadowsocks.Controller
             }
 
             _port_map_listener = new List<Listener>();
-            foreach (KeyValuePair<int, PortMapConfigCache> pair in _config.GetPortMapCache())
+            foreach (var pair in _config.GetPortMapCache())
             {
                 try
                 {
-                    Local local = new Local(_config, _transfer, _rangeSet);
-                    List<Listener.Service> services = new List<Listener.Service>();
-                    services.Add(local);
-                    Listener listener = new Listener(services);
+                    var local = new Local(_config, _transfer, _rangeSet);
+                    var services = new List<Listener.Service> { local };
+                    var listener = new Listener(services);
                     listener.Start(_config, pair.Key);
                     _port_map_listener.Add(listener);
                 }
@@ -483,9 +486,13 @@ namespace Shadowsocks.Controller
                     // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
                     if (e is SocketException se)
                     {
-                        if (se.SocketErrorCode == SocketError.AccessDenied)
+                        if (se.SocketErrorCode == SocketError.AddressAlreadyInUse)
                         {
-                            e = new Exception(I18N.GetString("Port already in use") + string.Format(" {0}", pair.Key), se);
+                            e = new Exception(string.Format(I18N.GetString("Port {0} already in use"), pair.Key), e);
+                        }
+                        else if (se.SocketErrorCode == SocketError.AccessDenied)
+                        {
+                            e = new Exception(string.Format(I18N.GetString("Port {0} is reserved by system"), pair.Key), se);
                         }
                     }
                     Logging.LogUsefulException(e);
@@ -563,10 +570,10 @@ namespace Shadowsocks.Controller
         /// </summary>
         public void DisconnectAllConnections()
         {
-            Configuration config = GetCurrentConfiguration();
-            for (int id = 0; id < config.configs.Count; ++id)
+            var config = GetCurrentConfiguration();
+            for (var id = 0; id < config.configs.Count; ++id)
             {
-                Server server = config.configs[id];
+                var server = config.configs[id];
                 server.GetConnections().CloseAll();
             }
         }

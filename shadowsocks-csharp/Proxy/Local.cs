@@ -1,6 +1,6 @@
-﻿using Shadowsocks.Model;
+﻿using Shadowsocks.Controller;
+using Shadowsocks.Model;
 using Shadowsocks.Obfs;
-using Shadowsocks.Proxy;
 using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Threading;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
-namespace Shadowsocks.Controller
+namespace Shadowsocks.Proxy
 {
     class CallbackStatus
     {
