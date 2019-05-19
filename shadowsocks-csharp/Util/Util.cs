@@ -12,6 +12,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -85,7 +86,7 @@ namespace Shadowsocks.Util
                         sb.Write(buffer, 0, n);
                     }
                 }
-                return System.Text.Encoding.UTF8.GetString(sb.ToArray());
+                return Encoding.UTF8.GetString(sb.ToArray());
             }
         }
 
@@ -479,7 +480,7 @@ namespace Shadowsocks.Util
 
         public static string GetExecutablePath()
         {
-            return System.Reflection.Assembly.GetExecutingAssembly().Location;
+            return Assembly.GetExecutingAssembly().Location;
         }
 
         public static RegistryKey OpenRegKey(string name, bool writable, RegistryHive hive = RegistryHive.CurrentUser)
@@ -536,7 +537,7 @@ namespace Shadowsocks.Util
             {
                 try
                 {
-                    _tempPath = Directory.CreateDirectory(Path.Combine(Application.StartupPath, @"temp")).FullName;
+                    _tempPath = Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(GetExecutablePath()), @"temp")).FullName;
                 }
                 catch (Exception e)
                 {
@@ -544,6 +545,7 @@ namespace Shadowsocks.Util
                     throw;
                 }
             }
+
             return _tempPath;
         }
 
