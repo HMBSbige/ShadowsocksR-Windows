@@ -21,8 +21,6 @@ namespace Shadowsocks.Util
 {
     public static class Utils
     {
-        private delegate IPHostEntry GetHostEntryHandler(string ip);
-
         public static LRUCache<string, IPAddress> DnsBuffer { get; } = new LRUCache<string, IPAddress>();
 
         public static LRUCache<string, IPAddress> LocalDnsBuffer => DnsBuffer;
@@ -393,26 +391,21 @@ namespace Shadowsocks.Util
 
             try
             {
-                var callback = new GetHostEntryHandler(Dns.GetHostEntry);
-                var result = callback.BeginInvoke(host, null, null);
-                if (result.AsyncWaitHandle.WaitOne(10000, true))
+
+                var ips = Dns.GetHostAddresses(host);
+                var type = IPv6_first ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
+
+                foreach (var ad in ips)
                 {
-                    var ipHostEntry = callback.EndInvoke(result);
-
-                    var type = IPv6_first ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
-
-                    foreach (var ad in ipHostEntry.AddressList)
-                    {
-                        if (ad.AddressFamily == type)
-                        {
-                            return ad;
-                        }
-                    }
-
-                    foreach (var ad in ipHostEntry.AddressList)
+                    if (ad.AddressFamily == type)
                     {
                         return ad;
                     }
+                }
+
+                foreach (var ad in ips)
+                {
+                    return ad;
                 }
             }
             catch

@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace Shadowsocks.Controller
@@ -628,8 +629,7 @@ namespace Shadowsocks.Controller
 
             public override void Shutdown()
             {
-                InvokeHandler handler = () => Close();
-                handler.BeginInvoke(null, null);
+                Task.Run(Close);
             }
         }
     }
