@@ -12,7 +12,7 @@ build:
   parallel: true
   verbosity: normal
 after_build:
-- cmd: 7z a ShadowsocksR.zip shadowsocks-csharp\bin\Release\netcoreapp3.0\ShadowsocksR.exe shadowsocks-csharp\bin\Release\netcoreapp3.0\ShadowsocksR.dll shadowsocks-csharp\bin\Release\netcoreapp3.0\ShadowsocksR.runtimeconfig.json
+- cmd: 7z a ShadowsocksR.zip %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\ShadowsocksR.exe %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\ShadowsocksR.dll %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\ShadowsocksR.runtimeconfig.json
 artifacts:
 - path: ShadowsocksR.zip
   name: ShadowsocksR.zip
