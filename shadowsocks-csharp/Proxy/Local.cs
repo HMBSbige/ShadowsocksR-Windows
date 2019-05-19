@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
 using Timer = System.Timers.Timer;
 
@@ -53,7 +54,6 @@ namespace Shadowsocks.Proxy
 
     class Local : Listener.Service
     {
-        private delegate void InvokeHandler();
         private readonly Configuration _config;
         private readonly ServerTransferTotal _transfer;
         private readonly IPRangeSet _ipRange;
@@ -96,11 +96,10 @@ namespace Shadowsocks.Proxy
             {
                 return false;
             }
-            InvokeHandler handler = () =>
+            Task.Run(() =>
             {
                 var unused = new ProxyAuthHandler(_config, _transfer, _ipRange, firstPacket, length, socket);
-            };
-            handler.BeginInvoke(null, null);
+            });
             return true;
         }
     }
@@ -533,8 +532,7 @@ namespace Shadowsocks.Proxy
 
                 if (cfg.ReconnectTimes > 0)
                 {
-                    InvokeHandler handler = Connect;
-                    handler.BeginInvoke(null, null);
+                    Task.Run(Connect);
                 }
                 else
                 {
@@ -721,8 +719,7 @@ namespace Shadowsocks.Proxy
 
         public override void Shutdown()
         {
-            InvokeHandler handler = () => Close();
-            handler.BeginInvoke(null, null);
+            Task.Run(Close);
         }
 
         public void Close()

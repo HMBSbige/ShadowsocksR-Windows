@@ -2,7 +2,6 @@
 {
     public abstract class IHandler
     {
-        public delegate void InvokeHandler();
         public abstract void Shutdown();
     }
 
