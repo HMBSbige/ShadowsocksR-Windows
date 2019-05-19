@@ -586,6 +586,17 @@ namespace Shadowsocks.Util
             }
         }
 
+        public static void OpenURL(string path)
+        {
+            new Process
+            {
+                StartInfo = new ProcessStartInfo(path)
+                {
+                    UseShellExecute = true
+                }
+            }.Start();
+        }
+
 #if !_CONSOLE
         public enum DeviceCap
         {

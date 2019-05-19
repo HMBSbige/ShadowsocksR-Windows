@@ -1,6 +1,7 @@
 ﻿using Shadowsocks.Controller;
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
+using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -696,14 +697,14 @@ namespace Shadowsocks.View
 
         void UpdateItem_Clicked(object sender, EventArgs e)
         {
-            Process.Start(updateChecker.LatestVersionURL);
+            Utils.OpenURL(updateChecker.LatestVersionURL);
             UpdateItem.Visible = false;
             updateChecker.Found = false;
         }
 
         void notifyIcon1_BalloonTipClicked(object sender, EventArgs e)
         {
-            //System.Diagnostics.Process.Start(updateChecker.LatestVersionURL);
+            //Utils.OpenUR(updateChecker.LatestVersionURL);
         }
 
         private void UpdateSysProxyMode(Configuration config)
@@ -1043,12 +1044,12 @@ namespace Shadowsocks.View
 
         private void OpenWiki_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/HMBSbige/shadowsocks-rss/wiki");
+            Utils.OpenURL(@"https://github.com/HMBSbige/shadowsocks-rss/wiki");
         }
 
         private void FeedbackItem_Click(object sender, EventArgs e)
         {
-            Process.Start(@"https://github.com/HMBSbige/ShadowsocksR-Windows/issues/new/choose");
+            Utils.OpenURL(@"https://github.com/HMBSbige/ShadowsocksR-Windows/issues/new/choose");
         }
 
         private void ResetPasswordItem_Click(object sender, EventArgs e)
@@ -1060,7 +1061,7 @@ namespace Shadowsocks.View
 
         private void AboutItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/HMBSbige/ShadowsocksR-Windows");
+            Utils.OpenURL("https://github.com/HMBSbige/ShadowsocksR-Windows");
         }
 
         [DllImport("user32.dll")]
@@ -1516,7 +1517,7 @@ namespace Shadowsocks.View
 
         void openURLFromQRCode(object sender, FormClosedEventArgs e)
         {
-            Process.Start(_urlToOpen);
+            Utils.OpenURL(_urlToOpen);
         }
 
         void showURLFromQRCode()
