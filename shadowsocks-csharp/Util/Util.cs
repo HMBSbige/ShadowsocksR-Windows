@@ -16,7 +16,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
-using System.Windows.Forms;
 
 namespace Shadowsocks.Util
 {
@@ -480,6 +479,12 @@ namespace Shadowsocks.Util
 
         public static string GetExecutablePath()
         {
+            var dllPath = GetDLLPath();
+            return Path.Combine(Path.GetDirectoryName(dllPath), $@"{Path.GetFileNameWithoutExtension(dllPath)}.exe");
+        }
+
+        public static string GetDLLPath()
+        {
             return Assembly.GetExecutingAssembly().Location;
         }
 
@@ -497,7 +502,7 @@ namespace Shadowsocks.Util
             var processInfo = new ProcessStartInfo
             {
                 Verb = "runas",
-                FileName = Application.ExecutablePath,
+                FileName = GetExecutablePath(),
                 Arguments = Arguments
             };
             try
@@ -537,7 +542,7 @@ namespace Shadowsocks.Util
             {
                 try
                 {
-                    _tempPath = Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(GetExecutablePath()), @"temp")).FullName;
+                    _tempPath = Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(GetDLLPath()), @"temp")).FullName;
                 }
                 catch (Exception e)
                 {
