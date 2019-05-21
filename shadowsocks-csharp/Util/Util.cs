@@ -479,11 +479,17 @@ namespace Shadowsocks.Util
 
         public static string GetExecutablePath()
         {
-            var dllPath = GetDLLPath();
+            var p = Process.GetCurrentProcess();
+            if (p.MainModule != null)
+            {
+                var res = p.MainModule.FileName;
+                return res;
+            }
+            var dllPath = GetDllPath();
             return Path.Combine(Path.GetDirectoryName(dllPath), $@"{Path.GetFileNameWithoutExtension(dllPath)}.exe");
         }
 
-        public static string GetDLLPath()
+        public static string GetDllPath()
         {
             return Assembly.GetExecutingAssembly().Location;
         }
@@ -542,7 +548,7 @@ namespace Shadowsocks.Util
             {
                 try
                 {
-                    _tempPath = Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(GetDLLPath()), @"temp")).FullName;
+                    _tempPath = Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(GetDllPath()), @"temp")).FullName;
                 }
                 catch (Exception e)
                 {
