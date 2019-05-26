@@ -1,6 +1,7 @@
 ﻿using Shadowsocks.Controller;
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
+using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,6 +14,7 @@ using System.Windows.Forms;
 using ZXing;
 using ZXing.Common;
 using ZXing.QrCode;
+using BitmapLuminanceSource = ZXing.Windows.Compatibility.BitmapLuminanceSource;
 
 namespace Shadowsocks.View
 {
@@ -359,21 +361,26 @@ namespace Shadowsocks.View
 
         private void controller_ToggleModeChanged(object sender, EventArgs e)
         {
-            Configuration config = controller.GetCurrentConfiguration();
+            var config = controller.GetCurrentConfiguration();
             UpdateSysProxyMode(config);
         }
 
         private void controller_ToggleRuleModeChanged(object sender, EventArgs e)
         {
-            Configuration config = controller.GetCurrentConfiguration();
+            var config = controller.GetCurrentConfiguration();
             UpdateProxyRule(config);
         }
 
         void controller_FileReadyToOpen(object sender, ShadowsocksController.PathEventArgs e)
         {
-            string argument = @"/select, " + e.Path;
-
-            Process.Start("explorer.exe", argument);
+            //Process.Start(@"explorer.exe", $@"/select, {e.Path}");
+            new Process
+            {
+                StartInfo = new ProcessStartInfo(e.Path)
+                {
+                    UseShellExecute = true
+                }
+            }.Start();
         }
 
         void ShowBalloonTip(string title, string content, ToolTipIcon icon, int timeout)
@@ -392,9 +399,9 @@ namespace Shadowsocks.View
 
         void controller_UpdatePACFromGFWListCompleted(object sender, GFWListUpdater.ResultEventArgs e)
         {
-            GFWListUpdater updater = (GFWListUpdater)sender;
-            string result = e.Success ?
-                (updater.update_type < 1 ? I18N.GetString(@"GFWList PAC updated") : I18N.GetString(@"PAC updated"))
+            var updater = (GFWListUpdater)sender;
+            var result = e.Success ?
+                updater.UpdateType < 1 ? I18N.GetString(@"GFWList PAC updated") : I18N.GetString(@"PAC updated")
                 : I18N.GetString(@"No updates found. Please report to GFWList if you have problems with it.");
             ShowBalloonTip(I18N.GetString(@"ShadowsocksR"), result, ToolTipIcon.Info, 1000);
         }
@@ -413,12 +420,12 @@ namespace Shadowsocks.View
                 return;
             }
             string lastGroup = null;
-            int count = 0;
+            var count = 0;
             if (!string.IsNullOrEmpty(updateFreeNodeChecker.FreeNodeResult))
             {
-                List<string> urls = new List<string>();
+                var urls = new List<string>();
                 updateFreeNodeChecker.FreeNodeResult = updateFreeNodeChecker.FreeNodeResult.TrimEnd('\r', '\n', ' ');
-                Configuration config = controller.GetCurrentConfiguration();
+                var config = controller.GetCurrentConfiguration();
                 Server selected_server = null;
                 if (config.index >= 0 && config.index < config.configs.Count)
                 {
@@ -432,9 +439,9 @@ namespace Shadowsocks.View
                 {
                     updateFreeNodeChecker.FreeNodeResult = "";
                 }
-                int max_node_num = 0;
+                var max_node_num = 0;
 
-                Match match_maxnum = Regex.Match(updateFreeNodeChecker.FreeNodeResult, "^MAX=([0-9]+)");
+                var match_maxnum = Regex.Match(updateFreeNodeChecker.FreeNodeResult, "^MAX=([0-9]+)");
                 if (match_maxnum.Success)
                 {
                     try
@@ -447,32 +454,32 @@ namespace Shadowsocks.View
                     }
                 }
                 URL_Split(updateFreeNodeChecker.FreeNodeResult, ref urls);
-                for (int i = urls.Count - 1; i >= 0; --i)
+                for (var i = urls.Count - 1; i >= 0; --i)
                 {
                     if (!urls[i].StartsWith("ssr"))
                         urls.RemoveAt(i);
                 }
                 if (urls.Count > 0)
                 {
-                    bool keep_selected_server = false; // set 'false' if import all nodes
+                    var keep_selected_server = false; // set 'false' if import all nodes
                     if (max_node_num <= 0 || max_node_num >= urls.Count)
                     {
                         urls.Reverse();
                     }
                     else
                     {
-                        Random r = new Random();
+                        var r = new Random();
                         Util.Utils.Shuffle(urls, r);
                         urls.RemoveRange(max_node_num, urls.Count - max_node_num);
                         if (!config.IsDefaultConfig())
                             keep_selected_server = true;
                     }
                     string curGroup = null;
-                    foreach (string url in urls)
+                    foreach (var url in urls)
                     {
                         try // try get group name
                         {
-                            Server server = new Server(url, null);
+                            var server = new Server(url, null);
                             if (!string.IsNullOrEmpty(server.group))
                             {
                                 curGroup = server.group;
@@ -482,12 +489,12 @@ namespace Shadowsocks.View
                         catch
                         { }
                     }
-                    string subscribeURL = updateSubscribeManager.URL;
+                    var subscribeURL = updateSubscribeManager.URL;
                     if (string.IsNullOrEmpty(curGroup))
                     {
                         curGroup = subscribeURL;
                     }
-                    for (int i = 0; i < config.serverSubscribes.Count; ++i)
+                    for (var i = 0; i < config.serverSubscribes.Count; ++i)
                     {
                         if (subscribeURL == config.serverSubscribes[i].URL)
                         {
@@ -503,12 +510,12 @@ namespace Shadowsocks.View
 
                     if (keep_selected_server && selected_server.group == curGroup)
                     {
-                        bool match = false;
-                        for (int i = 0; i < urls.Count; ++i)
+                        var match = false;
+                        for (var i = 0; i < urls.Count; ++i)
                         {
                             try
                             {
-                                Server server = new Server(urls[i], null);
+                                var server = new Server(urls[i], null);
                                 if (selected_server.isMatchServer(server))
                                 {
                                     match = true;
@@ -527,11 +534,11 @@ namespace Shadowsocks.View
 
                     // import all, find difference
                     {
-                        Dictionary<string, Server> old_servers = new Dictionary<string, Server>();
-                        Dictionary<string, Server> old_insert_servers = new Dictionary<string, Server>();
+                        var old_servers = new Dictionary<string, Server>();
+                        var old_insert_servers = new Dictionary<string, Server>();
                         if (!string.IsNullOrEmpty(lastGroup))
                         {
-                            for (int i = config.configs.Count - 1; i >= 0; --i)
+                            for (var i = config.configs.Count - 1; i >= 0; --i)
                             {
                                 if (lastGroup == config.configs[i].group)
                                 {
@@ -539,15 +546,15 @@ namespace Shadowsocks.View
                                 }
                             }
                         }
-                        foreach (string url in urls)
+                        foreach (var url in urls)
                         {
                             try
                             {
-                                Server server = new Server(url, curGroup);
-                                bool match = false;
+                                var server = new Server(url, curGroup);
+                                var match = false;
                                 if (!match)
                                 {
-                                    foreach (KeyValuePair<string, Server> pair in old_insert_servers)
+                                    foreach (var pair in old_insert_servers)
                                     {
                                         if (server.isMatchServer(pair.Value))
                                         {
@@ -559,7 +566,7 @@ namespace Shadowsocks.View
                                 old_insert_servers[server.id] = server;
                                 if (!match)
                                 {
-                                    foreach (KeyValuePair<string, Server> pair in old_servers)
+                                    foreach (var pair in old_servers)
                                     {
                                         if (server.isMatchServer(pair.Value))
                                         {
@@ -573,8 +580,8 @@ namespace Shadowsocks.View
                                 }
                                 if (!match)
                                 {
-                                    int insert_index = config.configs.Count;
-                                    for (int index = config.configs.Count - 1; index >= 0; --index)
+                                    var insert_index = config.configs.Count;
+                                    for (var index = config.configs.Count - 1; index >= 0; --index)
                                     {
                                         if (config.configs[index].group == curGroup)
                                         {
@@ -589,9 +596,9 @@ namespace Shadowsocks.View
                             catch
                             { }
                         }
-                        foreach (KeyValuePair<string, Server> pair in old_servers)
+                        foreach (var pair in old_servers)
                         {
-                            for (int i = config.configs.Count - 1; i >= 0; --i)
+                            for (var i = config.configs.Count - 1; i >= 0; --i)
                             {
                                 if (config.configs[i].id == pair.Key)
                                 {
@@ -605,8 +612,8 @@ namespace Shadowsocks.View
                     config = controller.GetCurrentConfiguration();
                     if (selected_server != null)
                     {
-                        bool match = false;
-                        for (int i = config.configs.Count - 1; i >= 0; --i)
+                        var match = false;
+                        for (var i = config.configs.Count - 1; i >= 0; --i)
                         {
                             if (config.configs[i].id == selected_server.id)
                             {
@@ -635,7 +642,7 @@ namespace Shadowsocks.View
                     }
                     if (count > 0)
                     {
-                        for (int i = 0; i < config.serverSubscribes.Count; ++i)
+                        for (var i = 0; i < config.serverSubscribes.Count; ++i)
                         {
                             if (config.serverSubscribes[i].URL == updateFreeNodeChecker.subscribeTask.URL)
                             {
@@ -690,14 +697,14 @@ namespace Shadowsocks.View
 
         void UpdateItem_Clicked(object sender, EventArgs e)
         {
-            Process.Start(updateChecker.LatestVersionURL);
+            Utils.OpenURL(updateChecker.LatestVersionURL);
             UpdateItem.Visible = false;
             updateChecker.Found = false;
         }
 
         void notifyIcon1_BalloonTipClicked(object sender, EventArgs e)
         {
-            //System.Diagnostics.Process.Start(updateChecker.LatestVersionURL);
+            //Utils.OpenUR(updateChecker.LatestVersionURL);
         }
 
         private void UpdateSysProxyMode(Configuration config)
@@ -719,7 +726,7 @@ namespace Shadowsocks.View
 
         private void LoadCurrentConfiguration()
         {
-            Configuration config = controller.GetCurrentConfiguration();
+            var config = controller.GetCurrentConfiguration();
             UpdateServersMenu();
             UpdateSysProxyMode(config);
 
@@ -737,20 +744,20 @@ namespace Shadowsocks.View
                 items.RemoveAt(0);
             }
 
-            Configuration configuration = controller.GetCurrentConfiguration();
-            SortedDictionary<string, MenuItem> group = new SortedDictionary<string, MenuItem>();
+            var configuration = controller.GetCurrentConfiguration();
+            var group = new SortedDictionary<string, MenuItem>();
             const string def_group = "!(no group)";
-            string select_group = "";
-            for (int i = 0; i < configuration.configs.Count; i++)
+            var select_group = "";
+            for (var i = 0; i < configuration.configs.Count; i++)
             {
                 string group_name;
-                Server server = configuration.configs[i];
+                var server = configuration.configs[i];
                 if (string.IsNullOrEmpty(server.group))
                     group_name = def_group;
                 else
                     group_name = server.group;
 
-                MenuItem item = new MenuItem(server.FriendlyName());
+                var item = new MenuItem(server.FriendlyName());
                 item.Tag = i;
                 item.Click += AServerItem_Click;
                 if (configuration.index == i)
@@ -769,8 +776,8 @@ namespace Shadowsocks.View
                 }
             }
             {
-                int i = 0;
-                foreach (KeyValuePair<string, MenuItem> pair in group)
+                var i = 0;
+                foreach (var pair in group)
                 {
                     if (pair.Key == def_group)
                     {
@@ -797,7 +804,7 @@ namespace Shadowsocks.View
                 configForm.Activate();
                 if (addNode)
                 {
-                    Configuration cfg = controller.GetCurrentConfiguration();
+                    var cfg = controller.GetCurrentConfiguration();
                     configForm.SetServerListSelectedIndex(cfg.index + 1);
                 }
             }
@@ -936,7 +943,7 @@ namespace Shadowsocks.View
             Util.Utils.ReleaseMemory();
             if (eventList.Count > 0)
             {
-                foreach (EventParams p in eventList)
+                foreach (var p in eventList)
                 {
                     updateFreeNodeChecker_NewFreeNodeFound(p.sender, p.e);
                 }
@@ -987,13 +994,13 @@ namespace Shadowsocks.View
 
         private void Import_Click(object sender, EventArgs e)
         {
-            using (OpenFileDialog dlg = new OpenFileDialog())
+            using (var dlg = new OpenFileDialog())
             {
                 dlg.InitialDirectory = Application.StartupPath;
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
-                    string name = dlg.FileName;
-                    Configuration cfg = Configuration.LoadFile(name);
+                    var name = dlg.FileName;
+                    var cfg = Configuration.LoadFile(name);
                     if (cfg.configs.Count == 1 && cfg.configs[0].server == Configuration.GetDefaultServer().server)
                     {
                         MessageBox.Show("Load config file failed", "ShadowsocksR");
@@ -1037,24 +1044,24 @@ namespace Shadowsocks.View
 
         private void OpenWiki_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/HMBSbige/shadowsocks-rss/wiki");
+            Utils.OpenURL(@"https://github.com/HMBSbige/shadowsocks-rss/wiki");
         }
 
         private void FeedbackItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/HMBSbige/ShadowsocksR-Windows/issues/new");
+            Utils.OpenURL(@"https://github.com/HMBSbige/ShadowsocksR-Windows/issues/new/choose");
         }
 
         private void ResetPasswordItem_Click(object sender, EventArgs e)
         {
-            ResetPassword dlg = new ResetPassword();
+            var dlg = new ResetPassword();
             dlg.Show();
             dlg.Activate();
         }
 
         private void AboutItem_Click(object sender, EventArgs e)
         {
-            Process.Start("https://github.com/HMBSbige/ShadowsocksR-Windows");
+            Utils.OpenURL("https://github.com/HMBSbige/ShadowsocksR-Windows");
         }
 
         [DllImport("user32.dll")]
@@ -1064,7 +1071,7 @@ namespace Shadowsocks.View
         {
             if (e.Button == MouseButtons.Left)
             {
-                int SCA_key = GetAsyncKeyState(Keys.ShiftKey) < 0 ? 1 : 0;
+                var SCA_key = GetAsyncKeyState(Keys.ShiftKey) < 0 ? 1 : 0;
                 SCA_key |= GetAsyncKeyState(Keys.ControlKey) < 0 ? 2 : 0;
                 SCA_key |= GetAsyncKeyState(Keys.Menu) < 0 ? 4 : 0;
                 if (SCA_key == 2)
@@ -1151,14 +1158,13 @@ namespace Shadowsocks.View
         {
             try
             {
-                Configuration config = controller.GetCurrentConfiguration();
-                string pacUrl;
-                pacUrl = "http://127.0.0.1:" + config.localPort.ToString() + "/pac?" + "auth=" + config.localAuthPassword + "&t=" + Util.Utils.GetTimestamp(DateTime.Now);
-                Clipboard.SetText(pacUrl);
+                var config = controller.GetCurrentConfiguration();
+                var pacUrl = $@"http://127.0.0.1:{config.localPort}/pac?auth={config.localAuthPassword}&t={Util.Utils.GetTimestamp(DateTime.Now)}";
+                Clipboard.SetDataObject(pacUrl);
             }
             catch
             {
-
+                // ignored
             }
         }
 
@@ -1202,13 +1208,13 @@ namespace Shadowsocks.View
 
         private void AServerItem_Click(object sender, EventArgs e)
         {
-            Configuration config = controller.GetCurrentConfiguration();
+            var config = controller.GetCurrentConfiguration();
             Console.WriteLine("config.checkSwitchAutoCloseAll:" + config.checkSwitchAutoCloseAll);
             if (config.checkSwitchAutoCloseAll)
             {
                 controller.DisconnectAllConnections();
             }
-            MenuItem item = (MenuItem)sender;
+            var item = (MenuItem)sender;
             controller.SelectServerIndex((int)item.Tag);
         }
 
@@ -1258,9 +1264,9 @@ namespace Shadowsocks.View
             {
                 return;
             }
-            int ss_index = text.IndexOf("ss://", 1, StringComparison.OrdinalIgnoreCase);
-            int ssr_index = text.IndexOf("ssr://", 1, StringComparison.OrdinalIgnoreCase);
-            int index = ss_index;
+            var ss_index = text.IndexOf("ss://", 1, StringComparison.OrdinalIgnoreCase);
+            var ssr_index = text.IndexOf("ssr://", 1, StringComparison.OrdinalIgnoreCase);
+            var index = ss_index;
             if (index == -1 || index > ssr_index && ssr_index != -1) index = ssr_index;
             if (index == -1)
             {
@@ -1277,13 +1283,13 @@ namespace Shadowsocks.View
         {
             try
             {
-                IDataObject iData = Clipboard.GetDataObject();
+                var iData = Clipboard.GetDataObject();
                 if (iData.GetDataPresent(DataFormats.Text))
                 {
-                    List<string> urls = new List<string>();
+                    var urls = new List<string>();
                     URL_Split((string)iData.GetData(DataFormats.Text), ref urls);
-                    int count = 0;
-                    foreach (string url in urls)
+                    var count = 0;
+                    foreach (var url in urls)
                     {
                         if (controller.AddServerBySSURL(url))
                             ++count;
@@ -1300,9 +1306,9 @@ namespace Shadowsocks.View
 
         private bool ScanQRCode(Screen screen, Bitmap fullImage, Rectangle cropRect, out string url, out Rectangle rect)
         {
-            using (Bitmap target = new Bitmap(cropRect.Width, cropRect.Height))
+            using (var target = new Bitmap(cropRect.Width, cropRect.Height))
             {
-                using (Graphics g = Graphics.FromImage(target))
+                using (var g = Graphics.FromImage(target))
                 {
                     g.DrawImage(fullImage, new Rectangle(0, 0, cropRect.Width, cropRect.Height),
                                     cropRect,
@@ -1310,13 +1316,13 @@ namespace Shadowsocks.View
                 }
                 var source = new BitmapLuminanceSource(target);
                 var bitmap = new BinaryBitmap(new HybridBinarizer(source));
-                QRCodeReader reader = new QRCodeReader();
+                var reader = new QRCodeReader();
                 var result = reader.decode(bitmap);
                 if (result != null)
                 {
                     url = result.Text;
                     double minX = int.MaxValue, minY = int.MaxValue, maxX = 0, maxY = 0;
-                    foreach (ResultPoint point in result.ResultPoints)
+                    foreach (var point in result.ResultPoints)
                     {
                         minX = Math.Min(minX, point.X);
                         minY = Math.Min(minY, point.Y);
@@ -1335,9 +1341,9 @@ namespace Shadowsocks.View
 
         private bool ScanQRCodeStretch(Screen screen, Bitmap fullImage, Rectangle cropRect, double mul, out string url, out Rectangle rect)
         {
-            using (Bitmap target = new Bitmap((int)(cropRect.Width * mul), (int)(cropRect.Height * mul)))
+            using (var target = new Bitmap((int)(cropRect.Width * mul), (int)(cropRect.Height * mul)))
             {
-                using (Graphics g = Graphics.FromImage(target))
+                using (var g = Graphics.FromImage(target))
                 {
                     g.DrawImage(fullImage, new Rectangle(0, 0, target.Width, target.Height),
                                     cropRect,
@@ -1345,13 +1351,13 @@ namespace Shadowsocks.View
                 }
                 var source = new BitmapLuminanceSource(target);
                 var bitmap = new BinaryBitmap(new HybridBinarizer(source));
-                QRCodeReader reader = new QRCodeReader();
+                var reader = new QRCodeReader();
                 var result = reader.decode(bitmap);
                 if (result != null)
                 {
                     url = result.Text;
                     double minX = int.MaxValue, minY = int.MaxValue, maxX = 0, maxY = 0;
-                    foreach (ResultPoint point in result.ResultPoints)
+                    foreach (var point in result.ResultPoints)
                     {
                         minX = Math.Min(minX, point.X);
                         minY = Math.Min(minY, point.Y);
@@ -1374,9 +1380,9 @@ namespace Shadowsocks.View
             if (index < 5)
             {
                 const int div = 5;
-                int w = width * 3 / div;
-                int h = height * 3 / div;
-                Point[] pt = new Point[5] {
+                var w = width * 3 / div;
+                var h = height * 3 / div;
+                var pt = new Point[5] {
                     new Point(1, 1),
 
                     new Point(0, 0),
@@ -1390,7 +1396,7 @@ namespace Shadowsocks.View
                 const int base_index = 5;
                 if (index < base_index + 6)
                 {
-                    double[] s = new double[] {
+                    var s = new double[] {
                         1,
                         2,
                         3,
@@ -1408,9 +1414,9 @@ namespace Shadowsocks.View
                 {
                     const int hdiv = 7;
                     const int vdiv = 5;
-                    int w = width * 3 / hdiv;
-                    int h = height * 3 / vdiv;
-                    Point[] pt = new Point[8] {
+                    var w = width * 3 / hdiv;
+                    var h = height * 3 / vdiv;
+                    var pt = new Point[8] {
                         new Point(1, 1),
                         new Point(3, 1),
 
@@ -1432,13 +1438,13 @@ namespace Shadowsocks.View
         private void ScanScreenQRCode(bool ss_only)
         {
             Thread.Sleep(100);
-            foreach (Screen screen in Screen.AllScreens)
+            foreach (var screen in Screen.AllScreens)
             {
-                Point screen_size = Util.Utils.GetScreenPhysicalSize();
-                using (Bitmap fullImage = new Bitmap(screen_size.X,
+                var screen_size = Util.Utils.GetScreenPhysicalSize();
+                using (var fullImage = new Bitmap(screen_size.X,
                                                 screen_size.Y))
                 {
-                    using (Graphics g = Graphics.FromImage(fullImage))
+                    using (var g = Graphics.FromImage(fullImage))
                     {
                         g.CopyFromScreen(screen.Bounds.X,
                                          screen.Bounds.Y,
@@ -1446,11 +1452,11 @@ namespace Shadowsocks.View
                                          fullImage.Size,
                                          CopyPixelOperation.SourceCopy);
                     }
-                    bool decode_fail = false;
-                    for (int i = 0; i < 100; i++)
+                    var decode_fail = false;
+                    for (var i = 0; i < 100; i++)
                     {
                         double stretch;
-                        Rectangle cropRect = GetScanRect(fullImage.Width, fullImage.Height, i, out stretch);
+                        var cropRect = GetScanRect(fullImage.Width, fullImage.Height, i, out stretch);
                         if (cropRect.Width == 0)
                             break;
 
@@ -1459,7 +1465,7 @@ namespace Shadowsocks.View
                         if (stretch == 1 ? ScanQRCode(screen, fullImage, cropRect, out url, out rect) : ScanQRCodeStretch(screen, fullImage, cropRect, stretch, out url, out rect))
                         {
                             var success = controller.AddServerBySSURL(url);
-                            QRCodeSplashForm splash = new QRCodeSplashForm();
+                            var splash = new QRCodeSplashForm();
                             if (success)
                             {
                                 splash.FormClosed += splash_FormClosed;
@@ -1478,7 +1484,7 @@ namespace Shadowsocks.View
                                 continue;
                             }
                             splash.Location = new Point(screen.Bounds.X, screen.Bounds.Y);
-                            double dpi = Screen.PrimaryScreen.Bounds.Width / (double)screen_size.X;
+                            var dpi = Screen.PrimaryScreen.Bounds.Width / (double)screen_size.X;
                             splash.TargetRect = new Rectangle(
                                 (int)(rect.Left * dpi + screen.Bounds.X),
                                 (int)(rect.Top * dpi + screen.Bounds.Y),
@@ -1511,12 +1517,12 @@ namespace Shadowsocks.View
 
         void openURLFromQRCode(object sender, FormClosedEventArgs e)
         {
-            Process.Start(_urlToOpen);
+            Utils.OpenURL(_urlToOpen);
         }
 
         void showURLFromQRCode()
         {
-            ShowTextForm dlg = new ShowTextForm("QRCode", _urlToOpen);
+            var dlg = new ShowTextForm("QRCode", _urlToOpen);
             dlg.Show();
             dlg.Activate();
             dlg.BringToFront();

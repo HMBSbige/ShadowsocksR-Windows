@@ -226,7 +226,8 @@ Auto update=自動更新
 # Messages
 
 Shadowsocks Error: {0}=Shadowsocks 錯誤: {0}
-Port already in use=連接埠已被占用
+Port {0} already in use=連接埠號碼 {0} 已被使用
+Port {0} is reserved by system=連接埠號碼 {0} 由系統保留
 Illegal port number format=非法連接埠格式
 Please add at least one server=請添加至少一個伺服器
 Server IP can not be blank=伺服器 IP 不能為空

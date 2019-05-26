@@ -6,6 +6,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using Shadowsocks.Model;
+using Shadowsocks.Util;
 #if !_CONSOLE
 using Shadowsocks.View;
 #endif
@@ -37,7 +38,7 @@ namespace Shadowsocks
                     return;
                 }
             }
-            using (Mutex mutex = new Mutex(false, "Global\\ShadowsocksR_" + Application.StartupPath.GetHashCode()))
+            using (Mutex mutex = new Mutex(false, "Global\\ShadowsocksR_" + Application.StartupPath.GetDeterministicHashCode()))
             {
                 AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
                 Application.EnableVisualStyles();

@@ -39,7 +39,7 @@ namespace Shadowsocks.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Shadowsocks.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("shadowsocks.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,10 +61,21 @@ namespace Shadowsocks.Properties {
         }
         
         /// <summary>
+        ///   查找 System.Byte[] 类型的本地化资源。
+        /// </summary>
+        internal static byte[] abp_js {
+            get {
+                object obj = ResourceManager.GetObject("abp_js", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 # translation for Simplified Chinese
         ///
         ///Shadowsocks=Shadowsocks
         ///ShadowsocksR=ShadowsocksR
+        ///: =：
         ///
         ///# Menu items
         ///
@@ -84,7 +95,7 @@ namespace Shadowsocks.Properties {
         ///Import servers from file...=从文件导入服务器...
         ///Servers Subscribe=服务器订阅
         ///Subscribe setting...=SSR服务器订阅设置...
-        ///Update subscribe SSR nod [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///Update subscribe S [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string cn {
             get {
@@ -113,23 +124,14 @@ namespace Shadowsocks.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
-        /// </summary>
-        internal static byte[] mgwz_dll {
-            get {
-                object obj = ResourceManager.GetObject("mgwz_dll", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 listen-address __PRIVOXY_BIND_IP__:__PRIVOXY_BIND_PORT__
+        ///toggle 0
+        ///logfile ShadowsocksR.log
         ///show-on-task-bar 0
         ///activity-animation 0
         ///forward-socks5 / 127.0.0.1:__SOCKS_PORT__ .
+        ///max-client-connections 2048
         ///hide-console
-        ///__BYPASS_ACTION__
-        ///
         /// 的本地化字符串。
         /// </summary>
         internal static string privoxy_conf {
@@ -214,6 +216,7 @@ namespace Shadowsocks.Properties {
         ///
         ///Shadowsocks=Shadowsocks
         ///ShadowsocksR=ShadowsocksR
+        ///: =：
         ///
         ///# Menu items
         ///
@@ -233,7 +236,7 @@ namespace Shadowsocks.Properties {
         ///Import servers from file...=從文件導入伺服器...
         ///Servers Subscribe=伺服器訂閱
         ///Subscribe setting...=SSR伺服器訂閱設置...
-        ///Update subscribe SSR [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///Update subscri [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string zh_tw {
             get {

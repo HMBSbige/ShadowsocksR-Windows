@@ -12,23 +12,22 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using System.Windows.Forms;
+using System.Text;
 
 namespace Shadowsocks.Util
 {
     public static class Utils
     {
-        private delegate IPHostEntry GetHostEntryHandler(string ip);
-
         public static LRUCache<string, IPAddress> DnsBuffer { get; } = new LRUCache<string, IPAddress>();
 
         public static LRUCache<string, IPAddress> LocalDnsBuffer => DnsBuffer;
 
         private static Process current_process => Process.GetCurrentProcess();
 
-        public static void ReleaseMemory()
+        public static void ReleaseMemory(bool removePages = true)
         {
 #if !_CONSOLE
             // release any unused pages
@@ -39,18 +38,35 @@ namespace Shadowsocks.Util
             // which is part of user experience
             GC.Collect(GC.MaxGeneration);
             GC.WaitForPendingFinalizers();
-
-            if (UIntPtr.Size == 4)
+            if (removePages)
             {
-                SetProcessWorkingSetSize(current_process.Handle,
-                                         (UIntPtr)0xFFFFFFFF,
-                                         (UIntPtr)0xFFFFFFFF);
-            }
-            else if (UIntPtr.Size == 8)
-            {
-                SetProcessWorkingSetSize(current_process.Handle,
-                                         (UIntPtr)0xFFFFFFFFFFFFFFFF,
-                                         (UIntPtr)0xFFFFFFFFFFFFFFFF);
+                // as some users have pointed out
+                // removing pages from working set will cause some IO
+                // which lowered user experience for another group of users
+                //
+                // so we do 2 more things here to satisfy them:
+                // 1. only remove pages once when configuration is changed
+                // 2. add more comments here to tell users that calling
+                //    this function will not be more frequent than
+                //    IM apps writing chat logs, or web browsers writing cache files
+                //    if they're so concerned about their disk, they should
+                //    uninstall all IM apps and web browsers
+                //
+                // please open an issue if you're worried about anything else in your computer
+                // no matter it's GPU performance, monitor contrast, audio fidelity
+                // or anything else in the task manager
+                // we'll do as much as we can to help you
+                //
+                // just kidding
+                if (!Environment.Is64BitProcess)
+                {
+                    SetProcessWorkingSetSize(current_process.Handle, (UIntPtr)0xFFFFFFFF, (UIntPtr)0xFFFFFFFF);
+                }
+                else
+                {
+                    SetProcessWorkingSetSize(current_process.Handle, (UIntPtr)0xFFFFFFFFFFFFFFFF,
+                            (UIntPtr)0xFFFFFFFFFFFFFFFF);
+                }
             }
 #endif
         }
@@ -69,7 +85,7 @@ namespace Shadowsocks.Util
                         sb.Write(buffer, 0, n);
                     }
                 }
-                return System.Text.Encoding.UTF8.GetString(sb.ToArray());
+                return Encoding.UTF8.GetString(sb.ToArray());
             }
         }
 
@@ -375,26 +391,21 @@ namespace Shadowsocks.Util
 
             try
             {
-                var callback = new GetHostEntryHandler(Dns.GetHostEntry);
-                var result = callback.BeginInvoke(host, null, null);
-                if (result.AsyncWaitHandle.WaitOne(10000, true))
+
+                var ips = Dns.GetHostAddresses(host);
+                var type = IPv6_first ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
+
+                foreach (var ad in ips)
                 {
-                    var ipHostEntry = callback.EndInvoke(result);
-
-                    var type = IPv6_first ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
-
-                    foreach (var ad in ipHostEntry.AddressList)
-                    {
-                        if (ad.AddressFamily == type)
-                        {
-                            return ad;
-                        }
-                    }
-
-                    foreach (var ad in ipHostEntry.AddressList)
+                    if (ad.AddressFamily == type)
                     {
                         return ad;
                     }
+                }
+
+                foreach (var ad in ips)
+                {
+                    return ad;
                 }
             }
             catch
@@ -468,7 +479,19 @@ namespace Shadowsocks.Util
 
         public static string GetExecutablePath()
         {
-            return System.Reflection.Assembly.GetExecutingAssembly().Location;
+            var p = Process.GetCurrentProcess();
+            if (p.MainModule != null)
+            {
+                var res = p.MainModule.FileName;
+                return res;
+            }
+            var dllPath = GetDllPath();
+            return Path.Combine(Path.GetDirectoryName(dllPath), $@"{Path.GetFileNameWithoutExtension(dllPath)}.exe");
+        }
+
+        public static string GetDllPath()
+        {
+            return Assembly.GetExecutingAssembly().Location;
         }
 
         public static RegistryKey OpenRegKey(string name, bool writable, RegistryHive hive = RegistryHive.CurrentUser)
@@ -485,7 +508,7 @@ namespace Shadowsocks.Util
             var processInfo = new ProcessStartInfo
             {
                 Verb = "runas",
-                FileName = Application.ExecutablePath,
+                FileName = GetExecutablePath(),
                 Arguments = Arguments
             };
             try
@@ -525,7 +548,7 @@ namespace Shadowsocks.Util
             {
                 try
                 {
-                    _tempPath = Directory.CreateDirectory(Path.Combine(Application.StartupPath, @"temp")).FullName;
+                    _tempPath = Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(GetDllPath()), @"temp")).FullName;
                 }
                 catch (Exception e)
                 {
@@ -533,12 +556,56 @@ namespace Shadowsocks.Util
                     throw;
                 }
             }
+
             return _tempPath;
         }
 
         public static string GetTempPath(string filename)
         {
             return Path.Combine(GetTempPath(), filename);
+        }
+
+        public static bool IsGFWListPAC(string filename)
+        {
+            if (File.Exists(filename))
+            {
+                var original = FileManager.NonExclusiveReadAllText(PACServer.PAC_FILE, Encoding.UTF8);
+                if (original.Contains(@"adblockplus") && !original.Contains(@"cnIpRange"))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static int GetDeterministicHashCode(this string str)
+        {
+            unchecked
+            {
+                var hash1 = (5381 << 16) + 5381;
+                var hash2 = hash1;
+
+                for (var i = 0; i < str.Length; i += 2)
+                {
+                    hash1 = ((hash1 << 5) + hash1) ^ str[i];
+                    if (i == str.Length - 1)
+                        break;
+                    hash2 = ((hash2 << 5) + hash2) ^ str[i + 1];
+                }
+
+                return hash1 + hash2 * 1566083941;
+            }
+        }
+
+        public static void OpenURL(string path)
+        {
+            new Process
+            {
+                StartInfo = new ProcessStartInfo(path)
+                {
+                    UseShellExecute = true
+                }
+            }.Start();
         }
 
 #if !_CONSOLE

@@ -1,0 +1,104 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+	
+	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyName>ShadowsocksR</AssemblyName>
+    <RootNamespace>Shadowsocks</RootNamespace>
+    <ApplicationIcon>shadowsocks.ico</ApplicationIcon>
+    <StartupObject>Shadowsocks.Program</StartupObject>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;_DOTNET_4_0, PROTOCOL_STATISTICS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;_DOTNET_4_0, PROTOCOL_STATISTICS</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Costura.Fody" Version="4.0.0" Condition=" '$(SelfContained)' != 'true' " />
+    <PackageReference Include="DnsClient" Version="1.2.0" />
+    <PackageReference Include="Fody" Version="5.0.6" Condition=" '$(SelfContained)' != 'true' ">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.6" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' ">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.IO.Compression" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="View\ConfigForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\ConfigForm.Designer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\InputPassword.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\InputPassword.Designer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\LogForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\LogForm.Designer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\PortSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\PortSettingsForm.Designer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\QRCodeSplashForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\ResetPassword.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\ResetPassword.Designer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\ServerLogForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\ServerLogForm.Designer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\SettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\SettingsForm.Designer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\ShowTextForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\ShowTextForm.Designer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\SubscribeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="View\SubscribeForm.Designer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+
+</Project>

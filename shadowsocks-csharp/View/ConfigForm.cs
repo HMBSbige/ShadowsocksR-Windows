@@ -2,6 +2,7 @@
 using Shadowsocks.Encryption;
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
+using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -636,7 +637,7 @@ namespace Shadowsocks.View
 
         private void LinkUpdate_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            System.Diagnostics.Process.Start(_updateChecker.LatestVersionURL);
+            Utils.OpenURL(_updateChecker.LatestVersionURL);
         }
 
         private void PasswordLabel_CheckedChanged(object sender, EventArgs e)

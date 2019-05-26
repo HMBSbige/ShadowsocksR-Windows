@@ -18,7 +18,7 @@ namespace Shadowsocks.Encryption.Stream
         {
         }
 
-        private static Dictionary<string, EncryptorInfo> _ciphers = new Dictionary<string, EncryptorInfo> {
+        private static readonly Dictionary<string, EncryptorInfo> _ciphers = new Dictionary<string, EncryptorInfo> {
             { "aes-128-cbc", new EncryptorInfo(16, 16, false, CIPHER_AES, "AES-128-CBC") },
             { "aes-192-cbc", new EncryptorInfo(24, 16, false, CIPHER_AES, "AES-192-CBC") },
             { "aes-256-cbc", new EncryptorInfo(32, 16, false, CIPHER_AES, "AES-256-CBC") },
@@ -37,7 +37,7 @@ namespace Shadowsocks.Encryption.Stream
             { "rc4-md5-6", new EncryptorInfo(16, 6, true, CIPHER_RC4, "ARC4-128") },
         };
 
-        public static List<string> SupportedCiphers()
+        public static IEnumerable<string> SupportedCiphers()
         {
             return new List<string>(_ciphers.Keys);
         }
@@ -50,7 +50,7 @@ namespace Shadowsocks.Encryption.Stream
         protected override void initCipher(byte[] iv, bool isCipher)
         {
             base.initCipher(iv, isCipher);
-            IntPtr ctx = Marshal.AllocHGlobal(MbedTLS.cipher_get_size_ex());
+            var ctx = Marshal.AllocHGlobal(MbedTLS.cipher_get_size_ex());
             if (isCipher)
             {
                 _encryptCtx = ctx;
@@ -59,22 +59,23 @@ namespace Shadowsocks.Encryption.Stream
             {
                 _decryptCtx = ctx;
             }
-            byte[] realkey;
-            if (_method.StartsWith("rc4-"))
+            byte[] realKey;
+            if (_method.StartsWith(@"rc4-"))
             {
-                byte[] temp = new byte[keyLen + ivLen];
-                realkey = new byte[keyLen];
+                var temp = new byte[keyLen + ivLen];
                 Array.Copy(_key, 0, temp, 0, keyLen);
                 Array.Copy(iv, 0, temp, keyLen, ivLen);
-                realkey = MbedTLS.MD5(temp);
+                realKey = MbedTLS.MD5(temp);
             }
             else
             {
-                realkey = _key;
+                realKey = _key;
             }
             MbedTLS.cipher_init(ctx);
             if (MbedTLS.cipher_setup(ctx, MbedTLS.cipher_info_from_string(getInfo().name)) != 0)
+            {
                 throw new Exception("Cannot initialize mbed TLS cipher context");
+            }
             /*
              * MbedTLS takes key length by bit
              * cipher_setkey() will set the correct key schedule
@@ -86,7 +87,7 @@ namespace Shadowsocks.Encryption.Stream
              *  == MBEDTLS_{EN,DE}CRYPT
              *  
              */
-            if (MbedTLS.cipher_setkey(ctx, realkey, keyLen * 8,
+            if (MbedTLS.cipher_setkey(ctx, realKey, keyLen * 8,
                 isCipher ? MbedTLS.MBEDTLS_ENCRYPT : MbedTLS.MBEDTLS_DECRYPT) != 0)
                 throw new Exception("Cannot set mbed TLS cipher key");
             if (MbedTLS.cipher_set_iv(ctx, iv, ivLen) != 0)
@@ -102,18 +103,25 @@ namespace Shadowsocks.Encryption.Stream
             {
                 throw new ObjectDisposedException(this.ToString());
             }
-            if (MbedTLS.cipher_update(isCipher ? _encryptCtx : _decryptCtx,
-                buf, length, outbuf, ref length) != 0)
+            if (MbedTLS.cipher_update(isCipher ? _encryptCtx : _decryptCtx, buf, length, outbuf, ref length) != 0)
+            {
                 throw new Exception("Cannot update mbed TLS cipher context");
+            }
         }
 
         #region IDisposable
+
         private bool _disposed;
 
         public override void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        ~StreamMbedTLSEncryptor()
+        {
+            Dispose(false);
         }
 
         private void Dispose(bool disposing)
@@ -129,20 +137,24 @@ namespace Shadowsocks.Encryption.Stream
 
             if (disposing)
             {
-                if (_encryptCtx != IntPtr.Zero)
-                {
-                    MbedTLS.cipher_free(_encryptCtx);
-                    Marshal.FreeHGlobal(_encryptCtx);
-                    _encryptCtx = IntPtr.Zero;
-                }
-                if (_decryptCtx != IntPtr.Zero)
-                {
-                    MbedTLS.cipher_free(_decryptCtx);
-                    Marshal.FreeHGlobal(_decryptCtx);
-                    _decryptCtx = IntPtr.Zero;
-                }
+                // free managed objects
+            }
+
+            // free unmanaged objects
+            if (_encryptCtx != IntPtr.Zero)
+            {
+                MbedTLS.cipher_free(_encryptCtx);
+                Marshal.FreeHGlobal(_encryptCtx);
+                _encryptCtx = IntPtr.Zero;
+            }
+            if (_decryptCtx != IntPtr.Zero)
+            {
+                MbedTLS.cipher_free(_decryptCtx);
+                Marshal.FreeHGlobal(_decryptCtx);
+                _decryptCtx = IntPtr.Zero;
             }
         }
+
         #endregion
     }
 }

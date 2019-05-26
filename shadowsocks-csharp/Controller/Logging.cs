@@ -109,7 +109,7 @@ namespace Shadowsocks.Controller
 
         private static void CompressOldLogFile()
         {
-            var list = Directory.GetFiles(Utils.GetTempPath(), @"*.log", SearchOption.TopDirectoryOnly);
+            var list = Directory.GetFiles(Utils.GetTempPath(), @"shadowsocks_*.log", SearchOption.TopDirectoryOnly);
             foreach (var file in list)
             {
                 if (file != LogFile)
