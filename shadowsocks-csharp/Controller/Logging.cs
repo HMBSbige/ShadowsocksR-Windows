@@ -27,6 +27,8 @@ namespace Shadowsocks.Controller
         private static StreamWriterWithTimestamp _logStreamWriter;
         private static readonly object _lock = new object();
         public static bool save_to_file = true;
+        public static TextWriter DefaultOut;
+        public static TextWriter DefaultError;
 
         public static bool OpenLogFile()
         {
@@ -51,8 +53,8 @@ namespace Shadowsocks.Controller
                 }
                 else
                 {
-                    Console.SetOut(Console.Out);
-                    Console.SetError(Console.Error);
+                    Console.SetOut(DefaultOut);
+                    Console.SetError(DefaultError);
                 }
 
                 return true;

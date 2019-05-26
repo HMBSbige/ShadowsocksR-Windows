@@ -351,6 +351,8 @@ namespace Shadowsocks.Controller
             // some logic in configuration updated the config when saving, we need to read it again
             _config = MergeGetConfiguration(_config);
             _config.FlushPortMapCache();
+            Logging.save_to_file = _config.logEnable;
+            Logging.OpenLogFile();
             ReloadIPRange();
 
             var hostMap = new HostMap();

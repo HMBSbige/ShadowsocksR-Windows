@@ -8,6 +8,7 @@ ShadowsocksR for Windows
 * [latest release]
 * [nightly build]
 
+#### Artifacts
 * `ShadowsocksR-netcore.zip` 
     * 需要安装 [.NET Core 3.0 Runtime](https://dotnet.microsoft.com/download/dotnet-core/3.0)
     * 文件较少
@@ -24,7 +25,7 @@ ShadowsocksR for Windows
     * 无需任何运行时
     * 文件较多
 
-### Develop
+#### Develop
 
 Visual Studio Community 2019 is recommended.
 

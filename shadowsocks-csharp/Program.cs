@@ -77,6 +77,8 @@ namespace Shadowsocks
                 HostMap.Instance().LoadHostFile();
 
                 // Logging
+                Logging.DefaultOut = Console.Out;
+                Logging.DefaultError = Console.Error;
                 Configuration cfg = _controller.GetConfiguration();
                 Logging.save_to_file = cfg.logEnable;
 

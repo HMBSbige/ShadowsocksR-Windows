@@ -135,7 +135,7 @@ namespace Shadowsocks.Model
 
         public bool autoBan;
         public bool checkSwitchAutoCloseAll;
-        public bool logEnable;
+        public bool logEnable = true;
         public bool sameHostForSameTarget;
 
         public int keepVisitTime;
