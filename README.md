@@ -21,4 +21,4 @@ Copyright © HMBSbige 2019. Forked from ShadowsocksR by BreakWa11
 [Appveyor]:       https://ci.appveyor.com/project/HMBSbige/shadowsocksr-windows
 [Build Status]:   https://ci.appveyor.com/api/projects/status/b9jgwdfvn20ithj1/branch/master?svg=true
 [latest release]: https://github.com/HMBSbige/ShadowsocksR-Windows/releases
-[nightly build]: https://ci.appveyor.com/project/HMBSbige/shadowsocksr-windows/build/artifacts
+[nightly build]: https://ci.appveyor.com/project/HMBSbige/shadowsocksr-windows/branch/master/artifacts
