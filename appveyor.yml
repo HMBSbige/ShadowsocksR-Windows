@@ -7,13 +7,17 @@ install:
 - cmd: git submodule update --init --recursive
 before_build:
 - cmd: nuget restore
-build:
-  project: shadowsocks-csharp.sln
-  parallel: true
-  verbosity: normal
+build_script:
+- cmd: build.cmd
 after_build:
-- cmd: 7z a ShadowsocksR.zip %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\ShadowsocksR.exe %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\ShadowsocksR.dll %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\ShadowsocksR.runtimeconfig.json
+- cmd: 7z a ShadowsocksR-netcore.zip %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\ShadowsocksR.exe %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\ShadowsocksR.dll %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\ShadowsocksR.runtimeconfig.json
+test: off
 artifacts:
-- path: ShadowsocksR.zip
-  name: ShadowsocksR.zip
-  
+- path: ShadowsocksR-netcore.zip
+  name: ShadowsocksR-netcore.zip
+- path: shadowsocks-csharp\bin\Release\net472\ShadowsocksR.exe
+  name: ShadowsocksR-net472.exe
+- path: shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x86\publish
+  name: ShadowsocksR-netcore-win32
+- path: shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x64\publish
+  name: ShadowsocksR-netcore-win64

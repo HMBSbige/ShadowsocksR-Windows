@@ -14,7 +14,7 @@ using System.Windows.Forms;
 using ZXing;
 using ZXing.Common;
 using ZXing.QrCode;
-using ZXing.Windows.Compatibility;
+using BitmapLuminanceSource = ZXing.Windows.Compatibility.BitmapLuminanceSource;
 
 namespace Shadowsocks.View
 {

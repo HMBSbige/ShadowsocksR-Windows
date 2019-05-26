@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -26,14 +26,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Costura.Fody" Version="4.0.0" />
+    <PackageReference Include="Costura.Fody" Version="4.0.0" Condition=" '$(SelfContained)' != 'true' " />
     <PackageReference Include="DnsClient" Version="1.2.0" />
-    <PackageReference Include="Fody" Version="5.0.6">
+    <PackageReference Include="Fody" Version="5.0.6" Condition=" '$(SelfContained)' != 'true' ">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.6" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' ">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.IO.Compression" />
   </ItemGroup>
 
   <ItemGroup>
