@@ -21,9 +21,24 @@ namespace Shadowsocks.Controller
 
         public const string Name = @"ShadowsocksR";
         public const string Copyright = @"Copyright © HMBSbige 2019 & BreakWa11 2017. Fork from Shadowsocks by clowwindy";
-        public const string Version = @"4.9.5.2";
+        public const string Version = @"5.0.0.0";
 
         public const string FullVersion = Version +
+#if IsDotNetCore
+        @" .Net Core" +
+#else
+        @"" +
+#endif
+#if IsSelfContainedDotNetCore
+        @" SelfContained" +
+    #if Is64Bit
+            @" x64" +
+    #else
+            @"" +
+    #endif
+#else
+        @"" +
+#endif
 #if DEBUG
         @" Debug";
 #else

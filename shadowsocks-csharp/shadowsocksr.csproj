@@ -24,7 +24,13 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE;_DOTNET_4_0, PROTOCOL_STATISTICS</DefineConstants>
   </PropertyGroup>
-
+  
+  <PropertyGroup>
+	<DefineConstants Condition=" $(TargetFramework.StartsWith(netcoreapp)) ">$(DefineConstants);IsDotNetCore</DefineConstants>
+	<DefineConstants Condition=" '$(SelfContained)' == 'true' ">$(DefineConstants);IsSelfContainedDotNetCore</DefineConstants>
+	<DefineConstants Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">$(DefineConstants);Is64Bit</DefineConstants>
+  </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="Costura.Fody" Version="4.0.0" Condition=" '$(SelfContained)' != 'true' " />
     <PackageReference Include="DnsClient" Version="1.2.0" />
