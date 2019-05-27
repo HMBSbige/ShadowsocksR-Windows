@@ -225,7 +225,6 @@ namespace Shadowsocks.Controller
                 }
                 http.Proxy = proxy;
                 http.DownloadStringCompleted += HttpDownloadCNIPCompleted;
-                ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls;
                 http.DownloadStringAsync(new Uri(CNIP_URL + @"?rnd=" + Utils.RandUInt32()));
             }
             else

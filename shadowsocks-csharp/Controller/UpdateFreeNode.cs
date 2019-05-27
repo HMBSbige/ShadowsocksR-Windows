@@ -14,8 +14,6 @@ namespace Shadowsocks.Controller
         public ServerSubscribe subscribeTask;
         public bool noitify;
 
-        public const string Name = "ShadowsocksR";
-
         public void CheckUpdate(Configuration config, ServerSubscribe subscribeTask, bool use_proxy, bool noitify)
         {
             FreeNodeResult = null;
@@ -45,14 +43,8 @@ namespace Shadowsocks.Controller
                 this.subscribeTask = subscribeTask;
                 string URL = subscribeTask.URL;
 
-                //add support for tls1.2+
-                if (URL.StartsWith("https", StringComparison.OrdinalIgnoreCase))
-                {
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-                }
-
                 http.DownloadStringCompleted += http_DownloadStringCompleted;
-                http.DownloadStringAsync(new Uri(URL != null ? URL : UpdateURL));
+                http.DownloadStringAsync(new Uri(URL ?? UpdateURL));
             }
             catch (Exception e)
             {
