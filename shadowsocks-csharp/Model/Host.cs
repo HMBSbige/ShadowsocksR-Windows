@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
-using System.Text;
 
 namespace Shadowsocks.Model
 {
@@ -128,7 +128,7 @@ namespace Shadowsocks.Model
         public bool LoadHostFile()
         {
             string filename = HOST_FILENAME;
-            string absFilePath = System.IO.Path.Combine(System.Windows.Forms.Application.StartupPath, filename);
+            string absFilePath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), filename);
             if (System.IO.File.Exists(absFilePath))
             {
                 try

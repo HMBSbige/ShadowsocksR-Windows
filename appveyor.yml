@@ -9,14 +9,21 @@ before_build:
 build_script:
 - cmd: build.cmd
 after_build:
-- cmd: 7z a ShadowsocksR-netcore.zip %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\ShadowsocksR.exe %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\ShadowsocksR.dll %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\ShadowsocksR.runtimeconfig.json
+- cmd: >-
+    7z a ShadowsocksR-netcore.zip %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\ShadowsocksR.exe %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\ShadowsocksR.dll %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\ShadowsocksR.runtimeconfig.json
+
+    7z a ShadowsocksR-netcore-win32.zip %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x86\publish\ShadowsocksR.exe
+    
+    7z a ShadowsocksR-net472.zip %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\net472\ShadowsocksR.exe
+
+    7z a ShadowsocksR-netcore-win64.zip %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x64\publish\ShadowsocksR.exe
 test: off
 artifacts:
 - path: ShadowsocksR-netcore.zip
   name: ShadowsocksR-netcore.zip
-- path: shadowsocks-csharp\bin\Release\net472\ShadowsocksR.exe
-  name: ShadowsocksR-net472.exe
-- path: shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x86\publish
-  name: ShadowsocksR-netcore-win32
-- path: shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x64\publish
-  name: ShadowsocksR-netcore-win64
+- path: ShadowsocksR-net472.zip
+  name: ShadowsocksR-net472.zip
+- path: ShadowsocksR-netcore-win32.zip
+  name: ShadowsocksR-netcore-win32.zip
+- path: ShadowsocksR-netcore-win64.zip
+  name: ShadowsocksR-netcore-win64.zip

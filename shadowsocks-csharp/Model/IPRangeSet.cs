@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Text;
 
 namespace Shadowsocks.Model
 {
@@ -69,11 +67,11 @@ namespace Shadowsocks.Model
         public bool LoadApnic(string zone)
         {
             string filename = APNIC_EXT_FILENAME;
-            string absFilePath = Path.Combine(System.Windows.Forms.Application.StartupPath, filename);
+            string absFilePath = Path.Combine(Directory.GetCurrentDirectory(), filename);
             if (!File.Exists(absFilePath))
             {
                 filename = APNIC_FILENAME;
-                absFilePath = Path.Combine(System.Windows.Forms.Application.StartupPath, filename);
+                absFilePath = Path.Combine(Directory.GetCurrentDirectory(), filename);
             }
             if (File.Exists(absFilePath))
             {
@@ -81,7 +79,8 @@ namespace Shadowsocks.Model
                 {
                     using (StreamReader stream = File.OpenText(absFilePath))
                     {
-                        using (StreamWriter out_stream = new StreamWriter(File.OpenWrite(CHN_FILENAME))) {
+                        using (StreamWriter out_stream = new StreamWriter(File.OpenWrite(CHN_FILENAME)))
+                        {
                             while (true)
                             {
                                 string line = stream.ReadLine();
@@ -119,7 +118,7 @@ namespace Shadowsocks.Model
 
         public bool LoadChn()
         {
-            string absFilePath = Path.Combine(System.Windows.Forms.Application.StartupPath, CHN_FILENAME);
+            string absFilePath = Path.Combine(Directory.GetCurrentDirectory(), CHN_FILENAME);
             if (File.Exists(absFilePath))
             {
                 try

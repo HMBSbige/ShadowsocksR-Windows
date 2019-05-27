@@ -1,13 +1,12 @@
-﻿using System;
+﻿using Shadowsocks.Controller;
+using Shadowsocks.Model;
+using Shadowsocks.Properties;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
-using Shadowsocks.Controller;
-using Shadowsocks.Model;
-using Shadowsocks.Properties;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace Shadowsocks.View
 {
@@ -38,7 +37,6 @@ namespace Shadowsocks.View
         private int updateTick = 0;
         private int updateSize = 0;
         private int pendingUpdate = 0;
-        private string title_perfix = "";
         private ServerSpeedLogShow[] ServerSpeedLogList;
         private Thread workerThread;
         private AutoResetEvent workerEvent = new AutoResetEvent(false);
@@ -48,57 +46,54 @@ namespace Shadowsocks.View
             this.controller = controller;
             try
             {
-                this.Icon = Icon.FromHandle((new Bitmap("icon.png")).GetHicon());
-                title_perfix = System.Windows.Forms.Application.StartupPath;
-                if (title_perfix.Length > 20)
-                    title_perfix = title_perfix.Substring(0, 20);
+                Icon = Icon.FromHandle(new Bitmap("icon.png").GetHicon());
             }
             catch
             {
-                this.Icon = Icon.FromHandle(Resources.ssw128.GetHicon());
+                Icon = Icon.FromHandle(Resources.ssw128.GetHicon());
             }
-            this.Font = System.Drawing.SystemFonts.MessageBoxFont;
+            Font = SystemFonts.MessageBoxFont;
             InitializeComponent();
 
-            this.Width = 810;
+            Width = 810;
             int dpi_mul = Util.Utils.GetDpiMul();
 
             Configuration config = controller.GetCurrentConfiguration();
             if (config.configs.Count < 8)
             {
-                this.Height = 300 * dpi_mul / 4;
+                Height = 300 * dpi_mul / 4;
             }
             else if (config.configs.Count < 20)
             {
-                this.Height = (300 + (config.configs.Count - 8) * 16) * dpi_mul / 4;
+                Height = (300 + (config.configs.Count - 8) * 16) * dpi_mul / 4;
             }
             else
             {
-                this.Height = 500 * dpi_mul / 4;
+                Height = 500 * dpi_mul / 4;
             }
             UpdateTexts();
             UpdateLog();
 
-            this.Menu = new MainMenu(new MenuItem[] {
+            Menu = new MainMenu(new MenuItem[] {
                 CreateMenuGroup("&Control", new MenuItem[] {
-                    CreateMenuItem("&Disconnect direct connections", new EventHandler(this.DisconnectForward_Click)),
-                    CreateMenuItem("Disconnect &All", new EventHandler(this.Disconnect_Click)),
+                    CreateMenuItem("&Disconnect direct connections", new EventHandler(DisconnectForward_Click)),
+                    CreateMenuItem("Disconnect &All", new EventHandler(Disconnect_Click)),
                     new MenuItem("-"),
-                    CreateMenuItem("Clear &MaxSpeed", new EventHandler(this.ClearMaxSpeed_Click)),
-                    clearItem = CreateMenuItem("&Clear", new EventHandler(this.ClearItem_Click)),
+                    CreateMenuItem("Clear &MaxSpeed", new EventHandler(ClearMaxSpeed_Click)),
+                    clearItem = CreateMenuItem("&Clear", new EventHandler(ClearItem_Click)),
                     new MenuItem("-"),
-                    CreateMenuItem("Clear &Selected Total", new EventHandler(this.ClearSelectedTotal_Click)),
-                    CreateMenuItem("Clear &Total", new EventHandler(this.ClearTotal_Click)),
+                    CreateMenuItem("Clear &Selected Total", new EventHandler(ClearSelectedTotal_Click)),
+                    CreateMenuItem("Clear &Total", new EventHandler(ClearTotal_Click)),
                 }),
                 CreateMenuGroup("Port &out", new MenuItem[] {
-                    CreateMenuItem("Copy current link", new EventHandler(this.copyLinkItem_Click)),
-                    CreateMenuItem("Copy current group links", new EventHandler(this.copyGroupLinkItem_Click)),
-                    CreateMenuItem("Copy all enable links", new EventHandler(this.copyEnableLinksItem_Click)),
-                    CreateMenuItem("Copy all links", new EventHandler(this.copyLinksItem_Click)),
+                    CreateMenuItem("Copy current link", new EventHandler(copyLinkItem_Click)),
+                    CreateMenuItem("Copy current group links", new EventHandler(copyGroupLinkItem_Click)),
+                    CreateMenuItem("Copy all enable links", new EventHandler(copyEnableLinksItem_Click)),
+                    CreateMenuItem("Copy all links", new EventHandler(copyLinksItem_Click)),
                 }),
                 CreateMenuGroup("&Window", new MenuItem[] {
-                    CreateMenuItem("Auto &size", new EventHandler(this.autosizeItem_Click)),
-                    this.topmostItem = CreateMenuItem("Always On &Top", new EventHandler(this.topmostItem_Click)),
+                    CreateMenuItem("Auto &size", new EventHandler(autosizeItem_Click)),
+                    topmostItem = CreateMenuItem("Always On &Top", new EventHandler(topmostItem_Click)),
                 }),
             });
             controller.ConfigChanged += controller_ConfigChanged;
@@ -119,7 +114,7 @@ namespace Shadowsocks.View
             }
             if (ExistDoubleBufferListViewVerticalScrollBar)
                 width += SystemInformation.VerticalScrollBarWidth;
-            this.Width = width + (this.Width - this.ClientSize.Width) + 1;
+            Width = width + (Width - ClientSize.Width) + 1;
             ServerDataGrid.AutoResizeColumnHeadersHeight();
         }
         private MenuItem CreateMenuGroup(string text, MenuItem[] items)
@@ -134,7 +129,7 @@ namespace Shadowsocks.View
 
         private void UpdateTitle()
         {
-            this.Text = title_perfix + I18N.GetString("ServerLog") + "("
+            Text = I18N.GetString("ServerLog") + "("
                 + (controller.GetCurrentConfiguration().shareOverLan ? "any" : "local") + ":" + controller.GetCurrentConfiguration().localPort.ToString()
                 + "(" + Model.Server.GetForwardServerRef().GetConnections().Count.ToString() + ")"
                 + " " + I18N.GetString("Version") + UpdateChecker.FullVersion
@@ -272,7 +267,7 @@ namespace Shadowsocks.View
         {
             if (workerThread == null)
             {
-                workerThread = new Thread(this.UpdateLogThread);
+                workerThread = new Thread(UpdateLogThread);
                 workerThread.Start();
             }
             else
@@ -318,7 +313,7 @@ namespace Shadowsocks.View
             int displayEndIndex = displayBeginIndex + ServerDataGrid.DisplayedRowCount(true);
             try
             {
-                for (int list_index = (lastRefreshIndex >= ServerDataGrid.RowCount) ? 0 : lastRefreshIndex, rowChangeCnt = 0;
+                for (int list_index = lastRefreshIndex >= ServerDataGrid.RowCount ? 0 : lastRefreshIndex, rowChangeCnt = 0;
                     list_index < ServerDataGrid.RowCount && rowChangeCnt <= 100;
                     ++list_index)
                 {
@@ -685,7 +680,7 @@ namespace Shadowsocks.View
             }
             if (ExistDoubleBufferListViewVerticalScrollBar)
                 width += SystemInformation.VerticalScrollBarWidth;
-            this.Width = width + (this.Width - this.ClientSize.Width) + 1;
+            Width = width + (Width - ClientSize.Width) + 1;
             ServerDataGrid.AutoResizeColumnHeadersHeight();
         }
 
@@ -764,7 +759,7 @@ namespace Shadowsocks.View
         private void topmostItem_Click(object sender, EventArgs e)
         {
             topmostItem.Checked = !topmostItem.Checked;
-            this.TopMost = topmostItem.Checked;
+            TopMost = topmostItem.Checked;
         }
 
         private void DisconnectForward_Click(object sender, EventArgs e)
@@ -825,7 +820,7 @@ namespace Shadowsocks.View
                 updatePause -= 1;
                 return;
             }
-            if (this.WindowState == FormWindowState.Minimized)
+            if (WindowState == FormWindowState.Minimized)
             {
                 if (++pendingUpdate < 40)
                 {
@@ -1049,7 +1044,7 @@ namespace Shadowsocks.View
             //e.SortResult = 0;
             if (e.Column.Name == "Server" || e.Column.Name == "Group")
             {
-                e.SortResult = System.String.Compare(Convert.ToString(e.CellValue1), Convert.ToString(e.CellValue2));
+                e.SortResult = String.Compare(Convert.ToString(e.CellValue1), Convert.ToString(e.CellValue2));
                 e.Handled = true;
             }
             else if (e.Column.Name == "ID"
@@ -1062,7 +1057,7 @@ namespace Shadowsocks.View
             {
                 Int32 v1 = Convert.ToInt32(e.CellValue1);
                 Int32 v2 = Convert.ToInt32(e.CellValue2);
-                e.SortResult = (v1 == v2 ? 0 : (v1 < v2 ? -1 : 1));
+                e.SortResult = v1 == v2 ? 0 : v1 < v2 ? -1 : 1;
             }
             else if (e.Column.Name == "ErrorPercent")
             {
@@ -1086,13 +1081,13 @@ namespace Shadowsocks.View
                 String s2 = Convert.ToString(e.CellValue2);
                 long v1 = Str2Long(s1);
                 long v2 = Str2Long(s2);
-                e.SortResult = (v1 == v2 ? 0 : (v1 < v2 ? -1 : 1));
+                e.SortResult = v1 == v2 ? 0 : v1 < v2 ? -1 : 1;
             }
             if (e.SortResult == 0)
             {
                 int v1 = listOrder[Convert.ToInt32(ServerDataGrid[0, e.RowIndex1].Value)];
                 int v2 = listOrder[Convert.ToInt32(ServerDataGrid[0, e.RowIndex2].Value)];
-                e.SortResult = (v1 == v2 ? 0 : (v1 < v2 ? -1 : 1));
+                e.SortResult = v1 == v2 ? 0 : v1 < v2 ? -1 : 1;
                 if (e.SortResult != 0 && ServerDataGrid.SortOrder == SortOrder.Descending)
                 {
                     e.SortResult = -e.SortResult;
@@ -1145,8 +1140,8 @@ namespace Shadowsocks.View
             }
             if (ExistDoubleBufferListViewVerticalScrollBar)
                 width += SystemInformation.VerticalScrollBarWidth;
-            width += (this.Width - this.ClientSize.Width) + 1;
-            ServerDataGrid.Columns[2].Width += this.Width - width;
+            width += Width - ClientSize.Width + 1;
+            ServerDataGrid.Columns[2].Width += Width - width;
         }
 
         private void ServerDataGrid_ColumnWidthChanged(object sender, DataGridViewColumnEventArgs e)
@@ -1161,9 +1156,9 @@ namespace Shadowsocks.View
             ServerDataGrid.AutoResizeColumnHeadersHeight();
             if (ExistDoubleBufferListViewVerticalScrollBar)
                 width += SystemInformation.VerticalScrollBarWidth;
-            this.Width = width + (this.Width - this.ClientSize.Width) + 1;
+            Width = width + (Width - ClientSize.Width) + 1;
         }
 
-        private bool ExistDoubleBufferListViewVerticalScrollBar => ServerDataGrid.ColumnHeadersHeight + (controller.GetCurrentConfiguration().configs.Count * ServerDataGrid.RowTemplate.Height) >= ServerDataGrid.Height;
+        private bool ExistDoubleBufferListViewVerticalScrollBar => ServerDataGrid.ColumnHeadersHeight + controller.GetCurrentConfiguration().configs.Count * ServerDataGrid.RowTemplate.Height >= ServerDataGrid.Height;
     }
 }

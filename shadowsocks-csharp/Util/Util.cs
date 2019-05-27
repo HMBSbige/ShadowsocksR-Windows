@@ -548,7 +548,7 @@ namespace Shadowsocks.Util
             {
                 try
                 {
-                    _tempPath = Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(GetDllPath()), @"temp")).FullName;
+                    _tempPath = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), @"temp")).FullName;
                 }
                 catch (Exception e)
                 {

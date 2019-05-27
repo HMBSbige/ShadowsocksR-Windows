@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -996,7 +997,7 @@ namespace Shadowsocks.View
         {
             using (var dlg = new OpenFileDialog())
             {
-                dlg.InitialDirectory = Application.StartupPath;
+                dlg.InitialDirectory = Directory.GetCurrentDirectory();
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
                     var name = dlg.FileName;

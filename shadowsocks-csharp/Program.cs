@@ -26,6 +26,7 @@ namespace Shadowsocks
         [STAThread]
         static void Main(string[] args)
         {
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(Utils.GetExecutablePath()));
 #if !_CONSOLE
             foreach (var arg in args)
             {
@@ -38,7 +39,7 @@ namespace Shadowsocks
                     return;
                 }
             }
-            using (var mutex = new Mutex(false, "Global\\ShadowsocksR_" + Application.StartupPath.GetDeterministicHashCode()))
+            using (var mutex = new Mutex(false, "Global\\ShadowsocksR_" + Directory.GetCurrentDirectory().GetDeterministicHashCode()))
             {
                 AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
                 Application.EnableVisualStyles();
@@ -54,7 +55,6 @@ namespace Shadowsocks
                     return;
                 }
 #endif
-                Directory.SetCurrentDirectory(Application.StartupPath);
 
 #if !_CONSOLE
                 var tryTimes = 0;
