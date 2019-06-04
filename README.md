@@ -14,7 +14,7 @@ ShadowsocksR for Windows
     * 文件较小
 
 * `ShadowsocksR-net472.zip` 
-    * 需要安装 [.NET Framework 4.7.2](https://dotnet.microsoft.com/download) （最新版 Win10 自带）
+    * 需要安装 [.NET Framework 4.8](https://dotnet.microsoft.com/download) （最新版 Win10 自带）
     * 文件小
 
 * `ShadowsocksR-netcore-win32.zip`

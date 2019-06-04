@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
+using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -444,7 +445,7 @@ namespace Shadowsocks.Model
             serverSubscribes = config.serverSubscribes;
         }
 
-        private void FixConfiguration()
+        public void FixConfiguration()
         {
             if (localPort == 0)
             {
@@ -547,22 +548,9 @@ namespace Shadowsocks.Model
                 var jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
                 if (GlobalConfiguration.config_password.Length > 0)
                 {
-                    var encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
+                    using var encryptor = EncryptorFactory.GetEncryptor(@"aes-256-cfb", GlobalConfiguration.config_password);
                     var cfgData = Encoding.UTF8.GetBytes(jsonString);
-                    var cfgEncrypt = new byte[cfgData.Length + 128];
-                    var dataLen = 0;
-                    const int buffer_size = 32768;
-                    var input = new byte[buffer_size];
-                    var output = new byte[buffer_size + 128];
-                    for (var start_pos = 0; start_pos < cfgData.Length; start_pos += buffer_size)
-                    {
-                        var len = Math.Min(cfgData.Length - start_pos, buffer_size);
-                        Buffer.BlockCopy(cfgData, start_pos, input, 0, len);
-                        encryptor.Encrypt(input, len, output, out var out_len);
-                        Buffer.BlockCopy(output, 0, cfgEncrypt, dataLen, out_len);
-                        dataLen += out_len;
-                    }
-                    jsonString = Convert.ToBase64String(cfgEncrypt, 0, dataLen);
+                    jsonString = Utils.EncryptLargeBytesToBase64String(encryptor, cfgData);
                 }
                 using (var sw = new StreamWriter(File.Open(CONFIG_FILE, FileMode.Create)))
                 {
@@ -596,22 +584,8 @@ namespace Shadowsocks.Model
             {
                 if (GlobalConfiguration.config_password.Length > 0)
                 {
-                    var cfg_encrypt = Convert.FromBase64String(config_str);
-                    var encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
-                    var cfg_data = new byte[cfg_encrypt.Length];
-                    var data_len = 0;
-                    const int buffer_size = 32768;
-                    var input = new byte[buffer_size];
-                    var output = new byte[buffer_size + 128];
-                    for (var start_pos = 0; start_pos < cfg_encrypt.Length; start_pos += buffer_size)
-                    {
-                        var len = Math.Min(cfg_encrypt.Length - start_pos, buffer_size);
-                        Buffer.BlockCopy(cfg_encrypt, start_pos, input, 0, len);
-                        encryptor.Decrypt(input, len, output, out var out_len);
-                        Buffer.BlockCopy(output, 0, cfg_data, data_len, out_len);
-                        data_len += out_len;
-                    }
-                    config_str = Encoding.UTF8.GetString(cfg_data, 0, data_len);
+                    using var encryptor = EncryptorFactory.GetEncryptor(@"aes-256-cfb", GlobalConfiguration.config_password);
+                    config_str = Encoding.UTF8.GetString(Utils.DecryptLargeBase64StringToBytes(encryptor, config_str));
                 }
             }
             catch
@@ -721,11 +695,8 @@ namespace Shadowsocks.Model
                 {
                     if (GlobalConfiguration.config_password.Length > 0)
                     {
-                        var cfgEncrypt = Convert.FromBase64String(config_str);
-                        var encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
-                        var cfgData = new byte[cfgEncrypt.Length];
-                        encryptor.Decrypt(cfgEncrypt, cfgEncrypt.Length, cfgData, out var data_len);
-                        config_str = Encoding.UTF8.GetString(cfgData, 0, data_len);
+                        using var encryptor = EncryptorFactory.GetEncryptor(@"aes-256-cfb", GlobalConfiguration.config_password);
+                        config_str = Encoding.UTF8.GetString(Utils.DecryptLargeBase64StringToBytes(encryptor, config_str));
                     }
                 }
                 catch
@@ -766,11 +737,9 @@ namespace Shadowsocks.Model
                     var jsonString = JsonConvert.SerializeObject(config.servers, Formatting.Indented);
                     if (GlobalConfiguration.config_password.Length > 0)
                     {
-                        var encryptor = EncryptorFactory.GetEncryptor("aes-256-cfb", GlobalConfiguration.config_password);
+                        using var encryptor = EncryptorFactory.GetEncryptor(@"aes-256-cfb", GlobalConfiguration.config_password);
                         var cfgData = Encoding.UTF8.GetBytes(jsonString);
-                        var cfgEncrypt = new byte[cfgData.Length + 128];
-                        encryptor.Encrypt(cfgData, cfgData.Length, cfgEncrypt, out var data_len);
-                        jsonString = Convert.ToBase64String(cfgEncrypt, 0, data_len);
+                        jsonString = Utils.EncryptLargeBytesToBase64String(encryptor, cfgData);
                     }
                     sw.Write(jsonString);
                     sw.Flush();
