@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-#if !_CONSOLE
-#endif
-using Shadowsocks.Controller;
-using System.Text.RegularExpressions;
-using System.Net;
+﻿using Shadowsocks.Controller;
 using Shadowsocks.Proxy;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Shadowsocks.Model
 {

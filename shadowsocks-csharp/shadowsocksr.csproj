@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -17,12 +17,12 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;_DOTNET_4_0, PROTOCOL_STATISTICS</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;PROTOCOL_STATISTICS</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;_DOTNET_4_0, PROTOCOL_STATISTICS</DefineConstants>
+    <DefineConstants>TRACE;PROTOCOL_STATISTICS</DefineConstants>
   </PropertyGroup>
   
   <PropertyGroup>

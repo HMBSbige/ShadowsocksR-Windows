@@ -1,8 +1,8 @@
 ﻿using Shadowsocks.Model;
+using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace Shadowsocks.Encryption.Stream
@@ -96,7 +96,7 @@ namespace Shadowsocks.Encryption.Stream
             if (_key == null)
                 _key = CachedKeys.Get(k);
             Array.Resize(ref _iv, ivLen);
-            randBytes(_iv, ivLen);
+            Utils.RandBytes(_iv, ivLen);
         }
 
         public static void bytesToKey(byte[] password, byte[] key)
@@ -120,14 +120,6 @@ namespace Shadowsocks.Encryption.Stream
                 md5Sum.CopyTo(key, i);
                 i += md5Sum.Length;
             }
-        }
-
-        protected static void randBytes(byte[] buf, int length)
-        {
-            var temp = new byte[length];
-            var rngServiceProvider = new RNGCryptoServiceProvider();
-            rngServiceProvider.GetBytes(temp);
-            temp.CopyTo(buf, 0);
         }
 
         protected virtual void initCipher(byte[] iv, bool isCipher)
@@ -218,7 +210,7 @@ namespace Shadowsocks.Encryption.Stream
         public override void ResetEncrypt()
         {
             _encryptIVSent = false;
-            randBytes(_iv, ivLen);
+            Utils.RandBytes(_iv, ivLen);
         }
 
         public override void ResetDecrypt()

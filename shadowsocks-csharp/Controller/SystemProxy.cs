@@ -1,13 +1,10 @@
-﻿using System.Windows.Forms;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
+using Shadowsocks.Model;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.IO;
-using Shadowsocks.Model;
-
 using System.ComponentModel;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Shadowsocks.Controller
 {
@@ -226,7 +223,7 @@ namespace Shadowsocks.Controller
 
             // Get total length of INTERNET_PER_CONN_OPTIONs
             int len = 0;
-            foreach(INTERNET_PER_CONN_OPTION option in _optionlist)
+            foreach (INTERNET_PER_CONN_OPTION option in _optionlist)
             {
                 len += Marshal.SizeOf(option);
             }
@@ -502,14 +499,9 @@ namespace Shadowsocks.Controller
             // we are building x86 binary for both x86 and x64, which will
             // cause problem when opening registry key
             // detect operating system instead of CPU
-#if _DOTNET_4_0
-            RegistryKey userKey = RegistryKey.OpenRemoteBaseKey(RegistryHive.CurrentUser, "",
+            var userKey = RegistryKey.OpenRemoteBaseKey(RegistryHive.CurrentUser, "",
                 Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32
                 ).OpenSubKey(name, writable);
-#else
-            RegistryKey userKey = RegistryKey.OpenRemoteBaseKey(RegistryHive.CurrentUser, ""
-                ).OpenSubKey(name, writable);
-#endif
             return userKey;
         }
 
@@ -612,7 +604,7 @@ namespace Shadowsocks.Controller
                         {
                             case "DEFAULTCONNECTIONSETTINGS":
                             case "SAVEDLEGACYSETTINGS":
-                            //case "LAN CONNECTION":
+                                //case "LAN CONNECTION":
                                 continue;
                             default:
                                 //set all the connections's proxy as the lan

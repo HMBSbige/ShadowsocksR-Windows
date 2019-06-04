@@ -29,10 +29,8 @@ namespace Shadowsocks.Controller
         private PACServer _pacServer;
         private Configuration _config;
         private ServerTransferTotal _transfer;
-        public IPRangeSet _rangeSet;
-#if !_CONSOLE
+        private IPRangeSet _rangeSet;
         private HttpProxyRunner privoxyRunner;
-#endif
         private GFWListUpdater gfwListUpdater;
         private ChnDomainsAndIPUpdater chnDomainsAndIPUpdater;
         private bool stopped;
@@ -288,13 +286,11 @@ namespace Shadowsocks.Controller
             }
 
             _listener?.Stop();
-#if !_CONSOLE
             privoxyRunner?.Stop();
             if (_config.sysProxyMode != (int)ProxyMode.NoModify && _config.sysProxyMode != (int)ProxyMode.Direct)
             {
                 SystemProxy.Update(_config, true);
             }
-#endif
             ServerTransferTotal.Save(_transfer);
         }
 
@@ -359,12 +355,10 @@ namespace Shadowsocks.Controller
             hostMap.LoadHostFile();
             HostMap.Instance().Clear(hostMap);
 
-#if !_CONSOLE
             if (privoxyRunner == null)
             {
                 privoxyRunner = new HttpProxyRunner();
             }
-#endif
             if (_pacServer == null)
             {
                 _pacServer = new PACServer();
@@ -393,10 +387,8 @@ namespace Shadowsocks.Controller
             // http://stackoverflow.com/questions/10235093/socket-doesnt-close-after-application-exits-if-a-launched-process-is-open
             try
             {
-#if !_CONSOLE
                 privoxyRunner.Stop();
                 privoxyRunner.Start(_config);
-#endif
 
                 var local = new Local(_config, _transfer, _rangeSet);
                 var services = new List<Listener.Service>
@@ -404,9 +396,7 @@ namespace Shadowsocks.Controller
                     local,
                     _pacServer,
                     new APIServer(this, _config),
-#if !_CONSOLE
                     new HttpPortForwarder(privoxyRunner.RunningPort, _config)
-#endif
                 };
                 _listener = new Listener(services);
                 _listener.Start(_config, 0);
@@ -478,12 +468,10 @@ namespace Shadowsocks.Controller
 
         private void UpdateSystemProxy()
         {
-#if !_CONSOLE
             if (_config.sysProxyMode != (int)ProxyMode.NoModify)
             {
                 SystemProxy.Update(_config, false);
             }
-#endif
         }
 
         private void pacServer_PACFileChanged(object sender, EventArgs e)

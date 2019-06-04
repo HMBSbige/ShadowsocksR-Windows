@@ -30,7 +30,6 @@ namespace Shadowsocks.Util
 
         public static void ReleaseMemory(bool removePages = true)
         {
-#if !_CONSOLE
             // release any unused pages
             // making the numbers look good in task manager
             // this is totally nonsense in programming
@@ -65,55 +64,48 @@ namespace Shadowsocks.Util
                 }
                 else
                 {
-                    SetProcessWorkingSetSize(current_process.Handle, (UIntPtr)0xFFFFFFFFFFFFFFFF,
-                            (UIntPtr)0xFFFFFFFFFFFFFFFF);
+                    SetProcessWorkingSetSize(current_process.Handle, (UIntPtr)0xFFFFFFFFFFFFFFFF, (UIntPtr)0xFFFFFFFFFFFFFFFF);
                 }
             }
-#endif
         }
 
         public static string UnGzip(byte[] buf)
         {
-            byte[] buffer = new byte[1024];
+            var buffer = new byte[1024];
+            using var sb = new MemoryStream();
+            using var input = new GZipStream(new MemoryStream(buf), CompressionMode.Decompress, false);
             int n;
-            using (MemoryStream sb = new MemoryStream())
+            while ((n = input.Read(buffer, 0, buffer.Length)) > 0)
             {
-                using (GZipStream input = new GZipStream(new MemoryStream(buf),
-                    CompressionMode.Decompress, false))
-                {
-                    while ((n = input.Read(buffer, 0, buffer.Length)) > 0)
-                    {
-                        sb.Write(buffer, 0, n);
-                    }
-                }
-                return Encoding.UTF8.GetString(sb.ToArray());
+                sb.Write(buffer, 0, n);
             }
+            return Encoding.UTF8.GetString(sb.ToArray());
         }
 
         public static void RandBytes(byte[] buf, int length)
         {
-            byte[] temp = new byte[length];
-            RNGCryptoServiceProvider rngServiceProvider = new RNGCryptoServiceProvider();
+            var temp = new byte[length];
+            var rngServiceProvider = new RNGCryptoServiceProvider();
             rngServiceProvider.GetBytes(temp);
             temp.CopyTo(buf, 0);
         }
 
         public static uint RandUInt32()
         {
-            byte[] temp = new byte[4];
-            RNGCryptoServiceProvider rngServiceProvider = new RNGCryptoServiceProvider();
+            var temp = new byte[4];
+            var rngServiceProvider = new RNGCryptoServiceProvider();
             rngServiceProvider.GetBytes(temp);
             return BitConverter.ToUInt32(temp, 0);
         }
 
         public static void Shuffle<T>(IList<T> list, Random rng)
         {
-            int n = list.Count;
+            var n = list.Count;
             while (n > 1)
             {
-                int k = rng.Next(n);
+                var k = rng.Next(n);
                 n--;
-                T value = list[k];
+                var value = list[k];
                 list[k] = list[n];
                 list[n] = value;
             }
@@ -121,7 +113,7 @@ namespace Shadowsocks.Util
 
         public static bool BitCompare(byte[] target, int target_offset, byte[] m, int m_offset, int targetLength)
         {
-            for (int i = 0; i < targetLength; ++i)
+            for (var i = 0; i < targetLength; ++i)
             {
                 if (target[target_offset + i] != m[m_offset + i])
                     return false;
@@ -133,11 +125,11 @@ namespace Shadowsocks.Util
         {
             if (m.Length > 0 && targetLength >= m.Length)
             {
-                for (int i = 0; i <= targetLength - m.Length; ++i)
+                for (var i = 0; i <= targetLength - m.Length; ++i)
                 {
                     if (target[i] == m[0])
                     {
-                        int j = 1;
+                        var j = 1;
                         for (; j < m.Length; ++j)
                         {
                             if (target[i + j] != m[j])
@@ -155,8 +147,8 @@ namespace Shadowsocks.Util
 
         public static bool isMatchSubNet(IPAddress ip, IPAddress net, int netmask)
         {
-            byte[] addr = ip.GetAddressBytes();
-            byte[] net_addr = net.GetAddressBytes();
+            var addr = ip.GetAddressBytes();
+            var net_addr = net.GetAddressBytes();
             int i = 8, index = 0;
             for (; i < netmask; i += 8, index += 1)
             {
@@ -170,8 +162,8 @@ namespace Shadowsocks.Util
 
         public static bool isMatchSubNet(IPAddress ip, string netmask)
         {
-            string[] mask = netmask.Split('/');
-            IPAddress netmask_ip = IPAddress.Parse(mask[0]);
+            var mask = netmask.Split('/');
+            var netmask_ip = IPAddress.Parse(mask[0]);
             if (ip.AddressFamily == netmask_ip.AddressFamily)
             {
                 try
@@ -191,15 +183,15 @@ namespace Shadowsocks.Util
 
         public static bool isLocal(IPAddress ip)
         {
-            byte[] addr = ip.GetAddressBytes();
+            var addr = ip.GetAddressBytes();
             if (addr.Length == 4)
             {
-                string[] netmasks = new string[]
+                var netmasks = new[]
                 {
                     "127.0.0.0/8",
                     "169.254.0.0/16",
                 };
-                foreach (string netmask in netmasks)
+                foreach (var netmask in netmasks)
                 {
                     if (isMatchSubNet(ip, netmask))
                         return true;
@@ -208,11 +200,11 @@ namespace Shadowsocks.Util
             }
             else if (addr.Length == 16)
             {
-                string[] netmasks = new string[]
+                var netmasks = new[]
                 {
                     "::1/128",
                 };
-                foreach (string netmask in netmasks)
+                foreach (var netmask in netmasks)
                 {
                     if (isMatchSubNet(ip, netmask))
                         return true;
@@ -229,12 +221,12 @@ namespace Shadowsocks.Util
 
         public static bool isLAN(IPAddress ip)
         {
-            byte[] addr = ip.GetAddressBytes();
+            var addr = ip.GetAddressBytes();
             if (addr.Length == 4)
             {
                 if (ip.Equals(new IPAddress(0)))
                     return false;
-                string[] netmasks = new string[]
+                var netmasks = new[]
                 {
                     "0.0.0.0/8",
                     "10.0.0.0/8",
@@ -249,7 +241,7 @@ namespace Shadowsocks.Util
                     //"198.51.100.0/24",
                     //"203.0.113.0/24",
                 };
-                foreach (string netmask in netmasks)
+                foreach (var netmask in netmasks)
                 {
                     if (isMatchSubNet(ip, netmask))
                         return true;
@@ -258,13 +250,13 @@ namespace Shadowsocks.Util
             }
             else if (addr.Length == 16)
             {
-                string[] netmasks = new string[]
+                var netmasks = new[]
                 {
                     "::1/128",
                     "fc00::/7",
                     "fe80::/10",
                 };
-                foreach (string netmask in netmasks)
+                foreach (var netmask in netmasks)
                 {
                     if (isMatchSubNet(ip, netmask))
                         return true;
@@ -286,15 +278,15 @@ namespace Shadowsocks.Util
 
         public static string urlDecode(string str)
         {
-            string ret = "";
-            for (int i = 0; i < str.Length; ++i)
+            var ret = "";
+            for (var i = 0; i < str.Length; ++i)
             {
                 if (str[i] == '%' && i < str.Length - 2)
                 {
-                    string s = str.Substring(i + 1, 2).ToLower();
-                    int val = 0;
-                    char c1 = s[0];
-                    char c2 = s[1];
+                    var s = str.Substring(i + 1, 2).ToLower();
+                    var val = 0;
+                    var c1 = s[0];
+                    var c2 = s[1];
                     val += (c1 < 'a') ? c1 - '0' : 10 + (c1 - 'a');
                     val *= 16;
                     val += (c2 < 'a') ? c2 - '0' : 10 + (c2 - 'a');
@@ -524,7 +516,7 @@ namespace Shadowsocks.Util
             process?.WaitForExit();
             if (process != null)
             {
-                int ret = process.ExitCode;
+                var ret = process.ExitCode;
                 process.Close();
                 return ret;
             }
@@ -534,7 +526,7 @@ namespace Shadowsocks.Util
         public static int GetDpiMul()
         {
             int dpi;
-            using (Graphics graphics = Graphics.FromHwnd(IntPtr.Zero))
+            using (var graphics = Graphics.FromHwnd(IntPtr.Zero))
             {
                 dpi = (int)graphics.DpiX;
             }
@@ -649,7 +641,6 @@ namespace Shadowsocks.Util
             return cfgData;
         }
 
-#if !_CONSOLE
         public enum DeviceCap
         {
             DESKTOPVERTRES = 117,
@@ -658,11 +649,11 @@ namespace Shadowsocks.Util
 
         public static Point GetScreenPhysicalSize()
         {
-            using (Graphics g = Graphics.FromHwnd(IntPtr.Zero))
+            using (var g = Graphics.FromHwnd(IntPtr.Zero))
             {
-                IntPtr desktop = g.GetHdc();
-                int PhysicalScreenWidth = GetDeviceCaps(desktop, (int)DeviceCap.DESKTOPHORZRES);
-                int PhysicalScreenHeight = GetDeviceCaps(desktop, (int)DeviceCap.DESKTOPVERTRES);
+                var desktop = g.GetHdc();
+                var PhysicalScreenWidth = GetDeviceCaps(desktop, (int)DeviceCap.DESKTOPHORZRES);
+                var PhysicalScreenHeight = GetDeviceCaps(desktop, (int)DeviceCap.DESKTOPVERTRES);
 
                 return new Point(PhysicalScreenWidth, PhysicalScreenHeight);
             }
@@ -674,6 +665,5 @@ namespace Shadowsocks.Util
         [DllImport("kernel32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool SetProcessWorkingSetSize(IntPtr process, UIntPtr minimumWorkingSetSize, UIntPtr maximumWorkingSetSize);
-#endif
     }
 }
