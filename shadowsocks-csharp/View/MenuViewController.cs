@@ -1040,7 +1040,7 @@ namespace Shadowsocks.View
                 timerDelayCheckUpdate = null;
             }
             _notifyIcon.Visible = false;
-            Application.Exit();
+            System.Windows.Application.Current.Shutdown();
         }
 
         private void OpenWiki_Click(object sender, EventArgs e)

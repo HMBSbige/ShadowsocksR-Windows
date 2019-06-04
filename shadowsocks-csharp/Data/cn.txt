@@ -195,6 +195,9 @@ Parse gui-config.json error, maybe require password to decrypt=解析 gui-config
 # ResetPassword Form
 
 ResetPassword=重置密码
+Old password=旧密码
+New password=新密码
+Confirm new password=确认新密码
 
 # PortSettingsForm Form
 

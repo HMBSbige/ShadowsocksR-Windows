@@ -163,9 +163,9 @@ namespace Shadowsocks.Model
             GlobalConfiguration.config_password = password;
         }
 
-        public static bool SetPasswordTry(string old_password, string password)
+        public static bool SetPasswordTry(string oldPassword)
         {
-            return old_password == GlobalConfiguration.config_password;
+            return oldPassword == GlobalConfiguration.config_password;
         }
 
         public bool KeepCurrentServer(int port, string targetAddr, string id)

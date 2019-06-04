@@ -32,6 +32,10 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <None Remove="View\ResetPassword.xaml" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <PackageReference Include="Costura.Fody" Version="4.0.0" Condition=" '$(SelfContained)' != 'true' " />
     <PackageReference Include="DnsClient" Version="1.2.0" />
     <PackageReference Include="Fody" Version="5.0.6" Condition=" '$(SelfContained)' != 'true' ">
@@ -73,12 +77,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="View\QRCodeSplashForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="View\ResetPassword.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="View\ResetPassword.Designer.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="View\ServerLogForm.cs">
