@@ -33,6 +33,7 @@
   
   <ItemGroup>
     <None Remove="View\ResetPassword.xaml" />
+    <None Remove="View\ShowTextWindow.xaml" />
   </ItemGroup>
   
   <ItemGroup>
@@ -89,12 +90,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="View\SettingsForm.Designer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="View\ShowTextForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="View\ShowTextForm.Designer.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="View\SubscribeForm.cs">

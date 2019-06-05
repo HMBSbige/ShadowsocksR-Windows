@@ -371,7 +371,7 @@ namespace Shadowsocks.View
             UpdateProxyRule(config);
         }
 
-        void controller_FileReadyToOpen(object sender, ShadowsocksController.PathEventArgs e)
+        private void controller_FileReadyToOpen(object sender, ShadowsocksController.PathEventArgs e)
         {
             //Process.Start(@"explorer.exe", $@"/select, {e.Path}");
             new Process
@@ -383,7 +383,7 @@ namespace Shadowsocks.View
             }.Start();
         }
 
-        void ShowBalloonTip(string title, string content, ToolTipIcon icon, int timeout)
+        private void ShowBalloonTip(string title, string content, ToolTipIcon icon, int timeout)
         {
             _notifyIcon.BalloonTipTitle = title;
             _notifyIcon.BalloonTipText = content;
@@ -391,13 +391,13 @@ namespace Shadowsocks.View
             _notifyIcon.ShowBalloonTip(timeout);
         }
 
-        void controller_UpdatePACFromGFWListError(object sender, ErrorEventArgs e)
+        private void controller_UpdatePACFromGFWListError(object sender, ErrorEventArgs e)
         {
             ShowBalloonTip(I18N.GetString(@"Failed to update PAC file"), e.GetException().Message, ToolTipIcon.Error, 5000);
             Logging.LogUsefulException(e.GetException());
         }
 
-        void controller_UpdatePACFromGFWListCompleted(object sender, GFWListUpdater.ResultEventArgs e)
+        private void controller_UpdatePACFromGFWListCompleted(object sender, GFWListUpdater.ResultEventArgs e)
         {
             var updater = (GFWListUpdater)sender;
             var result = e.Success ?
@@ -406,13 +406,13 @@ namespace Shadowsocks.View
             ShowBalloonTip(I18N.GetString(@"ShadowsocksR"), result, ToolTipIcon.Info, 1000);
         }
 
-        void controller_UpdatePACFromChnDomainsAndIPCompleted(object sender, ChnDomainsAndIPUpdater.ResultEventArgs e)
+        private void controller_UpdatePACFromChnDomainsAndIPCompleted(object sender, ChnDomainsAndIPUpdater.ResultEventArgs e)
         {
             var result = e.Success ? I18N.GetString(@"PAC updated") : I18N.GetString(@"No updates found.");
             ShowBalloonTip(I18N.GetString(@"ShadowsocksR"), result, ToolTipIcon.Info, 1000);
         }
 
-        void updateFreeNodeChecker_NewFreeNodeFound(object sender, EventArgs e)
+        private void updateFreeNodeChecker_NewFreeNodeFound(object sender, EventArgs e)
         {
             if (configFrom_open)
             {
@@ -688,7 +688,7 @@ namespace Shadowsocks.View
             }
         }
 
-        void updateChecker_NewVersionFound(object sender, EventArgs e)
+        private void updateChecker_NewVersionFound(object sender, EventArgs e)
         {
             if (updateChecker.Found)
             {
@@ -702,19 +702,19 @@ namespace Shadowsocks.View
             }
         }
 
-        void updateChecker_NewVersionNotFound(object sender, EventArgs e)
+        private void updateChecker_NewVersionNotFound(object sender, EventArgs e)
         {
             ShowBalloonTip($@"{I18N.GetString(@"ShadowsocksR")} {UpdateChecker.FullVersion}", I18N.GetString(@"No newer version was found"), ToolTipIcon.Info, 10000);
         }
 
-        void UpdateItem_Clicked(object sender, EventArgs e)
+        private void UpdateItem_Clicked(object sender, EventArgs e)
         {
             Utils.OpenURL(updateChecker.LatestVersionUrl);
             UpdateItem.Visible = false;
             updateChecker.Found = false;
         }
 
-        void notifyIcon1_BalloonTipClicked(object sender, EventArgs e)
+        private void notifyIcon1_BalloonTipClicked(object sender, EventArgs e)
         {
             //Utils.OpenUR(updateChecker.LatestVersionURL);
         }
@@ -946,7 +946,7 @@ namespace Shadowsocks.View
             }
         }
 
-        void configForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void configForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             configForm = null;
             configFrom_open = false;
@@ -961,31 +961,31 @@ namespace Shadowsocks.View
             }
         }
 
-        void settingsForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void settingsForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             settingsForm = null;
             Utils.ReleaseMemory();
         }
 
-        void serverLogForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void serverLogForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             serverLogForm = null;
             Utils.ReleaseMemory();
         }
 
-        void portMapForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void portMapForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             portMapForm = null;
             Utils.ReleaseMemory();
         }
 
-        void globalLogForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void globalLogForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             logForm = null;
             Utils.ReleaseMemory();
         }
 
-        void subScribeForm_FormClosed(object sender, FormClosedEventArgs e)
+        private void subScribeForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             subScribeForm = null;
         }
@@ -1467,9 +1467,6 @@ namespace Shadowsocks.View
                         else if (!ss_only)
                         {
                             _urlToOpen = url;
-                            //if (url.StartsWith("http://") || url.StartsWith("https://"))
-                            //    splash.FormClosed += openURLFromQRCode;
-                            //else
                             splash.FormClosed += showURLFromQRCode;
                         }
                         else
@@ -1503,25 +1500,25 @@ namespace Shadowsocks.View
             ScanScreenQRCode(false);
         }
 
-        void splash_FormClosed(object sender, FormClosedEventArgs e)
+        private void splash_FormClosed(object sender, FormClosedEventArgs e)
         {
             ShowConfigForm(true);
         }
 
-        void showURLFromQRCode()
+        private void showURLFromQRCode()
         {
-            var dlg = new ShowTextForm("QRCode", _urlToOpen);
+            var dlg = new ShowTextWindow(_urlToOpen);
             dlg.Show();
             dlg.Activate();
             dlg.BringToFront();
         }
 
-        void showURLFromQRCode(object sender, FormClosedEventArgs e)
+        private void showURLFromQRCode(object sender, FormClosedEventArgs e)
         {
             showURLFromQRCode();
         }
 
-        void showURLFromQRCode(object sender, EventArgs e)
+        private void showURLFromQRCode(object sender, EventArgs e)
         {
             showURLFromQRCode();
         }

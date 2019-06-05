@@ -17,6 +17,9 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using Point = System.Drawing.Point;
 
 namespace Shadowsocks.Util
 {
@@ -661,6 +664,18 @@ namespace Shadowsocks.Util
                     Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32
             ).OpenSubKey(name, writable);
             return userKey;
+        }
+
+        public static void BringToFront(this FrameworkElement element)
+        {
+            if (element?.Parent is Panel parent)
+            {
+                var maxZ = parent.Children.OfType<UIElement>()
+                        .Where(x => x != element)
+                        .Select(Panel.GetZIndex)
+                        .Max();
+                Panel.SetZIndex(element, maxZ + 1);
+            }
         }
 
         public enum DeviceCap
