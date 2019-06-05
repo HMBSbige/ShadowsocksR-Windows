@@ -31,69 +31,40 @@ namespace Shadowsocks.Proxy.SystemProxy
             }
             var global = sysProxyMode == (int)ProxyMode.Global;
             var enabled = sysProxyMode != (int)ProxyMode.Direct;
-            var win8 = new Version(@"6.2");
-            //if (Environment.OSVersion.Version.CompareTo(win8) < 0)
+            using var registry = Utils.OpenUserRegKey(@"Software\Microsoft\Windows\CurrentVersion\Internet Settings", true);
+            try
             {
-                using var registry = Utils.OpenUserRegKey(@"Software\Microsoft\Windows\CurrentVersion\Internet Settings", true);
-                try
+                if (enabled)
                 {
-                    if (enabled)
+                    if (global)
                     {
-                        if (global)
-                        {
-                            Utils.RegistrySetValue(registry, @"ProxyEnable", 1);
-                            Utils.RegistrySetValue(registry, @"ProxyServer", $@"127.0.0.1:{config.localPort}");
-                            Utils.RegistrySetValue(registry, @"AutoConfigURL", string.Empty);
-                        }
-                        else
-                        {
-                            var pacUrl = pacSrv.PacUrl;
-                            Utils.RegistrySetValue(registry, @"ProxyEnable", 0);
-                            Utils.RegistrySetValue(registry, @"ProxyServer", string.Empty);
-                            Utils.RegistrySetValue(registry, @"AutoConfigURL", pacUrl);
-                        }
-                    }
-                    else
-                    {
-                        Utils.RegistrySetValue(registry, @"ProxyEnable", 0);
-                        Utils.RegistrySetValue(registry, @"ProxyServer", string.Empty);
+                        Utils.RegistrySetValue(registry, @"ProxyEnable", 1);
+                        Utils.RegistrySetValue(registry, @"ProxyServer", $@"127.0.0.1:{config.localPort}");
                         Utils.RegistrySetValue(registry, @"AutoConfigURL", string.Empty);
                     }
-                    IEProxyUpdate(config, sysProxyMode, pacSrv.PacUrl);
-                    NotifyIE();
-                    //Must Notify IE first, or the connections do not change
-                    CopyProxySettingFromLan();
-                }
-                catch (Exception e)
-                {
-                    Logging.LogUsefulException(e);
-                }
-            }
-            if (Environment.OSVersion.Version.CompareTo(win8) >= 0)
-            {
-                try
-                {
-                    if (enabled)
-                    {
-                        if (global)
-                        {
-                            WinINet.SetIEProxy(true, true, $@"127.0.0.1:{config.localPort}", string.Empty);
-                        }
-                        else
-                        {
-                            var pacUrl = pacSrv.PacUrl;
-                            WinINet.SetIEProxy(true, false, string.Empty, pacUrl);
-                        }
-                    }
                     else
                     {
-                        WinINet.SetIEProxy(false, false, string.Empty, string.Empty);
+                        var pacUrl = pacSrv.PacUrl;
+                        Utils.RegistrySetValue(registry, @"ProxyEnable", 0);
+                        Utils.RegistrySetValue(registry, @"ProxyServer", string.Empty);
+                        Utils.RegistrySetValue(registry, @"AutoConfigURL", pacUrl);
                     }
                 }
-                catch (Exception ex)
+                else
                 {
-                    Logging.LogUsefulException(ex);
+                    Utils.RegistrySetValue(registry, @"ProxyEnable", 0);
+                    Utils.RegistrySetValue(registry, @"ProxyServer", string.Empty);
+                    Utils.RegistrySetValue(registry, @"AutoConfigURL", string.Empty);
                 }
+
+                IEProxyUpdate(config, sysProxyMode, pacSrv == null ? string.Empty : pacSrv.PacUrl);
+                NotifyIE();
+                //Must Notify IE first, or the connections do not change
+                CopyProxySettingFromLan();
+            }
+            catch (Exception e)
+            {
+                Logging.LogUsefulException(e);
             }
         }
 
