@@ -1,11 +1,13 @@
 ﻿using Shadowsocks.Model;
 using Shadowsocks.Proxy;
+using Shadowsocks.Proxy.SystemProxy;
 using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Shadowsocks.Controller
 {
@@ -289,7 +291,7 @@ namespace Shadowsocks.Controller
             privoxyRunner?.Stop();
             if (_config.sysProxyMode != (int)ProxyMode.NoModify && _config.sysProxyMode != (int)ProxyMode.Direct)
             {
-                SystemProxy.Update(_config, true);
+                SystemProxy.Update(_config, true, null);
             }
             ServerTransferTotal.Save(_transfer);
         }
@@ -470,7 +472,7 @@ namespace Shadowsocks.Controller
         {
             if (_config.sysProxyMode != (int)ProxyMode.NoModify)
             {
-                SystemProxy.Update(_config, false);
+                SystemProxy.Update(_config, false, _pacServer);
             }
         }
 
@@ -523,11 +525,15 @@ namespace Shadowsocks.Controller
         public void DisconnectAllConnections()
         {
             var config = GetCurrentConfiguration();
-            for (var id = 0; id < config.configs.Count; ++id)
+            foreach (var server in config.configs)
             {
-                var server = config.configs[id];
                 server.GetConnections().CloseAll();
             }
+        }
+
+        public void CopyPacUrl()
+        {
+            Clipboard.SetDataObject(_pacServer.PacUrl);
         }
 
         #region Memory Management

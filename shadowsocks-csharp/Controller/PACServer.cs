@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Shadowsocks.Controller
 {
-    class PACServer : Listener.Service
+    public class PACServer : Listener.Service
     {
         public static string gfwlist_FILE = @"gfwlist.txt";
 
@@ -23,6 +23,8 @@ namespace Shadowsocks.Controller
         public static string WHITELIST_FILE = @"whitelist.txt";
 
         public static string USER_WHITELIST_TEMPLATE_FILE = @"user_whitelist_temp.txt";
+
+        public string PacUrl { get; private set; } = "";
 
         FileSystemWatcher PACFileWatcher;
         FileSystemWatcher UserRuleFileWatcher;
@@ -40,6 +42,7 @@ namespace Shadowsocks.Controller
         public void UpdateConfiguration(Configuration config)
         {
             _config = config;
+            PacUrl = $@"http://127.0.0.1:{config.localPort}/pac?auth={config.localAuthPassword}&t={Utils.GetTimestamp(DateTime.Now)}";
         }
 
         public bool Handle(byte[] firstPacket, int length, Socket socket)

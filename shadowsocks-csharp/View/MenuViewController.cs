@@ -301,7 +301,7 @@ namespace Shadowsocks.View
                     new MenuItem("-"),
                     CreateMenuItem("Update local PAC from Chn Only list", UpdatePACFromCNOnlyListItem_Click),
                     new MenuItem("-"),
-                    CreateMenuItem("Copy PAC URL", CopyPACURLItem_Click),
+                    CreateMenuItem("Copy PAC URL", CopyPacUrlItem_Click),
                     CreateMenuItem("Edit local PAC file...", EditPACFileItem_Click),
                     CreateMenuItem("Edit user rule for GFWList...", EditUserRuleFileForGFWListItem_Click),
                 }),
@@ -1161,18 +1161,9 @@ namespace Shadowsocks.View
             controller.ToggleSameHostForSameTargetRandom(sameHostForSameTargetItem.Checked);
         }
 
-        private void CopyPACURLItem_Click(object sender, EventArgs e)
+        private void CopyPacUrlItem_Click(object sender, EventArgs e)
         {
-            try
-            {
-                var config = controller.GetCurrentConfiguration();
-                var pacUrl = $@"http://127.0.0.1:{config.localPort}/pac?auth={config.localAuthPassword}&t={Utils.GetTimestamp(DateTime.Now)}";
-                Clipboard.SetDataObject(pacUrl);
-            }
-            catch
-            {
-                // ignored
-            }
+            controller.CopyPacUrl();
         }
 
         private void EditPACFileItem_Click(object sender, EventArgs e)

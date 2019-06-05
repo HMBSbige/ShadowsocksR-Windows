@@ -39,7 +39,7 @@ namespace UnitTest
             var largeBytes = new byte[ushort.MaxValue * 100];
             RandomNumberGenerator.Fill(largeBytes);
             var largeStr = Encoding.UTF8.GetString(largeBytes);
-            var encryptor = EncryptorFactory.GetEncryptor(@"aes-256-cfb", @"密码");
+            using var encryptor = EncryptorFactory.GetEncryptor(@"aes-256-cfb", @"密码");
 
             var encodeStr = Utils.EncryptLargeBytesToBase64String(encryptor, largeBytes);
 
