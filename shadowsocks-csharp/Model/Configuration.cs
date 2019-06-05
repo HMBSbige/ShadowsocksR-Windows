@@ -732,18 +732,16 @@ namespace Shadowsocks.Model
         {
             try
             {
-                using (var sw = new StreamWriter(File.Open(LOG_FILE, FileMode.Create)))
+                using var sw = new StreamWriter(File.Open(LOG_FILE, FileMode.Create));
+                var jsonString = JsonConvert.SerializeObject(config.servers, Formatting.Indented);
+                if (GlobalConfiguration.config_password.Length > 0)
                 {
-                    var jsonString = JsonConvert.SerializeObject(config.servers, Formatting.Indented);
-                    if (GlobalConfiguration.config_password.Length > 0)
-                    {
-                        using var encryptor = EncryptorFactory.GetEncryptor(@"aes-256-cfb", GlobalConfiguration.config_password);
-                        var cfgData = Encoding.UTF8.GetBytes(jsonString);
-                        jsonString = Utils.EncryptLargeBytesToBase64String(encryptor, cfgData);
-                    }
-                    sw.Write(jsonString);
-                    sw.Flush();
+                    using var encryptor = EncryptorFactory.GetEncryptor(@"aes-256-cfb", GlobalConfiguration.config_password);
+                    var cfgData = Encoding.UTF8.GetBytes(jsonString);
+                    jsonString = Utils.EncryptLargeBytesToBase64String(encryptor, cfgData);
                 }
+                sw.Write(jsonString);
+                sw.Flush();
             }
             catch (IOException e)
             {

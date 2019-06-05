@@ -220,16 +220,14 @@ namespace Shadowsocks.View
                 using (var g = Graphics.FromImage(drawArea))
                 {
                     g.Clear(Color.White);
-                    using (Brush b = new SolidBrush(Color.Black))
+                    using Brush b = new SolidBrush(Color.Black);
+                    for (var row = 0; row < m.Width; ++row)
                     {
-                        for (var row = 0; row < m.Width; ++row)
+                        for (var col = 0; col < m.Height; ++col)
                         {
-                            for (var col = 0; col < m.Height; ++col)
+                            if (m[row, col] != 0)
                             {
-                                if (m[row, col] != 0)
-                                {
-                                    g.FillRectangle(b, blockSize * (row + 1), blockSize * (col + 1), blockSize, blockSize);
-                                }
+                                g.FillRectangle(b, blockSize * (row + 1), blockSize * (col + 1), blockSize, blockSize);
                             }
                         }
                     }

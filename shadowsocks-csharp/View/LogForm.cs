@@ -80,34 +80,30 @@ namespace Shadowsocks.View
 
             try
             {
-                using (
-                    var reader =
-                        new StreamReader(new FileStream(newLogFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                )
+                using var reader =
+                        new StreamReader(new FileStream(newLogFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
+                if (_currentOffset == 0)
                 {
-                    if (_currentOffset == 0)
+                    var maxSize = reader.BaseStream.Length;
+                    if (maxSize > MaxReadSize)
                     {
-                        var maxSize = reader.BaseStream.Length;
-                        if (maxSize > MaxReadSize)
-                        {
-                            reader.BaseStream.Seek(-MaxReadSize, SeekOrigin.End);
-                            reader.ReadLine();
-                        }
+                        reader.BaseStream.Seek(-MaxReadSize, SeekOrigin.End);
+                        reader.ReadLine();
                     }
-                    else
-                    {
-                        reader.BaseStream.Seek(_currentOffset, SeekOrigin.Begin);
-                    }
-
-                    var txt = reader.ReadToEnd();
-                    if (!string.IsNullOrEmpty(txt))
-                    {
-                        logTextBox.AppendText(txt);
-                        logTextBox.ScrollToCaret();
-                    }
-
-                    _currentOffset = reader.BaseStream.Position;
                 }
+                else
+                {
+                    reader.BaseStream.Seek(_currentOffset, SeekOrigin.Begin);
+                }
+
+                var txt = reader.ReadToEnd();
+                if (!string.IsNullOrEmpty(txt))
+                {
+                    logTextBox.AppendText(txt);
+                    logTextBox.ScrollToCaret();
+                }
+
+                _currentOffset = reader.BaseStream.Position;
             }
             catch (FileNotFoundException)
             {
@@ -130,13 +126,11 @@ namespace Shadowsocks.View
 
         private void fontToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (FontDialog fontDialog = new FontDialog())
+            using FontDialog fontDialog = new FontDialog();
+            fontDialog.Font = logTextBox.Font;
+            if (fontDialog.ShowDialog() == DialogResult.OK)
             {
-                fontDialog.Font = logTextBox.Font;
-                if (fontDialog.ShowDialog() == DialogResult.OK)
-                {
-                    logTextBox.Font = fontDialog.Font;
-                }
+                logTextBox.Font = fontDialog.Font;
             }
         }
 

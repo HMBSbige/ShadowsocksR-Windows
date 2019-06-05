@@ -73,11 +73,13 @@ namespace Shadowsocks.Util
         {
             var buffer = new byte[1024];
             using var sb = new MemoryStream();
-            using var input = new GZipStream(new MemoryStream(buf), CompressionMode.Decompress, false);
-            int n;
-            while ((n = input.Read(buffer, 0, buffer.Length)) > 0)
+            using (var input = new GZipStream(new MemoryStream(buf), CompressionMode.Decompress, false))
             {
-                sb.Write(buffer, 0, n);
+                int n;
+                while ((n = input.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    sb.Write(buffer, 0, n);
+                }
             }
             return Encoding.UTF8.GetString(sb.ToArray());
         }
@@ -669,14 +671,12 @@ namespace Shadowsocks.Util
 
         public static Point GetScreenPhysicalSize()
         {
-            using (var g = Graphics.FromHwnd(IntPtr.Zero))
-            {
-                var desktop = g.GetHdc();
-                var PhysicalScreenWidth = GetDeviceCaps(desktop, (int)DeviceCap.DESKTOPHORZRES);
-                var PhysicalScreenHeight = GetDeviceCaps(desktop, (int)DeviceCap.DESKTOPVERTRES);
+            using var g = Graphics.FromHwnd(IntPtr.Zero);
+            var desktop = g.GetHdc();
+            var PhysicalScreenWidth = GetDeviceCaps(desktop, (int)DeviceCap.DESKTOPHORZRES);
+            var PhysicalScreenHeight = GetDeviceCaps(desktop, (int)DeviceCap.DESKTOPVERTRES);
 
-                return new Point(PhysicalScreenWidth, PhysicalScreenHeight);
-            }
+            return new Point(PhysicalScreenWidth, PhysicalScreenHeight);
         }
 
         [DllImport("gdi32.dll")]

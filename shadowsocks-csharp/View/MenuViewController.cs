@@ -1001,22 +1001,20 @@ namespace Shadowsocks.View
 
         private void Import_Click(object sender, EventArgs e)
         {
-            using (var dlg = new OpenFileDialog())
+            using var dlg = new OpenFileDialog();
+            dlg.InitialDirectory = Directory.GetCurrentDirectory();
+            if (dlg.ShowDialog() == DialogResult.OK)
             {
-                dlg.InitialDirectory = Directory.GetCurrentDirectory();
-                if (dlg.ShowDialog() == DialogResult.OK)
+                var name = dlg.FileName;
+                var cfg = Configuration.LoadFile(name);
+                if (cfg.configs.Count == 1 && cfg.configs[0].server == Configuration.GetDefaultServer().server)
                 {
-                    var name = dlg.FileName;
-                    var cfg = Configuration.LoadFile(name);
-                    if (cfg.configs.Count == 1 && cfg.configs[0].server == Configuration.GetDefaultServer().server)
-                    {
-                        MessageBox.Show(@"Load config file failed", UpdateChecker.Name);
-                    }
-                    else
-                    {
-                        controller.MergeConfiguration(cfg);
-                        LoadCurrentConfiguration();
-                    }
+                    MessageBox.Show(@"Load config file failed", UpdateChecker.Name);
+                }
+                else
+                {
+                    controller.MergeConfiguration(cfg);
+                    LoadCurrentConfiguration();
                 }
             }
         }
@@ -1438,63 +1436,61 @@ namespace Shadowsocks.View
             foreach (var screen in Screen.AllScreens)
             {
                 var screen_size = Utils.GetScreenPhysicalSize();
-                using (var fullImage = new Bitmap(screen_size.X, screen_size.Y))
+                using var fullImage = new Bitmap(screen_size.X, screen_size.Y);
+                using (var g = Graphics.FromImage(fullImage))
                 {
-                    using (var g = Graphics.FromImage(fullImage))
-                    {
-                        g.CopyFromScreen(screen.Bounds.X,
-                                         screen.Bounds.Y,
-                                         0, 0,
-                                         fullImage.Size,
-                                         CopyPixelOperation.SourceCopy);
-                    }
-                    var decode_fail = false;
-                    for (var i = 0; i < 100; i++)
-                    {
-                        var cropRect = GetScanRect(fullImage.Width, fullImage.Height, i, out var stretch);
-                        if (cropRect.Width == 0)
-                            break;
+                    g.CopyFromScreen(screen.Bounds.X,
+                            screen.Bounds.Y,
+                            0, 0,
+                            fullImage.Size,
+                            CopyPixelOperation.SourceCopy);
+                }
+                var decode_fail = false;
+                for (var i = 0; i < 100; i++)
+                {
+                    var cropRect = GetScanRect(fullImage.Width, fullImage.Height, i, out var stretch);
+                    if (cropRect.Width == 0)
+                        break;
 
-                        string url;
-                        Rectangle rect;
-                        if (Math.Abs(stretch - 1.0) < 1e6 ? ScanQRCode(fullImage, cropRect, out url, out rect) : ScanQRCodeStretch(fullImage, cropRect, stretch, out url, out rect))
+                    string url;
+                    Rectangle rect;
+                    if (Math.Abs(stretch - 1.0) < 1e6 ? ScanQRCode(fullImage, cropRect, out url, out rect) : ScanQRCodeStretch(fullImage, cropRect, stretch, out url, out rect))
+                    {
+                        var success = controller.AddServerBySSURL(url);
+                        var splash = new QRCodeSplashForm();
+                        if (success)
                         {
-                            var success = controller.AddServerBySSURL(url);
-                            var splash = new QRCodeSplashForm();
-                            if (success)
-                            {
-                                splash.FormClosed += splash_FormClosed;
-                            }
-                            else if (!ss_only)
-                            {
-                                _urlToOpen = url;
-                                //if (url.StartsWith("http://") || url.StartsWith("https://"))
-                                //    splash.FormClosed += openURLFromQRCode;
-                                //else
-                                splash.FormClosed += showURLFromQRCode;
-                            }
-                            else
-                            {
-                                decode_fail = true;
-                                continue;
-                            }
-                            splash.Location = new Point(screen.Bounds.X, screen.Bounds.Y);
-                            var dpi = Screen.PrimaryScreen.Bounds.Width / (double)screen_size.X;
-                            splash.TargetRect = new Rectangle(
+                            splash.FormClosed += splash_FormClosed;
+                        }
+                        else if (!ss_only)
+                        {
+                            _urlToOpen = url;
+                            //if (url.StartsWith("http://") || url.StartsWith("https://"))
+                            //    splash.FormClosed += openURLFromQRCode;
+                            //else
+                            splash.FormClosed += showURLFromQRCode;
+                        }
+                        else
+                        {
+                            decode_fail = true;
+                            continue;
+                        }
+                        splash.Location = new Point(screen.Bounds.X, screen.Bounds.Y);
+                        var dpi = Screen.PrimaryScreen.Bounds.Width / (double)screen_size.X;
+                        splash.TargetRect = new Rectangle(
                                 (int)(rect.Left * dpi + screen.Bounds.X),
                                 (int)(rect.Top * dpi + screen.Bounds.Y),
                                 (int)(rect.Width * dpi),
                                 (int)(rect.Height * dpi));
-                            splash.Size = new Size(fullImage.Width, fullImage.Height);
-                            splash.Show();
-                            return;
-                        }
-                    }
-                    if (decode_fail)
-                    {
-                        MessageBox.Show(I18N.GetString("Failed to decode QRCode"));
+                        splash.Size = new Size(fullImage.Width, fullImage.Height);
+                        splash.Show();
                         return;
                     }
+                }
+                if (decode_fail)
+                {
+                    MessageBox.Show(I18N.GetString("Failed to decode QRCode"));
+                    return;
                 }
             }
             MessageBox.Show(I18N.GetString("No QRCode found. Try to zoom in or move it to the center of the screen."));

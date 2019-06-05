@@ -21,7 +21,7 @@ namespace Shadowsocks
         private static void Main(string[] args)
         {
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Utils.GetExecutablePath()));
-            if (args.Any(arg => arg == "--setautorun"))
+            if (args.Any(arg => arg == @"--setautorun"))
             {
                 if (!AutoStartup.Switch())
                 {
@@ -30,7 +30,15 @@ namespace Shadowsocks
                 return;
             }
 
-            using var mutex = new Mutex(false, "Global\\ShadowsocksR_" + Directory.GetCurrentDirectory().GetDeterministicHashCode());
+            using var mutex = new Mutex(false, $@"Global\ShadowsocksR_{Directory.GetCurrentDirectory().GetDeterministicHashCode()}");
+            if (!mutex.WaitOne(0, false))
+            {
+                MessageBox.Show(I18N.GetString("Find Shadowsocks icon in your notify tray.") + Environment.NewLine +
+                                I18N.GetString("If you want to start multiple Shadowsocks, make a copy in another directory."),
+                        I18N.GetString("ShadowsocksR is already running."));
+                return;
+            }
+
             var app = new Application
             {
                 ShutdownMode = ShutdownMode.OnExplicitShutdown
@@ -42,14 +50,6 @@ namespace Shadowsocks
 
             SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
             app.Exit += App_Exit;
-
-            if (!mutex.WaitOne(0, false))
-            {
-                MessageBox.Show(I18N.GetString("Find Shadowsocks icon in your notify tray.") + Environment.NewLine +
-                                I18N.GetString("If you want to start multiple Shadowsocks, make a copy in another directory."),
-                        I18N.GetString("ShadowsocksR is already running."));
-                return;
-            }
 
             var tryTimes = 0;
             while (Configuration.Load() == null)

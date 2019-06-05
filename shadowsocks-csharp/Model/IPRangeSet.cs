@@ -79,31 +79,29 @@ namespace Shadowsocks.Model
                 {
                     using (StreamReader stream = File.OpenText(absFilePath))
                     {
-                        using (StreamWriter out_stream = new StreamWriter(File.OpenWrite(CHN_FILENAME)))
+                        using StreamWriter out_stream = new StreamWriter(File.OpenWrite(CHN_FILENAME));
+                        while (true)
                         {
-                            while (true)
-                            {
-                                string line = stream.ReadLine();
-                                if (line == null)
-                                    break;
-                                string[] parts = line.Split('|');
-                                if (parts.Length < 7)
-                                    continue;
-                                if (parts[0] != "apnic" || parts[1] != zone || parts[2] != "ipv4")
-                                    continue;
-                                IPAddress addr;
-                                IPAddress.TryParse(parts[3], out addr);
-                                uint size = UInt32.Parse(parts[4]);
-                                Insert(addr, size);
+                            string line = stream.ReadLine();
+                            if (line == null)
+                                break;
+                            string[] parts = line.Split('|');
+                            if (parts.Length < 7)
+                                continue;
+                            if (parts[0] != "apnic" || parts[1] != zone || parts[2] != "ipv4")
+                                continue;
+                            IPAddress addr;
+                            IPAddress.TryParse(parts[3], out addr);
+                            uint size = UInt32.Parse(parts[4]);
+                            Insert(addr, size);
 
-                                byte[] addr_bytes = addr.GetAddressBytes();
-                                Array.Reverse(addr_bytes);
-                                uint ip_addr = BitConverter.ToUInt32(addr_bytes, 0);
-                                ip_addr += size - 1;
-                                addr_bytes = BitConverter.GetBytes(ip_addr);
-                                Array.Reverse(addr_bytes);
-                                out_stream.Write(parts[3] + " " + (new IPAddress(addr_bytes)).ToString() + "\r\n");
-                            }
+                            byte[] addr_bytes = addr.GetAddressBytes();
+                            Array.Reverse(addr_bytes);
+                            uint ip_addr = BitConverter.ToUInt32(addr_bytes, 0);
+                            ip_addr += size - 1;
+                            addr_bytes = BitConverter.GetBytes(ip_addr);
+                            Array.Reverse(addr_bytes);
+                            out_stream.Write(parts[3] + " " + (new IPAddress(addr_bytes)).ToString() + "\r\n");
                         }
                     }
                     return true;
@@ -123,22 +121,20 @@ namespace Shadowsocks.Model
             {
                 try
                 {
-                    using (StreamReader stream = File.OpenText(absFilePath))
+                    using StreamReader stream = File.OpenText(absFilePath);
+                    while (true)
                     {
-                        while (true)
-                        {
-                            string line = stream.ReadLine();
-                            if (line == null)
-                                break;
-                            string[] parts = line.Split(' ');
-                            if (parts.Length < 2)
-                                continue;
+                        string line = stream.ReadLine();
+                        if (line == null)
+                            break;
+                        string[] parts = line.Split(' ');
+                        if (parts.Length < 2)
+                            continue;
 
-                            IPAddress addr_beg, addr_end;
-                            IPAddress.TryParse(parts[0], out addr_beg);
-                            IPAddress.TryParse(parts[1], out addr_end);
-                            Insert(addr_beg, addr_end);
-                        }
+                        IPAddress addr_beg, addr_end;
+                        IPAddress.TryParse(parts[0], out addr_beg);
+                        IPAddress.TryParse(parts[1], out addr_end);
+                        Insert(addr_beg, addr_end);
                     }
                 }
                 catch
