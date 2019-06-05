@@ -40,7 +40,7 @@ namespace Shadowsocks.View
             Icon = Icon.FromHandle(Resources.ssw128.GetHicon());
             _controller = controller;
             _updateChecker = updateChecker;
-            if (updateChecker.LatestVersionURL == null)
+            if (updateChecker.LatestVersionUrl == null)
                 llbUpdate.Visible = false;
 
             foreach (string name in EncryptorFactory.GetEncryptor().Keys)
@@ -635,7 +635,7 @@ namespace Shadowsocks.View
 
         private void LinkUpdate_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Utils.OpenURL(_updateChecker.LatestVersionURL);
+            Utils.OpenURL(_updateChecker.LatestVersionUrl);
         }
 
         private void PasswordLabel_CheckedChanged(object sender, EventArgs e)
