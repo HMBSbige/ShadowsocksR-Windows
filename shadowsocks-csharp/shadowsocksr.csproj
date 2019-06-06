@@ -32,6 +32,7 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <None Remove="View\QRCodeSplashWindow.xaml" />
     <None Remove="View\ResetPassword.xaml" />
     <None Remove="View\ShowTextWindow.xaml" />
   </ItemGroup>
@@ -75,9 +76,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="View\PortSettingsForm.Designer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="View\QRCodeSplashForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="View\ServerLogForm.cs">

@@ -10,7 +10,6 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Windows.Forms;
 using ZXing;
 using ZXing.Common;
@@ -1302,143 +1301,13 @@ namespace Shadowsocks.View
             }
         }
 
-        private bool ScanQRCode(Bitmap fullImage, Rectangle cropRect, out string url, out Rectangle rect)
+        #region QRCode
+
+        private void ScanQRCodeItem_Click(object sender, EventArgs e)
         {
-            using (var target = new Bitmap(cropRect.Width, cropRect.Height))
-            {
-                using (var g = Graphics.FromImage(target))
-                {
-                    g.DrawImage(fullImage, new Rectangle(0, 0, cropRect.Width, cropRect.Height),
-                                    cropRect,
-                                    GraphicsUnit.Pixel);
-                }
-                var source = new BitmapLuminanceSource(target);
-                var bitmap = new BinaryBitmap(new HybridBinarizer(source));
-                var reader = new QRCodeReader();
-                var result = reader.decode(bitmap);
-                if (result != null)
-                {
-                    url = result.Text;
-                    double minX = int.MaxValue, minY = int.MaxValue, maxX = 0, maxY = 0;
-                    foreach (var point in result.ResultPoints)
-                    {
-                        minX = Math.Min(minX, point.X);
-                        minY = Math.Min(minY, point.Y);
-                        maxX = Math.Max(maxX, point.X);
-                        maxY = Math.Max(maxY, point.Y);
-                    }
-                    //rect = new Rectangle((int)minX, (int)minY, (int)(maxX - minX), (int)(maxY - minY));
-                    rect = new Rectangle(cropRect.Left + (int)minX, cropRect.Top + (int)minY, (int)(maxX - minX), (int)(maxY - minY));
-                    return true;
-                }
-            }
-            url = "";
-            rect = new Rectangle();
-            return false;
-        }
-
-        private bool ScanQRCodeStretch(Bitmap fullImage, Rectangle cropRect, double mul, out string url, out Rectangle rect)
-        {
-            using (var target = new Bitmap((int)(cropRect.Width * mul), (int)(cropRect.Height * mul)))
-            {
-                using (var g = Graphics.FromImage(target))
-                {
-                    g.DrawImage(fullImage, new Rectangle(0, 0, target.Width, target.Height),
-                                    cropRect,
-                                    GraphicsUnit.Pixel);
-                }
-                var source = new BitmapLuminanceSource(target);
-                var bitmap = new BinaryBitmap(new HybridBinarizer(source));
-                var reader = new QRCodeReader();
-                var result = reader.decode(bitmap);
-                if (result != null)
-                {
-                    url = result.Text;
-                    double minX = int.MaxValue, minY = int.MaxValue, maxX = 0, maxY = 0;
-                    foreach (var point in result.ResultPoints)
-                    {
-                        minX = Math.Min(minX, point.X);
-                        minY = Math.Min(minY, point.Y);
-                        maxX = Math.Max(maxX, point.X);
-                        maxY = Math.Max(maxY, point.Y);
-                    }
-                    //rect = new Rectangle((int)minX, (int)minY, (int)(maxX - minX), (int)(maxY - minY));
-                    rect = new Rectangle(cropRect.Left + (int)(minX / mul), cropRect.Top + (int)(minY / mul), (int)((maxX - minX) / mul), (int)((maxY - minY) / mul));
-                    return true;
-                }
-            }
-            url = "";
-            rect = new Rectangle();
-            return false;
-        }
-
-        private Rectangle GetScanRect(int width, int height, int index, out double stretch)
-        {
-            stretch = 1;
-            if (index < 5)
-            {
-                const int div = 5;
-                var w = width * 3 / div;
-                var h = height * 3 / div;
-                var pt = new[] {
-                    new Point(1, 1),
-                    new Point(0, 0),
-                    new Point(0, 2),
-                    new Point(2, 0),
-                    new Point(2, 2),
-                };
-                return new Rectangle(pt[index].X * width / div, pt[index].Y * height / div, w, h);
-            }
-            {
-                const int base_index = 5;
-                if (index < base_index + 6)
-                {
-                    var s = new double[] {
-                        1,
-                        2,
-                        3,
-                        4,
-                        6,
-                        8
-                    };
-                    stretch = 1 / s[index - base_index];
-                    return new Rectangle(0, 0, width, height);
-                }
-            }
-            {
-                const int base_index = 11;
-                if (index < base_index + 8)
-                {
-                    const int hdiv = 7;
-                    const int vdiv = 5;
-                    var w = width * 3 / hdiv;
-                    var h = height * 3 / vdiv;
-                    var pt = new[] {
-                        new Point(1, 1),
-                        new Point(3, 1),
-
-                        new Point(0, 0),
-                        new Point(0, 2),
-
-                        new Point(2, 0),
-                        new Point(2, 2),
-
-                        new Point(4, 0),
-                        new Point(4, 2),
-                    };
-                    return new Rectangle(pt[index - base_index].X * width / hdiv, pt[index - base_index].Y * height / vdiv, w, h);
-                }
-            }
-            return new Rectangle(0, 0, 0, 0);
-        }
-
-        private void ScanScreenQRCode(bool ss_only)
-        {
-            Thread.Sleep(100);
             foreach (var screen in Screen.AllScreens)
             {
-                var screen_size = Utils.GetScreenPhysicalSize();
-                using var fullImage = new Bitmap(screen_size.X, screen_size.Y);
+                using var fullImage = new Bitmap(screen.Bounds.Width, screen.Bounds.Height);
                 using (var g = Graphics.FromImage(fullImage))
                 {
                     g.CopyFromScreen(screen.Bounds.X,
@@ -1447,60 +1316,70 @@ namespace Shadowsocks.View
                             fullImage.Size,
                             CopyPixelOperation.SourceCopy);
                 }
-                var decode_fail = false;
-                for (var i = 0; i < 100; i++)
+                const int maxTry = 10;
+                for (var i = 0; i < maxTry; i++)
                 {
-                    var cropRect = GetScanRect(fullImage.Width, fullImage.Height, i, out var stretch);
-                    if (cropRect.Width == 0)
-                        break;
+                    var marginLeft = (int)((double)fullImage.Width * i / 2.5 / maxTry);
+                    var marginTop = (int)((double)fullImage.Height * i / 2.5 / maxTry);
+                    var cropRect = new Rectangle(marginLeft, marginTop, fullImage.Width - marginLeft * 2, fullImage.Height - marginTop * 2);
+                    var target = new Bitmap(screen.Bounds.Width, screen.Bounds.Height);
 
-                    string url;
-                    Rectangle rect;
-                    if (Math.Abs(stretch - 1.0) < 1e6 ? ScanQRCode(fullImage, cropRect, out url, out rect) : ScanQRCodeStretch(fullImage, cropRect, stretch, out url, out rect))
+                    var imageScale = screen.Bounds.Width / (double)cropRect.Width;
+                    using (var g = Graphics.FromImage(target))
                     {
-                        var success = controller.AddServerBySSURL(url);
-                        var splash = new QRCodeSplashForm();
+                        g.DrawImage(fullImage, new Rectangle(0, 0, target.Width, target.Height),
+                                cropRect,
+                                GraphicsUnit.Pixel);
+                    }
+                    var source = new BitmapLuminanceSource(target);
+                    var bitmap = new BinaryBitmap(new HybridBinarizer(source));
+                    var reader = new QRCodeReader();
+                    var result = reader.decode(bitmap);
+                    if (result != null)
+                    {
+                        var success = controller.AddServerBySSURL(result.Text);
+                        var splash = new QRCodeSplashWindow();
                         if (success)
                         {
-                            splash.FormClosed += splash_FormClosed;
-                        }
-                        else if (!ss_only)
-                        {
-                            _urlToOpen = url;
-                            splash.FormClosed += showURLFromQRCode;
+                            splash.Closed += Splash_Closed;
                         }
                         else
                         {
-                            decode_fail = true;
-                            continue;
+                            _urlToOpen = result.Text;
+                            splash.Closed += Splash_Closed2;
                         }
-                        splash.Location = new Point(screen.Bounds.X, screen.Bounds.Y);
-                        var dpi = Screen.PrimaryScreen.Bounds.Width / (double)screen_size.X;
-                        splash.TargetRect = new Rectangle(
-                                (int)(rect.Left * dpi + screen.Bounds.X),
-                                (int)(rect.Top * dpi + screen.Bounds.Y),
-                                (int)(rect.Width * dpi),
-                                (int)(rect.Height * dpi));
-                        splash.Size = new Size(fullImage.Width, fullImage.Height);
+                        double minX = int.MaxValue, minY = int.MaxValue, maxX = 0, maxY = 0;
+                        foreach (var point in result.ResultPoints)
+                        {
+                            minX = Math.Min(minX, point.X);
+                            minY = Math.Min(minY, point.Y);
+                            maxX = Math.Max(maxX, point.X);
+                            maxY = Math.Max(maxY, point.Y);
+                        }
+                        minX /= imageScale;
+                        minY /= imageScale;
+                        maxX /= imageScale;
+                        maxY /= imageScale;
+                        // make it 20% larger
+                        var margin = (maxX - minX) * 0.20f;
+                        minX += -margin + marginLeft;
+                        maxX += margin + marginLeft;
+                        minY += -margin + marginTop;
+                        maxY += margin + marginTop;
+                        splash.Left = screen.Bounds.X;
+                        splash.Top = screen.Bounds.Y;
+                        splash.TargetRect = new Rectangle((int)minX, (int)minY, (int)maxX - (int)minX, (int)maxY - (int)minY);
+                        splash.Width = fullImage.Width;
+                        splash.Height = fullImage.Height;
                         splash.Show();
                         return;
                     }
-                }
-                if (decode_fail)
-                {
-                    MessageBox.Show(I18N.GetString("Failed to decode QRCode"));
-                    return;
                 }
             }
             MessageBox.Show(I18N.GetString("No QRCode found. Try to zoom in or move it to the center of the screen."));
         }
 
-        private void ScanQRCodeItem_Click(object sender, EventArgs e)
-        {
-            ScanScreenQRCode(false);
-        }
-
-        private void splash_FormClosed(object sender, FormClosedEventArgs e)
+        private void Splash_Closed(object sender, EventArgs e)
         {
             ShowConfigForm(true);
         }
@@ -1513,7 +1392,7 @@ namespace Shadowsocks.View
             dlg.BringToFront();
         }
 
-        private void showURLFromQRCode(object sender, FormClosedEventArgs e)
+        private void Splash_Closed2(object sender, EventArgs e)
         {
             showURLFromQRCode();
         }
@@ -1522,5 +1401,7 @@ namespace Shadowsocks.View
         {
             showURLFromQRCode();
         }
+
+        #endregion
     }
 }
