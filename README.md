@@ -11,9 +11,9 @@ ShadowsocksR for Windows
 #### Artifacts
 * `ShadowsocksR-netcore.zip` 
     * 需要安装 [.NET Core 3.0 Runtime](https://dotnet.microsoft.com/download/dotnet-core/3.0)
-    * 文件较小
+    * 文件小
 
-* `ShadowsocksR-net472.zip` 
+* `ShadowsocksR-net48.zip` 
     * 需要安装 [.NET Framework 4.8](https://dotnet.microsoft.com/download) （最新版 Win10 自带）
     * 文件小
 
