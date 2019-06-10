@@ -10,11 +10,15 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Windows;
 using System.Windows.Forms;
 using ZXing;
 using ZXing.Common;
 using ZXing.QrCode;
 using BitmapLuminanceSource = ZXing.Windows.Compatibility.BitmapLuminanceSource;
+using Clipboard = System.Windows.Forms.Clipboard;
+using DataFormats = System.Windows.Forms.DataFormats;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace Shadowsocks.View
 {
@@ -65,7 +69,7 @@ namespace Shadowsocks.View
         private ServerLogForm serverLogForm;
         private PortSettingsForm portMapForm;
         private SubscribeForm subScribeForm;
-        private LogForm logForm;
+        private LogWindow logWindow;
         private string _urlToOpen;
         private System.Timers.Timer timerDelayCheckUpdate;
 
@@ -903,24 +907,28 @@ namespace Shadowsocks.View
             }
         }
 
-        private void ShowGlobalLogForm()
+        private void ShowGlobalLogWindow()
         {
-            if (logForm != null)
+            if (logWindow != null)
             {
-                logForm.Activate();
-                logForm.Update();
-                if (logForm.WindowState == FormWindowState.Minimized)
+                logWindow.Activate();
+                logWindow.UpdateLayout();
+                if (logWindow.WindowState == WindowState.Minimized)
                 {
-                    logForm.WindowState = FormWindowState.Normal;
+                    logWindow.WindowState = WindowState.Normal;
                 }
             }
             else
             {
-                logForm = new LogForm(controller);
-                logForm.Show();
-                logForm.Activate();
-                logForm.BringToFront();
-                logForm.FormClosed += globalLogForm_FormClosed;
+                logWindow = new LogWindow();
+                logWindow.Show();
+                logWindow.Activate();
+                logWindow.BringToFront();
+                logWindow.Closed += (sender, args) =>
+                {
+                    logWindow = null;
+                    Utils.ReleaseMemory();
+                };
             }
         }
 
@@ -975,12 +983,6 @@ namespace Shadowsocks.View
         private void portMapForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             portMapForm = null;
-            Utils.ReleaseMemory();
-        }
-
-        private void globalLogForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            logForm = null;
             Utils.ReleaseMemory();
         }
 
@@ -1232,7 +1234,7 @@ namespace Shadowsocks.View
 
         private void ShowLogItem_Click(object sender, EventArgs e)
         {
-            ShowGlobalLogForm();
+            ShowGlobalLogWindow();
         }
 
         private void ShowPortMapItem_Click(object sender, EventArgs e)

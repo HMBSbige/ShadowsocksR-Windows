@@ -167,14 +167,14 @@ Version=版本
 
 # Global Log Form
 
-&File=文件(&F)
-Clear &log=清空日志(&L)
-Show in &Explorer=在资源管理器中显示(&E)
-&Close=关闭(&C)
-&View=视图(&V)
-&Font...=字体设置(&F)...
-&Wrap Text=自动换行(&W)
-&Always on top=置于顶层(&A)
+_File=文件(_F)
+Clear _log=清空日志(_L)
+Show in _Explorer=在资源管理器中显示(_E)
+_Close=关闭(_C)
+_View=视图(_V)
+_Font...=字体设置(_F)...
+_Wrap Text=自动换行(_W)
+_Always on top=置于顶层(_A)
 Log Viewer=日志查看器
 
 # QRCode Form

@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Obfs;
+using Shadowsocks.Obfs;
 using Shadowsocks.Util;
 using System;
 using System.Diagnostics;
@@ -68,7 +68,9 @@ namespace Shadowsocks.Controller
 
         private static void CloseLogFile()
         {
+            _logStreamWriter?.Close();
             _logStreamWriter?.Dispose();
+            _logFileStream?.Close();
             _logFileStream?.Dispose();
 
             _logStreamWriter = null;

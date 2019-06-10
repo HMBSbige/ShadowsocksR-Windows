@@ -1,0 +1,34 @@
+﻿<Window x:Class="Shadowsocks.View.LogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Height="475" Width="1000"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Closed="Window_Closed">
+
+    <Grid>
+        <DockPanel>
+            <Menu DockPanel.Dock="Top" Background="White" Height="25">
+                <MenuItem x:Name="FileMenuItem" Header="_File" Height="25">
+                    <MenuItem x:Name="ClearLogMenuItem" Header="Clear _log" Click="ClearLogMenuItem_Click" />
+                    <MenuItem x:Name="ShowInExplorerMenuItem" Header="Show in _Explorer" Click="ShowInExplorerMenuItem_Click" />
+                    <Separator />
+                    <MenuItem x:Name="CloseMenuItem" Header="_Close" Click="CloseMenuItem_Click" />
+                </MenuItem>
+                <MenuItem x:Name="ViewMenuItem" Header="_View" Height="25">
+                    <MenuItem x:Name="FontMenuItem" Header="_Font..." Click="FontMenuItem_Click" />
+                    <MenuItem x:Name="WrapTextMenuItem" Header="_Wrap Text" Click="WrapTextMenuItem_Click" Checked="WrapTextMenuItem_Checked" Unchecked="WrapTextMenuItem_Checked" />
+                    <MenuItem x:Name="AlwaysOnTopMenuItem" Header="_Always on top" Click="AlwaysOnTopMenuItem_Click" Checked="AlwaysOnTopMenuItem_Checked" Unchecked="AlwaysOnTopMenuItem_Checked" />
+                </MenuItem>
+            </Menu>
+            <TextBox x:Name="LogTextBox"
+            HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+            TextWrapping="NoWrap" IsReadOnly="True"
+            Background="Black" Foreground="White"
+            FontFamily="Courier New" FontSize="14" FontWeight="Bold"
+            ></TextBox>
+        </DockPanel>
+    </Grid>
+</Window>

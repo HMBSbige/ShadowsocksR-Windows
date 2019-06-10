@@ -33,6 +33,7 @@
   
   <ItemGroup>
     <None Remove="View\InputPasswordWindow.xaml" />
+    <None Remove="View\LogWindow.xaml" />
     <None Remove="View\QRCodeSplashWindow.xaml" />
     <None Remove="View\ResetPassword.xaml" />
     <None Remove="View\ShowTextWindow.xaml" />
@@ -59,12 +60,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="View\ConfigForm.Designer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="View\LogForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="View\LogForm.Designer.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="View\PortSettingsForm.cs">
