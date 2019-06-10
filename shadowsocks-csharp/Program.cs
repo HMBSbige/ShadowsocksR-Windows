@@ -56,12 +56,14 @@ namespace Shadowsocks
             {
                 if (tryTimes >= 5)
                     return;
-                using (var dlg = new InputPassword())
+                var dlg = new InputPasswordWindow();
+                if (dlg.ShowDialog() == true)
                 {
-                    if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                        Configuration.SetPassword(dlg.password);
-                    else
-                        return;
+                    Configuration.SetPassword(dlg.Password);
+                }
+                else
+                {
+                    return;
                 }
                 tryTimes += 1;
             }
