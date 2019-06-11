@@ -128,6 +128,7 @@ TTL=空闲断开秒数
 
 OK=确定
 Cancel=取消
+Apply=应用
 
 # ServerLog Form
 

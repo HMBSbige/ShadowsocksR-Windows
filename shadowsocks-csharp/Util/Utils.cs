@@ -19,6 +19,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using Point = System.Drawing.Point;
 
 namespace Shadowsocks.Util
@@ -675,6 +676,26 @@ namespace Shadowsocks.Util
                         .Select(Panel.GetZIndex)
                         .Max();
                 Panel.SetZIndex(element, maxZ + 1);
+            }
+        }
+
+        public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
+        {
+            if (depObj != null)
+            {
+                for (var i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+                {
+                    var child = VisualTreeHelper.GetChild(depObj, i);
+                    if (child is T dependencyObject)
+                    {
+                        yield return dependencyObject;
+                    }
+
+                    foreach (var childOfChild in FindVisualChildren<T>(child))
+                    {
+                        yield return childOfChild;
+                    }
+                }
             }
         }
 

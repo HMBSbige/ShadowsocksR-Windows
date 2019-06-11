@@ -65,11 +65,11 @@ namespace Shadowsocks.View
         private MenuItem sameHostForSameTargetItem;
         private MenuItem UpdateItem;
         private ConfigForm configForm;
-        private SettingsForm settingsForm;
+        private SettingsWindow _settingsWindow;
         private ServerLogForm serverLogForm;
         private PortSettingsForm portMapForm;
         private SubscribeForm subScribeForm;
-        private LogWindow logWindow;
+        private LogWindow _logWindow;
         private string _urlToOpen;
         private System.Timers.Timer timerDelayCheckUpdate;
 
@@ -159,6 +159,7 @@ namespace Shadowsocks.View
             var global = config.sysProxyMode == (int)ProxyMode.Global;
             var random = config.random;
 
+            //TODO
             try
             {
                 var icon = new Bitmap("icon.png");
@@ -851,17 +852,21 @@ namespace Shadowsocks.View
 
         private void ShowSettingForm()
         {
-            if (settingsForm != null)
+            if (_settingsWindow != null)
             {
-                settingsForm.Activate();
+                _settingsWindow.Activate();
             }
             else
             {
-                settingsForm = new SettingsForm(controller);
-                settingsForm.Show();
-                settingsForm.Activate();
-                settingsForm.BringToFront();
-                settingsForm.FormClosed += settingsForm_FormClosed;
+                _settingsWindow = new SettingsWindow(controller);
+                _settingsWindow.Show();
+                _settingsWindow.Activate();
+                _settingsWindow.BringToFront();
+                _settingsWindow.Closed += (o, args) =>
+                {
+                    _settingsWindow = null;
+                    Utils.ReleaseMemory();
+                };
             }
         }
 
@@ -909,24 +914,24 @@ namespace Shadowsocks.View
 
         private void ShowGlobalLogWindow()
         {
-            if (logWindow != null)
+            if (_logWindow != null)
             {
-                logWindow.Activate();
-                logWindow.UpdateLayout();
-                if (logWindow.WindowState == WindowState.Minimized)
+                _logWindow.Activate();
+                _logWindow.UpdateLayout();
+                if (_logWindow.WindowState == WindowState.Minimized)
                 {
-                    logWindow.WindowState = WindowState.Normal;
+                    _logWindow.WindowState = WindowState.Normal;
                 }
             }
             else
             {
-                logWindow = new LogWindow();
-                logWindow.Show();
-                logWindow.Activate();
-                logWindow.BringToFront();
-                logWindow.Closed += (sender, args) =>
+                _logWindow = new LogWindow();
+                _logWindow.Show();
+                _logWindow.Activate();
+                _logWindow.BringToFront();
+                _logWindow.Closed += (sender, args) =>
                 {
-                    logWindow = null;
+                    _logWindow = null;
                     Utils.ReleaseMemory();
                 };
             }
@@ -966,12 +971,6 @@ namespace Shadowsocks.View
                 }
                 eventList.Clear();
             }
-        }
-
-        private void settingsForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            settingsForm = null;
-            Utils.ReleaseMemory();
         }
 
         private void serverLogForm_FormClosed(object sender, FormClosedEventArgs e)
