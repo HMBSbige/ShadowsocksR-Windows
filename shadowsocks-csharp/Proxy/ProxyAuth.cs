@@ -1,10 +1,10 @@
-﻿using Shadowsocks.Controller;
-using Shadowsocks.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Shadowsocks.Controller;
+using Shadowsocks.Model;
 
 namespace Shadowsocks.Proxy
 {
@@ -460,7 +460,7 @@ namespace Shadowsocks.Proxy
                 else if (err == 2)
                 {
                     string dataSend = httpProxyState.Http407();
-                    byte[] httpData = System.Text.Encoding.UTF8.GetBytes(dataSend);
+                    byte[] httpData = Encoding.UTF8.GetBytes(dataSend);
                     _connection.Send(httpData);
                     if (HttpHandshakeRecv())
                         break;
@@ -479,7 +479,7 @@ namespace Shadowsocks.Proxy
                 else if (err == 500)
                 {
                     string dataSend = httpProxyState.Http500();
-                    byte[] httpData = System.Text.Encoding.UTF8.GetBytes(dataSend);
+                    byte[] httpData = Encoding.UTF8.GetBytes(dataSend);
                     _connection.Send(httpData);
                     if (HttpHandshakeRecv())
                         break;
@@ -503,11 +503,9 @@ namespace Shadowsocks.Proxy
                     _firstPacketLength = bytesRead;
                     return false;
                 }
-                else
-                {
-                    Console.WriteLine("failed to recv data in HttpHandshakeRecv");
-                    Close();
-                }
+
+                Console.WriteLine("failed to recv data in HttpHandshakeRecv");
+                Close();
             }
             catch (Exception e)
             {
@@ -568,7 +566,7 @@ namespace Shadowsocks.Proxy
                     }
                     if (cfg.type == PortMapType.Forward) // tunnel
                     {
-                        byte[] addr = System.Text.Encoding.UTF8.GetBytes(cfg.server_addr);
+                        byte[] addr = Encoding.UTF8.GetBytes(cfg.server_addr);
                         byte[] newFirstPacket = new byte[_firstPacketLength + addr.Length + 4];
                         newFirstPacket[0] = 3;
                         newFirstPacket[1] = (byte)addr.Length;

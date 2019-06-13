@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Shadowsocks.Model
 {
@@ -67,7 +66,7 @@ namespace Shadowsocks.Model
             _Init(1, _level - 1, 0, _size);
             for (int i = _count; i < (2 << _level); ++i)
             {
-                _tree[i].min = Int64.MaxValue;
+                _tree[i].min = long.MaxValue;
             }
             int offset = 1 << _level;
             for (int i = _count >> 1; i < offset; ++i)
@@ -154,7 +153,7 @@ namespace Shadowsocks.Model
             int l = index * 2;
             int r = l + 1;
             int count = 0;
-            long sub_min_val = Int64.MaxValue;
+            long sub_min_val = long.MaxValue;
             if (_tree[l].range_max > range_min)
             {
                 long out_val;
@@ -206,26 +205,20 @@ namespace Shadowsocks.Model
                     {
                         return FindNthMin(l, range_min, _tree[l].range_max, nth, val);
                     }
-                    else
-                    {
-                        return FindNthMin(r, _tree[r].range_min, range_max, nth - cnt, val);
-                    }
+
+                    return FindNthMin(r, _tree[r].range_min, range_max, nth - cnt, val);
                 }
-                else
-                {
-                    return FindNthMin(l, Math.Max(range_min, _tree[l].range_min), range_max, nth, val);
-                }
+
+                return FindNthMin(l, Math.Max(range_min, _tree[l].range_min), range_max, nth, val);
             }
-            else
-            {
-                return FindNthMin(r, range_min, Math.Min(range_max, _tree[r].range_max), nth, val);
-            }
+
+            return FindNthMin(r, range_min, Math.Min(range_max, _tree[r].range_max), nth, val);
         }
 
         public int FindMinCount2(int index, int range_min, int range_max, out long min_val)
         {
             int offset = 1 << _level;
-            long min = Int64.MaxValue;
+            long min = long.MaxValue;
             int cnt = 0;
             for (int i = range_min; i < range_max; ++i)
             {
@@ -248,7 +241,7 @@ namespace Shadowsocks.Model
         public int FindNthMin2(int range_min, int range_max, int nth)
         {
             int offset = 1 << _level;
-            long min = Int64.MaxValue;
+            long min = long.MaxValue;
             int cnt = 0;
             for (int i = range_min; i < range_max; ++i)
             {

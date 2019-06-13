@@ -1,11 +1,11 @@
-﻿using Shadowsocks.Controller;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using FontFamily = System.Windows.Media.FontFamily;
+using System.Windows.Media;
+using Shadowsocks.Controller;
 
 namespace Shadowsocks.View
 {

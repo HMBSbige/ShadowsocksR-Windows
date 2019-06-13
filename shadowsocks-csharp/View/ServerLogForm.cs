@@ -1,12 +1,12 @@
-﻿using Shadowsocks.Controller;
-using Shadowsocks.Model;
-using Shadowsocks.Properties;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
+using Shadowsocks.Controller;
+using Shadowsocks.Model;
+using Shadowsocks.Properties;
 
 namespace Shadowsocks.View
 {
@@ -30,13 +30,13 @@ namespace Shadowsocks.View
         private MenuItem topmostItem;
         private MenuItem clearItem;
         private List<int> listOrder = new List<int>();
-        private int lastRefreshIndex = 0;
+        private int lastRefreshIndex;
         private bool firstDispley = true;
-        private bool rowChange = false;
-        private int updatePause = 0;
-        private int updateTick = 0;
-        private int updateSize = 0;
-        private int pendingUpdate = 0;
+        private bool rowChange;
+        private int updatePause;
+        private int updateTick;
+        private int updateSize;
+        private int pendingUpdate;
         private ServerSpeedLogShow[] ServerSpeedLogList;
         private Thread workerThread;
         private AutoResetEvent workerEvent = new AutoResetEvent(false);
@@ -74,27 +74,27 @@ namespace Shadowsocks.View
             UpdateTexts();
             UpdateLog();
 
-            Menu = new MainMenu(new MenuItem[] {
-                CreateMenuGroup("&Control", new MenuItem[] {
-                    CreateMenuItem("&Disconnect direct connections", new EventHandler(DisconnectForward_Click)),
-                    CreateMenuItem("Disconnect &All", new EventHandler(Disconnect_Click)),
+            Menu = new MainMenu(new[] {
+                CreateMenuGroup("&Control", new[] {
+                    CreateMenuItem("&Disconnect direct connections", DisconnectForward_Click),
+                    CreateMenuItem("Disconnect &All", Disconnect_Click),
                     new MenuItem("-"),
-                    CreateMenuItem("Clear &MaxSpeed", new EventHandler(ClearMaxSpeed_Click)),
-                    clearItem = CreateMenuItem("&Clear", new EventHandler(ClearItem_Click)),
+                    CreateMenuItem("Clear &MaxSpeed", ClearMaxSpeed_Click),
+                    clearItem = CreateMenuItem("&Clear", ClearItem_Click),
                     new MenuItem("-"),
-                    CreateMenuItem("Clear &Selected Total", new EventHandler(ClearSelectedTotal_Click)),
-                    CreateMenuItem("Clear &Total", new EventHandler(ClearTotal_Click)),
+                    CreateMenuItem("Clear &Selected Total", ClearSelectedTotal_Click),
+                    CreateMenuItem("Clear &Total", ClearTotal_Click)
                 }),
-                CreateMenuGroup("Port &out", new MenuItem[] {
-                    CreateMenuItem("Copy current link", new EventHandler(copyLinkItem_Click)),
-                    CreateMenuItem("Copy current group links", new EventHandler(copyGroupLinkItem_Click)),
-                    CreateMenuItem("Copy all enable links", new EventHandler(copyEnableLinksItem_Click)),
-                    CreateMenuItem("Copy all links", new EventHandler(copyLinksItem_Click)),
+                CreateMenuGroup("Port &out", new[] {
+                    CreateMenuItem("Copy current link", copyLinkItem_Click),
+                    CreateMenuItem("Copy current group links", copyGroupLinkItem_Click),
+                    CreateMenuItem("Copy all enable links", copyEnableLinksItem_Click),
+                    CreateMenuItem("Copy all links", copyLinksItem_Click)
                 }),
-                CreateMenuGroup("&Window", new MenuItem[] {
-                    CreateMenuItem("Auto &size", new EventHandler(autosizeItem_Click)),
-                    topmostItem = CreateMenuItem("Always On &Top", new EventHandler(topmostItem_Click)),
-                }),
+                CreateMenuGroup("&Window", new[] {
+                    CreateMenuItem("Auto &size", autosizeItem_Click),
+                    topmostItem = CreateMenuItem("Always On &Top", topmostItem_Click)
+                })
             });
             controller.ConfigChanged += controller_ConfigChanged;
 
@@ -130,8 +130,8 @@ namespace Shadowsocks.View
         private void UpdateTitle()
         {
             Text = I18N.GetString("ServerLog") + "("
-                + (controller.GetCurrentConfiguration().shareOverLan ? "any" : "local") + ":" + controller.GetCurrentConfiguration().localPort.ToString()
-                + "(" + Model.Server.GetForwardServerRef().GetConnections().Count.ToString() + ")"
+                + (controller.GetCurrentConfiguration().shareOverLan ? "any" : "local") + ":" + controller.GetCurrentConfiguration().localPort
+                + "(" + Model.Server.GetForwardServerRef().GetConnections().Count + ")"
                 + " " + I18N.GetString("Version") + UpdateChecker.FullVersion
                 + ")";
         }
@@ -168,34 +168,28 @@ namespace Shadowsocks.View
                         return (bytes / (double)P).ToString("F3") + "P";
                     return (bytes / (double)T).ToString("F3") + "T";
                 }
-                else
-                {
-                    if (bytes >= G * 99)
-                        return (bytes / (double)G).ToString("F2") + "G";
-                    if (bytes >= G * 9)
-                        return (bytes / (double)G).ToString("F3") + "G";
-                    return (bytes / (double)G).ToString("F4") + "G";
-                }
+
+                if (bytes >= G * 99)
+                    return (bytes / (double)G).ToString("F2") + "G";
+                if (bytes >= G * 9)
+                    return (bytes / (double)G).ToString("F3") + "G";
+                return (bytes / (double)G).ToString("F4") + "G";
             }
-            else
+
+            if (bytes >= K * 990)
             {
-                if (bytes >= K * 990)
-                {
-                    if (bytes >= M * 100)
-                        return (bytes / (double)M).ToString("F1") + "M";
-                    if (bytes > M * 9.9)
-                        return (bytes / (double)M).ToString("F2") + "M";
-                    return (bytes / (double)M).ToString("F3") + "M";
-                }
-                else
-                {
-                    if (bytes > K * 99)
-                        return (bytes / (double)K).ToString("F0") + "K";
-                    if (bytes > 900)
-                        return (bytes / (double)K).ToString("F1") + "K";
-                    return bytes.ToString();
-                }
+                if (bytes >= M * 100)
+                    return (bytes / (double)M).ToString("F1") + "M";
+                if (bytes > M * 9.9)
+                    return (bytes / (double)M).ToString("F2") + "M";
+                return (bytes / (double)M).ToString("F3") + "M";
             }
+
+            if (bytes > K * 99)
+                return (bytes / (double)K).ToString("F0") + "K";
+            if (bytes > 900)
+                return (bytes / (double)K).ToString("F1") + "K";
+            return bytes.ToString();
         }
 
         public bool SetBackColor(DataGridViewCell cell, Color newColor)
@@ -1004,33 +998,33 @@ namespace Shadowsocks.View
             }
         }
 
-        private long Str2Long(String str)
+        private long Str2Long(string str)
         {
             if (str == "-") return -1;
             //if (String.IsNullOrEmpty(str)) return -1;
             if (str.LastIndexOf('K') > 0)
             {
-                Double ret = Convert.ToDouble(str.Substring(0, str.LastIndexOf('K')));
+                double ret = Convert.ToDouble(str.Substring(0, str.LastIndexOf('K')));
                 return (long)(ret * 1024);
             }
             if (str.LastIndexOf('M') > 0)
             {
-                Double ret = Convert.ToDouble(str.Substring(0, str.LastIndexOf('M')));
+                double ret = Convert.ToDouble(str.Substring(0, str.LastIndexOf('M')));
                 return (long)(ret * 1024 * 1024);
             }
             if (str.LastIndexOf('G') > 0)
             {
-                Double ret = Convert.ToDouble(str.Substring(0, str.LastIndexOf('G')));
+                double ret = Convert.ToDouble(str.Substring(0, str.LastIndexOf('G')));
                 return (long)(ret * 1024 * 1024 * 1024);
             }
             if (str.LastIndexOf('T') > 0)
             {
-                Double ret = Convert.ToDouble(str.Substring(0, str.LastIndexOf('T')));
+                double ret = Convert.ToDouble(str.Substring(0, str.LastIndexOf('T')));
                 return (long)(ret * 1024 * 1024 * 1024 * 1024);
             }
             try
             {
-                Double ret = Convert.ToDouble(str);
+                double ret = Convert.ToDouble(str);
                 return (long)ret;
             }
             catch
@@ -1044,7 +1038,7 @@ namespace Shadowsocks.View
             //e.SortResult = 0;
             if (e.Column.Name == "Server" || e.Column.Name == "Group")
             {
-                e.SortResult = String.Compare(Convert.ToString(e.CellValue1), Convert.ToString(e.CellValue2));
+                e.SortResult = string.Compare(Convert.ToString(e.CellValue1), Convert.ToString(e.CellValue2));
                 e.Handled = true;
             }
             else if (e.Column.Name == "ID"
@@ -1055,16 +1049,16 @@ namespace Shadowsocks.View
                 || e.Column.Name == "Continuous"
                 )
             {
-                Int32 v1 = Convert.ToInt32(e.CellValue1);
-                Int32 v2 = Convert.ToInt32(e.CellValue2);
+                int v1 = Convert.ToInt32(e.CellValue1);
+                int v2 = Convert.ToInt32(e.CellValue2);
                 e.SortResult = v1 == v2 ? 0 : v1 < v2 ? -1 : 1;
             }
             else if (e.Column.Name == "ErrorPercent")
             {
-                String s1 = Convert.ToString(e.CellValue1);
-                String s2 = Convert.ToString(e.CellValue2);
-                Int32 v1 = s1.Length <= 1 ? 0 : Convert.ToInt32(Convert.ToDouble(s1.Substring(0, s1.Length - 1)) * 100);
-                Int32 v2 = s2.Length <= 1 ? 0 : Convert.ToInt32(Convert.ToDouble(s2.Substring(0, s2.Length - 1)) * 100);
+                string s1 = Convert.ToString(e.CellValue1);
+                string s2 = Convert.ToString(e.CellValue2);
+                int v1 = s1.Length <= 1 ? 0 : Convert.ToInt32(Convert.ToDouble(s1.Substring(0, s1.Length - 1)) * 100);
+                int v2 = s2.Length <= 1 ? 0 : Convert.ToInt32(Convert.ToDouble(s2.Substring(0, s2.Length - 1)) * 100);
                 e.SortResult = v1 == v2 ? 0 : v1 < v2 ? -1 : 1;
             }
             else if (e.Column.Name == "AvgLatency"
@@ -1077,8 +1071,8 @@ namespace Shadowsocks.View
                 || e.Column.Name == "DownloadRaw"
                 )
             {
-                String s1 = Convert.ToString(e.CellValue1);
-                String s2 = Convert.ToString(e.CellValue2);
+                string s1 = Convert.ToString(e.CellValue1);
+                string s2 = Convert.ToString(e.CellValue2);
                 long v1 = Str2Long(s1);
                 long v2 = Str2Long(s2);
                 e.SortResult = v1 == v2 ? 0 : v1 < v2 ? -1 : 1;

@@ -1,13 +1,13 @@
-﻿using Shadowsocks.Controller;
-using Shadowsocks.Encryption;
-using Shadowsocks.Model;
-using Shadowsocks.Properties;
-using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Net;
 using System.Windows.Forms;
+using Shadowsocks.Controller;
+using Shadowsocks.Encryption;
+using Shadowsocks.Model;
+using Shadowsocks.Properties;
+using Shadowsocks.Util;
 using ZXing.QrCode.Internal;
 
 namespace Shadowsocks.View
@@ -209,7 +209,7 @@ namespace Shadowsocks.View
 
         private void GenQr(string str)
         {
-            var width = 350 * Util.Utils.GetDpiMul() / 4;
+            var width = 350 * Utils.GetDpiMul() / 4;
             if (txtLink.Focused || chkSSRLink.Focused)
             {
                 var qrText = str;

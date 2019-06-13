@@ -1,5 +1,5 @@
-﻿using Shadowsocks.Model;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Shadowsocks.Model;
 
 namespace Shadowsocks.Controller
 {
@@ -42,13 +42,11 @@ namespace Shadowsocks.Controller
                 _config = null;
                 return false;
             }
-            else
-            {
-                Url = _serverSubscribes[0].URL;
-                _updater.CheckUpdate(_config, _serverSubscribes[0], _useProxy, _notify);
-                _serverSubscribes.RemoveAt(0);
-                return true;
-            }
+
+            Url = _serverSubscribes[0].URL;
+            _updater.CheckUpdate(_config, _serverSubscribes[0], _useProxy, _notify);
+            _serverSubscribes.RemoveAt(0);
+            return true;
         }
 
         public string Url { get; private set; }

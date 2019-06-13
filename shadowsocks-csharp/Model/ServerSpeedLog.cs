@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Shadowsocks.Model
 {
@@ -54,20 +53,20 @@ namespace Shadowsocks.Model
     }
     public class ServerSpeedLog
     {
-        private long totalConnectTimes = 0;
-        private long totalDisconnectTimes = 0;
-        private long errorConnectTimes = 0;
-        private long errorTimeoutTimes = 0;
-        private long errorDecodeTimes = 0;
-        private long errorEmptyTimes = 0;
-        private long errorContinurousTimes = 0;
-        private long transUpload = 0;
-        private long transDownload = 0;
-        private long transDownloadRaw = 0;
+        private long totalConnectTimes;
+        private long totalDisconnectTimes;
+        private long errorConnectTimes;
+        private long errorTimeoutTimes;
+        private long errorDecodeTimes;
+        private long errorEmptyTimes;
+        private long errorContinurousTimes;
+        private long transUpload;
+        private long transDownload;
+        private long transDownloadRaw;
         private List<TransLog> downTransLog = new List<TransLog>();
         private List<TransLog> upTransLog = new List<TransLog>();
-        private long maxTransDownload = 0;
-        private long maxTransUpload = 0;
+        private long maxTransDownload;
+        private long maxTransUpload;
         private int avgConnectTime = -1;
         //private List<TransLog> speedLog = null;
         private LinkedList<ErrorLog> errList = new LinkedList<ErrorLog>();
@@ -236,8 +235,8 @@ namespace Shadowsocks.Model
                         long ret = (long)(totalBytes / totalTime);
                         return ret;
                     }
-                    else
-                        return 0;
+
+                    return 0;
                 }
             }
         }
@@ -248,7 +247,7 @@ namespace Shadowsocks.Model
                 List<TransLog> transLog;
                 lock (this)
                 {
-                    if (this.upTransLog == null)
+                    if (upTransLog == null)
                         return 0;
                     transLog = new List<TransLog>();
                     for (int i = 0; i < upTransLog.Count; ++i)
@@ -276,8 +275,8 @@ namespace Shadowsocks.Model
                         long ret = (long)(totalBytes / totalTime);
                         return ret;
                     }
-                    else
-                        return 0;
+
+                    return 0;
                 }
             }
         }

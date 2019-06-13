@@ -1,16 +1,16 @@
-﻿using Shadowsocks.Controller;
-using Shadowsocks.Encryption;
-using Shadowsocks.Encryption.Stream;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using Shadowsocks.Controller;
+using Shadowsocks.Encryption;
+using Shadowsocks.Encryption.Stream;
 
 namespace Shadowsocks.Obfs
 {
     public class AuthData : VerifyData
     {
         public byte[] clientID;
-        public UInt32 connectionID;
+        public uint connectionID;
     }
 
     public class AuthSHA1 : VerifySimpleBase
@@ -22,7 +22,7 @@ namespace Shadowsocks.Obfs
             has_recv_header = false;
         }
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
-            {"auth_sha1", new int[]{1, 0, 1}},
+            {"auth_sha1", new[]{1, 0, 1}}
         };
 
         protected bool has_sent_header;
@@ -62,7 +62,7 @@ namespace Shadowsocks.Obfs
             int rand_len = LinearRandomInt(250) + 1;
             int data_offset = rand_len + 4 + 2;
             outlength = data_offset + datalength + 12 + 10;
-            AuthData authData = (AuthData)this.Server.data;
+            AuthData authData = (AuthData)Server.data;
             lock (authData)
             {
                 if (authData.connectionID > 0xFF000000)
@@ -73,14 +73,14 @@ namespace Shadowsocks.Obfs
                 {
                     authData.clientID = new byte[4];
                     g_random.GetBytes(authData.clientID);
-                    authData.connectionID = (UInt32)LinearRandomInt(0x1000000);
+                    authData.connectionID = (uint)LinearRandomInt(0x1000000);
                 }
                 authData.connectionID += 1;
                 Array.Copy(authData.clientID, 0, outdata, data_offset + 4, 4);
                 Array.Copy(BitConverter.GetBytes(authData.connectionID), 0, outdata, data_offset + 8, 4);
             }
-            UInt64 utc_time_second = (UInt64)Math.Floor(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
-            UInt32 utc_time = (UInt32)(utc_time_second);
+            ulong utc_time_second = (ulong)Math.Floor(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
+            uint utc_time = (uint)(utc_time_second);
             Array.Copy(BitConverter.GetBytes(utc_time), 0, outdata, data_offset, 4);
 
             Array.Copy(data, 0, outdata, data_offset + 12, datalength);
@@ -88,7 +88,7 @@ namespace Shadowsocks.Obfs
             outdata[5] = (byte)(outlength);
             outdata[6] = (byte)(rand_len);
 
-            ulong crc32 = Util.CRC32.CalcCRC32(Server.key, (int)Server.key.Length);
+            ulong crc32 = Util.CRC32.CalcCRC32(Server.key, Server.key.Length);
             BitConverter.GetBytes((uint)crc32).CopyTo(outdata, 0);
 
             byte[] key = new byte[Server.iv.Length + Server.key.Length];
@@ -195,7 +195,7 @@ namespace Shadowsocks.Obfs
             has_recv_header = false;
         }
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
-            {"auth_sha1_v2", new int[]{1, 0, 1}},
+            {"auth_sha1_v2", new[]{1, 0, 1}}
         };
 
         protected bool has_sent_header;
@@ -259,7 +259,7 @@ namespace Shadowsocks.Obfs
             int rand_len = (datalength > 400 ? LinearRandomInt(128) : LinearRandomInt(1024)) + 1;
             int data_offset = rand_len + 4 + 2;
             outlength = data_offset + datalength + 12 + 10;
-            AuthData authData = (AuthData)this.Server.data;
+            AuthData authData = (AuthData)Server.data;
             {
                 byte[] rnd_data = new byte[rand_len];
                 random.NextBytes(rnd_data);
@@ -275,7 +275,7 @@ namespace Shadowsocks.Obfs
                 {
                     authData.clientID = new byte[8];
                     g_random.GetBytes(authData.clientID);
-                    authData.connectionID = (UInt32)BitConverter.ToInt64(authData.clientID, 0) % 0xFFFFFD;
+                    authData.connectionID = (uint)BitConverter.ToInt64(authData.clientID, 0) % 0xFFFFFD;
                 }
                 authData.connectionID += 1;
                 Array.Copy(authData.clientID, 0, outdata, data_offset, 8);
@@ -300,7 +300,7 @@ namespace Shadowsocks.Obfs
             byte[] crcdata = new byte[salt.Length + Server.key.Length];
             salt.CopyTo(crcdata, 0);
             Server.key.CopyTo(crcdata, salt.Length);
-            ulong crc32 = Util.CRC32.CalcCRC32(crcdata, (int)crcdata.Length);
+            ulong crc32 = Util.CRC32.CalcCRC32(crcdata, crcdata.Length);
             BitConverter.GetBytes((uint)crc32).CopyTo(outdata, 0);
 
             byte[] key = new byte[Server.iv.Length + Server.key.Length];
@@ -418,7 +418,7 @@ namespace Shadowsocks.Obfs
             has_recv_header = false;
         }
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
-            {"auth_sha1_v4", new int[]{1, 0, 1}},
+            {"auth_sha1_v4", new[]{1, 0, 1}}
         };
 
         protected bool has_sent_header;
@@ -491,7 +491,7 @@ namespace Shadowsocks.Obfs
             int rand_len = (datalength > 400 ? LinearRandomInt(128) : LinearRandomInt(1024)) + 1;
             int data_offset = rand_len + 4 + 2;
             outlength = data_offset + datalength + 12 + 10;
-            AuthData authData = (AuthData)this.Server.data;
+            AuthData authData = (AuthData)Server.data;
             {
                 byte[] rnd_data = new byte[rand_len];
                 random.NextBytes(rnd_data);
@@ -507,14 +507,14 @@ namespace Shadowsocks.Obfs
                 {
                     authData.clientID = new byte[4];
                     g_random.GetBytes(authData.clientID);
-                    authData.connectionID = (UInt32)BitConverter.ToInt32(authData.clientID, 0) % 0xFFFFFD;
+                    authData.connectionID = (uint)BitConverter.ToInt32(authData.clientID, 0) % 0xFFFFFD;
                 }
                 authData.connectionID += 1;
                 Array.Copy(authData.clientID, 0, outdata, data_offset + 4, 4);
                 Array.Copy(BitConverter.GetBytes(authData.connectionID), 0, outdata, data_offset + 8, 4);
             }
-            UInt64 utc_time_second = (UInt64)Math.Floor(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
-            UInt32 utc_time = (UInt32)(utc_time_second);
+            ulong utc_time_second = (ulong)Math.Floor(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
+            uint utc_time = (uint)(utc_time_second);
             Array.Copy(BitConverter.GetBytes(utc_time), 0, outdata, data_offset, 4);
 
             Array.Copy(data, 0, outdata, data_offset + 12, datalength);
@@ -537,7 +537,7 @@ namespace Shadowsocks.Obfs
             Server.key.CopyTo(crcdata, salt.Length + 2);
             crcdata[0] = outdata[0];
             crcdata[1] = outdata[1];
-            ulong crc32 = Util.CRC32.CalcCRC32(crcdata, (int)crcdata.Length);
+            ulong crc32 = Util.CRC32.CalcCRC32(crcdata, crcdata.Length);
             BitConverter.GetBytes((uint)crc32).CopyTo(outdata, 2);
 
             byte[] key = new byte[Server.iv.Length + Server.key.Length];
@@ -677,8 +677,8 @@ namespace Shadowsocks.Obfs
             random = new Random(BitConverter.ToInt32(bytes, 0));
         }
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
-            {"auth_aes128_md5", new int[]{1, 0, 1}},
-            {"auth_aes128_sha1", new int[]{1, 0, 1}},
+            {"auth_aes128_md5", new[]{1, 0, 1}},
+            {"auth_aes128_sha1", new[]{1, 0, 1}}
         };
 
         protected bool has_sent_header;
@@ -892,7 +892,7 @@ namespace Shadowsocks.Obfs
             const int authhead_len = 7 + 4 + 16 + 4;
             const int overhead = authhead_len + 4;
             byte[] encrypt = new byte[24];
-            AuthDataAes128 authData = this.Server.data as AuthDataAes128;
+            AuthDataAes128 authData = Server.data as AuthDataAes128;
 
             lock (authData)
             {
@@ -904,7 +904,7 @@ namespace Shadowsocks.Obfs
                 {
                     authData.clientID = new byte[4];
                     g_random.GetBytes(authData.clientID);
-                    authData.connectionID = (UInt32)BitConverter.ToInt32(authData.clientID, 0) % 0xFFFFFD;
+                    authData.connectionID = (uint)BitConverter.ToInt32(authData.clientID, 0) % 0xFFFFFD;
                 }
                 authData.connectionID += 1;
                 Array.Copy(authData.clientID, 0, encrypt, 4, 4);
@@ -931,8 +931,8 @@ namespace Shadowsocks.Obfs
                 rnd_data.CopyTo(outdata, data_offset - rand_len);
             }
 
-            UInt64 utc_time_second = (UInt64)Math.Floor(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
-            UInt32 utc_time = (UInt32)(utc_time_second);
+            ulong utc_time_second = (ulong)Math.Floor(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
+            uint utc_time = (uint)(utc_time_second);
             Array.Copy(BitConverter.GetBytes(utc_time), 0, encrypt, 0, 4);
             encrypt[12] = (byte)(outlength);
             encrypt[13] = (byte)(outlength >> 8);
@@ -963,7 +963,7 @@ namespace Shadowsocks.Obfs
 
                 byte[] encrypt_key = user_key;
 
-                var encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("aes-128-cbc", System.Convert.ToBase64String(encrypt_key) + SALT);
+                var encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("aes-128-cbc", Convert.ToBase64String(encrypt_key) + SALT);
                 int enc_outlen;
 
                 encryptor.SetIV(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
@@ -1011,7 +1011,8 @@ namespace Shadowsocks.Obfs
             {
                 return null;
             }
-            else if (data == send_buffer)
+
+            if (data == send_buffer)
             {
                 datalength = send_buffer.Length;
                 send_buffer = null;
@@ -1024,14 +1025,12 @@ namespace Shadowsocks.Obfs
                 {
                     return outdata;
                 }
-                else
-                {
-                    Array.Resize(ref send_buffer, send_buffer.Length + datalength);
-                    Array.Copy(data, 0, send_buffer, send_buffer.Length - datalength, datalength);
-                    data = send_buffer;
-                    datalength = send_buffer.Length;
-                    send_buffer = null;
-                }
+
+                Array.Resize(ref send_buffer, send_buffer.Length + datalength);
+                Array.Copy(data, 0, send_buffer, send_buffer.Length - datalength, datalength);
+                data = send_buffer;
+                datalength = send_buffer.Length;
+                send_buffer = null;
             }
             const int unit_len = 8100;
             int ogn_datalength = datalength;

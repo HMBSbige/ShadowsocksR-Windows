@@ -52,7 +52,7 @@ namespace Shadowsocks.Encryption.Stream
                 {"chacha20", new EncryptorInfo(32, 8, true, CIPHER_CHACHA20)},
                 {"xsalsa20", new EncryptorInfo(32, 24, true, CIPHER_XSALSA20)},
                 {"xchacha20", new EncryptorInfo(32, 24, true, CIPHER_XCHACHA20)},
-                {"chacha20-ietf", new EncryptorInfo(32, 12, true, CIPHER_CHACHA20_IETF)},
+                {"chacha20-ietf", new EncryptorInfo(32, 12, true, CIPHER_CHACHA20_IETF)}
         };
 
         protected override Dictionary<string, EncryptorInfo> getCiphers()

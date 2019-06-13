@@ -1,5 +1,5 @@
-﻿using Shadowsocks.Controller;
-using System.Windows.Input;
+﻿using System.Windows.Input;
+using Shadowsocks.Controller;
 
 namespace Shadowsocks.View
 {

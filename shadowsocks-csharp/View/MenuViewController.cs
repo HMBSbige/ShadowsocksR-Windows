@@ -149,91 +149,62 @@ namespace Shadowsocks.View
 
         private void UpdateTrayIcon()
         {
-            int dpi;
-            using (var graphics = Graphics.FromHwnd(IntPtr.Zero))
-            {
-                dpi = (int)graphics.DpiX;
-            }
             var config = controller.GetCurrentConfiguration();
             var enabled = config.sysProxyMode != (int)ProxyMode.NoModify && config.sysProxyMode != (int)ProxyMode.Direct;
             var global = config.sysProxyMode == (int)ProxyMode.Global;
             var random = config.random;
 
-            //TODO
-            try
+            var icon = Resources.ss24;
+            double mul_a = 1.0, mul_r = 1.0, mul_g = 1.0, mul_b = 1.0;
+            if (!enabled)
             {
-                var icon = new Bitmap("icon.png");
-                var newIcon = Icon.FromHandle(icon.GetHicon());
-                icon.Dispose();
-                _notifyIcon.Icon = newIcon;
+                mul_g = 0.4;
             }
-            catch
+            else if (!global)
             {
-                Bitmap icon;
-                if (dpi < 97)
-                {
-                    // dpi = 96;
-                    icon = Resources.ss16;
-                }
-                else if (dpi < 121)
-                {
-                    // dpi = 120;
-                    icon = Resources.ss20;
-                }
-                else
-                {
-                    icon = Resources.ss24;
-                }
-                double mul_a = 1.0, mul_r = 1.0, mul_g = 1.0, mul_b = 1.0;
-                if (!enabled)
-                {
-                    mul_g = 0.4;
-                }
-                else if (!global)
-                {
-                    mul_b = 0.4;
-                    mul_g = 0.8;
-                }
-                if (!random)
-                {
-                    mul_r = 0.4;
-                }
+                mul_b = 0.4;
+                mul_g = 0.8;
+            }
 
-                var iconCopy = new Bitmap(icon);
-                for (var x = 0; x < iconCopy.Width; ++x)
-                {
-                    for (var y = 0; y < iconCopy.Height; ++y)
-                    {
-                        var color = icon.GetPixel(x, y);
-                        iconCopy.SetPixel(x, y,
+            if (!random)
+            {
+                mul_r = 0.4;
+            }
 
+            var iconCopy = new Bitmap(icon);
+            for (var x = 0; x < iconCopy.Width; ++x)
+            {
+                for (var y = 0; y < iconCopy.Height; ++y)
+                {
+                    var color = icon.GetPixel(x, y);
+                    iconCopy.SetPixel(x, y,
                             Color.FromArgb((byte)(color.A * mul_a),
-                            ((byte)(color.R * mul_r)),
-                            ((byte)(color.G * mul_g)),
-                            ((byte)(color.B * mul_b))));
-                    }
+                                    (byte)(color.R * mul_r),
+                                    (byte)(color.G * mul_g),
+                                    (byte)(color.B * mul_b)));
                 }
-                var newIcon = Icon.FromHandle(iconCopy.GetHicon());
-                icon.Dispose();
-                iconCopy.Dispose();
-
-                _notifyIcon.Icon = newIcon;
             }
+
+            var newIcon = Icon.FromHandle(iconCopy.GetHicon());
+            icon.Dispose();
+            iconCopy.Dispose();
+
+            _notifyIcon.Icon = newIcon;
 
             string strServer = null;
             var line3 = string.Empty;
             var line4 = string.Empty;
             if (random)
             {
-                strServer = $@"{I18N.GetString("Load balance")}{I18N.GetString(": ")}{I18N.GetString(config.balanceAlgorithm)}";
+                strServer = $@"{I18N.GetString(@"Load balance")}{I18N.GetString(@": ")}{I18N.GetString(config.balanceAlgorithm)}";
                 if (config.randomInGroup)
                 {
-                    line3 = $@"{I18N.GetString("Balance in group")}{Environment.NewLine}";
+                    line3 = $@"{I18N.GetString(@"Balance in group")}{Environment.NewLine}";
                 }
 
                 if (config.autoBan)
                 {
-                    line4 = $@"{I18N.GetString("AutoBan")}{Environment.NewLine}";
+                    line4 = $@"{I18N.GetString(@"AutoBan")}{Environment.NewLine}";
                 }
             }
             else
@@ -252,7 +223,7 @@ namespace Shadowsocks.View
                     }
                     else
                     {
-                        strServer = $@"{groupName}{I18N.GetString(": ")}{serverName}";
+                        strServer = $@"{groupName}{I18N.GetString(@": ")}{serverName}";
                     }
                 }
             }
@@ -260,11 +231,11 @@ namespace Shadowsocks.View
 
             // we want to show more details but notify icon title is limited to 127 characters
             var line1 = (enabled
-                                ? global ? I18N.GetString("Global") : I18N.GetString("PAC")
-                                : I18N.GetString("Disable system proxy"))
+                                ? global ? I18N.GetString(@"Global") : I18N.GetString(@"PAC")
+                                : I18N.GetString(@"Disable system proxy"))
                                 + Environment.NewLine;
             var line2 = string.IsNullOrWhiteSpace(strServer) ? null : $@"{strServer}{Environment.NewLine}";
-            var line5 = string.Format(I18N.GetString("Running: Port {0}"), config.localPort); // this feedback is very important because they need to know Shadowsocks is running
+            var line5 = string.Format(I18N.GetString(@"Running: Port {0}"), config.localPort); // this feedback is very important because they need to know Shadowsocks is running
 
             var text = $@"{line1}{line2}{line3}{line4}{line5}";
             var suffix = $@"...{Environment.NewLine}";
@@ -276,12 +247,12 @@ namespace Shadowsocks.View
             SetNotifyIconText(_notifyIcon, text);
         }
 
-        private MenuItem CreateMenuItem(string text, EventHandler click)
+        private static MenuItem CreateMenuItem(string text, EventHandler click)
         {
             return new MenuItem(I18N.GetString(text), click);
         }
 
-        private MenuItem CreateMenuGroup(string text, MenuItem[] items)
+        private static MenuItem CreateMenuGroup(string text, MenuItem[] items)
         {
             return new MenuItem(I18N.GetString(text), items);
         }
@@ -307,7 +278,7 @@ namespace Shadowsocks.View
                     new MenuItem("-"),
                     CreateMenuItem("Copy PAC URL", CopyPacUrlItem_Click),
                     CreateMenuItem("Edit local PAC file...", EditPACFileItem_Click),
-                    CreateMenuItem("Edit user rule for GFWList...", EditUserRuleFileForGFWListItem_Click),
+                    CreateMenuItem("Edit user rule for GFWList...", EditUserRuleFileForGFWListItem_Click)
                 }),
                 CreateMenuGroup("Proxy rule", new[] {
                     ruleBypassLan = CreateMenuItem("Bypass LAN", RuleBypassLanItem_Click),
@@ -315,7 +286,7 @@ namespace Shadowsocks.View
                     ruleBypassNotChina = CreateMenuItem("Bypass LAN && not China", RuleBypassNotChinaItem_Click),
                     ruleUser = CreateMenuItem("User custom", RuleUserItem_Click),
                     new MenuItem("-"),
-                    ruleDisableBypass = CreateMenuItem("Disable bypass", RuleBypassDisableItem_Click),
+                    ruleDisableBypass = CreateMenuItem("Disable bypass", RuleBypassDisableItem_Click)
                 }),
                 new MenuItem("-"),
                 ServersItem = CreateMenuGroup("Servers", new[] {
@@ -327,12 +298,12 @@ namespace Shadowsocks.View
                     sameHostForSameTargetItem = CreateMenuItem("Same host for same address", SelectSameHostForSameTargetItem_Click),
                     new MenuItem("-"),
                     CreateMenuItem("Server statistic...", ShowServerLogItem_Click),
-                    CreateMenuItem("Disconnect current", DisconnectCurrent_Click),
+                    CreateMenuItem("Disconnect current", DisconnectCurrent_Click)
                 }),
                 CreateMenuGroup("Servers Subscribe", new[] {
                     CreateMenuItem("Subscribe setting...", SubscribeSetting_Click),
                     CreateMenuItem("Update subscribe SSR node", CheckNodeUpdate_Click),
-                    CreateMenuItem("Update subscribe SSR node(bypass proxy)", CheckNodeUpdateBypassProxy_Click),
+                    CreateMenuItem("Update subscribe SSR node(bypass proxy)", CheckNodeUpdateBypassProxy_Click)
                 }),
                 CreateMenuItem("Global settings...", Setting_Click),
                 CreateMenuItem("Port settings...", ShowPortMapItem_Click),
@@ -632,7 +603,8 @@ namespace Shadowsocks.View
                                 match = true;
                                 break;
                             }
-                            else if (config.configs[i].group == selected_server.group)
+
+                            if (config.configs[i].group == selected_server.group)
                             {
                                 if (config.configs[i].isMatchServer(selected_server))
                                 {

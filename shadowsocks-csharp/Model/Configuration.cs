@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
-using Shadowsocks.Controller;
-using Shadowsocks.Encryption;
-using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Windows.Forms;
+using Newtonsoft.Json;
+using Shadowsocks.Controller;
+using Shadowsocks.Encryption;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.Model
 {
@@ -39,7 +39,7 @@ namespace Shadowsocks.Model
         BypassLan,
         BypassLanAndChina,
         BypassLanAndNotChina,
-        UserCustom = 16,
+        UserCustom = 16
     }
 
     [Serializable]
@@ -80,7 +80,8 @@ namespace Shadowsocks.Model
     [Serializable]
     class ConfigurationException : Exception
     {
-        public ConfigurationException() : base() { }
+        public ConfigurationException()
+        { }
         public ConfigurationException(string message) : base(message) { }
         public ConfigurationException(string message, Exception inner) : base(message, inner) { }
         protected ConfigurationException(System.Runtime.Serialization.SerializationInfo info,
@@ -91,7 +92,8 @@ namespace Shadowsocks.Model
     [Serializable]
     class ConfigurationWarning : Exception
     {
-        public ConfigurationWarning() : base() { }
+        public ConfigurationWarning()
+        { }
         public ConfigurationWarning(string message) : base(message) { }
         public ConfigurationWarning(string message, Exception inner) : base(message, inner) { }
         protected ConfigurationWarning(System.Runtime.Serialization.SerializationInfo info,
@@ -237,7 +239,8 @@ namespace Shadowsocks.Model
                     }
                     return i == -1 ? GetErrorServer() : configs[i];
                 }
-                else if (usingRandom && cfgRandom)
+
+                if (usingRandom && cfgRandom)
                 {
                     int i;
                     if (filter == null && randomInGroup)
@@ -258,51 +261,45 @@ namespace Shadowsocks.Model
                     {
                         var visit = new UriVisitTime
                         {
-                            uri = targetAddr,
-                            index = i,
-                            visitTime = DateTime.Now
+                                uri = targetAddr,
+                                index = i,
+                                visitTime = DateTime.Now
                         };
                         uricache.Set(targetAddr, visit);
                     }
                     return configs[i];
                 }
-                else
-                {
-                    if (index >= 0 && index < configs.Count)
-                    {
-                        var selIndex = index;
-                        if (usingRandom)
-                        {
-                            foreach (var unused in configs)
-                            {
-                                if (configs[selIndex].isEnable())
-                                {
-                                    break;
-                                }
-                                else
-                                {
-                                    selIndex = (selIndex + 1) % configs.Count;
-                                }
-                            }
-                        }
 
-                        if (targetAddr != null)
+                if (index >= 0 && index < configs.Count)
+                {
+                    var selIndex = index;
+                    if (usingRandom)
+                    {
+                        foreach (var unused in configs)
                         {
-                            var visit = new UriVisitTime
+                            if (configs[selIndex].isEnable())
                             {
+                                break;
+                            }
+
+                            selIndex = (selIndex + 1) % configs.Count;
+                        }
+                    }
+
+                    if (targetAddr != null)
+                    {
+                        var visit = new UriVisitTime
+                        {
                                 uri = targetAddr,
                                 index = selIndex,
                                 visitTime = DateTime.Now
-                            };
-                            uricache.Set(targetAddr, visit);
-                        }
-                        return configs[selIndex];
+                        };
+                        uricache.Set(targetAddr, visit);
                     }
-                    else
-                    {
-                        return GetErrorServer();
-                    }
+                    return configs[selIndex];
                 }
+
+                return GetErrorServer();
             }
         }
 
@@ -486,7 +483,7 @@ namespace Shadowsocks.Model
                 if (id.ContainsKey(server.id))
                 {
                     var newId = new byte[16];
-                    Util.Utils.RandBytes(newId, newId.Length);
+                    Utils.RandBytes(newId, newId.Length);
                     server.id = BitConverter.ToString(newId).Replace("-", string.Empty);
                 }
                 else

@@ -1,10 +1,10 @@
-﻿using Shadowsocks.Model;
-using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using Shadowsocks.Model;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller
 {
@@ -15,7 +15,7 @@ namespace Shadowsocks.Controller
         private const string SS_CNIP_TEMPLATE_URL = @"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_cnip_temp.pac";
         private const string SS_WHITE_TEMPLATE_URL = @"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white_temp.pac";
         private const string SS_WHITER_TEMPLATE_URL = @"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white_r_temp.pac";
-        private string TEMPLATE_URL = null;
+        private string TEMPLATE_URL;
 
         private const string USER_AGENT = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36";
 
@@ -23,11 +23,11 @@ namespace Shadowsocks.Controller
         private static readonly string USER_RULE_FILE = PACServer.WHITELIST_FILE;
         private static readonly string USER_TEMPLATE_FILE = PACServer.USER_WHITELIST_TEMPLATE_FILE;
 
-        private static string SS_template = null;
-        private static string cnIpRange = null;
-        private static string cnIp16Range = null;
+        private static string SS_template;
+        private static string cnIpRange;
+        private static string cnIp16Range;
 
-        private Configuration lastConfig = null;
+        private Configuration lastConfig;
         private Templates lastTemplate = Templates.None;
 
         public event EventHandler<ResultEventArgs> UpdateCompleted;

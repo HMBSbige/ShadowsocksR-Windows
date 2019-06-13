@@ -1,11 +1,11 @@
-﻿using Shadowsocks.Controller;
-using Shadowsocks.Controls;
-using Shadowsocks.Model;
-using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using Shadowsocks.Controller;
+using Shadowsocks.Controls;
+using Shadowsocks.Model;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.View
 {

@@ -1,11 +1,11 @@
-﻿using Shadowsocks.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Timers;
+using Shadowsocks.Model;
 
 namespace Shadowsocks.Controller
 {

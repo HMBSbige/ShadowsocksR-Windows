@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 using Shadowsocks.Model;
 
 namespace Shadowsocks.Controller
@@ -20,15 +18,15 @@ namespace Shadowsocks.Controller
         public DateTime timeConnectEnd;
         public DateTime timeBeginUpload;
         public DateTime timeBeginDownload;
-        public long sizeUpload = 0;
-        public long sizeDownload = 0;
-        public long sizeProtocolRecv = 0;
-        public long sizeRecv = 0;
+        public long sizeUpload;
+        public long sizeDownload;
+        public long sizeProtocolRecv;
+        public long sizeRecv;
         private List<TransLog> sizeTransfer = new List<TransLog>();
         public string server;
         public ServerTransferTotal transfer;
-        public int upload_cnt = 0;
-        public int download_cnt = 0;
+        public int upload_cnt;
+        public int download_cnt;
 
         public void BeginConnect()
         {
@@ -124,7 +122,7 @@ namespace Shadowsocks.Controller
                     lastdir = t.dir;
                     ret += (t.dir == 0 ? " u" : " d");
                 }
-                ret += " " + t.size.ToString();
+                ret += " " + t.size;
             }
 #endif
             return ret;
@@ -140,7 +138,7 @@ namespace Shadowsocks.Controller
             HTTP = 1,
             TLS = 2,
             SOCKS4 = 4,
-            SOCKS5 = 5,
+            SOCKS5 = 5
         }
         protected Protocol protocol = Protocol.NOTBEGIN;
         protected byte[] send_buffer = new byte[0];
@@ -186,7 +184,6 @@ namespace Shadowsocks.Controller
                     )
                 {
                     protocol = Protocol.HTTP;
-                    return;
                 }
             }
             else
@@ -209,26 +206,23 @@ namespace Shadowsocks.Controller
                     Finish();
                     return 0;
                 }
-                else
-                {
-                    protocol = Protocol.UNKONWN;
-                    return 1;
-                    //throw new ProtocolException("Wrong http response");
-                }
+
+                protocol = Protocol.UNKONWN;
+                return 1;
+                //throw new ProtocolException("Wrong http response");
             }
-            else if (protocol == Protocol.TLS && recv_buffer.Length > 4)
+
+            if (protocol == Protocol.TLS && recv_buffer.Length > 4)
             {
                 if (recv_buffer[0] == 22 && recv_buffer[1] == 3)
                 {
                     Finish();
                     return 0;
                 }
-                else
-                {
-                    protocol = Protocol.UNKONWN;
-                    return 2;
-                    //throw new ProtocolException("Wrong tls response");
-                }
+
+                protocol = Protocol.UNKONWN;
+                return 2;
+                //throw new ProtocolException("Wrong tls response");
             }
             return 0;
         }

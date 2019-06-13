@@ -92,7 +92,7 @@ namespace Shadowsocks.Model
                                 continue;
                             IPAddress addr;
                             IPAddress.TryParse(parts[3], out addr);
-                            uint size = UInt32.Parse(parts[4]);
+                            uint size = uint.Parse(parts[4]);
                             Insert(addr, size);
 
                             byte[] addr_bytes = addr.GetAddressBytes();
@@ -101,7 +101,7 @@ namespace Shadowsocks.Model
                             ip_addr += size - 1;
                             addr_bytes = BitConverter.GetBytes(ip_addr);
                             Array.Reverse(addr_bytes);
-                            out_stream.Write(parts[3] + " " + (new IPAddress(addr_bytes)).ToString() + "\r\n");
+                            out_stream.Write(parts[3] + " " + (new IPAddress(addr_bytes)) + "\r\n");
                         }
                     }
                     return true;

@@ -1,10 +1,10 @@
-﻿using Shadowsocks.Controller;
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
+using Shadowsocks.Controller;
 
 namespace Shadowsocks.Util
 {

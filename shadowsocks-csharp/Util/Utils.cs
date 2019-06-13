@@ -1,10 +1,4 @@
-﻿using DnsClient;
-using DnsClient.Protocol;
-using Microsoft.Win32;
-using Shadowsocks.Controller;
-using Shadowsocks.Encryption;
-using Shadowsocks.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -20,7 +14,12 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Point = System.Drawing.Point;
+using DnsClient;
+using DnsClient.Protocol;
+using Microsoft.Win32;
+using Shadowsocks.Controller;
+using Shadowsocks.Encryption;
+using Shadowsocks.Model;
 
 namespace Shadowsocks.Util
 {
@@ -30,7 +29,13 @@ namespace Shadowsocks.Util
 
         public static LRUCache<string, IPAddress> LocalDnsBuffer => DnsBuffer;
 
-        private static Process current_process => Process.GetCurrentProcess();
+        #region ReleaseMemory
+
+        private static Process CurrentProcess => Process.GetCurrentProcess();
+
+        [DllImport(@"kernel32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool SetProcessWorkingSetSize(IntPtr process, UIntPtr minimumWorkingSetSize, UIntPtr maximumWorkingSetSize);
 
         public static void ReleaseMemory(bool removePages = true)
         {
@@ -64,14 +69,16 @@ namespace Shadowsocks.Util
                 // just kidding
                 if (!Environment.Is64BitProcess)
                 {
-                    SetProcessWorkingSetSize(current_process.Handle, (UIntPtr)0xFFFFFFFF, (UIntPtr)0xFFFFFFFF);
+                    SetProcessWorkingSetSize(CurrentProcess.Handle, (UIntPtr)0xFFFFFFFF, (UIntPtr)0xFFFFFFFF);
                 }
                 else
                 {
-                    SetProcessWorkingSetSize(current_process.Handle, (UIntPtr)0xFFFFFFFFFFFFFFFF, (UIntPtr)0xFFFFFFFFFFFFFFFF);
+                    SetProcessWorkingSetSize(CurrentProcess.Handle, (UIntPtr)0xFFFFFFFFFFFFFFFF, (UIntPtr)0xFFFFFFFFFFFFFFFF);
                 }
             }
         }
+
+        #endregion
 
         public static string UnGzip(byte[] buf)
         {
@@ -181,10 +188,8 @@ namespace Shadowsocks.Util
                     return false;
                 }
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         public static bool isLocal(IPAddress ip)
@@ -195,7 +200,7 @@ namespace Shadowsocks.Util
                 var netmasks = new[]
                 {
                     "127.0.0.0/8",
-                    "169.254.0.0/16",
+                    "169.254.0.0/16"
                 };
                 foreach (var netmask in netmasks)
                 {
@@ -204,11 +209,12 @@ namespace Shadowsocks.Util
                 }
                 return false;
             }
-            else if (addr.Length == 16)
+
+            if (addr.Length == 16)
             {
                 var netmasks = new[]
                 {
-                    "::1/128",
+                        "::1/128"
                 };
                 foreach (var netmask in netmasks)
                 {
@@ -242,7 +248,7 @@ namespace Shadowsocks.Util
                     "172.16.0.0/12",
                     //"192.0.0.0/24",
                     //"192.0.2.0/24",
-                    "192.168.0.0/16",
+                    "192.168.0.0/16"
                     //"198.18.0.0/15",
                     //"198.51.100.0/24",
                     //"203.0.113.0/24",
@@ -254,13 +260,14 @@ namespace Shadowsocks.Util
                 }
                 return false;
             }
-            else if (addr.Length == 16)
+
+            if (addr.Length == 16)
             {
                 var netmasks = new[]
                 {
-                    "::1/128",
-                    "fc00::/7",
-                    "fe80::/10",
+                        "::1/128",
+                        "fc00::/7",
+                        "fe80::/10"
                 };
                 foreach (var netmask in netmasks)
                 {
@@ -698,28 +705,5 @@ namespace Shadowsocks.Util
                 }
             }
         }
-
-        public enum DeviceCap
-        {
-            DESKTOPVERTRES = 117,
-            DESKTOPHORZRES = 118,
-        }
-
-        public static Point GetScreenPhysicalSize()
-        {
-            using var g = Graphics.FromHwnd(IntPtr.Zero);
-            var desktop = g.GetHdc();
-            var PhysicalScreenWidth = GetDeviceCaps(desktop, (int)DeviceCap.DESKTOPHORZRES);
-            var PhysicalScreenHeight = GetDeviceCaps(desktop, (int)DeviceCap.DESKTOPVERTRES);
-
-            return new Point(PhysicalScreenWidth, PhysicalScreenHeight);
-        }
-
-        [DllImport("gdi32.dll")]
-        static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
-
-        [DllImport("kernel32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool SetProcessWorkingSetSize(IntPtr process, UIntPtr minimumWorkingSetSize, UIntPtr maximumWorkingSetSize);
     }
 }

@@ -6,11 +6,11 @@ namespace Shadowsocks.Controls
 {
     public partial class NumberUpDown
     {
-        private int _numValue = 0;
+        private int _numValue;
 
         private int _maxNum = 65535;
 
-        private int _minNum = 0;
+        private int _minNum;
 
         public int NumValue
         {

@@ -1,7 +1,7 @@
-﻿using Shadowsocks.Controller;
-using Shadowsocks.Model;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
+using Shadowsocks.Controller;
+using Shadowsocks.Model;
 
 namespace Shadowsocks.View
 {

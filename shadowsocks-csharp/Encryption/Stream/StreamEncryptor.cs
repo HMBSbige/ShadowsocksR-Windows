@@ -1,9 +1,9 @@
-﻿using Shadowsocks.Model;
-using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using Shadowsocks.Model;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.Encryption.Stream
 {

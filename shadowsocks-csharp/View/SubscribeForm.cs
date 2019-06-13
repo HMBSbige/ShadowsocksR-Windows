@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using Shadowsocks.Controller;
 using Shadowsocks.Model;
@@ -19,10 +16,10 @@ namespace Shadowsocks.View
 
         public SubscribeForm(ShadowsocksController controller)
         {
-            this.Font = System.Drawing.SystemFonts.MessageBoxFont;
+            Font = SystemFonts.MessageBoxFont;
             InitializeComponent();
 
-            this.Icon = Icon.FromHandle(Resources.ssw128.GetHicon());
+            Icon = Icon.FromHandle(Resources.ssw128.GetHicon());
             this.controller = controller;
 
             UpdateTexts();
@@ -33,7 +30,7 @@ namespace Shadowsocks.View
 
         private void UpdateTexts()
         {
-            this.Text = I18N.GetString("Subscribe Settings");
+            Text = I18N.GetString("Subscribe Settings");
             label1.Text = I18N.GetString("URL");
             label2.Text = I18N.GetString("Group name");
             checkBoxAutoUpdate.Text = I18N.GetString("Auto update");
@@ -83,7 +80,7 @@ namespace Shadowsocks.View
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void buttonOK_Click(object sender, EventArgs e)
@@ -95,7 +92,7 @@ namespace Shadowsocks.View
                 return;
             }
             controller.SaveServersConfig(_modifiedConfiguration);
-            this.Close();
+            Close();
         }
 
         private void UpdateList()
@@ -104,7 +101,7 @@ namespace Shadowsocks.View
             for (int i = 0; i < _modifiedConfiguration.serverSubscribes.Count; ++i)
             {
                 ServerSubscribe ss = _modifiedConfiguration.serverSubscribes[i];
-                listServerSubscribe.Items.Add((String.IsNullOrEmpty(ss.Group) ? "    " : ss.Group + " - ") + ss.URL);
+                listServerSubscribe.Items.Add((string.IsNullOrEmpty(ss.Group) ? "    " : ss.Group + " - ") + ss.URL);
             }
         }
 

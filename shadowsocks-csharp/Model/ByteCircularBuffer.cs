@@ -75,10 +75,10 @@ namespace Shadowsocks.Model
             }
 
             _buffer = new byte[capacity];
-            this.Capacity = capacity;
-            this.Size = 0;
-            this.Head = 0;
-            this.Tail = 0;
+            Capacity = capacity;
+            Size = 0;
+            Head = 0;
+            Tail = 0;
         }
 
         #endregion
@@ -97,16 +97,16 @@ namespace Shadowsocks.Model
             {
                 if (value != _capacity)
                 {
-                    if (value < this.Size)
+                    if (value < Size)
                     {
                         throw new ArgumentOutOfRangeException(nameof(value), value,
                             "The new capacity must be greater than or equal to the buffer size.");
                     }
 
                     var newBuffer = new byte[value];
-                    if (this.Size > 0)
+                    if (Size > 0)
                     {
-                        this.CopyTo(newBuffer);
+                        CopyTo(newBuffer);
                     }
 
                     _buffer = newBuffer;
@@ -126,14 +126,14 @@ namespace Shadowsocks.Model
         /// Gets a value indicating whether the buffer is empty.
         /// </summary>
         /// <value><c>true</c> if buffer is empty; otherwise, <c>false</c>.</value>
-        public virtual bool IsEmpty => this.Size == 0;
+        public virtual bool IsEmpty => Size == 0;
 
         /// <summary>
         /// Gets a value indicating whether the buffer is full.
         /// </summary>
         /// <value><c>true</c> if the buffer is full; otherwise, <c>false</c>.</value>
         /// <remarks>The <see cref="IsFull"/> property always returns <c>false</c> if the <see cref="AllowOverwrite"/> property is set to <c>true</c>.</remarks>
-        public virtual bool IsFull => this.Size == this.Capacity;
+        public virtual bool IsFull => Size == Capacity;
 
         /// <summary>
         /// Gets the number of elements contained in the <see cref="ByteCircularBuffer"/>.
@@ -156,10 +156,10 @@ namespace Shadowsocks.Model
         /// </summary>
         public void Clear()
         {
-            this.Size = 0;
-            this.Head = 0;
-            this.Tail = 0;
-            _buffer = new byte[this.Capacity];
+            Size = 0;
+            Head = 0;
+            Tail = 0;
+            _buffer = new byte[Capacity];
         }
 
         /// <summary>
@@ -169,13 +169,13 @@ namespace Shadowsocks.Model
         /// <returns><c>true</c> if <paramref name="item" /> is found in the <see cref="ByteCircularBuffer" />; otherwise, <c>false</c>.</returns>
         public bool Contains(byte item)
         {
-            var bufferIndex = this.Head;
+            var bufferIndex = Head;
             var comparer = EqualityComparer<byte>.Default;
             var result = false;
 
-            for (int i = 0; i < this.Size; i++, bufferIndex++)
+            for (int i = 0; i < Size; i++, bufferIndex++)
             {
-                if (bufferIndex == this.Capacity)
+                if (bufferIndex == Capacity)
                 {
                     bufferIndex = 0;
                 }
@@ -196,7 +196,7 @@ namespace Shadowsocks.Model
         /// <param name="array">The one-dimensional <see cref="Array"/> that is the destination of the elements copied from <see cref="ByteCircularBuffer"/>. The <see cref="Array"/> must have zero-based indexing.</param>
         public void CopyTo(byte[] array)
         {
-            this.CopyTo(array, 0);
+            CopyTo(array, 0);
         }
 
         /// <summary>
@@ -206,7 +206,7 @@ namespace Shadowsocks.Model
         /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
         public void CopyTo(byte[] array, int arrayIndex)
         {
-            this.CopyTo(this.Head, array, arrayIndex, Math.Min(this.Size, array.Length - arrayIndex));
+            CopyTo(Head, array, arrayIndex, Math.Min(Size, array.Length - arrayIndex));
         }
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace Shadowsocks.Model
         /// <param name="count">The number of elements to copy.</param>
         public virtual void CopyTo(int index, byte[] array, int arrayIndex, int count)
         {
-            if (count > this.Size)
+            if (count > Size)
             {
                 throw new ArgumentOutOfRangeException(nameof(count), count,
                     "The read count cannot be greater than the buffer size.");
@@ -247,7 +247,7 @@ namespace Shadowsocks.Model
             if (count <= 0) throw new ArgumentOutOfRangeException("should greater than 0");
             var result = new byte[count];
 
-            this.Get(result);
+            Get(result);
 
             return result;
         }
@@ -260,7 +260,7 @@ namespace Shadowsocks.Model
         public int Get(byte[] array)
         {
             if (array.Length <= 0) throw new ArgumentOutOfRangeException("should greater than 0");
-            return this.Get(array, 0, array.Length);
+            return Get(array, 0, array.Length);
         }
 
         /// <summary>
@@ -280,7 +280,7 @@ namespace Shadowsocks.Model
             {
                 throw new ArgumentOutOfRangeException(nameof(count), "Negative count specified. Count must be positive.");
             }
-            if (count > this.Size)
+            if (count > Size)
             {
                 throw new ArgumentException("Ringbuffer contents insufficient for take/read operation.", nameof(count));
             }
@@ -292,10 +292,10 @@ namespace Shadowsocks.Model
             var dstIndex = arrayIndex;
             while (count > 0)
             {
-                int chunk = Math.Min(Capacity - this.Head, count);
-                Buffer.BlockCopy(_buffer, this.Head, array, dstIndex, chunk);
-                this.Head = (this.Head + chunk == Capacity) ? 0 : this.Head + chunk;
-                this.Size -= chunk;
+                int chunk = Math.Min(Capacity - Head, count);
+                Buffer.BlockCopy(_buffer, Head, array, dstIndex, chunk);
+                Head = (Head + chunk == Capacity) ? 0 : Head + chunk;
+                Size -= chunk;
                 dstIndex += chunk;
                 bytesCopied += chunk;
                 count -= chunk;
@@ -311,17 +311,17 @@ namespace Shadowsocks.Model
         /// <remarks>This method is similar to the <see cref="Peek()"/> method, but <c>Peek</c> does not modify the <see cref="ByteCircularBuffer"/>.</remarks>
         public virtual byte Get()
         {
-            if (this.IsEmpty)
+            if (IsEmpty)
             {
                 throw new InvalidOperationException("The buffer is empty.");
             }
 
-            var item = _buffer[this.Head];
-            if (++this.Head == this.Capacity)
+            var item = _buffer[Head];
+            if (++Head == Capacity)
             {
-                this.Head = 0;
+                Head = 0;
             }
-            this.Size--;
+            Size--;
 
             return item;
         }
@@ -333,12 +333,12 @@ namespace Shadowsocks.Model
         /// <exception cref="System.InvalidOperationException">Thrown if the buffer is empty.</exception>
         public virtual byte Peek()
         {
-            if (this.IsEmpty)
+            if (IsEmpty)
             {
                 throw new InvalidOperationException("The buffer is empty.");
             }
 
-            var item = _buffer[this.Head];
+            var item = _buffer[Head];
 
             return item;
         }
@@ -351,13 +351,13 @@ namespace Shadowsocks.Model
         /// <exception cref="System.InvalidOperationException">Thrown if the buffer is empty.</exception>
         public virtual byte[] Peek(int count)
         {
-            if (this.IsEmpty)
+            if (IsEmpty)
             {
                 throw new InvalidOperationException("The buffer is empty.");
             }
 
             var items = new byte[count];
-            this.CopyTo(items);
+            CopyTo(items);
 
             return items;
         }
@@ -371,18 +371,18 @@ namespace Shadowsocks.Model
         {
             int bufferIndex;
 
-            if (this.IsEmpty)
+            if (IsEmpty)
             {
                 throw new InvalidOperationException("The buffer is empty.");
             }
 
-            if (this.Tail == 0)
+            if (Tail == 0)
             {
-                bufferIndex = this.Size - 1;
+                bufferIndex = Size - 1;
             }
             else
             {
-                bufferIndex = this.Tail - 1;
+                bufferIndex = Tail - 1;
             }
 
             var item = _buffer[bufferIndex];
@@ -398,7 +398,7 @@ namespace Shadowsocks.Model
         /// <remarks>If <see cref="Size"/> plus the size of <paramref name="array"/> exceeds the capacity of the <see cref="ByteCircularBuffer"/> and the <see cref="AllowOverwrite"/> property is <c>true</c>, the oldest items in the <see cref="ByteCircularBuffer"/> are overwritten with <paramref name="array"/>.</remarks>
         public int Put(byte[] array)
         {
-            return this.Put(array, 0, array.Length);
+            return Put(array, 0, array.Length);
         }
 
         /// <summary>
@@ -412,7 +412,7 @@ namespace Shadowsocks.Model
         public virtual int Put(byte[] array, int arrayIndex, int count)
         {
             if (count <= 0) throw new ArgumentOutOfRangeException(nameof(count), "Count must be positive.");
-            if (this.Size + count > this.Capacity)
+            if (Size + count > Capacity)
             {
                 throw new InvalidOperationException("The buffer does not have sufficient capacity to put new items.");
             }
@@ -428,7 +428,7 @@ namespace Shadowsocks.Model
                 int chunk = Math.Min(Capacity - Tail, bytesToProcess);
                 Buffer.BlockCopy(array, srcIndex, _buffer, Tail, chunk);
                 Tail = (Tail + chunk == Capacity) ? 0 : Tail + chunk;
-                this.Size += chunk;
+                Size += chunk;
                 srcIndex += chunk;
                 bytesToProcess -= chunk;
             }
@@ -448,26 +448,26 @@ namespace Shadowsocks.Model
                 throw new InvalidOperationException("The buffer does not have sufficient capacity to put new items.");
             }
 
-            _buffer[this.Tail] = item;
+            _buffer[Tail] = item;
 
-            this.Tail++;
-            if (this.Size == this.Capacity)
+            Tail++;
+            if (Size == Capacity)
             {
-                this.Head++;
-                if (this.Head >= this.Capacity)
+                Head++;
+                if (Head >= Capacity)
                 {
-                    this.Head -= this.Capacity;
+                    Head -= Capacity;
                 }
             }
 
-            if (this.Tail == this.Capacity)
+            if (Tail == Capacity)
             {
-                this.Tail = 0;
+                Tail = 0;
             }
 
-            if (this.Size != this.Capacity)
+            if (Size != Capacity)
             {
-                this.Size++;
+                Size++;
             }
         }
 
@@ -481,14 +481,14 @@ namespace Shadowsocks.Model
             {
                 throw new ArgumentOutOfRangeException(nameof(count), "Negative count specified. Count must be positive.");
             }
-            if (count > this.Size)
+            if (count > Size)
             {
                 throw new ArgumentException("Ringbuffer contents insufficient for operation.", nameof(count));
             }
 
             // Modular division gives new offset position
-            this.Head = (this.Head + count) % Capacity;
-            this.Size -= count;
+            Head = (Head + count) % Capacity;
+            Size -= count;
         }
 
         /// <summary>
@@ -498,9 +498,9 @@ namespace Shadowsocks.Model
         /// <remarks>The <see cref="ByteCircularBuffer"/> is not modified. The order of the elements in the new array is the same as the order of the elements from the beginning of the <see cref="ByteCircularBuffer"/> to its end.</remarks>
         public byte[] ToArray()
         {
-            var result = new byte[this.Size];
+            var result = new byte[Size];
 
-            this.CopyTo(result);
+            CopyTo(result);
 
             return result;
         }

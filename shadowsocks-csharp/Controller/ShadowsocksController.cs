@@ -1,13 +1,13 @@
-﻿using Shadowsocks.Model;
-using Shadowsocks.Proxy;
-using Shadowsocks.Proxy.SystemProxy;
-using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Windows;
+using Shadowsocks.Model;
+using Shadowsocks.Proxy;
+using Shadowsocks.Proxy.SystemProxy;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller
 {
@@ -16,7 +16,7 @@ namespace Shadowsocks.Controller
         NoModify,
         Direct,
         Pac,
-        Global,
+        Global
     }
 
     public class ShadowsocksController
@@ -232,10 +232,8 @@ namespace Shadowsocks.Controller
                     return false;
                 }
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         public void ToggleMode(ProxyMode mode)

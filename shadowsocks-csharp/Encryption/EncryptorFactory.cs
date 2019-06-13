@@ -1,7 +1,7 @@
-﻿using Shadowsocks.Encryption.Stream;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Shadowsocks.Encryption.Stream;
 
 namespace Shadowsocks.Encryption
 {

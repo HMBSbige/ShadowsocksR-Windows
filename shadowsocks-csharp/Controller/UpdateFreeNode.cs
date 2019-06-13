@@ -1,7 +1,7 @@
-﻿using Shadowsocks.Model;
-using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Net;
+using Shadowsocks.Model;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller
 {
