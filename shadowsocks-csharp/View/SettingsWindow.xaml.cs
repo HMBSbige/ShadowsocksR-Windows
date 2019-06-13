@@ -204,7 +204,10 @@ namespace Shadowsocks.View
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-            SaveConfig();
+            if(ApplyButton.IsEnabled)
+            {
+                SaveConfig();
+            }
             Close();
         }
 
