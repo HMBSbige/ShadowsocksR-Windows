@@ -126,6 +126,8 @@ Reconnect Times=重连次数
 ConnectTimeout=连接超时
 TTL=空闲断开秒数
 
+Misc=杂项
+
 OK=确定
 Cancel=取消
 Apply=应用

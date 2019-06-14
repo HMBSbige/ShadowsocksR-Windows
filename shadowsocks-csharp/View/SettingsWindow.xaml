@@ -68,55 +68,59 @@
                 <PasswordBox x:Name="AuthPassPasswordBox" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Height="23.24" VerticalContentAlignment="Center" />
             </Grid>
         </GroupBox>
-        <Grid Grid.Row="0" Grid.Column="1" Margin="10,0,10,0">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Label Grid.Row="3" Grid.Column="0" Content="Balance" VerticalAlignment="Center" Margin="0,0,10,0" />
-            <Label Grid.Row="6" Grid.Column="0" Content="Logging" VerticalAlignment="Center" Margin="0,0,10,0" />
-            <CheckBox x:Name="AutoStartupCheckBox" Grid.Row="0" Grid.Column="1" Content="Start on Boot" VerticalAlignment="Center" Margin="0,0,10,0" />
-            <CheckBox x:Name="SwitchAutoCloseAllCheckBox" Grid.Row="1" Grid.Column="1" Content="Switch auto close TCP links" VerticalAlignment="Center" Margin="0,0,10,0" />
-            <CheckBox x:Name="BalanceCheckBox" Grid.Row="2" Grid.Column="1" Content="Load balance" VerticalAlignment="Center" Margin="0,0,10,0" />
-            <CheckBox x:Name="BalanceInGroupCheckBox" Grid.Row="4" Grid.Column="1" Content="Balance in group" VerticalAlignment="Center" Margin="0,0,10,0" />
-            <CheckBox x:Name="AutoBanCheckBox" Grid.Row="5" Grid.Column="1" Content="AutoBan" VerticalAlignment="Center" Margin="0,0,10,0" />
-            <CheckBox x:Name="LogEnableCheckBox" Grid.Row="6" Grid.Column="1" Content="Enable Log" VerticalAlignment="Center" Margin="0,0,10,0" />
-            <ComboBox x:Name="BalanceComboBox" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Height="23.24" />
-        </Grid>
-        <Grid Grid.Row="1" Grid.Column="1" Margin="10,0,10,0">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Button Grid.Row="0" Grid.Column="1" Content="Set Default" Click="DefaultButton_Click"/>
-            <Label Grid.Row="1" Grid.Column="0" Content="DNS" VerticalAlignment="Center" Margin="0,0,10,0" />
-            <Label Grid.Row="2" Grid.Column="0" Content="Local Dns" VerticalAlignment="Center" Margin="0,0,10,0" />
-            <Label Grid.Row="3" Grid.Column="0" Content="Reconnect Times" VerticalAlignment="Center" Margin="0,0,10,0" />
-            <Label Grid.Row="4" Grid.Column="0" Content="ConnectTimeout" VerticalAlignment="Center" Margin="0,0,10,0" />
-            <Label Grid.Row="5" Grid.Column="0" Content="TTL" VerticalAlignment="Center" Margin="0,0,10,0" />
-            <TextBox x:Name="DnsTextBox" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Height="23.24" VerticalContentAlignment="Center" />
-            <TextBox x:Name="LocalDnsTextBox" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Height="23.24" VerticalContentAlignment="Center" />
-            <controls:NumberUpDown x:Name="ReconnectNumber" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Height="23.24" MinNum="0" MaxNum="20" />
-            <controls:NumberUpDown x:Name="TimeoutNumber" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Height="23.24" MinNum="0" MaxNum="60" />
-            <controls:NumberUpDown x:Name="TtlNumber" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" Height="23.24" MinNum="0" MaxNum="600" />
-        </Grid>
+        <GroupBox Header="Misc" Grid.Row="0" Grid.Column="1" Margin="10,0,10,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="3" Grid.Column="0" Content="Balance" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="6" Grid.Column="0" Content="Logging" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <CheckBox x:Name="AutoStartupCheckBox" Grid.Row="0" Grid.Column="1" Content="Start on Boot" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <CheckBox x:Name="SwitchAutoCloseAllCheckBox" Grid.Row="1" Grid.Column="1" Content="Switch auto close TCP links" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <CheckBox x:Name="BalanceCheckBox" Grid.Row="2" Grid.Column="1" Content="Load balance" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <CheckBox x:Name="BalanceInGroupCheckBox" Grid.Row="4" Grid.Column="1" Content="Balance in group" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <CheckBox x:Name="AutoBanCheckBox" Grid.Row="5" Grid.Column="1" Content="AutoBan" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <CheckBox x:Name="LogEnableCheckBox" Grid.Row="6" Grid.Column="1" Content="Enable Log" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <ComboBox x:Name="BalanceComboBox" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Height="23.24" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Misc" Grid.Row="1" Grid.Column="1" Margin="10,0,10,0">
+            <Grid >
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Row="0" Grid.Column="1" Content="Set Default" Click="DefaultButton_Click"/>
+                <Label Grid.Row="1" Grid.Column="0" Content="DNS" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="2" Grid.Column="0" Content="Local Dns" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="3" Grid.Column="0" Content="Reconnect Times" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="4" Grid.Column="0" Content="ConnectTimeout" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="5" Grid.Column="0" Content="TTL" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <TextBox x:Name="DnsTextBox" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Height="23.24" VerticalContentAlignment="Center" />
+                <TextBox x:Name="LocalDnsTextBox" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Height="23.24" VerticalContentAlignment="Center" />
+                <controls:NumberUpDown x:Name="ReconnectNumber" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Height="23.24" MinNum="0" MaxNum="20" />
+                <controls:NumberUpDown x:Name="TimeoutNumber" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Height="23.24" MinNum="0" MaxNum="60" />
+                <controls:NumberUpDown x:Name="TtlNumber" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" Height="23.24" MinNum="0" MaxNum="600" />
+            </Grid>
+        </GroupBox>
         <Grid Grid.Row="2" Grid.Column="1" Margin="10,10,10,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />

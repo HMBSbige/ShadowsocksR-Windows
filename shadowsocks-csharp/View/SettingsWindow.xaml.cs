@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
-using Shadowsocks.Controller;
+﻿using Shadowsocks.Controller;
 using Shadowsocks.Controls;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
+using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace Shadowsocks.View
 {
@@ -21,12 +21,14 @@ namespace Shadowsocks.View
         private void Window_Loaded(object sender, RoutedEventArgs _)
         {
             LoadLanguage();
-            LoadCurrentConfiguration();
             _controller.ConfigChanged += controller_ConfigChanged;
-            ApplyButton.IsEnabled = false;
             foreach (var c in Utils.FindVisualChildren<TextBox>(this))
             {
-                c.TextChanged += (o, e) => { ApplyButton.IsEnabled = true; };
+                //Not Child of NumberUpDown
+                if (c.Name.EndsWith(@"TextBox"))
+                {
+                    c.TextChanged += (o, e) => { ApplyButton.IsEnabled = true; };
+                }
             }
             foreach (var c in Utils.FindVisualChildren<PasswordBox>(this))
             {
@@ -45,6 +47,16 @@ namespace Shadowsocks.View
             {
                 c.ValueChanged += (o, e) => { ApplyButton.IsEnabled = true; };
             }
+
+            //Fix Width
+            foreach (var c in Utils.FindVisualChildren<GroupBox>(this))
+            {
+                c.MaxWidth = c.ActualWidth;
+                c.MinWidth = c.ActualWidth;
+            }
+
+            LoadCurrentConfiguration();
+            ApplyButton.IsEnabled = false;
         }
 
         private readonly ShadowsocksController _controller;
@@ -190,6 +202,7 @@ namespace Shadowsocks.View
         private void controller_ConfigChanged(object sender, EventArgs e)
         {
             LoadCurrentConfiguration();
+            ApplyButton.IsEnabled = false;
         }
 
         private bool SaveConfig()
@@ -204,7 +217,7 @@ namespace Shadowsocks.View
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-            if(ApplyButton.IsEnabled)
+            if (ApplyButton.IsEnabled)
             {
                 SaveConfig();
             }
