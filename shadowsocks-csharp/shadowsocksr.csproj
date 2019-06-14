@@ -76,12 +76,6 @@
     <Compile Update="View\ServerLogForm.Designer.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="View\SubscribeForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="View\SubscribeForm.Designer.cs">
-      <SubType>Form</SubType>
-    </Compile>
   </ItemGroup>
 
 </Project>
