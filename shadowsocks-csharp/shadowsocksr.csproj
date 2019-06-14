@@ -38,6 +38,7 @@
     <None Remove="View\QRCodeSplashWindow.xaml" />
     <None Remove="View\ResetPassword.xaml" />
     <None Remove="View\ShowTextWindow.xaml" />
+    <None Remove="View\SubscribeWindow.xaml" />
   </ItemGroup>
   
   <ItemGroup>

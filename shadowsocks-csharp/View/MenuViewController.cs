@@ -68,7 +68,7 @@ namespace Shadowsocks.View
         private SettingsWindow _settingsWindow;
         private ServerLogForm serverLogForm;
         private PortSettingsForm portMapForm;
-        private SubscribeForm subScribeForm;
+        private SubscribeWindow _subScribeWindow;
         private LogWindow _logWindow;
         private string _urlToOpen;
         private System.Timers.Timer timerDelayCheckUpdate;
@@ -911,22 +911,26 @@ namespace Shadowsocks.View
 
         private void ShowSubscribeSettingForm()
         {
-            if (subScribeForm != null)
+            if (_subScribeWindow != null)
             {
-                subScribeForm.Activate();
-                subScribeForm.Update();
-                if (subScribeForm.WindowState == FormWindowState.Minimized)
+                _subScribeWindow.Activate();
+                _subScribeWindow.UpdateLayout();
+                if (_subScribeWindow.WindowState == WindowState.Minimized)
                 {
-                    subScribeForm.WindowState = FormWindowState.Normal;
+                    _subScribeWindow.WindowState = WindowState.Normal;
                 }
             }
             else
             {
-                subScribeForm = new SubscribeForm(controller);
-                subScribeForm.Show();
-                subScribeForm.Activate();
-                subScribeForm.BringToFront();
-                subScribeForm.FormClosed += subScribeForm_FormClosed;
+                _subScribeWindow = new SubscribeWindow(controller);
+                _subScribeWindow.Show();
+                _subScribeWindow.Activate();
+                _subScribeWindow.BringToFront();
+                _subScribeWindow.Closed += (sender, args) =>
+                {
+                    _subScribeWindow = null;
+                    Utils.ReleaseMemory();
+                };
             }
         }
 
@@ -955,11 +959,6 @@ namespace Shadowsocks.View
         {
             portMapForm = null;
             Utils.ReleaseMemory();
-        }
-
-        private void subScribeForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            subScribeForm = null;
         }
 
         private void Config_Click(object sender, EventArgs e)

@@ -228,6 +228,8 @@ URL=网址
 Group name=组名
 Last Update=最近更新
 Auto update=自动更新
+Add=添加
+Delete=删除
 
 # Messages
 
