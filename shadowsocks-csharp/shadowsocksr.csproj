@@ -35,6 +35,7 @@
     <None Remove="Controls\NumberUpDown.xaml" />
     <None Remove="View\InputPasswordWindow.xaml" />
     <None Remove="View\LogWindow.xaml" />
+    <None Remove="View\PortSettingsWindow.xaml" />
     <None Remove="View\QRCodeSplashWindow.xaml" />
     <None Remove="View\ResetPassword.xaml" />
     <None Remove="View\ShowTextWindow.xaml" />
@@ -62,12 +63,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="View\ConfigForm.Designer.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="View\PortSettingsForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="View\PortSettingsForm.Designer.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="View\ServerLogForm.cs">

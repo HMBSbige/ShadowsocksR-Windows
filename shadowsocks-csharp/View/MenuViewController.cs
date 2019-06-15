@@ -67,7 +67,7 @@ namespace Shadowsocks.View
         private ConfigForm configForm;
         private SettingsWindow _settingsWindow;
         private ServerLogForm serverLogForm;
-        private PortSettingsForm portMapForm;
+        private PortSettingsWindow _portMapWindow;
         private SubscribeWindow _subScribeWindow;
         private LogWindow _logWindow;
         private string _urlToOpen;
@@ -844,22 +844,26 @@ namespace Shadowsocks.View
 
         private void ShowPortMapForm()
         {
-            if (portMapForm != null)
+            if (_portMapWindow != null)
             {
-                portMapForm.Activate();
-                portMapForm.Update();
-                if (portMapForm.WindowState == FormWindowState.Minimized)
+                _portMapWindow.Activate();
+                _portMapWindow.UpdateLayout();
+                if (_portMapWindow.WindowState == WindowState.Minimized)
                 {
-                    portMapForm.WindowState = FormWindowState.Normal;
+                    _portMapWindow.WindowState = WindowState.Normal;
                 }
             }
             else
             {
-                portMapForm = new PortSettingsForm(controller);
-                portMapForm.Show();
-                portMapForm.Activate();
-                portMapForm.BringToFront();
-                portMapForm.FormClosed += portMapForm_FormClosed;
+                _portMapWindow = new PortSettingsWindow(controller);
+                _portMapWindow.Show();
+                _portMapWindow.Activate();
+                _portMapWindow.BringToFront();
+                _portMapWindow.Closed += (o, e) =>
+                {
+                    _portMapWindow = null;
+                    Utils.ReleaseMemory();
+                };
             }
         }
 
@@ -952,12 +956,6 @@ namespace Shadowsocks.View
         private void serverLogForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             serverLogForm = null;
-            Utils.ReleaseMemory();
-        }
-
-        private void portMapForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            portMapForm = null;
             Utils.ReleaseMemory();
         }
 

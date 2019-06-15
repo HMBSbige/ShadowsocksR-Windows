@@ -222,14 +222,13 @@ namespace Shadowsocks.View
                 UpdateList();
                 UpdateSelected(selectIndex);
                 SetSelectIndex(selectIndex);
+                ApplyButton.IsEnabled = true;
             }
 
             if (ServerSubscribeListBox.Items.Count == 0)
             {
                 UrlTextBox.IsEnabled = false;
             }
-
-            ApplyButton.IsEnabled = true;
         }
     }
 }
