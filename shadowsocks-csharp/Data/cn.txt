@@ -62,8 +62,6 @@ Global Settings=选项设置
 
 # Config Form
 
-&Add=添加(&A)
-&Delete=删除(&D)
 Up=上移
 Down=下移
 Verion=版本
@@ -71,7 +69,7 @@ Any=任意地址
 Local=本机地址
 New server=未配置的服务器
 
-Server=服务器(截图打码)
+Server=服务器
 Server IP=服务器 IP
 Server Port=服务器端口
 UDP Port=UDP端口

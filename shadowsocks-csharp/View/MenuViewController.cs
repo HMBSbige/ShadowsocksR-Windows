@@ -64,7 +64,7 @@ namespace Shadowsocks.View
         private MenuItem SelectRandomItem;
         private MenuItem sameHostForSameTargetItem;
         private MenuItem UpdateItem;
-        private ConfigForm configForm;
+        private ConfigWindow _configWindow;
         private SettingsWindow _settingsWindow;
         private ServerLogForm serverLogForm;
         private PortSettingsWindow _portMapWindow;
@@ -785,40 +785,66 @@ namespace Shadowsocks.View
 
         private void ShowConfigForm(bool addNode)
         {
-            if (configForm != null)
+            if (_configWindow != null)
             {
-                configForm.Activate();
+                _configWindow.Activate();
+                _configWindow.UpdateLayout();
+                if (_configWindow.WindowState == WindowState.Minimized)
+                {
+                    _configWindow.WindowState = WindowState.Normal;
+                }
                 if (addNode)
                 {
                     var cfg = controller.GetCurrentConfiguration();
-                    configForm.SetServerListSelectedIndex(cfg.index + 1);
+                    _configWindow.SetServerListSelectedIndex(cfg.index + 1);
                 }
             }
             else
             {
                 configFrom_open = true;
-                configForm = new ConfigForm(controller, updateChecker, addNode ? -1 : -2);
-                configForm.Show();
-                configForm.Activate();
-                configForm.BringToFront();
-                configForm.FormClosed += configForm_FormClosed;
+                _configWindow = new ConfigWindow(controller, addNode ? -1 : -2);
+                _configWindow.Show();
+                _configWindow.Activate();
+                _configWindow.BringToFront();
+                _configWindow.Closed += ConfigWindow_Closed;
+            }
+        }
+
+        private void ConfigWindow_Closed(object sender, EventArgs e)
+        {
+            _configWindow = null;
+            configFrom_open = false;
+            Utils.ReleaseMemory();
+            if (eventList.Count > 0)
+            {
+                foreach (var p in eventList)
+                {
+                    updateFreeNodeChecker_NewFreeNodeFound(p.sender, p.e);
+                }
+
+                eventList.Clear();
             }
         }
 
         private void ShowConfigForm(int index)
         {
-            if (configForm != null)
+            if (_configWindow != null)
             {
-                configForm.Activate();
+                _configWindow.Activate();
+                _configWindow.UpdateLayout();
+                if (_configWindow.WindowState == WindowState.Minimized)
+                {
+                    _configWindow.WindowState = WindowState.Normal;
+                }
             }
             else
             {
                 configFrom_open = true;
-                configForm = new ConfigForm(controller, updateChecker, index);
-                configForm.Show();
-                configForm.Activate();
-                configForm.BringToFront();
-                configForm.FormClosed += configForm_FormClosed;
+                _configWindow = new ConfigWindow(controller, index);
+                _configWindow.Show();
+                _configWindow.Activate();
+                _configWindow.BringToFront();
+                _configWindow.Closed += ConfigWindow_Closed;
             }
         }
 
@@ -938,21 +964,6 @@ namespace Shadowsocks.View
             }
         }
 
-        private void configForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            configForm = null;
-            configFrom_open = false;
-            Utils.ReleaseMemory();
-            if (eventList.Count > 0)
-            {
-                foreach (var p in eventList)
-                {
-                    updateFreeNodeChecker_NewFreeNodeFound(p.sender, p.e);
-                }
-                eventList.Clear();
-            }
-        }
-
         private void serverLogForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             serverLogForm = null;
@@ -1001,10 +1012,10 @@ namespace Shadowsocks.View
         public void Quit_Click(object sender, EventArgs e)
         {
             controller.Stop();
-            if (configForm != null)
+            if (_configWindow != null)
             {
-                configForm.Close();
-                configForm = null;
+                _configWindow.Close();
+                _configWindow = null;
             }
             if (serverLogForm != null)
             {

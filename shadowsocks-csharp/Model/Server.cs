@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Shadowsocks.Controller;
+using Shadowsocks.Proxy;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using Shadowsocks.Controller;
-using Shadowsocks.Proxy;
 
 namespace Shadowsocks.Model
 {
@@ -215,35 +215,6 @@ namespace Shadowsocks.Model
             return remarks + " (" + server + ":" + server_port + ")";
         }
 
-        public string HiddenName(bool hide = true)
-        {
-            if (string.IsNullOrEmpty(server))
-            {
-                return I18N.GetString("New server");
-            }
-            string server_alter_name = server;
-            if (hide)
-            {
-                server_alter_name = Util.ServerName.HideServerAddr(server);
-            }
-            if (string.IsNullOrEmpty(remarks_base64))
-            {
-                if (server.IndexOf(':') >= 0)
-                {
-                    return "[" + server_alter_name + "]:" + server_port;
-                }
-
-                return server_alter_name + ":" + server_port;
-            }
-
-            if (server.IndexOf(':') >= 0)
-            {
-                return remarks + " ([" + server_alter_name + "]:" + server_port + ")";
-            }
-
-            return remarks + " (" + server_alter_name + ":" + server_port + ")";
-        }
-
         public Server Clone()
         {
             Server ret = new Server();
@@ -424,13 +395,6 @@ namespace Shadowsocks.Model
                 group = force_group;
             else
                 group = "";
-        }
-
-        public string GetSSLinkForServer()
-        {
-            string parts = method + ":" + password + "@" + server + ":" + server_port;
-            string base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(parts)).Replace("=", "");
-            return "ss://" + base64;
         }
 
         public string GetSSRLinkForServer()

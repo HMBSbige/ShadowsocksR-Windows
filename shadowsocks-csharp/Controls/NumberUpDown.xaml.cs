@@ -37,6 +37,14 @@ namespace Shadowsocks.Controls
             }
         }
 
+        public string Value
+        {
+            get => GetValue(ValueProperty) as string;
+            set => SetValue(ValueProperty, value);
+        }
+
+        public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(@"Value", typeof(string), typeof(NumberUpDown));
+
         public int MinNum
         {
             get => _minNum;

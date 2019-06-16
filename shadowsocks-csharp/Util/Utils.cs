@@ -1,4 +1,10 @@
-﻿using System;
+﻿using DnsClient;
+using DnsClient.Protocol;
+using Microsoft.Win32;
+using Shadowsocks.Controller;
+using Shadowsocks.Encryption;
+using Shadowsocks.Model;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -14,12 +20,6 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using DnsClient;
-using DnsClient.Protocol;
-using Microsoft.Win32;
-using Shadowsocks.Controller;
-using Shadowsocks.Encryption;
-using Shadowsocks.Model;
 
 namespace Shadowsocks.Util
 {
@@ -359,10 +359,19 @@ namespace Shadowsocks.Util
                     {
                         UseCache = false
                     };
+                    IPAddress r = null;
                     if (IPv6_first)
                     {
-                        var r = client.Query(host, QueryType.AAAA).Answers.OfType<AaaaRecord>().FirstOrDefault()
-                                ?.Address;
+                        try
+                        {
+                            r = client.Query(host, QueryType.AAAA).Answers.OfType<AaaaRecord>().FirstOrDefault()?.Address;
+                        }
+                        catch (DnsResponseException)
+                        {
+                            client.UseTcpOnly = true;
+                            r = client.Query(host, QueryType.AAAA).Answers.OfType<AaaaRecord>().FirstOrDefault()?.Address;
+                        }
+
                         if (r != null)
                         {
                             return r;
@@ -376,7 +385,16 @@ namespace Shadowsocks.Util
                     }
                     else
                     {
-                        var r = client.Query(host, QueryType.A).Answers.OfType<ARecord>().FirstOrDefault()?.Address;
+                        try
+                        {
+                            r = client.Query(host, QueryType.A).Answers.OfType<ARecord>().FirstOrDefault()?.Address;
+                        }
+                        catch (DnsResponseException)
+                        {
+                            client.UseTcpOnly = true;
+                            r = client.Query(host, QueryType.A).Answers.OfType<ARecord>().FirstOrDefault()?.Address;
+                        }
+
                         if (r != null)
                         {
                             return r;

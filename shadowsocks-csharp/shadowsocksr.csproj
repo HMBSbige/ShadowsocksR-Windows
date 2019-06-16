@@ -32,7 +32,9 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <None Remove="Controls\MaskedTextBox.xaml" />
     <None Remove="Controls\NumberUpDown.xaml" />
+    <None Remove="View\ConfigWindow.xaml" />
     <None Remove="View\InputPasswordWindow.xaml" />
     <None Remove="View\LogWindow.xaml" />
     <None Remove="View\PortSettingsWindow.xaml" />
@@ -59,12 +61,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="View\ConfigForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Update="View\ConfigForm.Designer.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Update="View\ServerLogForm.cs">
       <SubType>Form</SubType>
     </Compile>
