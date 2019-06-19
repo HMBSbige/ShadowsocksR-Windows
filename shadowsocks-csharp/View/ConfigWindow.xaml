@@ -31,21 +31,11 @@
                 <DockPanel>
                     <TextBlock FontWeight="Bold" Text="{Binding RemarkName}" Foreground="DarkOrange" DockPanel.Dock="Left" />
                 </DockPanel>
-                <DockPanel>
+                <DockPanel
+                     Visibility="{Binding IsChecked,ElementName=ServerIpCheckBox,Converter={StaticResource Bool2Visibility}}">
                     <TextBlock Text="{Binding ServerName}" />
                     <TextBlock Text=":" />
                     <TextBlock Text="{Binding ServerPort}" />
-                </DockPanel>
-            </StackPanel>
-        </DataTemplate>
-        <DataTemplate x:Key="TemplateHideServer" DataType="model:ServerObject">
-            <StackPanel Margin="3">
-                <DockPanel>
-                    <TextBlock Text="{Binding GroupName}" Foreground="Green" FontWeight="Bold" />
-                </DockPanel>
-                <DockPanel>
-                    <TextBlock FontWeight="Bold" Text="{Binding RemarkName}" Foreground="DarkOrange"
-                               DockPanel.Dock="Left" />
                 </DockPanel>
             </StackPanel>
         </DataTemplate>
@@ -72,22 +62,13 @@
                       VerticalAlignment="Stretch"
                       Width="3" />
 
-        <ListBox Grid.Row="0" Grid.Column="0" Margin="10,0,10,0"
-                 ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                 ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True"
-                 SelectionChanged="ServersListBox_SelectionChanged" SelectionMode="Extended"
-                 ItemTemplate="{StaticResource TemplateHideServer}"
-                 DataContext="{Binding Path=ServerViewModel, ElementName=Cw}"
-                 ItemsSource="{Binding ServerCollection,Mode=TwoWay}"
-                 SelectedItem="{Binding SelectedServer,Mode=TwoWay}" />
         <ListBox x:Name="ServersListBox" Grid.Row="0" Grid.Column="0" Margin="10,0,10,0"
                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
                  ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" SelectionChanged="ServersListBox_SelectionChanged" SelectionMode="Extended"
                  ItemTemplate="{StaticResource ListBoxTemplate}"
                  DataContext="{Binding Path=ServerViewModel, ElementName=Cw}"
                  ItemsSource="{Binding ServerCollection,Mode=TwoWay}" 
-                 SelectedItem="{Binding SelectedServer,Mode=TwoWay}"
-                 Visibility="{Binding IsChecked,ElementName=ServerIpCheckBox,Converter={StaticResource Bool2Visibility}}" />
+                 SelectedItem="{Binding SelectedServer,Mode=TwoWay}" />
         <Grid Grid.Row="1" Grid.Column="0" Margin="10,10,10,0" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
