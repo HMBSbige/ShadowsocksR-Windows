@@ -216,7 +216,7 @@
             </StackPanel>
         </GroupBox>
         <Image x:Name="PictureQrCode" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3"
-        Stretch="None" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,0,10,0" />
+        Stretch="Uniform" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,0,10,0" StretchDirection="Both" />
 
     </Grid>
 </Window>

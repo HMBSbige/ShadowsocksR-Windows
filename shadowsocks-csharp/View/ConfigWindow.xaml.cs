@@ -146,7 +146,7 @@ namespace Shadowsocks.View
             try
             {
                 var h = Convert.ToInt32(MainGrid.ActualHeight);
-                var w = Convert.ToInt32(MainGrid.ColumnDefinitions[2].ActualWidth);
+                var w = Convert.ToInt32(MainGrid.ColumnDefinitions[2].ActualWidth - PictureQrCode.Margin.Left - PictureQrCode.Margin.Right);
                 PictureQrCode.Source = text != string.Empty
                         ? QrCodeUtils.GenQrCode(text, w, h)
                         : QrCodeUtils.GenQrCode2(text, Math.Min(w, h));
