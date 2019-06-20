@@ -1,6 +1,6 @@
 ﻿namespace Shadowsocks.View
 {
-    partial class ShowTextForm
+    sealed partial class ShowTextForm
     {
         /// <summary>
         /// Required designer variable.
@@ -58,6 +58,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(350, 418);
             this.Controls.Add(this.PictureQRcode);
             this.Controls.Add(this.textBox);

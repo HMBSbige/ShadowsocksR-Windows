@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Costura.Fody.4.0.0\build\Costura.Fody.props" Condition="Exists('..\packages\Costura.Fody.4.0.0\build\Costura.Fody.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,7 +11,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Shadowsocks</RootNamespace>
     <AssemblyName>ShadowsocksR</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartupObject>Shadowsocks.Program</StartupObject>
     <ApplicationIcon>shadowsocks.ico</ApplicationIcon>
@@ -36,114 +37,75 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-  </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\4.0\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;_DOTNET_4_0, _DOTNET_CURRENT, PROTOCOL_STATISTICS</DefineConstants>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;_DOTNET_4_0, PROTOCOL_STATISTICS</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\4.0\Release\</OutputPath>
-    <DefineConstants>TRACE;PROTOCOL_STATISTICS</DefineConstants>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;_DOTNET_4_0, PROTOCOL_STATISTICS</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>ManagedMinimumRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Costura, Version=4.0.0.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
+      <HintPath>..\packages\Costura.Fody.4.0.0\lib\net40\Costura.dll</HintPath>
+    </Reference>
+    <Reference Include="DnsClient, Version=1.2.0.0, Culture=neutral, PublicKeyToken=4574bb5573c51424, processorArchitecture=MSIL">
+      <HintPath>..\packages\DnsClient.1.2.0\lib\net471\DnsClient.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.XML" />
+    <Reference Include="zxing, Version=0.16.4.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZXing.Net.0.16.4\lib\net47\zxing.dll</HintPath>
+    </Reference>
+    <Reference Include="zxing.presentation, Version=0.16.4.0, Culture=neutral, PublicKeyToken=4e88037ac681fe60, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZXing.Net.0.16.4\lib\net47\zxing.presentation.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="3rd\opendns\DnsQuery.cs" />
-    <Compile Include="3rd\opendns\DnsResponse.cs" />
-    <Compile Include="3rd\opendns\Enum.cs" />
-    <Compile Include="3rd\opendns\RR\Address.cs" />
-    <Compile Include="3rd\opendns\RR\MX.cs" />
-    <Compile Include="3rd\opendns\RR\ResourceRecord.cs" />
-    <Compile Include="3rd\opendns\RR\ResourceRecordCollection.cs" />
-    <Compile Include="3rd\opendns\RR\SOA.cs" />
-    <Compile Include="3rd\zxing\BarcodeFormat.cs" />
-    <Compile Include="3rd\zxing\BaseLuminanceSource.cs" />
-    <Compile Include="3rd\zxing\Binarizer.cs" />
-    <Compile Include="3rd\zxing\BinaryBitmap.cs" />
-    <Compile Include="3rd\zxing\BitmapLuminanceSource.cs" />
-    <Compile Include="3rd\zxing\common\BitArray.cs" />
-    <Compile Include="3rd\zxing\common\BitMatrix.cs" />
-    <Compile Include="3rd\zxing\common\BitSource.cs" />
-    <Compile Include="3rd\zxing\common\DecoderResult.cs" />
-    <Compile Include="3rd\zxing\common\DefaultGridSampler.cs" />
-    <Compile Include="3rd\zxing\common\DetectorResult.cs" />
-    <Compile Include="3rd\zxing\common\detector\MathUtils.cs" />
-    <Compile Include="3rd\zxing\common\GlobalHistogramBinarizer.cs" />
-    <Compile Include="3rd\zxing\common\GridSampler.cs" />
-    <Compile Include="3rd\zxing\common\HybridBinarizer.cs" />
-    <Compile Include="3rd\zxing\common\PerspectiveTransform.cs" />
-    <Compile Include="3rd\zxing\common\reedsolomon\GenericGF.cs" />
-    <Compile Include="3rd\zxing\common\reedsolomon\GenericGFPoly.cs" />
-    <Compile Include="3rd\zxing\common\reedsolomon\ReedSolomonDecoder.cs" />
-    <Compile Include="3rd\zxing\common\reedsolomon\ReedSolomonEncoder.cs" />
-    <Compile Include="3rd\zxing\common\StringUtils.cs" />
-    <Compile Include="3rd\zxing\DecodeHintType.cs" />
-    <Compile Include="3rd\zxing\EncodeHintType.cs" />
-    <Compile Include="3rd\zxing\LuminanceSource.cs" />
-    <Compile Include="3rd\zxing\qrcode\decoder\BitMatrixParser.cs" />
-    <Compile Include="3rd\zxing\qrcode\decoder\DataBlock.cs" />
-    <Compile Include="3rd\zxing\qrcode\decoder\DataMask.cs" />
-    <Compile Include="3rd\zxing\qrcode\decoder\DecodedBitStreamParser.cs" />
-    <Compile Include="3rd\zxing\qrcode\decoder\Decoder.cs" />
-    <Compile Include="3rd\zxing\qrcode\decoder\ErrorCorrectionLevel.cs" />
-    <Compile Include="3rd\zxing\qrcode\decoder\FormatInformation.cs" />
-    <Compile Include="3rd\zxing\qrcode\decoder\Mode.cs" />
-    <Compile Include="3rd\zxing\qrcode\decoder\QRCodeDecoderMetaData.cs" />
-    <Compile Include="3rd\zxing\qrcode\decoder\Version.cs" />
-    <Compile Include="3rd\zxing\qrcode\detector\AlignmentPattern.cs" />
-    <Compile Include="3rd\zxing\qrcode\detector\AlignmentPatternFinder.cs" />
-    <Compile Include="3rd\zxing\qrcode\detector\Detector.cs" />
-    <Compile Include="3rd\zxing\qrcode\detector\FinderPattern.cs" />
-    <Compile Include="3rd\zxing\qrcode\detector\FinderPatternFinder.cs" />
-    <Compile Include="3rd\zxing\qrcode\detector\FinderPatternInfo.cs" />
-    <Compile Include="3rd\zxing\qrcode\encoder\BlockPair.cs" />
-    <Compile Include="3rd\zxing\qrcode\encoder\ByteMatrix.cs" />
-    <Compile Include="3rd\zxing\qrcode\encoder\Encoder.cs" />
-    <Compile Include="3rd\zxing\qrcode\encoder\MaskUtil.cs" />
-    <Compile Include="3rd\zxing\qrcode\encoder\MatrixUtil.cs" />
-    <Compile Include="3rd\zxing\qrcode\encoder\QRCode.cs" />
-    <Compile Include="3rd\SimpleJson.cs" />
-    <Compile Include="3rd\zxing\qrcode\QRCodeReader.cs" />
-    <Compile Include="3rd\zxing\Result.cs" />
-    <Compile Include="3rd\zxing\ResultMetadataType.cs" />
-    <Compile Include="3rd\zxing\ResultPoint.cs" />
-    <Compile Include="3rd\zxing\ResultPointCallback.cs" />
-    <Compile Include="3rd\zxing\WriterException.cs" />
     <Compile Include="Controller\APIServer.cs" />
     <Compile Include="Controller\AutoStartup.cs" />
     <Compile Include="Controller\ChnDomainsAndIPUpdater.cs" />
-    <Compile Include="Controller\FileManager.cs" />
+    <Compile Include="Util\FileManager.cs" />
     <Compile Include="Controller\GFWListUpdater.cs" />
     <Compile Include="Controller\HttpPortForwarder.cs" />
-    <Compile Include="Controller\HttpProxy.cs" />
-    <Compile Include="Controller\HttpProxyRunner.cs" />
+    <Compile Include="Proxy\HttpProxy.cs" />
+    <Compile Include="Proxy\HttpProxyRunner.cs" />
     <Compile Include="Controller\I18N.cs" />
     <Compile Include="Controller\Listener.cs" />
     <Compile Include="Controller\Logging.cs" />
-    <Compile Include="Controller\ProxyAuth.cs" />
-    <Compile Include="Controller\ProxySocket.cs" />
+    <Compile Include="Proxy\ProxyAuth.cs" />
+    <Compile Include="Proxy\ProxySocket.cs" />
     <Compile Include="Controller\Socks5Forwarder.cs" />
     <Compile Include="Controller\SpeedTest.cs" />
     <Compile Include="Controller\UpdateChecker.cs" />
@@ -184,11 +146,15 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Proxy\ProxyEncryptSocket.cs" />
+    <Compile Include="Proxy\ProxySocketTun.cs" />
+    <Compile Include="Proxy\ProxySocketTunLocal.cs" />
     <Compile Include="Util\Base64.cs" />
     <Compile Include="Util\CRC.cs" />
     <Compile Include="Util\EnvCheck.cs" />
     <Compile Include="Util\GetCNDomains.cs" />
     <Compile Include="Util\GetCNIP.cs" />
+    <Compile Include="Util\Job.cs" />
     <Compile Include="Util\ServerName.cs" />
     <Compile Include="Util\Util.cs" />
     <Compile Include="View\ConfigForm.cs">
@@ -197,7 +163,7 @@
     <Compile Include="View\ConfigForm.Designer.cs">
       <DependentUpon>ConfigForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Controller\Local.cs" />
+    <Compile Include="Proxy\Local.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controller\ShadowsocksController.cs" />
@@ -287,15 +253,16 @@
     <EmbeddedResource Include="View\SubscribeForm.resx">
       <DependentUpon>SubscribeForm.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="app.config" />
-    <None Include="app.manifest">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="App.config" />
+    <None Include="app.manifest" />
+    <None Include="Data\abp.js.gz" />
     <None Include="Data\libsscrypto.dll.gz" />
-    <None Include="Data\mgwz.dll.gz" />
+    <None Include="Data\libsscrypto64.dll.gz" />
     <None Include="Data\privoxy.exe.gz" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Data\proxy.pac.txt.gz" />
+    <None Include="packages.config" />
     <None Include="Resources\ss20.png" />
     <None Include="Resources\ss16.png" />
     <None Include="Resources\ss24.png" />
@@ -303,7 +270,7 @@
     <Content Include="Data\cn.txt" />
     <None Include="Data\privoxy_conf.txt" />
     <Content Include="Data\user-rule.txt" />
-    <Content Include="Data\zh-tw.txt" />
+    <None Include="Data\zh-tw.txt" />
     <Content Include="shadowsocks.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -340,6 +307,50 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <UsingTask TaskName="CosturaCleanup" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" TaskFactory="CodeTaskFactory">
+    <ParameterGroup>
+      <Config Output="false" Required="true" ParameterType="Microsoft.Build.Framework.ITaskItem" />
+      <Files Output="false" Required="true" ParameterType="Microsoft.Build.Framework.ITaskItem[]" />
+    </ParameterGroup>
+    <Task Evaluate="true">
+      <Reference xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Include="System.Xml" />
+      <Reference xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Include="System.Xml.Linq" />
+      <Using xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Namespace="System" />
+      <Using xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Namespace="System.IO" />
+      <Using xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Namespace="System.Xml.Linq" />
+      <Code xmlns="http://schemas.microsoft.com/developer/msbuild/2003" Type="Fragment" Language="cs"><![CDATA[
+var config = XElement.Load(Config.ItemSpec).Elements("Costura").FirstOrDefault();
+
+if (config == null) return true;
+
+var excludedAssemblies = new List<string>();
+var attribute = config.Attribute("ExcludeAssemblies");
+if (attribute != null)
+    foreach (var item in attribute.Value.Split('|').Select(x => x.Trim()).Where(x => x != string.Empty))
+        excludedAssemblies.Add(item);
+var element = config.Element("ExcludeAssemblies");
+if (element != null)
+    foreach (var item in element.Value.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Where(x => x != string.Empty))
+        excludedAssemblies.Add(item);
+
+var filesToCleanup = Files.Select(f => f.ItemSpec).Where(f => !excludedAssemblies.Contains(Path.GetFileNameWithoutExtension(f), StringComparer.InvariantCultureIgnoreCase));
+
+foreach (var item in filesToCleanup)
+  File.Delete(item);
+]]></Code>
+    </Task>
+  </UsingTask>
+  <Target Name="CleanReferenceCopyLocalPaths" AfterTargets="AfterBuild;NonWinFodyTarget">
+    <CosturaCleanup Config="FodyWeavers.xml" Files="@(ReferenceCopyLocalPaths->'$(OutDir)%(DestinationSubDirectory)%(Filename)%(Extension)')" />
+  </Target>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Costura.Fody.4.0.0\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.4.0.0\build\Costura.Fody.props'))" />
+    <Error Condition="!Exists('..\packages\Fody.5.0.5\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.5.0.5\build\Fody.targets'))" />
+  </Target>
+  <Import Project="..\packages\Fody.5.0.5\build\Fody.targets" Condition="Exists('..\packages\Fody.5.0.5\build\Fody.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

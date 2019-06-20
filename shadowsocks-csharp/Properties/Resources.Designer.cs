@@ -19,7 +19,7 @@ namespace Shadowsocks.Properties {
     // 类通过类似于 ResGen 或 Visual Studio 的工具自动生成的。
     // 若要添加或移除成员，请编辑 .ResX 文件，然后重新运行 ResGen
     // (以 /str 作为命令选项)，或重新生成 VS 项目。
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -61,10 +61,21 @@ namespace Shadowsocks.Properties {
         }
         
         /// <summary>
+        ///   查找 System.Byte[] 类型的本地化资源。
+        /// </summary>
+        internal static byte[] abp_js {
+            get {
+                object obj = ResourceManager.GetObject("abp_js", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 # translation for Simplified Chinese
         ///
         ///Shadowsocks=Shadowsocks
         ///ShadowsocksR=ShadowsocksR
+        ///: =：
         ///
         ///# Menu items
         ///
@@ -84,7 +95,7 @@ namespace Shadowsocks.Properties {
         ///Import servers from file...=从文件导入服务器...
         ///Servers Subscribe=服务器订阅
         ///Subscribe setting...=SSR服务器订阅设置...
-        ///Update subscribe SSR nod [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///Update subscribe S [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string cn {
             get {
@@ -108,16 +119,6 @@ namespace Shadowsocks.Properties {
         internal static byte[] libsscrypto64_dll {
             get {
                 object obj = ResourceManager.GetObject("libsscrypto64_dll", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
-        /// </summary>
-        internal static byte[] mgwz_dll {
-            get {
-                object obj = ResourceManager.GetObject("mgwz_dll", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -214,6 +215,7 @@ namespace Shadowsocks.Properties {
         ///
         ///Shadowsocks=Shadowsocks
         ///ShadowsocksR=ShadowsocksR
+        ///: =：
         ///
         ///# Menu items
         ///
@@ -233,7 +235,7 @@ namespace Shadowsocks.Properties {
         ///Import servers from file...=從文件導入伺服器...
         ///Servers Subscribe=伺服器訂閱
         ///Subscribe setting...=SSR伺服器訂閱設置...
-        ///Update subscribe SSR [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///Update subscri [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string zh_tw {
             get {

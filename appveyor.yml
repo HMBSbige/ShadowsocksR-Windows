@@ -1,17 +1,17 @@
 version: 1.0.{build}
-image: Visual Studio 2017
-environment:
-  matrix:
-    - platform: Any CPU
-      configuration: Debug
-    - platform: Any CPU
-      configuration: Release
-matrix:
-  fast_finish: false
+skip_tags: true
+image: Visual Studio 2019 Preview
+configuration: Release
+platform: Any CPU
+install:
+- cmd: git submodule update --init --recursive
+before_build:
+- cmd: nuget restore
 build:
+  project: shadowsocks-csharp.sln
   parallel: true
   verbosity: normal
 artifacts:
-- path: shadowsocks-csharp\bin\4.0\Release\ShadowsocksR.exe
-  name: ShadowsocksR-dotnet4.0.exe
+- path: shadowsocks-csharp\bin\Release\ShadowsocksR.exe
+  name: ShadowsocksR.exe
   

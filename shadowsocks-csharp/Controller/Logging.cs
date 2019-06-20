@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Shadowsocks.Obfs;
+using Shadowsocks.Util;
+using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-using Shadowsocks.Obfs;
 
 namespace Shadowsocks.Controller
 {
@@ -20,13 +20,12 @@ namespace Shadowsocks.Controller
     public class Logging
     {
         public static string LogFile;
-        public static string LogFilePath;
         public static string LogFileName;
         protected static string date;
 
         private static FileStream _logFileStream;
         private static StreamWriterWithTimestamp _logStreamWriter;
-        private static object _lock = new object();
+        private static readonly object _lock = new object();
         public static bool save_to_file = true;
 
         public static bool OpenLogFile()
@@ -37,21 +36,18 @@ namespace Shadowsocks.Controller
 
                 if (save_to_file)
                 {
-                    string curpath = Path.Combine(System.Windows.Forms.Application.StartupPath, @"temp");// Path.GetFullPath(".");//Path.GetTempPath();
-                    LogFilePath = curpath;
-                    if (!Directory.Exists(curpath))
-                    {
-                        Directory.CreateDirectory(curpath);
-                    }
-                    string new_date = DateTime.Now.ToString("yyyy-MM");
-                    LogFileName = "shadowsocks_" + new_date + ".log";
-                    LogFile = Path.Combine(curpath, LogFileName);
+                    var newDate = DateTime.Now.ToString("yyyy-MM");
+                    LogFileName = $@"shadowsocks_{newDate}.log";
+                    LogFile = Utils.GetTempPath(LogFileName);
                     _logFileStream = new FileStream(LogFile, FileMode.Append);
-                    _logStreamWriter = new StreamWriterWithTimestamp(_logFileStream);
-                    _logStreamWriter.AutoFlush = true;
+                    _logStreamWriter = new StreamWriterWithTimestamp(_logFileStream)
+                    {
+                        AutoFlush = true
+                    };
                     Console.SetOut(_logStreamWriter);
                     Console.SetError(_logStreamWriter);
-                    date = new_date;
+                    date = newDate;
+                    CompressOldLogFile();
                 }
                 else
                 {
@@ -108,12 +104,25 @@ namespace Shadowsocks.Controller
 
         private static string ToString(StackFrame[] stacks)
         {
-            string result = string.Empty;
-            foreach (StackFrame stack in stacks)
+            return stacks.Aggregate(string.Empty, (current, stack) => current + $@"{stack.GetMethod()}{Environment.NewLine}");
+        }
+
+        private static void CompressOldLogFile()
+        {
+            var list = Directory.GetFiles(Utils.GetTempPath(), @"shadowsocks_*.log", SearchOption.TopDirectoryOnly);
+            foreach (var file in list)
             {
-                result += string.Format("{0}\r\n", stack.GetMethod().ToString());
+                if (file != LogFile)
+                {
+                    FileManager.ZipCompressToFile(file).ContinueWith(task =>
+                    {
+                        if (task.Result)
+                        {
+                            File.Delete(file);
+                        }
+                    });
+                }
             }
-            return result;
         }
 
         protected static void UpdateLogFile()
@@ -207,25 +216,25 @@ namespace Shadowsocks.Controller
                 }
                 else if (se.ErrorCode == 11004)
                 {
-                    Logging.Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
+                    Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
                         + "DNS lookup failed");
                     return true;
                 }
                 else if (se.SocketErrorCode == SocketError.HostNotFound)
                 {
-                    Logging.Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
+                    Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
                         + "Host not found");
                     return true;
                 }
                 else if (se.SocketErrorCode == SocketError.ConnectionRefused)
                 {
-                    Logging.Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
+                    Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
                         + "connection refused");
                     return true;
                 }
                 else if (se.SocketErrorCode == SocketError.NetworkUnreachable)
                 {
-                    Logging.Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
+                    Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
                         + "network unreachable");
                     return true;
                 }
@@ -241,7 +250,7 @@ namespace Shadowsocks.Controller
                 }
                 else
                 {
-                    Logging.Log(LogLevel.Info, "Proxy server [" + remarks + "(" + server + ")] "
+                    Log(LogLevel.Info, "Proxy server [" + remarks + "(" + server + ")] "
                         + Convert.ToString(se.SocketErrorCode) + ":" + se.Message);
 
                     Debug(ToString(new StackTrace().GetFrames()));
@@ -251,10 +260,11 @@ namespace Shadowsocks.Controller
             }
             return false;
         }
+
         public static void Log(LogLevel level, object s)
         {
             UpdateLogFile();
-            var strMap = new []{
+            var strMap = new[]{
                 "Debug",
                 "Info",
                 "Warn",

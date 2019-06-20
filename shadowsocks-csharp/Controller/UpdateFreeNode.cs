@@ -1,13 +1,7 @@
 ﻿using Shadowsocks.Model;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Net;
-using System.Reflection;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Xml;
-using System.Windows.Forms;
 
 namespace Shadowsocks.Controller
 {
@@ -50,6 +44,13 @@ namespace Shadowsocks.Controller
                 //UseProxy = !UseProxy;
                 this.subscribeTask = subscribeTask;
                 string URL = subscribeTask.URL;
+
+                //add support for tls1.2+
+                if (URL.StartsWith("https", StringComparison.OrdinalIgnoreCase))
+                {
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 | SecurityProtocolType.Tls;
+                }
+
                 http.DownloadStringCompleted += http_DownloadStringCompleted;
                 http.DownloadStringAsync(new Uri(URL != null ? URL : UpdateURL));
             }

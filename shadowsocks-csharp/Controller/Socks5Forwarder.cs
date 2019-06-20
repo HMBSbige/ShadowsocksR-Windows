@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Shadowsocks.Model;
+using Shadowsocks.Proxy;
+using Shadowsocks.Util;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
-using OpenDNS;
-using Shadowsocks.Model;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller
 {
@@ -48,7 +48,7 @@ namespace Shadowsocks.Controller
             return false;
         }
 
-        public int IsHandle(byte[] firstPacket, int length, Socket socket)
+        private int IsHandle(byte[] firstPacket, int length, Socket socket)
         {
             if (length >= 7 && _config.proxyRuleMode != (int)ProxyRuleMode.Disable)
             {
@@ -80,10 +80,9 @@ namespace Shadowsocks.Controller
                                     if (_config.proxyRuleMode == (int)ProxyRuleMode.UserCustom)
                                     {
                                         Shadowsocks.Model.HostMap hostMap = HostMap.Instance();
-                                        string host_addr;
-                                        if (hostMap.GetHost(host, out host_addr))
+                                        if (hostMap.GetHost(host, out var host_addr))
                                         {
-                                            if (!String.IsNullOrEmpty(host_addr))
+                                            if (!string.IsNullOrEmpty(host_addr))
                                             {
                                                 string lower_host_addr = host_addr.ToLower();
                                                 if (lower_host_addr.StartsWith("reject")
@@ -117,20 +116,13 @@ namespace Shadowsocks.Controller
                                 }
                                 if (ipAddress == null)
                                 {
-                                    if (host.IndexOf('.') >= 0)
-                                    {
-                                        ipAddress = Util.Utils.QueryDns(host, _config.dnsServer);
-                                    }
-                                    else
-                                    {
-                                        ipAddress = Utils.QueryDns(host, null);
-                                    }
+                                    ipAddress = Utils.QueryDns(host, host.IndexOf('.') >= 0 ? _config.dnsServer : null);
                                     if (ipAddress != null)
                                     {
                                         Utils.DnsBuffer.Set(host, new IPAddress(ipAddress.GetAddressBytes()));
                                         if (host.IndexOf('.') >= 0)
                                         {
-                                            if (Util.Utils.isLAN(ipAddress)) // assume that it is polution if return LAN address
+                                            if (Utils.isLAN(ipAddress)) // assume that it is polution if return LAN address
                                             {
                                                 return CONNECT_REMOTEPROXY;
                                             }
@@ -198,8 +190,7 @@ namespace Shadowsocks.Controller
             return CONNECT_REMOTEPROXY;
         }
 
-        class Handler
-            : IHandler
+        class Handler : IHandler
         {
             private IPRangeSet _IPRange;
             private Configuration _config;
@@ -279,10 +270,9 @@ namespace Shadowsocks.Controller
                                     if (_config.proxyRuleMode == (int)ProxyRuleMode.UserCustom)
                                     {
                                         Shadowsocks.Model.HostMap hostMap = HostMap.Instance();
-                                        string host_addr;
-                                        if (hostMap.GetHost(_remote_host, out host_addr))
+                                        if (hostMap.GetHost(_remote_host, out var host_addr))
                                         {
-                                            if (!String.IsNullOrEmpty(host_addr))
+                                            if (!string.IsNullOrEmpty(host_addr))
                                             {
                                                 string lower_host_addr = host_addr.ToLower();
                                                 if (lower_host_addr.StartsWith("reject"))
@@ -307,14 +297,7 @@ namespace Shadowsocks.Controller
                                 }
                                 if (ipAddress == null)
                                 {
-                                    if (_remote_host.IndexOf('.') >= 0)
-                                    {
-                                        ipAddress = Util.Utils.QueryDns(_remote_host, _config.localDnsServer);
-                                    }
-                                    else
-                                    {
-                                        ipAddress = Utils.QueryDns(_remote_host, null);
-                                    }
+                                    ipAddress = Utils.QueryDns(_remote_host, _remote_host.IndexOf('.') >= 0 ? _config.localDnsServer : null);
                                 }
                                 if (ipAddress != null)
                                 {
@@ -353,13 +336,11 @@ namespace Shadowsocks.Controller
                     // ProxyAuth recv only socks5 head, so don't need to save anything else
                     IPEndPoint remoteEP = new IPEndPoint(ipAddress, _targetPort);
 
-                    _remote = new ProxySocketTun(ipAddress.AddressFamily,
-                        SocketType.Stream, ProtocolType.Tcp);
+                    _remote = new ProxySocketTun(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                     _remote.GetSocket().NoDelay = true;
 
                     // Connect to the remote endpoint.
-                    _remote.BeginConnect(remoteEP,
-                        new AsyncCallback(ConnectCallback), null);
+                    _remote.BeginConnect(remoteEP, ConnectCallback, null);
                 }
                 catch (Exception e)
                 {
@@ -411,7 +392,7 @@ namespace Shadowsocks.Controller
                 }
             }
 
-            private void ResetTimeout(Double time)
+            private void ResetTimeout(double time)
             {
                 if (time <= 0 && timer == null)
                     return;
@@ -648,8 +629,7 @@ namespace Shadowsocks.Controller
 
             public override void Shutdown()
             {
-                InvokeHandler handler = () => Close();
-                handler.BeginInvoke(null, null);
+                Task.Run(Close);
             }
         }
     }

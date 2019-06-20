@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace Shadowsocks.Encryption
 {
-    public class Sodium
+    public static class Sodium
     {
         private const string DLLNAME = @"libsscrypto.dll";
 
@@ -21,7 +21,7 @@ namespace Shadowsocks.Encryption
             var dllPath = Utils.GetTempPath(DLLNAME);
             try
             {
-                FileManager.UncompressFile(dllPath, Environment.Is64BitProcess ? Resources.libsscrypto64_dll : Resources.libsscrypto_dll);
+                FileManager.DecompressFile(dllPath, Environment.Is64BitProcess ? Resources.libsscrypto64_dll : Resources.libsscrypto_dll);
                 LoadLibrary(dllPath);
             }
             catch (IOException)
