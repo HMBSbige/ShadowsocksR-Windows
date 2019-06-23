@@ -139,6 +139,11 @@ namespace Shadowsocks.View
                 ServersListBox.SelectedIndex = index;
                 ServersListBox.ScrollIntoView(ServersListBox.Items[index]);
             }
+            else
+            {
+                ServersListBox.SelectedIndex = ServersListBox.Items.Count - 1;
+                ServersListBox.ScrollIntoView(ServersListBox.Items[ServersListBox.Items.Count - 1]);
+            }
         }
 
         private void GenQr(string text)
@@ -280,6 +285,7 @@ namespace Shadowsocks.View
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
+            var index = ServersListBox.SelectedIndex;
             foreach (ServerObject selectedItem in ServersListBox.SelectedItems.Cast<object>().ToArray())
             {
                 var position = ServerViewModel.ServerCollection.IndexOf(selectedItem);
@@ -289,7 +295,7 @@ namespace Shadowsocks.View
                     --_modifiedConfiguration.index;
                 }
             }
-            SetServerListSelectedIndex(_modifiedConfiguration.index);
+            SetServerListSelectedIndex(index);
         }
 
         private void UpButton_Click(object sender, RoutedEventArgs e)
@@ -373,5 +379,12 @@ namespace Shadowsocks.View
             }
         }
 
+        private void ServerIpCheckBox_IsCheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (ServersListBox.SelectedItem != null)
+            {
+                ServersListBox.ScrollIntoView(ServersListBox.SelectedItem);
+            }
+        }
     }
 }

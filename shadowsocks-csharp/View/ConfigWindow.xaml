@@ -119,7 +119,8 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <CheckBox x:Name="ServerIpCheckBox" Grid.Row="0" Grid.Column="0" Content="Server IP" VerticalAlignment="Center" Margin="0,10,5,0" IsChecked="{Binding PlainMode,Mode=TwoWay,ElementName=ServerIpTextBox}" ContentStringFormat="*{0}" HorizontalAlignment="Right" />
+                    <CheckBox x:Name="ServerIpCheckBox" Grid.Row="0" Grid.Column="0" Content="Server IP" VerticalAlignment="Center" Margin="0,10,5,0" IsChecked="{Binding PlainMode,Mode=TwoWay,ElementName=ServerIpTextBox}" ContentStringFormat="*{0}" HorizontalAlignment="Right"
+                    Checked="ServerIpCheckBox_IsCheckedChanged" Unchecked="ServerIpCheckBox_IsCheckedChanged" />
                     <controls:MaskedTextBox x:Name="ServerIpTextBox" Grid.Row="0" Grid.Column="1"
                                             Height="23.24" Margin="0,10,0,0"
                                             PlainMode="False"
