@@ -1,4 +1,5 @@
 ﻿using Shadowsocks.Model;
+using System;
 using System.Collections.ObjectModel;
 
 namespace Shadowsocks.ViewModel
@@ -29,7 +30,17 @@ namespace Shadowsocks.ViewModel
             {
                 SelectedServer = ServerCollection[config.index];
             }
+
+            ServerCollection.CollectionChanged -= ServerCollection_CollectionChanged;
+            ServerCollection.CollectionChanged += ServerCollection_CollectionChanged;
         }
+
+        private void ServerCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            ServersChanged?.Invoke(this, new EventArgs());
+        }
+
+        public event EventHandler ServersChanged;
 
         private ServerObject _selectedServer;
         public ServerObject SelectedServer
@@ -44,16 +55,17 @@ namespace Shadowsocks.ViewModel
                     OnPropertyChanged(nameof(SsLink));
                     if (_selectedServer != null)
                     {
-                        _selectedServer.PropertyChanged -= _selectedServer_PropertyChanged;
-                        _selectedServer.PropertyChanged += _selectedServer_PropertyChanged;
+                        _selectedServer.ServerChanged -= _selectedServer_ServerChanged;
+                        _selectedServer.ServerChanged += _selectedServer_ServerChanged;
                     }
                 }
             }
         }
 
-        private void _selectedServer_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void _selectedServer_ServerChanged(object sender, EventArgs e)
         {
             OnPropertyChanged(nameof(SsLink));
+            ServersChanged?.Invoke(this, new EventArgs());
         }
 
         private ObservableCollection<ServerObject> _serverCollection;
@@ -66,6 +78,7 @@ namespace Shadowsocks.ViewModel
                 {
                     _serverCollection = value;
                     OnPropertyChanged();
+                    ServersChanged?.Invoke(this, new EventArgs());
                 }
             }
         }

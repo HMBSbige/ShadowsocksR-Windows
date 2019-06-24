@@ -42,6 +42,8 @@ namespace Shadowsocks.View
             _controller.ConfigChanged += controller_ConfigChanged;
 
             LoadCurrentConfiguration();
+            ServerViewModel.ServersChanged += (o, e) => { ApplyButton.IsEnabled = true; };
+
             if (focusIndex == -1)
             {
                 var index = _modifiedConfiguration.index + 1;
@@ -130,6 +132,7 @@ namespace Shadowsocks.View
             _modifiedConfiguration = _controller.GetConfiguration();
             ServerViewModel.ReadConfig(_modifiedConfiguration);
             SetServerListSelectedIndex(_modifiedConfiguration.index);
+            ApplyButton.IsEnabled = false;
         }
 
         public void SetServerListSelectedIndex(int index)
@@ -247,7 +250,14 @@ namespace Shadowsocks.View
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-            if (SaveConfig())
+            if (ApplyButton.IsEnabled)
+            {
+                if (SaveConfig())
+                {
+                    Close();
+                }
+            }
+            else
             {
                 Close();
             }
@@ -261,7 +271,9 @@ namespace Shadowsocks.View
         private void ApplyButton_Click(object sender, RoutedEventArgs e)
         {
             if (SaveConfig())
-            { }
+            {
+                ApplyButton.IsEnabled = false;
+            }
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)

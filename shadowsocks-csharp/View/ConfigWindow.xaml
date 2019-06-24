@@ -93,7 +93,7 @@
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Content="OK" FontSize="14" Click="OkButton_Click"></Button>
             <Button Grid.Column="1" Content="Cancel" FontSize="14" Click="CancelButton_Click"></Button>
-            <Button Grid.Column="2" Content="Apply" FontSize="14" Click="ApplyButton_Click"></Button>
+            <Button x:Name="ApplyButton" Grid.Column="2" Content="Apply" FontSize="14" Click="ApplyButton_Click"></Button>
         </Grid>
         <GroupBox x:Name="ServerGroupBox" Grid.Row="0" Grid.Column="1" Header="Server" Margin="5,0,5,0">
             <StackPanel >

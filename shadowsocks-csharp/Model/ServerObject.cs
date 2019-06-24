@@ -352,11 +352,14 @@ namespace Shadowsocks.Model
             return $@"ssr://{base64}";
         }
 
+        public event EventHandler ServerChanged;
+
         protected override void OnPropertyChanged(string propertyName = null)
         {
             base.OnPropertyChanged(propertyName);
             base.OnPropertyChanged(nameof(SsLink));
             base.OnPropertyChanged(nameof(SsrLink));
+            ServerChanged?.Invoke(this, new EventArgs());
         }
 
         #endregion
