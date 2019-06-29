@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Shadowsocks.Model
 {
@@ -43,9 +44,9 @@ namespace Shadowsocks.Model
 
         private double Algorithm2(ServerSpeedLog serverSpeedLog) // perfer less delay
         {
-            if (serverSpeedLog.ErrorContinurousTimes >= 20)
+            if (serverSpeedLog.ErrorContinuousTimes >= 20)
                 return 1;
-            if (serverSpeedLog.ErrorContinurousTimes >= 10)
+            if (serverSpeedLog.ErrorContinuousTimes >= 10)
                 return MIN_CHANCE;
             if (serverSpeedLog.AvgConnectTime < 0 && serverSpeedLog.TotalConnectTimes >= 3)
                 return MIN_CHANCE;
@@ -57,16 +58,16 @@ namespace Shadowsocks.Model
             long connections = serverSpeedLog.TotalConnectTimes - serverSpeedLog.TotalDisconnectTimes;
             double chance = MAX_CHANCE * 10.0 / avgConnectTime - connections * CONNECTION_PENALTY;
             if (chance > MAX_CHANCE) chance = MAX_CHANCE;
-            chance -= serverSpeedLog.ErrorContinurousTimes * ERROR_PENALTY;
+            chance -= serverSpeedLog.ErrorContinuousTimes * ERROR_PENALTY;
             if (chance < MIN_CHANCE) chance = MIN_CHANCE;
             return chance;
         }
 
         private double Algorithm3(ServerSpeedLog serverSpeedLog) // perfer less error
         {
-            if (serverSpeedLog.ErrorContinurousTimes >= 20)
+            if (serverSpeedLog.ErrorContinuousTimes >= 20)
                 return 1;
-            if (serverSpeedLog.ErrorContinurousTimes >= 10)
+            if (serverSpeedLog.ErrorContinuousTimes >= 10)
                 return MIN_CHANCE;
             if (serverSpeedLog.AvgConnectTime < 0 && serverSpeedLog.TotalConnectTimes >= 3)
                 return MIN_CHANCE;
@@ -78,16 +79,16 @@ namespace Shadowsocks.Model
             long connections = serverSpeedLog.TotalConnectTimes - serverSpeedLog.TotalDisconnectTimes;
             double chance = MAX_CHANCE * 1.0 / (avgConnectTime / 500 + 1) - connections * CONNECTION_PENALTY;
             if (chance > MAX_CHANCE) chance = MAX_CHANCE;
-            chance -= serverSpeedLog.ErrorContinurousTimes * ERROR_PENALTY;
+            chance -= serverSpeedLog.ErrorContinuousTimes * ERROR_PENALTY;
             if (chance < MIN_CHANCE) chance = MIN_CHANCE;
             return chance;
         }
 
         private double Algorithm4(ServerSpeedLog serverSpeedLog, long avg_speed, double zero_chance) // perfer fast speed
         {
-            if (serverSpeedLog.ErrorContinurousTimes >= 20)
+            if (serverSpeedLog.ErrorContinuousTimes >= 20)
                 return 1;
-            if (serverSpeedLog.ErrorContinurousTimes >= 10)
+            if (serverSpeedLog.ErrorContinuousTimes >= 10)
                 return MIN_CHANCE;
             if (serverSpeedLog.AvgConnectTime < 0 && serverSpeedLog.TotalConnectTimes >= 3)
                 return MIN_CHANCE;
@@ -104,12 +105,12 @@ namespace Shadowsocks.Model
             long connections = serverSpeedLog.TotalConnectTimes - serverSpeedLog.TotalDisconnectTimes;
             double chance = MAX_CHANCE * speed_mul / (avgConnectTime / 500 + 1) - connections * CONNECTION_PENALTY;
             if (chance > MAX_CHANCE) chance = MAX_CHANCE;
-            chance -= serverSpeedLog.ErrorContinurousTimes * ERROR_PENALTY;
+            chance -= serverSpeedLog.ErrorContinuousTimes * ERROR_PENALTY;
             if (chance < MIN_CHANCE) chance = MIN_CHANCE;
             return chance;
         }
 
-        protected int SubSelect(List<Server> configs, int curIndex, string algorithm, FilterFunc filter, bool forceChange)
+        protected int SubSelect(ObservableCollection<Server> configs, int curIndex, string algorithm, FilterFunc filter, bool forceChange)
         {
             if (randomGennarator == null)
             {
@@ -124,20 +125,20 @@ namespace Shadowsocks.Model
             }
             else
             {
-                if (configs[lastSelectIndex].id != lastSelectID)
+                if (configs[lastSelectIndex].Id != lastSelectID)
                 {
                     if (lastSelectID != null)
                     {
                         for (int i = 0; i < configs.Count; ++i)
                         {
-                            if (configs[i].id == lastSelectID)
+                            if (configs[i].Id == lastSelectID)
                             {
                                 lastSelectIndex = i;
                                 break;
                             }
                         }
                     }
-                    if (configs[lastSelectIndex].id != lastSelectID)
+                    if (configs[lastSelectIndex].Id != lastSelectID)
                     {
                         lastSelectIndex = -1;
                         lastSelectTime = DateTime.Now;
@@ -165,7 +166,7 @@ namespace Shadowsocks.Model
                 List<ServerIndex> serverList = new List<ServerIndex>();
                 for (int i = 0; i < configs.Count; ++i)
                 {
-                    if (configs[i].isEnable())
+                    if (configs[i].Enable)
                     {
                         if (filter != null)
                         {
@@ -198,7 +199,7 @@ namespace Shadowsocks.Model
                 if (serverList.Count == 0)
                 {
                     int i = lastSelectIndex;
-                    if (i >= 0 && i < configs.Count && configs[i].isEnable())
+                    if (i >= 0 && i < configs.Count && configs[i].Enable)
                         serverList.Add(new ServerIndex(i, configs[i]));
                 }
                 int serverListIndex = -1;
@@ -234,7 +235,7 @@ namespace Shadowsocks.Model
                             }
                             else
                             {
-                                if (configs.Count > lastSelectIndex && lastSelectIndex >= 0 && configs[lastSelectIndex].isEnable() && !forceChange)
+                                if (configs.Count > lastSelectIndex && lastSelectIndex >= 0 && configs[lastSelectIndex].Enable && !forceChange)
                                 {
                                     return lastSelectIndex;
                                 }
@@ -251,7 +252,7 @@ namespace Shadowsocks.Model
                             foreach (ServerIndex s in serverList)
                             {
                                 long speed_u, speed_d;
-                                s.server.ServerSpeedLog().GetTransSpeed(out speed_u, out speed_d);
+                                s.server.SpeedLog.GetTransSpeed(out speed_u, out speed_d);
                                 if (speed_d == 0)
                                     ++zero_cnt;
                                 else
@@ -269,7 +270,7 @@ namespace Shadowsocks.Model
                             }
                             foreach (ServerIndex s in serverList)
                             {
-                                double chance = Algorithm4(s.server.ServerSpeedLog(), avg_speed, zero_chance);
+                                double chance = Algorithm4(s.server.SpeedLog, avg_speed, zero_chance);
                                 if (chance > 0)
                                 {
                                     chances.Add(lastBeginVal + chance);
@@ -281,7 +282,7 @@ namespace Shadowsocks.Model
                         {
                             foreach (ServerIndex s in serverList)
                             {
-                                double chance = Algorithm3(s.server.ServerSpeedLog());
+                                double chance = Algorithm3(s.server.SpeedLog);
                                 if (chance > 0)
                                 {
                                     chances.Add(lastBeginVal + chance);
@@ -302,7 +303,7 @@ namespace Shadowsocks.Model
                         double lastBeginVal = 0;
                         foreach (ServerIndex s in serverList)
                         {
-                            double chance = Algorithm2(s.server.ServerSpeedLog());
+                            double chance = Algorithm2(s.server.SpeedLog);
                             if (chance > 0)
                             {
                                 chances.Add(lastBeginVal + chance);
@@ -311,7 +312,7 @@ namespace Shadowsocks.Model
                         }
                         if (algorithm == "SelectedFirst"
                             && randomGennarator.Next(3) == 0
-                            && configs[curIndex].isEnable())
+                            && configs[curIndex].Enable)
                         {
                             for (int i = 0; i < serverList.Count; ++i)
                             {
@@ -335,12 +336,12 @@ namespace Shadowsocks.Model
             return -1;
         }
 
-        public int Select(List<Server> configs, int curIndex, string algorithm, FilterFunc filter, bool forceChange = false)
+        public int Select(ObservableCollection<Server> configs, int curIndex, string algorithm, FilterFunc filter, bool forceChange = false)
         {
             lastSelectIndex = SubSelect(configs, curIndex, algorithm, filter, forceChange);
             if (lastSelectIndex >= 0 && lastSelectIndex < configs.Count)
             {
-                lastSelectID = configs[lastSelectIndex].id;
+                lastSelectID = configs[lastSelectIndex].Id;
             }
             else
             {

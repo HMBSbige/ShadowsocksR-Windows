@@ -45,8 +45,6 @@ namespace Shadowsocks
             };
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            System.Windows.Forms.Application.EnableVisualStyles();
-            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
 
             SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
             app.Exit += App_Exit;

@@ -1,0 +1,264 @@
+﻿<Window x:Class="Shadowsocks.View.ServerLogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:Shadowsocks.Controls"
+        mc:Ignorable="d"
+        x:Name="Slw" 
+        Title="ServerLogWindow" Height="450" Width="800"
+        WindowStartupLocation="CenterScreen" SizeToContent="Width">
+    <Window.Resources>
+        <controls:SpeedToBrushConverter x:Key="SpeedToBrushConverter" />
+        <controls:ConnectNumberToBrushConverter x:Key="ConnectNumberToBrushConverter" />
+        <controls:ConnectErrorToBrushConverter x:Key="ConnectErrorToBrushConverter" />
+        <controls:ConnectEmptyToBrushConverter x:Key="ConnectEmptyToBrushConverter" />
+        <controls:ErrorPercentToBrushConverter x:Key="ErrorPercentToBrushConverter" />
+        <controls:BooleanToEnabledConverter x:Key="BooleanToEnabledConverter" />
+        <Style TargetType="DataGridCell" x:Key="DefaultCellStyle">
+            <Setter Property="BorderThickness" Value="0" />
+            <Style.Triggers>
+                <Trigger Property="DataGridCell.IsSelected" Value="True">
+                    <Setter Property="Background" Value="#0078d7" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridCell" x:Key="DownloadCellStyle">
+            <Setter Property="Background" Value="#FFFFF0F0" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Style.Triggers>
+                <Trigger Property="DataGridCell.IsSelected" Value="True">
+                    <Setter Property="Background" Value="#0078d7" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridCell" x:Key="UploadCellStyle">
+            <Setter Property="Background" Value="#FFF4FFF4" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Style.Triggers>
+                <Trigger Property="DataGridCell.IsSelected" Value="True">
+                    <Setter Property="Background" Value="#0078d7" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridCell" x:Key="DownloadRawCellStyle">
+            <Setter Property="Background" Value="#FFFF8080" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Style.Triggers>
+                <Trigger Property="DataGridCell.IsSelected" Value="True">
+                    <Setter Property="Background" Value="#0078d7" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}" x:Key="EnableCellStyle">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground"
+                    Value="{Binding Enable,Converter={StaticResource BooleanToEnabledConverter}}" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#0078d7" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}" x:Key="AvgDownloadCellStyle">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background"
+                    Value="{Binding SpeedLog.AvgDownloadBytes,Converter={StaticResource SpeedToBrushConverter}}" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#0078d7" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}" x:Key="MaxDownSpeedCellStyle">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background"
+                    Value="{Binding SpeedLog.MaxDownSpeed,Converter={StaticResource SpeedToBrushConverter}}" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#0078d7" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}" x:Key="AvgUploadCellStyle">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background"
+                    Value="{Binding SpeedLog.AvgUploadBytes,Converter={StaticResource SpeedToBrushConverter}}" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#0078d7" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}" x:Key="MaxUpSpeedCellStyle">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background"
+                    Value="{Binding SpeedLog.MaxUpSpeed,Converter={StaticResource SpeedToBrushConverter}}" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#0078d7" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}" x:Key="ConnectionCellStyle">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background"
+                    Value="{Binding SpeedLog.Connecting,Converter={StaticResource ConnectNumberToBrushConverter}}" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#0078d7" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}" x:Key="ConnectErrorCellStyle">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background"
+                    Value="{Binding SpeedLog.ConnectError,Converter={StaticResource ConnectErrorToBrushConverter}}" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#0078d7" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}" x:Key="ConnectEmptyCellStyle">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background"
+                    Value="{Binding SpeedLog.ErrorEmptyTimes,Converter={StaticResource ConnectEmptyToBrushConverter}}" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#0078d7" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}" x:Key="ConnectTimeoutCellStyle">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background"
+                    Value="{Binding SpeedLog.ErrorTimeoutTimes,Converter={StaticResource ConnectEmptyToBrushConverter}}" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#0078d7" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}" x:Key="ContinuousCellStyle">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background"
+                    Value="{Binding SpeedLog.ErrorContinuousTimes,Converter={StaticResource ConnectEmptyToBrushConverter}}" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#0078d7" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}" x:Key="ErrorPercentCellStyle">
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Background"
+                    Value="{Binding SpeedLog.ErrorPercent,Converter={StaticResource ErrorPercentToBrushConverter}}" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#0078d7" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}" x:Key="ServerCellStyle">
+            <Setter Property="BorderThickness" Value="0" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                        <Setter Property="Background" Value="Cyan" />
+                    </DataTrigger>
+                    <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#0078d7" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <DockPanel>
+            <Menu DockPanel.Dock="Top" Background="White">
+                <MenuItem x:Name="ControlMenuItem" Header="_Control" >
+                    <MenuItem x:Name="DisconnectDirectMenuItem" Click="DisconnectDirectMenuItem_OnClick"/>
+                    <MenuItem x:Name="DisconnectAllMenuItem" Click="DisconnectAllMenuItem_OnClick"/>
+                    <Separator />
+                    <MenuItem x:Name="ClearMaxMenuItem" Click="ClearMaxMenuItem_OnClick"/>
+                    <MenuItem x:Name="ClearAllMenuItem" Click="ClearAllMenuItem_OnClick"/>
+                    <Separator />
+                    <MenuItem x:Name="ClearSelectedTotalMenuItem" Click="ClearSelectedTotalMenuItem_OnClick"/>
+                    <MenuItem x:Name="ClearTotalMenuItem" Click="ClearTotalMenuItem_OnClick"/>
+                </MenuItem>
+                <MenuItem x:Name="OutMenuItem" Header="Port _out">
+                    <MenuItem x:Name="CopyCurrentLinkMenuItem" Click="CopyCurrentLinkMenuItem_OnClick"/>
+                    <MenuItem x:Name="CopyCurrentGroupLinksMenuItem" Click="CopyCurrentGroupLinksMenuItem_OnClick"/>
+                    <MenuItem x:Name="CopyAllEnableLinksMenuItem" Click="CopyAllEnableLinksMenuItem_OnClick"/>
+                    <MenuItem x:Name="CopyAllLinksMenuItem" Click="CopyAllLinksMenuItem_OnClick"/>
+                </MenuItem>
+                <MenuItem x:Name="WindowMenuItem" Header="_Window">
+                    <MenuItem x:Name="AutoSizeMenuItem" Click="AutoSizeMenuItem_OnClick"/>
+                    <MenuItem x:Name="AlwaysTopMenuItem" IsChecked="{Binding Topmost,ElementName=Slw}" Click="AlwaysTopMenuItem_OnClick"/>
+                </MenuItem>
+            </Menu>
+
+            <DataGrid x:Name="ServerDataGrid"
+                      GridLinesVisibility="All"
+                      HorizontalGridLinesBrush="LightGray"
+                      VerticalGridLinesBrush="LightGray"
+                      
+                      Background="Transparent"
+
+                      HeadersVisibility="Column"
+                      AutoGenerateColumns="False"
+                      SelectionUnit="Cell" SelectionMode="Single"
+                      CanUserAddRows="false" CanUserResizeRows="False"
+                      DataContext="{Binding ServerLogViewModel, ElementName=Slw}"
+                      ItemsSource="{Binding ServersCollection}"
+                      MouseLeftButtonUp="ServerDataGrid_MouseLeftButtonUp"
+                      MouseDoubleClick="ServerDataGrid_OnMouseDoubleClick"
+                      >
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding Index}"
+                    IsReadOnly="True" CellStyle="{StaticResource DefaultCellStyle}"/>
+                    <DataGridTextColumn Header="Group" Binding="{Binding GroupName}" 
+                    IsReadOnly="True" CellStyle="{StaticResource DefaultCellStyle}" />
+                    <DataGridTextColumn Header="Server" Binding="{Binding FriendlyName}"
+                    IsReadOnly="True" CellStyle="{StaticResource ServerCellStyle}"/>
+                    <DataGridTextColumn Header="Enable" Binding="{Binding Enable,Converter={StaticResource BooleanToEnabledConverter}}" 
+                    IsReadOnly="False" CellStyle="{StaticResource EnableCellStyle}" />
+                    <DataGridTextColumn Header="Connecting" Binding="{Binding SpeedLog.Connecting}"
+                    IsReadOnly="True" CellStyle="{StaticResource ConnectionCellStyle}"/>
+                    <DataGridTextColumn Header="Latency" Binding="{Binding SpeedLog.AvgConnectTimeText}"
+                    IsReadOnly="True" CellStyle="{StaticResource DefaultCellStyle}" />
+                    <DataGridTextColumn Header="Avg DSpeed" Binding="{Binding SpeedLog.AvgDownloadBytesText}"
+                    IsReadOnly="True" CellStyle="{StaticResource AvgDownloadCellStyle}" 
+                    SortMemberPath="SpeedLog.AvgDownloadBytes" />
+                    <DataGridTextColumn Header="Max DSpeed" Binding="{Binding SpeedLog.MaxDownSpeedText}"
+                    IsReadOnly="True" CellStyle="{StaticResource MaxDownSpeedCellStyle}"
+                    SortMemberPath="SpeedLog.MaxDownSpeed" />
+                    <DataGridTextColumn Header="Avg UpSpeed" Binding="{Binding SpeedLog.AvgUploadBytesText}"
+                    IsReadOnly="True" CellStyle="{StaticResource AvgUploadCellStyle}"
+                    SortMemberPath="SpeedLog.AvgUploadBytes" />
+                    <DataGridTextColumn Header="Max UpSpeed" Binding="{Binding SpeedLog.MaxUpSpeedText}"
+                    IsReadOnly="True" CellStyle="{StaticResource MaxUpSpeedCellStyle}"
+                    SortMemberPath="SpeedLog.MaxUpSpeed" />
+                    <DataGridTextColumn Header="Dload" Binding="{Binding SpeedLog.TotalDownloadBytesText}"
+                                        IsReadOnly="True" SortMemberPath="SpeedLog.TotalDownloadBytes"
+                                        CellStyle="{StaticResource DownloadCellStyle}" />
+                    <DataGridTextColumn Header="Upload" Binding="{Binding SpeedLog.TotalUploadBytesText}"
+                                        IsReadOnly="True" SortMemberPath="SpeedLog.TotalUploadBytes"
+                                        CellStyle="{StaticResource UploadCellStyle}" />
+                    <DataGridTextColumn Header="DloadRaw" Binding="{Binding SpeedLog.TotalDownloadRawBytesText}"
+                                        IsReadOnly="True" SortMemberPath="SpeedLog.TotalDownloadRawBytes"
+                                        CellStyle="{StaticResource DownloadRawCellStyle}" />
+                    <DataGridTextColumn Header="Error" Binding="{Binding SpeedLog.ConnectError}"
+                    IsReadOnly="True" CellStyle="{StaticResource ConnectErrorCellStyle}"/>
+                    <DataGridTextColumn Header="Timeout" Binding="{Binding SpeedLog.ErrorTimeoutTimes}"
+                    IsReadOnly="True" CellStyle="{StaticResource ConnectTimeoutCellStyle}"/>
+                    <DataGridTextColumn Header="Empty Response" Binding="{Binding SpeedLog.ErrorEmptyTimes}"
+                    IsReadOnly="True"  CellStyle="{StaticResource ConnectEmptyCellStyle}"/>
+                    <DataGridTextColumn Header="Continuous" Binding="{Binding SpeedLog.ErrorContinuousTimes}"
+                    IsReadOnly="True" CellStyle="{StaticResource ContinuousCellStyle}"/>
+                    <DataGridTextColumn Header="Error Percent" Binding="{Binding SpeedLog.ErrorPercentText}"
+                    IsReadOnly="True" SortMemberPath="SpeedLog.ErrorPercent" CellStyle="{StaticResource ErrorPercentCellStyle}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+    </Grid>
+</Window>

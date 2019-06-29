@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Shadowsocks.Model;
+using Shadowsocks.Proxy;
+using Shadowsocks.Proxy.SystemProxy;
+using Shadowsocks.Util;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Windows;
-using Shadowsocks.Model;
-using Shadowsocks.Proxy;
-using Shadowsocks.Proxy.SystemProxy;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller
 {
@@ -69,7 +69,7 @@ namespace Shadowsocks.Controller
                 if (_transfer.servers.TryGetValue(server.server, out var st))
                 {
                     var log = new ServerSpeedLog(st.totalUploadBytes, st.totalDownloadBytes);
-                    server.SetServerSpeedLog(log);
+                    server.SpeedLog = log;
                 }
             }
 
@@ -107,11 +107,11 @@ namespace Shadowsocks.Controller
             return _config;
         }
 
-        private int FindFirstMatchServer(Server server, List<Server> servers)
+        private int FindFirstMatchServer(Server server, IReadOnlyList<Server> servers)
         {
             for (var i = 0; i < servers.Count; ++i)
             {
-                if (server.isMatchServer(servers[i]))
+                if (server.IsMatchServer(servers[i]))
                 {
                     return i;
                 }
@@ -119,7 +119,7 @@ namespace Shadowsocks.Controller
             return -1;
         }
 
-        public void AppendConfiguration(Configuration mergeConfig, List<Server> servers)
+        public void AppendConfiguration(Configuration mergeConfig, IReadOnlyList<Server> servers)
         {
             if (servers != null)
             {
@@ -133,19 +133,19 @@ namespace Shadowsocks.Controller
             }
         }
 
-        public List<Server> MergeConfiguration(Configuration mergeConfig, List<Server> servers)
+        public List<Server> MergeConfiguration(Configuration mergeConfig, IReadOnlyList<Server> servers)
         {
             var missingServers = new List<Server>();
             if (servers != null)
             {
-                for (var j = 0; j < servers.Count; ++j)
+                foreach (var server in servers)
                 {
-                    var i = FindFirstMatchServer(servers[j], mergeConfig.configs);
+                    var i = FindFirstMatchServer(server, mergeConfig.configs);
                     if (i != -1)
                     {
-                        var enable = servers[j].enable;
-                        servers[j].CopyServer(mergeConfig.configs[i]);
-                        servers[j].enable = enable;
+                        var enable = server.Enable;
+                        server.CopyServer(mergeConfig.configs[i]);
+                        server.Enable = enable;
                     }
                 }
             }
@@ -173,7 +173,7 @@ namespace Shadowsocks.Controller
         public void MergeConfiguration(Configuration mergeConfig)
         {
             AppendConfiguration(_config, mergeConfig.configs);
-            SaveConfig(_config);
+            Save();
         }
 
         public bool SaveServersConfig(string config)
@@ -223,7 +223,7 @@ namespace Shadowsocks.Controller
                             index = _config.configs.Count;
                         _config.configs.Insert(index, server);
                     }
-                    SaveConfig(_config);
+                    Save();
                     return true;
                 }
                 catch (Exception e)
@@ -239,32 +239,37 @@ namespace Shadowsocks.Controller
         public void ToggleMode(ProxyMode mode)
         {
             _config.sysProxyMode = (int)mode;
-            SaveConfig(_config);
+            Save();
             ToggleModeChanged?.Invoke(this, new EventArgs());
         }
 
         public void ToggleRuleMode(int mode)
         {
             _config.proxyRuleMode = mode;
-            SaveConfig(_config);
+            Save();
             ToggleRuleModeChanged?.Invoke(this, new EventArgs());
         }
 
         public void ToggleSelectRandom(bool enabled)
         {
             _config.random = enabled;
-            SaveConfig(_config);
+            Save();
         }
 
         public void ToggleSameHostForSameTargetRandom(bool enabled)
         {
             _config.sameHostForSameTarget = enabled;
-            SaveConfig(_config);
+            Save();
         }
 
         public void SelectServerIndex(int index)
         {
             _config.index = index;
+            Save();
+        }
+
+        public void Save()
+        {
             SaveConfig(_config);
         }
 
@@ -303,7 +308,7 @@ namespace Shadowsocks.Controller
                 {
                     if (_transfer.servers.ContainsKey(server.server))
                     {
-                        server.ServerSpeedLog().ClearTrans();
+                        server.SpeedLog.ClearTrans();
                     }
                 }
             }
@@ -334,7 +339,7 @@ namespace Shadowsocks.Controller
             gfwListUpdater?.UpdateOnlinePAC(_config, url);
         }
 
-        protected void Reload()
+        private void Reload()
         {
             if (_port_map_listener != null)
             {

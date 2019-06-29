@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Shadowsocks.Controller;
+using Shadowsocks.Encryption;
+using Shadowsocks.Util;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Windows.Forms;
-using Newtonsoft.Json;
-using Shadowsocks.Controller;
-using Shadowsocks.Encryption;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Model
 {
@@ -106,7 +107,7 @@ namespace Shadowsocks.Model
     {
         #region Data
 
-        public List<Server> configs;
+        public ObservableCollection<Server> configs;
         public int index;
         public bool random;
         public int sysProxyMode;
@@ -185,13 +186,13 @@ namespace Shadowsocks.Model
                         var j = -1;
                         for (var i = 0; i < configs.Count; ++i)
                         {
-                            if (configs[i].id == id)
+                            if (configs[i].Id == id)
                             {
                                 j = i;
                                 break;
                             }
                         }
-                        if (j >= 0 && visit.index == j && configs[j].enable)
+                        if (j >= 0 && visit.index == j && configs[j].Enable)
                         {
                             uricache.Del(targetAddr);
                             return true;
@@ -215,7 +216,7 @@ namespace Shadowsocks.Model
                 if (sameHostForSameTarget && !forceRandom && targetAddr != null && uricache.ContainsKey(targetAddr))
                 {
                     var visit = uricache.Get(targetAddr);
-                    if (visit.index < configs.Count && configs[visit.index].enable && configs[visit.index].ServerSpeedLog().ErrorContinurousTimes == 0)
+                    if (visit.index < configs.Count && configs[visit.index].Enable && configs[visit.index].SpeedLog.ErrorContinuousTimes == 0)
                     {
                         uricache.Del(targetAddr);
                         return configs[visit.index];
@@ -229,7 +230,7 @@ namespace Shadowsocks.Model
                         i = serverStrategy.Select(configs, index, balanceAlgorithm, delegate (Server server, Server selServer)
                         {
                             if (selServer != null)
-                                return selServer.group == server.group;
+                                return selServer.Group == server.Group;
                             return false;
                         }, true);
                     }
@@ -248,7 +249,7 @@ namespace Shadowsocks.Model
                         i = serverStrategy.Select(configs, index, balanceAlgorithm, delegate (Server server, Server selServer)
                         {
                             if (selServer != null)
-                                return selServer.group == server.group;
+                                return selServer.Group == server.Group;
                             return false;
                         });
                     }
@@ -261,9 +262,9 @@ namespace Shadowsocks.Model
                     {
                         var visit = new UriVisitTime
                         {
-                                uri = targetAddr,
-                                index = i,
-                                visitTime = DateTime.Now
+                            uri = targetAddr,
+                            index = i,
+                            visitTime = DateTime.Now
                         };
                         uricache.Set(targetAddr, visit);
                     }
@@ -277,7 +278,7 @@ namespace Shadowsocks.Model
                     {
                         foreach (var unused in configs)
                         {
-                            if (configs[selIndex].isEnable())
+                            if (configs[selIndex].Enable)
                             {
                                 break;
                             }
@@ -290,9 +291,9 @@ namespace Shadowsocks.Model
                     {
                         var visit = new UriVisitTime
                         {
-                                uri = targetAddr,
-                                index = selIndex,
-                                visitTime = DateTime.Now
+                            uri = targetAddr,
+                            index = selIndex,
+                            visitTime = DateTime.Now
                         };
                         uricache.Set(targetAddr, visit);
                     }
@@ -310,10 +311,10 @@ namespace Shadowsocks.Model
             var server_group = new Dictionary<string, int>();
             foreach (var s in configs)
             {
-                id2server[s.id] = s;
-                if (!string.IsNullOrEmpty(s.group))
+                id2server[s.Id] = s;
+                if (!string.IsNullOrEmpty(s.Group))
                 {
-                    server_group[s.group] = 1;
+                    server_group[s.Group] = 1;
                 }
             }
             foreach (var pair in portMap)
@@ -369,16 +370,16 @@ namespace Shadowsocks.Model
 
         public static void CheckServer(Server server)
         {
-            CheckPort(server.server_port);
-            if (server.server_udp_port != 0)
-                CheckPort(server.server_udp_port);
+            CheckPort(server.Server_Port);
+            if (server.Server_Udp_Port != 0)
+                CheckPort(server.Server_Udp_Port);
             try
             {
-                CheckPassword(server.password);
+                CheckPassword(server.Password);
             }
             catch (ConfigurationWarning cw)
             {
-                server.password = string.Empty;
+                server.Password = string.Empty;
                 MessageBox.Show(cw.Message, cw.Message, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             CheckServer(server.server);
@@ -404,7 +405,7 @@ namespace Shadowsocks.Model
 
             serverSubscribes = new List<ServerSubscribe>();
 
-            configs = new List<Server>();
+            configs = new ObservableCollection<Server>();
         }
 
         public void CopyFrom(Configuration config)
@@ -480,15 +481,15 @@ namespace Shadowsocks.Model
             }
             foreach (var server in configs)
             {
-                if (id.ContainsKey(server.id))
+                if (id.ContainsKey(server.Id))
                 {
                     var newId = new byte[16];
                     Utils.RandBytes(newId, newId.Length);
-                    server.id = BitConverter.ToString(newId).Replace("-", string.Empty);
+                    server.Id = BitConverter.ToString(newId).Replace("-", string.Empty);
                 }
                 else
                 {
-                    id[server.id] = 0;
+                    id[server.Id] = 0;
                 }
             }
         }
@@ -619,17 +620,17 @@ namespace Shadowsocks.Model
             var s = new Server
             {
                 server = server.server,
-                server_port = server.server_port,
-                method = server.method,
-                protocol = server.protocol,
-                protocolparam = server.protocolparam ?? string.Empty,
+                Server_Port = server.Server_Port,
+                Method = server.Method,
+                Protocol = server.Protocol,
+                ProtocolParam = server.ProtocolParam ?? string.Empty,
                 obfs = server.obfs,
-                obfsparam = server.obfsparam ?? string.Empty,
-                password = server.password,
-                remarks = server.remarks,
-                group = server.group,
-                udp_over_tcp = server.udp_over_tcp,
-                server_udp_port = server.server_udp_port
+                ObfsParam = server.ObfsParam ?? string.Empty,
+                Password = server.Password,
+                Remarks = server.Remarks,
+                Group = server.Group,
+                UdpOverTcp = server.UdpOverTcp,
+                Server_Udp_Port = server.Server_Udp_Port
             };
             return s;
         }

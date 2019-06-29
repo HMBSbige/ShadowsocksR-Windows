@@ -132,10 +132,10 @@ namespace Shadowsocks.View
             var serverGroup = new Dictionary<string, int>();
             foreach (var s in configuration.configs)
             {
-                if (!string.IsNullOrEmpty(s.group) && !serverGroup.ContainsKey(s.group))
+                if (!string.IsNullOrEmpty(s.Group) && !serverGroup.ContainsKey(s.Group))
                 {
-                    ServersComboBox.Items.Add(@"#" + s.group);
-                    serverGroup[s.group] = 1;
+                    ServersComboBox.Items.Add(@"#" + s.Group);
+                    serverGroup[s.Group] = 1;
                 }
             }
 
@@ -214,7 +214,7 @@ namespace Shadowsocks.View
         {
             foreach (var s in _modifiedConfiguration.configs)
             {
-                if (id == s.id)
+                if (id == s.Id)
                 {
                     return GetDisplayText(s);
                 }
@@ -229,9 +229,9 @@ namespace Shadowsocks.View
             var serverGroup = new Dictionary<string, int>();
             foreach (var s in _modifiedConfiguration.configs)
             {
-                if (!string.IsNullOrEmpty(s.group) && !serverGroup.ContainsKey(s.group))
+                if (!string.IsNullOrEmpty(s.Group) && !serverGroup.ContainsKey(s.Group))
                 {
-                    serverGroup[s.group] = 1;
+                    serverGroup[s.Group] = 1;
                 }
             }
             if (key != null && _modifiedConfiguration.portMap.ContainsKey(key))
@@ -372,7 +372,7 @@ namespace Shadowsocks.View
 
         private static string GetDisplayText(Server s)
         {
-            return (!string.IsNullOrEmpty(s.group) ? s.group + " - " : "    - ") + s.FriendlyName() + "        #" + s.id;
+            return (!string.IsNullOrEmpty(s.Group) ? s.Group + " - " : "    - ") + s.FriendlyName + "        #" + s.Id;
         }
 
         private static string GetId(string text)

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Shadowsocks.Model;
+using System;
 using System.Collections.Generic;
-using Shadowsocks.Model;
 
 namespace Shadowsocks.Controller
 {
@@ -95,7 +95,7 @@ namespace Shadowsocks.Controller
             {
                 transfer.AddUpload(server, size);
             }
-            upload_cnt = 1;
+            upload_cnt += 1;
             download_cnt = 0;
 #if DEBUG
             if (sizeTransfer.Count < 1024 * 128)

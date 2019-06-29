@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Shadowsocks.Encryption;
+using Shadowsocks.Model;
+using Shadowsocks.Obfs;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Shadowsocks.Encryption;
-using Shadowsocks.Model;
-using Shadowsocks.Obfs;
 
 namespace Shadowsocks.Proxy
 {
@@ -136,13 +136,13 @@ namespace Shadowsocks.Proxy
         {
             lock (server) // need a server lock
             {
-                if (server.getProtocolData() == null)
+                if (server.Protocoldata == null)
                 {
-                    server.setProtocolData(_protocol.InitData());
+                    server.Protocoldata = _protocol.InitData();
                 }
-                if (server.getObfsData() == null)
+                if (server.Obfsdata == null)
                 {
-                    server.setObfsData(_obfs.InitData());
+                    server.Obfsdata = _obfs.InitData();
                 }
             }
             var mss = MSS;
@@ -151,9 +151,9 @@ namespace Shadowsocks.Proxy
             RecvBufferSize = RecvSize - OverHead;
             if (_proxy_server != null)
                 server_addr = _proxy_server;
-            _protocol.SetServerInfo(new ServerInfo(server_addr, server.server_port, server.protocolparam ?? "", server.getProtocolData(),
+            _protocol.SetServerInfo(new ServerInfo(server_addr, server.Server_Port, server.ProtocolParam ?? "", server.Protocoldata,
                 _encryptor.getIV(), _password, _encryptor.getKey(), head_len, mss, OverHead, RecvBufferSize));
-            _obfs.SetServerInfo(new ServerInfo(server_addr, server.server_port, server.obfsparam ?? "", server.getObfsData(),
+            _obfs.SetServerInfo(new ServerInfo(server_addr, server.Server_Port, server.ObfsParam ?? "", server.Obfsdata,
                 _encryptor.getIV(), _password, _encryptor.getKey(), head_len, mss, OverHead, RecvBufferSize));
         }
 

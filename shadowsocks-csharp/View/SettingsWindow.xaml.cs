@@ -63,9 +63,14 @@ namespace Shadowsocks.View
         private Configuration _modifiedConfiguration;
         private readonly Dictionary<int, string> _balanceIndexMap = new Dictionary<int, string>();
 
-        private void LoadLanguage()
+        private void UpdateTitle()
         {
             Title = $@"{I18N.GetString(@"Global Settings")}({(_controller.GetCurrentConfiguration().shareOverLan ? I18N.GetString(@"Any") : I18N.GetString(@"Local"))}:{_controller.GetCurrentConfiguration().localPort} {I18N.GetString(@"Version")}:{UpdateChecker.FullVersion})";
+        }
+
+        private void LoadLanguage()
+        {
+            UpdateTitle();
 
             foreach (var c in Utils.FindVisualChildren<Label>(this))
             {
@@ -202,6 +207,7 @@ namespace Shadowsocks.View
         private void controller_ConfigChanged(object sender, EventArgs e)
         {
             LoadCurrentConfiguration();
+            UpdateTitle();
             ApplyButton.IsEnabled = false;
         }
 

@@ -210,8 +210,8 @@ namespace Shadowsocks.Controller
                         Dictionary<string, object> servers = new Dictionary<string, object>();
                         for (int i = 0; i < config.configs.Count; ++i)
                         {
-                            _ServerSpeedLogList[i] = config.configs[i].ServerSpeedLog().Translate();
-                            servers[config.configs[i].id] = _ServerSpeedLogList[i];
+                            _ServerSpeedLogList[i] = config.configs[i].SpeedLog.Translate();
+                            servers[config.configs[i].Id] = _ServerSpeedLogList[i];
                         }
                         string content = JsonConvert.SerializeObject(servers, Formatting.Indented);
 

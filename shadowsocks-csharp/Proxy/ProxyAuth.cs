@@ -554,15 +554,15 @@ namespace Shadowsocks.Proxy
             if (_config.GetPortMapCache().ContainsKey(local_port))
             {
                 PortMapConfigCache cfg = _config.GetPortMapCache()[local_port];
-                if (cfg.server == null || cfg.id == cfg.server.id)
+                if (cfg.server == null || cfg.id == cfg.server.Id)
                 {
                     if (cfg.server != null)
                     {
-                        handler.select_server = delegate (Server server, Server selServer) { return server.id == cfg.server.id; };
+                        handler.select_server = delegate (Server server, Server selServer) { return server.Id == cfg.server.Id; };
                     }
                     else if (!string.IsNullOrEmpty(cfg.id))
                     {
-                        handler.select_server = delegate (Server server, Server selServer) { return server.group == cfg.id; };
+                        handler.select_server = delegate (Server server, Server selServer) { return server.Group == cfg.id; };
                     }
                     if (cfg.type == PortMapType.Forward) // tunnel
                     {

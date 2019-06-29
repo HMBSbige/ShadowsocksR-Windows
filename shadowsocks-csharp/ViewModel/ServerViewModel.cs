@@ -8,24 +8,13 @@ namespace Shadowsocks.ViewModel
     {
         public ServerViewModel()
         {
-            ServerCollection = new ObservableCollection<ServerObject>();
+            ServerCollection = new ObservableCollection<Server>();
             IsSsr = true;
         }
 
         public void ReadConfig(Configuration config)
         {
-            ServerCollection.Clear();
-            foreach (var server in config.configs)
-            {
-                var serverObject = ServerObject.CopyFromServer(server);
-
-                serverObject.Enable = server.enable;
-                serverObject.Protocoldata = server.getProtocolData();
-                serverObject.Obfsdata = server.getObfsData();
-
-                ServerCollection.Add(serverObject);
-            }
-
+            ServerCollection = config.configs;
             if (config.index >= 0 && config.index < ServerCollection.Count)
             {
                 SelectedServer = ServerCollection[config.index];
@@ -42,8 +31,8 @@ namespace Shadowsocks.ViewModel
 
         public event EventHandler ServersChanged;
 
-        private ServerObject _selectedServer;
-        public ServerObject SelectedServer
+        private Server _selectedServer;
+        public Server SelectedServer
         {
             get => _selectedServer;
             set
@@ -68,8 +57,8 @@ namespace Shadowsocks.ViewModel
             ServersChanged?.Invoke(this, new EventArgs());
         }
 
-        private ObservableCollection<ServerObject> _serverCollection;
-        public ObservableCollection<ServerObject> ServerCollection
+        private ObservableCollection<Server> _serverCollection;
+        public ObservableCollection<Server> ServerCollection
         {
             get => _serverCollection;
             set

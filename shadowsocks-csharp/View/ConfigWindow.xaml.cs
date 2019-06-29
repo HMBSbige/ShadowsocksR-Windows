@@ -95,9 +95,14 @@ namespace Shadowsocks.View
             LoadLanguage();
         }
 
-        private void LoadLanguage()
+        private void UpdateTitle()
         {
             Title = $@"{I18N.GetString(@"Edit Servers")}({(_controller.GetCurrentConfiguration().shareOverLan ? I18N.GetString(@"Any") : I18N.GetString(@"Local"))}:{_controller.GetCurrentConfiguration().localPort} {I18N.GetString(@"Version")}:{UpdateChecker.FullVersion})";
+        }
+
+        private void LoadLanguage()
+        {
+            UpdateTitle();
 
             foreach (var c in Utils.FindVisualChildren<Label>(this))
             {
@@ -125,6 +130,7 @@ namespace Shadowsocks.View
         private void controller_ConfigChanged(object sender, EventArgs e)
         {
             LoadCurrentConfiguration();
+            UpdateTitle();
         }
 
         private void LoadCurrentConfiguration()
@@ -155,9 +161,16 @@ namespace Shadowsocks.View
             {
                 var h = Convert.ToInt32(MainGrid.ActualHeight);
                 var w = Convert.ToInt32(MainGrid.ColumnDefinitions[2].ActualWidth - PictureQrCode.Margin.Left - PictureQrCode.Margin.Right);
-                PictureQrCode.Source = text != string.Empty
-                        ? QrCodeUtils.GenQrCode(text, w, h)
-                        : QrCodeUtils.GenQrCode2(text, Math.Min(w, h));
+                if (h <= 0 || w <= 0)
+                {
+                    PictureQrCode.Source = null;
+                }
+                else
+                {
+                    PictureQrCode.Source = text != string.Empty
+                            ? QrCodeUtils.GenQrCode(text, w, h)
+                            : QrCodeUtils.GenQrCode2(text, Math.Min(w, h));
+                }
             }
             catch
             {
@@ -203,41 +216,8 @@ namespace Shadowsocks.View
             ((TextBox)sender).SelectAll();
         }
 
-        private void SaveServers()
-        {
-            _modifiedConfiguration.configs.Clear();
-            foreach (var serverObject in ServerViewModel.ServerCollection)
-            {
-                var server = new Server
-                {
-                    server = serverObject.ServerName,
-                    server_port = serverObject.ServerPort,
-                    server_udp_port = serverObject.ServerUdpPort,
-                    password = serverObject.Password,
-                    method = serverObject.Method,
-                    protocol = serverObject.Protocol,
-                    protocolparam = serverObject.ProtocolParam,
-                    obfs = serverObject.ObfsName,
-                    obfsparam = serverObject.ObfsParam,
-                    remarks = serverObject.Remarks,
-                    group = serverObject.Group,
-                    udp_over_tcp = serverObject.UdpOverTcp,
-                    id = serverObject.Id,
-
-                    enable = serverObject.Enable
-                };
-
-                //Configuration.CheckServer(server);
-
-                server.setProtocolData(serverObject.Protocoldata);
-                server.setProtocolData(serverObject.Obfsdata);
-                _modifiedConfiguration.configs.Add(server);
-            }
-        }
-
         private bool SaveConfig()
         {
-            SaveServers();
             if (_modifiedConfiguration.configs.Count == 0)
             {
                 MessageBox.Show(I18N.GetString(@"Please add at least one server"));
@@ -280,13 +260,13 @@ namespace Shadowsocks.View
         {
             if (ServersListBox.SelectedIndex == -1)
             {
-                ServerViewModel.ServerCollection.Add(ServerObject.GetDefaultServer());
+                ServerViewModel.ServerCollection.Add(Server.GetDefaultServer());
                 SetServerListSelectedIndex(ServerViewModel.ServerCollection.Count - 1);
             }
             else
             {
                 var position = ServersListBox.SelectedIndex + 1;
-                ServerViewModel.ServerCollection.Insert(position, ServerObject.Clone((ServerObject)ServersListBox.SelectedItem));
+                ServerViewModel.ServerCollection.Insert(position, Server.Clone((Server)ServersListBox.SelectedItem));
                 if (position <= _modifiedConfiguration.index)
                 {
                     ++_modifiedConfiguration.index;
@@ -298,7 +278,7 @@ namespace Shadowsocks.View
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             var index = ServersListBox.SelectedIndex;
-            foreach (ServerObject selectedItem in ServersListBox.SelectedItems.Cast<object>().ToArray())
+            foreach (Server selectedItem in ServersListBox.SelectedItems.Cast<object>().ToArray())
             {
                 var position = ServerViewModel.ServerCollection.IndexOf(selectedItem);
                 ServerViewModel.ServerCollection.Remove(selectedItem);
@@ -313,7 +293,7 @@ namespace Shadowsocks.View
         private void UpButton_Click(object sender, RoutedEventArgs e)
         {
             var sortedCopy = new SortedDictionary<int, object>();
-            foreach (ServerObject selectedItem in ServersListBox.SelectedItems.Cast<object>().ToArray())
+            foreach (Server selectedItem in ServersListBox.SelectedItems.Cast<object>().ToArray())
             {
                 sortedCopy.Add(ServerViewModel.ServerCollection.IndexOf(selectedItem), selectedItem);
             }
@@ -352,7 +332,7 @@ namespace Shadowsocks.View
         private void DownButton_Click(object sender, RoutedEventArgs e)
         {
             var sortedCopy = new SortedDictionary<int, object>();
-            foreach (ServerObject selectedItem in ServersListBox.SelectedItems.Cast<object>().ToArray())
+            foreach (Server selectedItem in ServersListBox.SelectedItems.Cast<object>().ToArray())
             {
                 sortedCopy.Add(ServerViewModel.ServerCollection.IndexOf(selectedItem), selectedItem);
             }

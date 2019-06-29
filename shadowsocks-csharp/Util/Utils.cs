@@ -35,7 +35,8 @@ namespace Shadowsocks.Util
 
         [DllImport(@"kernel32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool SetProcessWorkingSetSize(IntPtr process, UIntPtr minimumWorkingSetSize, UIntPtr maximumWorkingSetSize);
+        private static extern bool SetProcessWorkingSetSize(IntPtr process, UIntPtr minimumWorkingSetSize,
+                UIntPtr maximumWorkingSetSize);
 
         public static void ReleaseMemory(bool removePages = true)
         {
@@ -73,7 +74,8 @@ namespace Shadowsocks.Util
                 }
                 else
                 {
-                    SetProcessWorkingSetSize(CurrentProcess.Handle, (UIntPtr)0xFFFFFFFFFFFFFFFF, (UIntPtr)0xFFFFFFFFFFFFFFFF);
+                    SetProcessWorkingSetSize(CurrentProcess.Handle, (UIntPtr)0xFFFFFFFFFFFFFFFF,
+                            (UIntPtr)0xFFFFFFFFFFFFFFFF);
                 }
             }
         }
@@ -92,6 +94,7 @@ namespace Shadowsocks.Util
                     sb.Write(buffer, 0, n);
                 }
             }
+
             return Encoding.UTF8.GetString(sb.ToArray());
         }
 
@@ -131,6 +134,7 @@ namespace Shadowsocks.Util
                 if (target[target_offset + i] != m[m_offset + i])
                     return false;
             }
+
             return true;
         }
 
@@ -148,6 +152,7 @@ namespace Shadowsocks.Util
                             if (target[i + j] != m[j])
                                 break;
                         }
+
                         if (j >= m.Length)
                         {
                             return i;
@@ -155,6 +160,7 @@ namespace Shadowsocks.Util
                     }
                 }
             }
+
             return -1;
         }
 
@@ -168,6 +174,7 @@ namespace Shadowsocks.Util
                 if (addr[index] != net_addr[index])
                     return false;
             }
+
             if ((addr[index] >> (i - netmask)) != (net_addr[index] >> (i - netmask)))
                 return false;
             return true;
@@ -199,14 +206,15 @@ namespace Shadowsocks.Util
             {
                 var netmasks = new[]
                 {
-                    "127.0.0.0/8",
-                    "169.254.0.0/16"
+                        "127.0.0.0/8",
+                        "169.254.0.0/16"
                 };
                 foreach (var netmask in netmasks)
                 {
                     if (isMatchSubNet(ip, netmask))
                         return true;
                 }
+
                 return false;
             }
 
@@ -221,8 +229,10 @@ namespace Shadowsocks.Util
                     if (isMatchSubNet(ip, netmask))
                         return true;
                 }
+
                 return false;
             }
+
             return true;
         }
 
@@ -240,24 +250,25 @@ namespace Shadowsocks.Util
                     return false;
                 var netmasks = new[]
                 {
-                    "0.0.0.0/8",
-                    "10.0.0.0/8",
-                    //"100.64.0.0/10", //部分地区运营商貌似在使用这个，这个可能不安全
-                    "127.0.0.0/8",
-                    "169.254.0.0/16",
-                    "172.16.0.0/12",
-                    //"192.0.0.0/24",
-                    //"192.0.2.0/24",
-                    "192.168.0.0/16"
-                    //"198.18.0.0/15",
-                    //"198.51.100.0/24",
-                    //"203.0.113.0/24",
+                        "0.0.0.0/8",
+                        "10.0.0.0/8",
+                        //"100.64.0.0/10", //部分地区运营商貌似在使用这个，这个可能不安全
+                        "127.0.0.0/8",
+                        "169.254.0.0/16",
+                        "172.16.0.0/12",
+                        //"192.0.0.0/24",
+                        //"192.0.2.0/24",
+                        "192.168.0.0/16"
+                        //"198.18.0.0/15",
+                        //"198.51.100.0/24",
+                        //"203.0.113.0/24",
                 };
                 foreach (var netmask in netmasks)
                 {
                     if (isMatchSubNet(ip, netmask))
                         return true;
                 }
+
                 return false;
             }
 
@@ -274,8 +285,10 @@ namespace Shadowsocks.Util
                     if (isMatchSubNet(ip, netmask))
                         return true;
                 }
+
                 return false;
             }
+
             return true;
         }
 
@@ -316,6 +329,7 @@ namespace Shadowsocks.Util
                     ret += str[i];
                 }
             }
+
             return ret;
         }
 
@@ -346,6 +360,7 @@ namespace Shadowsocks.Util
             {
                 Logging.Info($@"DNS query {host} answer {ret_ipAddress}");
             }
+
             return ret_ipAddress;
         }
 
@@ -364,12 +379,14 @@ namespace Shadowsocks.Util
                     {
                         try
                         {
-                            r = client.Query(host, QueryType.AAAA).Answers.OfType<AaaaRecord>().FirstOrDefault()?.Address;
+                            r = client.Query(host, QueryType.AAAA).Answers.OfType<AaaaRecord>().FirstOrDefault()
+                                    ?.Address;
                         }
                         catch (DnsResponseException)
                         {
                             client.UseTcpOnly = true;
-                            r = client.Query(host, QueryType.AAAA).Answers.OfType<AaaaRecord>().FirstOrDefault()?.Address;
+                            r = client.Query(host, QueryType.AAAA).Answers.OfType<AaaaRecord>().FirstOrDefault()
+                                    ?.Address;
                         }
 
                         if (r != null)
@@ -509,6 +526,7 @@ namespace Shadowsocks.Util
                 var res = p.MainModule.FileName;
                 return res;
             }
+
             var dllPath = GetDllPath();
             return Path.Combine(Path.GetDirectoryName(dllPath), $@"{Path.GetFileNameWithoutExtension(dllPath)}.exe");
         }
@@ -551,6 +569,7 @@ namespace Shadowsocks.Util
                 process.Close();
                 return ret;
             }
+
             return -1;
         }
 
@@ -561,10 +580,12 @@ namespace Shadowsocks.Util
             {
                 dpi = (int)graphics.DpiX;
             }
+
             return (dpi * 4 + 48) / 96;
         }
 
         private static string _tempPath;
+
         // return path to store temporary files
         public static string GetTempPath()
         {
@@ -572,7 +593,8 @@ namespace Shadowsocks.Util
             {
                 try
                 {
-                    _tempPath = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), @"temp")).FullName;
+                    _tempPath = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), @"temp"))
+                            .FullName;
                 }
                 catch (Exception e)
                 {
@@ -599,6 +621,7 @@ namespace Shadowsocks.Util
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -722,6 +745,49 @@ namespace Shadowsocks.Util
                     }
                 }
             }
+        }
+
+        public static string FormatBytes(long bytes)
+        {
+            const long K = 1024L;
+            const long M = K * 1024L;
+            const long G = M * 1024L;
+            const long T = G * 1024L;
+            const long P = T * 1024L;
+            const long E = P * 1024L;
+
+            if (bytes >= M * 990)
+            {
+                if (bytes >= G * 990)
+                {
+                    if (bytes >= P * 990)
+                        return $@"{bytes / (double)E:F3}EB";
+                    if (bytes >= T * 990)
+                        return $@"{bytes / (double)P:F3}PB";
+                    return $@"{bytes / (double)T:F3}TB";
+                }
+
+                if (bytes >= G * 99)
+                    return $@"{bytes / (double)G:F2}GB";
+                if (bytes >= G * 9)
+                    return $@"{bytes / (double)G:F3}GB";
+                return $@"{bytes / (double)G:F4}GB";
+            }
+
+            if (bytes >= K * 990)
+            {
+                if (bytes >= M * 100)
+                    return $@"{bytes / (double)M:F1}MB";
+                if (bytes > M * 9.9)
+                    return $@"{bytes / (double)M:F2}MB";
+                return $@"{bytes / (double)M:F3}MB";
+            }
+
+            if (bytes > K * 99)
+                return $@"{bytes / (double)K:F0}KB";
+            if (bytes > 900)
+                return $@"{bytes / (double)K:F1}KB";
+            return bytes == 0 ? $@"{bytes}Byte" : $@"{bytes}Bytes";
         }
     }
 }
