@@ -20,7 +20,7 @@ namespace Shadowsocks
         [STAThread]
         private static void Main(string[] args)
         {
-            Directory.SetCurrentDirectory(Path.GetDirectoryName(Utils.GetExecutablePath()));
+            Directory.SetCurrentDirectory(Path.GetDirectoryName(Utils.GetExecutablePath()) ?? throw new InvalidOperationException());
             if (args.Any(arg => arg == @"--setautorun"))
             {
                 if (!AutoStartup.Switch())

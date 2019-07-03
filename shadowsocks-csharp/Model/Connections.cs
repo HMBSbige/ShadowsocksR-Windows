@@ -56,17 +56,7 @@ namespace Shadowsocks.Model
                 }
                 catch
                 {
-
-                }
-            }
-        }
-        public int Count
-        {
-            get
-            {
-                lock (this)
-                {
-                    return sockets.Count;
+                    // ignored
                 }
             }
         }

@@ -11,7 +11,7 @@
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
         <TextBox x:Name="TextBox" Grid.Row="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True" />
-        <Image x:Name="PictureQrCode" Grid.Row="1" Stretch="None" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/> 
+        <Image x:Name="PictureQrCode" Grid.Row="1" Stretch="Uniform" StretchDirection="Both" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/> 
        
 	</Grid>
 </Window>

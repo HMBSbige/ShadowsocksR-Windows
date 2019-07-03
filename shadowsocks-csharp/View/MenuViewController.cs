@@ -1053,7 +1053,7 @@ namespace Shadowsocks.View
             Utils.OpenURL("https://github.com/HMBSbige/ShadowsocksR-Windows");
         }
 
-        [DllImport("user32.dll")]
+        [DllImport(@"user32.dll")]
         private static extern short GetAsyncKeyState(Keys vKey);
 
         private void notifyIcon1_Click(object sender, MouseEventArgs e)

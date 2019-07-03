@@ -8,7 +8,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Windows.Forms;
 
 namespace Shadowsocks.Model
 {
@@ -368,23 +367,6 @@ namespace Shadowsocks.Model
             return portMapCache;
         }
 
-        public static void CheckServer(Server server)
-        {
-            CheckPort(server.Server_Port);
-            if (server.Server_Udp_Port != 0)
-                CheckPort(server.Server_Udp_Port);
-            try
-            {
-                CheckPassword(server.Password);
-            }
-            catch (ConfigurationWarning cw)
-            {
-                server.Password = string.Empty;
-                MessageBox.Show(cw.Message, cw.Message, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            CheckServer(server.server);
-        }
-
         public Configuration()
         {
             index = 0;
@@ -615,26 +597,6 @@ namespace Shadowsocks.Model
             return configs.Count == 1 && configs[0].server == GetDefaultServer().server;
         }
 
-        public static Server CopyServer(Server server)
-        {
-            var s = new Server
-            {
-                server = server.server,
-                Server_Port = server.Server_Port,
-                Method = server.Method,
-                Protocol = server.Protocol,
-                ProtocolParam = server.ProtocolParam ?? string.Empty,
-                obfs = server.obfs,
-                ObfsParam = server.ObfsParam ?? string.Empty,
-                Password = server.Password,
-                Remarks = server.Remarks,
-                Group = server.Group,
-                UdpOverTcp = server.UdpOverTcp,
-                Server_Udp_Port = server.Server_Udp_Port
-            };
-            return s;
-        }
-
         private static Server GetErrorServer()
         {
             var server = new Server { server = "invalid" };
@@ -646,22 +608,6 @@ namespace Shadowsocks.Model
             if (port <= IPEndPoint.MinPort || port > IPEndPoint.MaxPort)
             {
                 throw new ConfigurationException(I18N.GetString("Port out of range"));
-            }
-        }
-
-        private static void CheckPassword(string password)
-        {
-            if (string.IsNullOrEmpty(password))
-            {
-                throw new ConfigurationWarning(I18N.GetString("Password are blank"));
-            }
-        }
-
-        private static void CheckServer(string server)
-        {
-            if (string.IsNullOrEmpty(server))
-            {
-                throw new ConfigurationException(I18N.GetString("Server IP can not be blank"));
             }
         }
 

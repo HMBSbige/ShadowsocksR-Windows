@@ -374,7 +374,7 @@ namespace Shadowsocks.Util
                     {
                         UseCache = false
                     };
-                    IPAddress r = null;
+                    IPAddress r;
                     if (IPv6_first)
                     {
                         try
@@ -528,7 +528,7 @@ namespace Shadowsocks.Util
             }
 
             var dllPath = GetDllPath();
-            return Path.Combine(Path.GetDirectoryName(dllPath), $@"{Path.GetFileNameWithoutExtension(dllPath)}.exe");
+            return Path.Combine(Path.GetDirectoryName(dllPath) ?? throw new InvalidOperationException(), $@"{Path.GetFileNameWithoutExtension(dllPath)}.exe");
         }
 
         public static string GetDllPath()
@@ -571,17 +571,6 @@ namespace Shadowsocks.Util
             }
 
             return -1;
-        }
-
-        public static int GetDpiMul()
-        {
-            int dpi;
-            using (var graphics = Graphics.FromHwnd(IntPtr.Zero))
-            {
-                dpi = (int)graphics.DpiX;
-            }
-
-            return (dpi * 4 + 48) / 96;
         }
 
         private static string _tempPath;
