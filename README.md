@@ -25,6 +25,9 @@ ShadowsocksR for Windows
     * 无需任何运行时
     * 文件大
 
+#### Donate
+[Donate](./pic/wechat.jpg)
+
 #### Develop
 
 Visual Studio Community 2019 is recommended.
