@@ -1,18 +1,18 @@
-﻿using System;
+﻿using Shadowsocks.Controller;
+using Shadowsocks.Model;
+using Shadowsocks.Properties;
+using Shadowsocks.Util;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Shadowsocks.Controller;
-using Shadowsocks.Model;
-using Shadowsocks.Properties;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Proxy
 {
-    class HttpProxyRunner
+    public class HttpProxyRunner
     {
         private static readonly string UNIQUE_CONFIG_FILE;
         private static readonly Job PRIVOXY_JOB;
@@ -126,7 +126,7 @@ namespace Shadowsocks.Proxy
             }
         }
 
-        private static int GetFreePort()
+        public static int GetFreePort()
         {
             const int defaultPort = 60000;
             try

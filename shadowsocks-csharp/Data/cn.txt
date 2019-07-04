@@ -167,6 +167,8 @@ Empty Response=空连
 Error Percent=出错比例
 Continuous=连错
 Version=版本
+Experimental=实验性功能
+Test selected server=测试选定的服务器
 
 # Global Log Form
 

@@ -195,6 +195,9 @@
                     <MenuItem x:Name="AutoSizeMenuItem" Click="AutoSizeMenuItem_OnClick"/>
                     <MenuItem x:Name="AlwaysTopMenuItem" IsChecked="{Binding Topmost,ElementName=Slw}" Click="AlwaysTopMenuItem_OnClick"/>
                 </MenuItem>
+                <MenuItem x:Name="TestMenuItem" Header="Experimental">
+                    <MenuItem x:Name="TestSelectedMenuItem" Click="TestSelectedMenuItem_OnClick" />
+                </MenuItem>
             </Menu>
 
             <DataGrid x:Name="ServerDataGrid"

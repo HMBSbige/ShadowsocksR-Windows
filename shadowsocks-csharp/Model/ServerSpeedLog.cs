@@ -177,7 +177,7 @@ namespace Shadowsocks.Model
 
         #region 延迟
 
-        public long AvgConnectTime => avgConnectTime;
+        public int AvgConnectTime => avgConnectTime;
 
         public long AvgConnectTimeText
         {

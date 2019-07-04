@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Shadowsocks.Controller;
+using Shadowsocks.Model;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Shadowsocks.Controller;
-using Shadowsocks.Model;
 
 namespace Shadowsocks.Proxy
 {
@@ -517,19 +517,29 @@ namespace Shadowsocks.Proxy
 
         private void Connect()
         {
-            Handler.GetCurrentServer getCurrentServer = delegate (int localPort, ServerSelectStrategy.FilterFunc filter, string targetURI, bool cfgRandom, bool usingRandom, bool forceRandom) { return _config.GetCurrentServer(localPort, filter, targetURI, cfgRandom, usingRandom, forceRandom); };
-            Handler.KeepCurrentServer keepCurrentServer = delegate (int localPort, string targetURI, string id) { _config.KeepCurrentServer(localPort, targetURI, id); };
+            Server GetCurrentServer(int localPort, ServerSelectStrategy.FilterFunc filter, string targetURI, bool cfgRandom, bool usingRandom, bool forceRandom)
+            => _config.GetCurrentServer(localPort, filter, targetURI, cfgRandom, usingRandom, forceRandom);
+
+            void KeepCurrentServer(int localPort, string targetURI, string id)
+            {
+                _config.KeepCurrentServer(localPort, targetURI, id);
+            }
 
             int local_port = ((IPEndPoint)_connection.LocalEndPoint).Port;
-            Handler handler = new Handler();
+            Handler handler = new Handler
+            {
+                getCurrentServer = GetCurrentServer,
+                keepCurrentServer = KeepCurrentServer,
+                connection = new ProxySocketTunLocal(_connection),
+                connectionUDP = _connectionUDP,
+                cfg =
+                    {
+                            ReconnectTimesRemain = _config.reconnectTimes,
+                            Random = _config.random,
+                            ForceRandom = _config.random
+                    }
+            };
 
-            handler.getCurrentServer = getCurrentServer;
-            handler.keepCurrentServer = keepCurrentServer;
-            handler.connection = new ProxySocketTunLocal(_connection);
-            handler.connectionUDP = _connectionUDP;
-            handler.cfg.ReconnectTimesRemain = _config.reconnectTimes;
-            handler.cfg.Random = _config.random;
-            handler.cfg.ForceRandom = _config.random;
             handler.setServerTransferTotal(_transfer);
             if (_config.proxyEnable)
             {
