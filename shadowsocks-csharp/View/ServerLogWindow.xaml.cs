@@ -42,7 +42,7 @@ namespace Shadowsocks.View
             ServerLogViewModel.ReadConfig(_controller);
             if (ServerLogViewModel.SelectedServer != null)
             {
-                ServerDataGrid.ScrollIntoView(ServerLogViewModel.SelectedServer);
+                ServerDataGrid.ScrollIntoView(ServerLogViewModel.SelectedServer, ServerColumn);
             }
         }
 
@@ -362,13 +362,13 @@ namespace Shadowsocks.View
             {
                 if (ServerDataGrid.SelectedCells[0].Item is Server serverObject)
                 {
-                    ServerDataGrid.ScrollIntoView(serverObject);
+                    ServerDataGrid.ScrollIntoView(serverObject, ServerColumn);
                     return;
                 }
             }
             if (ServerLogViewModel.SelectedServer != null)
             {
-                ServerDataGrid.ScrollIntoView(ServerLogViewModel.SelectedServer);
+                ServerDataGrid.ScrollIntoView(ServerLogViewModel.SelectedServer, ServerColumn);
             }
         }
     }

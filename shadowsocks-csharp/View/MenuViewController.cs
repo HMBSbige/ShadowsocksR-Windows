@@ -397,7 +397,7 @@ namespace Shadowsocks.View
         private void updateFreeNodeChecker_NewFreeNodeFound(object sender, EventArgs e)
         {
             //TODO
-            if (configFrom_open || _serverLogWindow != null)
+            if (configFrom_open)
             {
                 eventList.Add(new EventParams(sender, e));
                 return;

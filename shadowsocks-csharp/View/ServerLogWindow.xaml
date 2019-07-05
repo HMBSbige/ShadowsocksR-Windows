@@ -220,7 +220,7 @@
                     IsReadOnly="True" CellStyle="{StaticResource DefaultCellStyle}"/>
                     <DataGridTextColumn Header="Group" Binding="{Binding GroupName}" 
                     IsReadOnly="True" CellStyle="{StaticResource DefaultCellStyle}" />
-                    <DataGridTextColumn Header="Server" Binding="{Binding FriendlyName}"
+                    <DataGridTextColumn x:Name="ServerColumn" Header="Server" Binding="{Binding FriendlyName}"
                     IsReadOnly="True" CellStyle="{StaticResource ServerCellStyle}"/>
                     <DataGridTextColumn Header="Enable" Binding="{Binding Enable,Converter={StaticResource BooleanToEnabledConverter}}" 
                     IsReadOnly="False" CellStyle="{StaticResource EnableCellStyle}" />
