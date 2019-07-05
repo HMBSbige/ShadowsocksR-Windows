@@ -14,7 +14,7 @@ namespace Shadowsocks.View
 {
     public partial class ServerLogWindow
     {
-        public ServerLogWindow(ShadowsocksController controller)
+        public ServerLogWindow(ShadowsocksController controller, WindowStatus status)
         {
             InitializeComponent();
             _controller = controller;
@@ -22,6 +22,18 @@ namespace Shadowsocks.View
             _controller.ConfigChanged += controller_ConfigChanged;
             LoadLanguage();
             LoadConfig();
+            if (status == null)
+            {
+                SizeToContent = SizeToContent.Width;
+                Height = 400;
+                WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            }
+            else
+            {
+                SizeToContent = SizeToContent.Manual;
+                WindowStartupLocation = WindowStartupLocation.Manual;
+                status.SetStatus(this);
+            }
         }
 
         private void LoadConfig()
@@ -342,6 +354,22 @@ namespace Shadowsocks.View
                 _controller.GetCurrentConfiguration().portMap.Remove(port.ToString());
                 Dispatcher.Invoke(_controller.Save);
             });
+        }
+
+        private void ServerLogWindow_OnStateChanged(object sender, EventArgs e)
+        {
+            if (ServerDataGrid.SelectedCells.Count > 0 && ServerDataGrid.SelectedCells[0].Column != null)
+            {
+                if (ServerDataGrid.SelectedCells[0].Item is Server serverObject)
+                {
+                    ServerDataGrid.ScrollIntoView(serverObject);
+                    return;
+                }
+            }
+            if (ServerLogViewModel.SelectedServer != null)
+            {
+                ServerDataGrid.ScrollIntoView(ServerLogViewModel.SelectedServer);
+            }
         }
     }
 }

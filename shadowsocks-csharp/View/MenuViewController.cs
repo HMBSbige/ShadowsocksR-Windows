@@ -66,7 +66,14 @@ namespace Shadowsocks.View
         private MenuItem UpdateItem;
         private ConfigWindow _configWindow;
         private SettingsWindow _settingsWindow;
+
+        #region ServerLogWindow
+
         private ServerLogWindow _serverLogWindow;
+        private WindowStatus _serverLogWindowStatus;
+
+        #endregion
+
         private PortSettingsWindow _portMapWindow;
         private SubscribeWindow _subScribeWindow;
         private LogWindow _logWindow;
@@ -389,7 +396,8 @@ namespace Shadowsocks.View
 
         private void updateFreeNodeChecker_NewFreeNodeFound(object sender, EventArgs e)
         {
-            if (configFrom_open)
+            //TODO
+            if (configFrom_open || _serverLogWindow != null)
             {
                 eventList.Add(new EventParams(sender, e));
                 return;
@@ -907,12 +915,13 @@ namespace Shadowsocks.View
             }
             else
             {
-                _serverLogWindow = new ServerLogWindow(controller);
+                _serverLogWindow = new ServerLogWindow(controller, _serverLogWindowStatus);
                 _serverLogWindow.Show();
                 _serverLogWindow.Activate();
                 _serverLogWindow.BringToFront();
                 _serverLogWindow.Closed += (o, e) =>
                 {
+                    _serverLogWindowStatus = new WindowStatus(_serverLogWindow);
                     _serverLogWindow = null;
                     Utils.ReleaseMemory();
                 };

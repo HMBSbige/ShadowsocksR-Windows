@@ -6,8 +6,7 @@
         xmlns:controls="clr-namespace:Shadowsocks.Controls"
         mc:Ignorable="d"
         x:Name="Slw" 
-        Title="ServerLogWindow" Height="450" Width="800"
-        WindowStartupLocation="CenterScreen" SizeToContent="Width">
+        Title="ServerLogWindow" StateChanged="ServerLogWindow_OnStateChanged">
     <Window.Resources>
         <controls:SpeedToBrushConverter x:Key="SpeedToBrushConverter" />
         <controls:ConnectNumberToBrushConverter x:Key="ConnectNumberToBrushConverter" />
