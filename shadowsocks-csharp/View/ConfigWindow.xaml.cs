@@ -151,7 +151,10 @@ namespace Shadowsocks.View
             else
             {
                 ServersListBox.SelectedIndex = ServersListBox.Items.Count - 1;
-                ServersListBox.ScrollIntoView(ServersListBox.Items[ServersListBox.Items.Count - 1]);
+                if (ServersListBox.SelectedIndex > 0)
+                {
+                    ServersListBox.ScrollIntoView(ServersListBox.Items[ServersListBox.Items.Count - 1]);
+                }
             }
         }
 

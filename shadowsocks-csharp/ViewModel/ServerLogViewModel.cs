@@ -25,15 +25,39 @@ namespace Shadowsocks.ViewModel
             }
         }
 
+        private Server _selectedServer;
+        public Server SelectedServer
+        {
+            get => _selectedServer;
+            private set
+            {
+                if (_selectedServer != value)
+                {
+                    _selectedServer = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public void ReadConfig(ShadowsocksController controller)
         {
             var config = controller.GetCurrentConfiguration();
             ServersCollection = config.configs;
+            SelectedServer = null;
             var index = 1;
+
             foreach (var server in ServersCollection)
             {
                 server.Index = index++;
-                server.IsSelected = config.index == server.Index - 1;
+                if (config.index == server.Index - 1)
+                {
+                    server.IsSelected = true;
+                    SelectedServer = server;
+                }
+                else
+                {
+                    server.IsSelected = false;
+                }
             }
         }
     }

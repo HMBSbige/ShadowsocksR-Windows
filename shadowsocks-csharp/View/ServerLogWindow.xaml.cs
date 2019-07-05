@@ -28,6 +28,10 @@ namespace Shadowsocks.View
         {
             UpdateTitle();
             ServerLogViewModel.ReadConfig(_controller);
+            if (ServerLogViewModel.SelectedServer != null)
+            {
+                ServerDataGrid.ScrollIntoView(ServerLogViewModel.SelectedServer);
+            }
         }
 
         private void controller_ConfigChanged(object sender, EventArgs e)
