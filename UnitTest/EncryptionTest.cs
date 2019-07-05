@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shadowsocks.Encryption;
 using Shadowsocks.Encryption.Stream;
+using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace UnitTest
@@ -16,7 +16,7 @@ namespace UnitTest
             var plain = new byte[16384];
             var cipher = new byte[plain.Length + 16];
             var plain2 = new byte[plain.Length + 16];
-            RandomNumberGenerator.Fill(plain);
+            Utils.RandBytes(plain);
             encryptor.Encrypt(plain, plain.Length, cipher, out var outLen);
             decryptor.Decrypt(cipher, outLen, plain2, out var outLen2);
             Assert.AreEqual(plain.Length, outLen2);
@@ -39,8 +39,6 @@ namespace UnitTest
                 Assert.AreEqual(plain[j], plain2[j]);
             }
         }
-
-        public TestContext TestContext { get; set; }
 
         [TestMethod]
         public void TestStreamOpenSSLEncryption()
@@ -152,7 +150,7 @@ namespace UnitTest
                     }
                     catch (Exception e)
                     {
-                        TestContext.WriteLine($@"{cipher}:{e.Message}");
+                        Console.WriteLine($@"{cipher}:{e.Message}");
                         failed = true;
                         throw;
                     }

@@ -7,7 +7,6 @@ using Shadowsocks.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -98,19 +97,27 @@ namespace Shadowsocks.Util
             return Encoding.UTF8.GetString(sb.ToArray());
         }
 
-        public static void RandBytes(byte[] buf, int length)
+        public static void RandBytes(byte[] buf, int length = -1)
         {
+            if (length == -1)
+            {
+                length = buf.Length;
+            }
             var temp = new byte[length];
-            var rngServiceProvider = new RNGCryptoServiceProvider();
-            rngServiceProvider.GetBytes(temp);
+            using (var rngServiceProvider = new RNGCryptoServiceProvider())
+            {
+                rngServiceProvider.GetBytes(temp);
+            }
             temp.CopyTo(buf, 0);
         }
 
         public static uint RandUInt32()
         {
             var temp = new byte[4];
-            var rngServiceProvider = new RNGCryptoServiceProvider();
-            rngServiceProvider.GetBytes(temp);
+            using (var rngServiceProvider = new RNGCryptoServiceProvider())
+            {
+                rngServiceProvider.GetBytes(temp);
+            }
             return BitConverter.ToUInt32(temp, 0);
         }
 
