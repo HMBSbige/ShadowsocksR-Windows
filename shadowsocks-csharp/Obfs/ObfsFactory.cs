@@ -8,7 +8,7 @@ namespace Shadowsocks.Obfs
     {
         private static Dictionary<string, Type> _registeredObfs;
 
-        private static Type[] _constructorTypes = new Type[] { typeof(string) };
+        private static Type[] _constructorTypes = { typeof(string) };
 
         static ObfsFactory()
         {

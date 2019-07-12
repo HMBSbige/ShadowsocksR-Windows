@@ -1,15 +1,15 @@
-﻿using Shadowsocks.Controller;
-using Shadowsocks.Encryption;
-using Shadowsocks.Encryption.Stream;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using Shadowsocks.Controller;
+using Shadowsocks.Encryption;
+using Shadowsocks.Encryption.Stream;
 
 namespace Shadowsocks.Obfs
 {
     class xorshift128plus
     {
-        protected UInt64 v0, v1;
+        protected ulong v0, v1;
         protected int init_loop;
 
         public xorshift128plus(int init_loop_ = 4)
@@ -18,10 +18,10 @@ namespace Shadowsocks.Obfs
             init_loop = init_loop_;
         }
 
-        public UInt64 next()
+        public ulong next()
         {
-            UInt64 x = v0;
-            UInt64 y = v1;
+            ulong x = v0;
+            ulong y = v1;
             v0 = y;
             x ^= x << 23;
             x ^= (y ^ (x >> 17) ^ (y >> 26));
@@ -71,7 +71,7 @@ namespace Shadowsocks.Obfs
         }
 
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
-            {"auth_chain_a", new int[]{1, 0, 1}},
+            {"auth_chain_a", new[]{1, 0, 1}}
         };
 
         protected bool has_sent_header;
@@ -213,7 +213,7 @@ namespace Shadowsocks.Obfs
             }
         }
 
-        public virtual void OnInitAuthData(UInt64 unixTimestamp)
+        public virtual void OnInitAuthData(ulong unixTimestamp)
         {
 
         }
@@ -222,7 +222,7 @@ namespace Shadowsocks.Obfs
         {
             const int authhead_len = 4 + 8 + 4 + 16 + 4;
             byte[] encrypt = new byte[24];
-            AuthDataAesChain authData = this.Server.data as AuthDataAesChain;
+            AuthDataAesChain authData = Server.data as AuthDataAesChain;
 
             lock (authData)
             {
@@ -234,7 +234,7 @@ namespace Shadowsocks.Obfs
                 {
                     authData.clientID = new byte[4];
                     g_random.GetBytes(authData.clientID);
-                    authData.connectionID = (UInt32)BitConverter.ToInt32(authData.clientID, 0) % 0xFFFFFD;
+                    authData.connectionID = (uint)BitConverter.ToInt32(authData.clientID, 0) % 0xFFFFFD;
                 }
                 authData.connectionID += 1;
                 Array.Copy(authData.clientID, 0, encrypt, 4, 4);
@@ -247,8 +247,8 @@ namespace Shadowsocks.Obfs
             Server.iv.CopyTo(key, 0);
             Server.key.CopyTo(key, Server.iv.Length);
 
-            UInt64 utc_time_second = (UInt64)Math.Floor(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
-            UInt32 utc_time = (UInt32)(utc_time_second);
+            ulong utc_time_second = (ulong)Math.Floor(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
+            uint utc_time = (uint)(utc_time_second);
             Array.Copy(BitConverter.GetBytes(utc_time), 0, encrypt, 0, 4);
             OnInitAuthData(utc_time_second);
 
@@ -294,7 +294,7 @@ namespace Shadowsocks.Obfs
 
                 byte[] encrypt_key = user_key;
 
-                var encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("aes-128-cbc", System.Convert.ToBase64String(encrypt_key) + SALT);
+                var encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("aes-128-cbc", Convert.ToBase64String(encrypt_key) + SALT);
                 int enc_outlen;
 
                 encryptor.SetIV(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
@@ -311,7 +311,7 @@ namespace Shadowsocks.Obfs
                 Array.Copy(md5data, 0, encrypt, 20, 4);
             }
             encrypt.CopyTo(outdata, 12);
-            encryptor = EncryptorFactory.GetEncryptor("rc4", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(last_client_hash, 0, 16));
+            encryptor = EncryptorFactory.GetEncryptor("rc4", Convert.ToBase64String(user_key) + Convert.ToBase64String(last_client_hash, 0, 16));
 
             // combine first chunk
             {
@@ -336,7 +336,8 @@ namespace Shadowsocks.Obfs
             {
                 return null;
             }
-            else if (data == send_buffer)
+
+            if (data == send_buffer)
             {
                 datalength = send_buffer.Length;
                 send_buffer = null;
@@ -347,14 +348,12 @@ namespace Shadowsocks.Obfs
                 {
                     return outdata;
                 }
-                else
-                {
-                    Array.Resize(ref send_buffer, send_buffer.Length + datalength);
-                    Array.Copy(data, 0, send_buffer, send_buffer.Length - datalength, datalength);
-                    data = send_buffer;
-                    datalength = send_buffer.Length;
-                    send_buffer = null;
-                }
+
+                Array.Resize(ref send_buffer, send_buffer.Length + datalength);
+                Array.Copy(data, 0, send_buffer, send_buffer.Length - datalength, datalength);
+                data = send_buffer;
+                datalength = send_buffer.Length;
+                send_buffer = null;
             }
             int unit_len = Server.tcp_mss - Server.overhead;
             int ogn_datalength = datalength;
@@ -522,7 +521,7 @@ namespace Shadowsocks.Obfs
             byte[] rand_data = new byte[rand_len];
             random.NextBytes(rand_data);
             outlength = datalength + rand_len + 8;
-            encryptor = EncryptorFactory.GetEncryptor("rc4", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(md5data, 0, 16));
+            encryptor = EncryptorFactory.GetEncryptor("rc4", Convert.ToBase64String(user_key) + Convert.ToBase64String(md5data, 0, 16));
             encryptor.Encrypt(plaindata, datalength, outdata, out datalength);
             rand_data.CopyTo(outdata, datalength);
             auth_data.CopyTo(outdata, outlength - 8);
@@ -558,7 +557,7 @@ namespace Shadowsocks.Obfs
             md5data = md5.ComputeHash(plaindata, datalength - 8, 7);
             int rand_len = UdpGetRandLen(random_server, md5data);
             outlength = datalength - rand_len - 8;
-            encryptor = EncryptorFactory.GetEncryptor("rc4", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(md5data, 0, 16));
+            encryptor = EncryptorFactory.GetEncryptor("rc4", Convert.ToBase64String(user_key) + Convert.ToBase64String(md5data, 0, 16));
             encryptor.Decrypt(plaindata, outlength, plaindata, out outlength);
             return plaindata;
         }
@@ -573,11 +572,11 @@ namespace Shadowsocks.Obfs
         }
 
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
-            {"auth_chain_b", new int[]{1, 0, 1}},
+            {"auth_chain_b", new[]{1, 0, 1}}
         };
 
-        protected int[] data_size_list = null;
-        protected int[] data_size_list2 = null;
+        protected int[] data_size_list;
+        protected int[] data_size_list2;
 
         public static new List<string> SupportedObfs()
         {
@@ -685,10 +684,10 @@ namespace Shadowsocks.Obfs
         }
 
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
-            {"auth_chain_c", new int[]{1, 0, 1}},
+            {"auth_chain_c", new[]{1, 0, 1}}
         };
 
-        protected int[] data_size_list0 = null;
+        protected int[] data_size_list0;
 
         public static new List<string> SupportedObfs()
         {
@@ -755,7 +754,7 @@ namespace Shadowsocks.Obfs
         }
 
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
-            {"auth_chain_d", new int[]{1, 0, 1}},
+            {"auth_chain_d", new[]{1, 0, 1}}
         };
 
         public static new List<string> SupportedObfs()
@@ -829,7 +828,7 @@ namespace Shadowsocks.Obfs
         }
 
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
-            {"auth_chain_e", new int[]{1, 0, 1}},
+            {"auth_chain_e", new[]{1, 0, 1}}
         };
 
         public static new List<string> SupportedObfs()
@@ -867,7 +866,7 @@ namespace Shadowsocks.Obfs
         }
 
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
-            {"auth_chain_f", new int[]{1, 0, 1}},
+            {"auth_chain_f", new[]{1, 0, 1}}
         };
 
         public static new List<string> SupportedObfs()
@@ -880,8 +879,8 @@ namespace Shadowsocks.Obfs
             return _obfs;
         }
 
-        protected UInt64 key_change_interval = 60 * 60 * 24;    // a day by second
-        protected UInt64 key_change_datetime_key;
+        protected ulong key_change_interval = 60 * 60 * 24;    // a day by second
+        protected ulong key_change_datetime_key;
         protected List<byte> key_change_datetime_key_bytes = new List<byte>();
 
         protected override void InitDataSizeList()
@@ -920,15 +919,15 @@ namespace Shadowsocks.Obfs
                 {
                     protocalParams = protocalParams.Split('#')[1];
                 }
-                UInt64 interval;
-                if (UInt64.TryParse(protocalParams, out interval))
+                ulong interval;
+                if (ulong.TryParse(protocalParams, out interval))
                 {
                     key_change_interval = interval;
                 }
             }
         }
 
-        public override void OnInitAuthData(UInt64 unixTimestamp)
+        public override void OnInitAuthData(ulong unixTimestamp)
         {
             key_change_datetime_key = unixTimestamp / key_change_interval;
             for (int i = 7; i > -1; --i)

@@ -62,8 +62,6 @@ Global Settings=選項設置
 
 # Config Form
 
-&Add=添加(&A)
-&Delete=刪除(&D)
 Up=上移
 Down=下移
 Version=版本
@@ -71,7 +69,7 @@ Any=任意地址
 Local=本機地址
 New server=未配置的伺服器
 
-Server=伺服器(截圖打碼)
+Server=伺服器
 Server IP=伺服器 IP
 Server Port=伺服器連接埠
 UDP Port=UDP連接埠
@@ -126,35 +124,40 @@ Reconnect Times=重連次數
 ConnectTimeout=連接超時
 TTL=空閒斷開秒數
 
+Misc=雜項
+
 OK=確定
 Cancel=取消
+Apply=套用
 
 # ServerLog Form
 
 ServerLog=伺服器記錄
-&Control=操作(&C)
-&Disconnect direct connections=斷開直連連接(&D)
-Disconnect &All=斷開當前所有連接(&A)
-Clear &MaxSpeed=重置歷史最高(&M)
-&Clear=清空(&C)
-Clear &Selected Total=清空選中節點歷史流量(&S)
-Clear &Total=清空所有歷史流量(&T)
-Port &out=導出(&O)
+_Control=操作(_C)
+_Disconnect direct connections=斷開直連連接(_D)
+Disconnect _All=斷開當前所有連接(_A)
+Clear _MaxSpeed=重置歷史最高(_M)
+_Clear=清空(_C)
+Clear _Selected Total=清空選中節點歷史流量(_S)
+Clear _Total=清空所有歷史流量(_T)
+Port _out=導出(_O)
 Copy current link=複製選中連結
 Copy current group links=複製選中組連結
 Copy all enable links=複製所有開啟節點連結
 Copy all links=複製所有節點連結
-&Window=窗口(&W)
-Auto &size=自動調整大小(&S)
-Always On &Top=窗口置頂(&T)
+_Window=窗口(_W)
+Auto _size=自動調整大小(_S)
+Always On _Top=窗口置頂(_T)
 Total Connect=總連接
 Enable=開關
+Enabled=已啟用
+Disabled=已停用
 Connecting=連接
 Latency=延遲
-Avg DSpeed=下載
-Max DSpeed=最高
-Avg UpSpeed=上傳
-Max UpSpeed=最高
+Avg DSpeed=平均下載速度
+Max DSpeed=最高下載速度
+Avg UpSpeed=平均上傳速度
+Max UpSpeed=最高上傳速度
 Upload=總上傳
 Dload=總下載
 DloadRaw=實下載
@@ -164,17 +167,19 @@ Empty Response=空連
 Error Percent=出錯比例
 Continuous=連錯
 Version=版本
+Experimental=實驗性功能
+Test selected server=測試選定的伺服器
 
 # Global Log Form
 
-&File=文件(&F)
-Clear &log=清空日誌(&L)
-Show in &Explorer=在資源管理器中顯示(&E)
-&Close=關閉(&C)
-&View=視圖(&V)
-&Font...=字體設置(&F)...
-&Wrap Text=自動換行(&W)
-&Always on top=置於頂層(&A)
+_File=文件(_F)
+Clear _log=清空日誌(_L)
+Show in _Explorer=在資源管理器中顯示(_E)
+_Close=關閉(_C)
+_View=視圖(_V)
+_Font...=字體設置(_F)...
+_Wrap Text=自動換行(_W)
+_Always on top=置於頂層(_A)
 Log Viewer=日誌查看器
 
 # QRCode Form
@@ -195,6 +200,9 @@ Parse gui-config.json error, maybe require password to decrypt=解析 gui-config
 # ResetPassword Form
 
 ResetPassword=重設密碼
+Old password=舊密碼
+New password=新密碼
+Confirm new password=確認新密碼
 
 # PortSettingsForm Form
 
@@ -222,6 +230,8 @@ URL=網址
 Group name=組名
 Last Update=最近更新
 Auto update=自動更新
+Add=新增
+Delete=刪除
 
 # Messages
 

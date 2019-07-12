@@ -1,0 +1,135 @@
+﻿<Window x:Class="Shadowsocks.View.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:Shadowsocks.Controls"
+        mc:Ignorable="d"
+        Title="SettingsWindow" Height="500" Width="750" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" ResizeMode="NoResize" Loaded="Window_Loaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <GroupBox Header="Remote proxy" Grid.Row="0" Grid.Column="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <CheckBox x:Name="SocksProxyCheckBox" Grid.Row="0" Grid.Column="0" Content="Proxy On" VerticalAlignment="Center" Margin="0,0,10,5" />
+                <CheckBox x:Name="PacProxyCheckBox" Grid.Row="0" Grid.Column="1" Content="PAC &quot;direct&quot; return this proxy" VerticalAlignment="Center" Margin="0,0,10,5" />
+                <ComboBox x:Name="ProxyTypeComboBox" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Height="23.24" />
+                <Label Grid.Row="2" Grid.Column="0" Content="Server IP" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="3" Grid.Column="0" Content="Server Port" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="4" Grid.Column="0" Content="Username" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="5" Grid.Column="0" Content="Password" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="6" Grid.Column="0" Content="User Agent" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <TextBox x:Name="SocksServerTextBox" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Height="23.24" VerticalContentAlignment="Center" />
+                <controls:NumberUpDown x:Name="SocksPortTextBox" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Height="23.24" MinNum="1" MaxNum="65535" />
+                <TextBox x:Name="SocksUserTextBox" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Height="23.24" VerticalContentAlignment="Center" />
+                <PasswordBox x:Name="SocksPassPasswordBox" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" Height="23.24" VerticalContentAlignment="Center" />
+                <TextBox x:Name="SocksUserAgentTextBox" Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" Height="23.24" VerticalContentAlignment="Center" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Local proxy" Grid.Row="1" Grid.Column="0" >
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <CheckBox x:Name="ShareOverLanCheckBox" Grid.Row="0" Grid.Column="1" Content="Allow Clients from LAN" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="1" Grid.Column="0" Content="Local Port" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="2" Grid.Column="0" Content="Username" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="3" Grid.Column="0" Content="Password" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <controls:NumberUpDown x:Name="ProxyPortNumber" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Height="23.24" MinNum="1" MaxNum="65535" />
+                <TextBox x:Name="AuthUserTextBox" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Height="23.24" VerticalContentAlignment="Center" />
+                <PasswordBox x:Name="AuthPassPasswordBox" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Height="23.24" VerticalContentAlignment="Center" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Misc" Grid.Row="0" Grid.Column="1" Margin="10,0,10,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="3" Grid.Column="0" Content="Balance" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="6" Grid.Column="0" Content="Logging" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <CheckBox x:Name="AutoStartupCheckBox" Grid.Row="0" Grid.Column="1" Content="Start on Boot" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <CheckBox x:Name="SwitchAutoCloseAllCheckBox" Grid.Row="1" Grid.Column="1" Content="Switch auto close TCP links" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <CheckBox x:Name="BalanceCheckBox" Grid.Row="2" Grid.Column="1" Content="Load balance" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <CheckBox x:Name="BalanceInGroupCheckBox" Grid.Row="4" Grid.Column="1" Content="Balance in group" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <CheckBox x:Name="AutoBanCheckBox" Grid.Row="5" Grid.Column="1" Content="AutoBan" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <CheckBox x:Name="LogEnableCheckBox" Grid.Row="6" Grid.Column="1" Content="Enable Log" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <ComboBox x:Name="BalanceComboBox" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Height="23.24" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Misc" Grid.Row="1" Grid.Column="1" Margin="10,0,10,0">
+            <Grid >
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Row="0" Grid.Column="1" Content="Set Default" Click="DefaultButton_Click"/>
+                <Label Grid.Row="1" Grid.Column="0" Content="DNS" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="2" Grid.Column="0" Content="Local Dns" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="3" Grid.Column="0" Content="Reconnect Times" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="4" Grid.Column="0" Content="ConnectTimeout" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <Label Grid.Row="5" Grid.Column="0" Content="TTL" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <TextBox x:Name="DnsTextBox" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Height="23.24" VerticalContentAlignment="Center" />
+                <TextBox x:Name="LocalDnsTextBox" Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Height="23.24" VerticalContentAlignment="Center" />
+                <controls:NumberUpDown x:Name="ReconnectNumber" Grid.Row="3" Grid.Column="1" VerticalAlignment="Center" Height="23.24" MinNum="0" MaxNum="20" />
+                <controls:NumberUpDown x:Name="TimeoutNumber" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Height="23.24" MinNum="0" MaxNum="60" />
+                <controls:NumberUpDown x:Name="TtlNumber" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" Height="23.24" MinNum="0" MaxNum="600" />
+            </Grid>
+        </GroupBox>
+        <Grid Grid.Row="2" Grid.Column="1" Margin="10,10,10,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="OK" FontSize="14" Click="OkButton_Click"></Button>
+            <Button Grid.Column="1" Content="Cancel" FontSize="14" Click="CancelButton_Click"></Button>
+            <Button x:Name="ApplyButton" Grid.Column="2" Content="Apply" FontSize="14" Click="ApplyButton_Click"></Button>
+        </Grid>
+    </Grid>
+</Window>

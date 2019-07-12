@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Shadowsocks.Model
 {
@@ -18,7 +16,7 @@ namespace Shadowsocks.Model
         }
 
         public IPAddressCmp(string ip)
-            : base(IPAddressCmp.FromString(ip).GetAddressBytes())
+            : base(FromString(ip).GetAddressBytes())
         {
         }
 
@@ -38,12 +36,12 @@ namespace Shadowsocks.Model
             {
                 if (b1[i] < b2[i])
                     return -1;
-                else if (b1[i] > b2[i])
+                if (b1[i] > b2[i])
                     return 1;
             }
             if (b1.Length < b2.Length)
                 return -1;
-            else if (b1.Length > b2.Length)
+            if (b1.Length > b2.Length)
                 return 1;
             return 0;
         }

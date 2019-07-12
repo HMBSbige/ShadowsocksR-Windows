@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Shadowsocks.Controller;
 
 namespace Shadowsocks.Model
@@ -71,7 +70,7 @@ namespace Shadowsocks.Model
                     _key_2_time[key] = t;
                     return _store[key];
                 }
-                return default(V);
+                return default;
             }
         }
 
@@ -132,7 +131,7 @@ namespace Shadowsocks.Model
                         _key_2_time.Remove(p.Value);
                         _time_2_key.Remove(p.Key);
                         _store.Remove(p.Value);
-                        Logging.Debug("sweep [" + p.Key.ToString() + "]: " + p.Value.ToString());
+                        Logging.Debug("sweep [" + p.Key + "]: " + p.Value);
                         sweep += 1;
                         break;
                     }
@@ -141,7 +140,7 @@ namespace Shadowsocks.Model
                 }
                 if (sweep > 0)
                 {
-                    Logging.Debug("sweep " + sweep.ToString() + " items");
+                    Logging.Debug("sweep " + sweep + " items");
                 }
             }
         }

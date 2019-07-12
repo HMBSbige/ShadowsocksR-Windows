@@ -39,7 +39,7 @@ namespace Shadowsocks.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Shadowsocks.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("shadowsocks.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -125,12 +125,13 @@ namespace Shadowsocks.Properties {
         
         /// <summary>
         ///   查找类似 listen-address __PRIVOXY_BIND_IP__:__PRIVOXY_BIND_PORT__
+        ///toggle 0
+        ///logfile ShadowsocksR.log
         ///show-on-task-bar 0
         ///activity-animation 0
         ///forward-socks5 / 127.0.0.1:__SOCKS_PORT__ .
+        ///max-client-connections 2048
         ///hide-console
-        ///__BYPASS_ACTION__
-        ///
         /// 的本地化字符串。
         /// </summary>
         internal static string privoxy_conf {

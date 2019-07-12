@@ -1,12 +1,13 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Windows.Forms;
+﻿using System;
+using System.IO;
+using Microsoft.Win32;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller
 {
     class AutoStartup
     {
-        static string Key = "ShadowsocksR_" + Application.StartupPath.GetHashCode();
+        static string Key = "ShadowsocksR_" + Directory.GetCurrentDirectory().GetDeterministicHashCode();
         static string RegistryRunPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
 
         public static bool Set(bool enabled)
@@ -14,8 +15,8 @@ namespace Shadowsocks.Controller
             RegistryKey runKey = null;
             try
             {
-                string path = Util.Utils.GetExecutablePath();
-                runKey = Util.Utils.OpenRegKey(RegistryRunPath, true);
+                string path = Utils.GetExecutablePath();
+                runKey = Utils.OpenRegKey(RegistryRunPath, true);
                 if (enabled)
                 {
                     runKey.SetValue(Key, path);
@@ -30,7 +31,7 @@ namespace Shadowsocks.Controller
             catch //(Exception e)
             {
                 //Logging.LogUsefulException(e);
-                return Util.Utils.RunAsAdmin("--setautorun") == 0;
+                return Utils.RunAsAdmin("--setautorun") == 0;
             }
             finally
             {
@@ -54,8 +55,8 @@ namespace Shadowsocks.Controller
             RegistryKey runKey = null;
             try
             {
-                string path = Util.Utils.GetExecutablePath();
-                runKey = Util.Utils.OpenRegKey(RegistryRunPath, true);
+                string path = Utils.GetExecutablePath();
+                runKey = Utils.OpenRegKey(RegistryRunPath, true);
                 if (enabled)
                 {
                     runKey.SetValue(Key, path);
@@ -93,7 +94,7 @@ namespace Shadowsocks.Controller
             RegistryKey runKey = null;
             try
             {
-                runKey = Util.Utils.OpenRegKey(RegistryRunPath, false);
+                runKey = Utils.OpenRegKey(RegistryRunPath, false);
                 string[] runList = runKey.GetValueNames();
                 runKey.Close();
                 foreach (string item in runList)

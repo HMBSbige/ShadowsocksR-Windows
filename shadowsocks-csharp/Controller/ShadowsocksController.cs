@@ -1,11 +1,13 @@
 ﻿using Shadowsocks.Model;
 using Shadowsocks.Proxy;
+using Shadowsocks.Proxy.SystemProxy;
 using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Shadowsocks.Controller
 {
@@ -14,7 +16,7 @@ namespace Shadowsocks.Controller
         NoModify,
         Direct,
         Pac,
-        Global,
+        Global
     }
 
     public class ShadowsocksController
@@ -29,10 +31,8 @@ namespace Shadowsocks.Controller
         private PACServer _pacServer;
         private Configuration _config;
         private ServerTransferTotal _transfer;
-        public IPRangeSet _rangeSet;
-#if !_CONSOLE
+        private IPRangeSet _rangeSet;
         private HttpProxyRunner privoxyRunner;
-#endif
         private GFWListUpdater gfwListUpdater;
         private ChnDomainsAndIPUpdater chnDomainsAndIPUpdater;
         private bool stopped;
@@ -69,7 +69,7 @@ namespace Shadowsocks.Controller
                 if (_transfer.servers.TryGetValue(server.server, out var st))
                 {
                     var log = new ServerSpeedLog(st.totalUploadBytes, st.totalDownloadBytes);
-                    server.SetServerSpeedLog(log);
+                    server.SpeedLog = log;
                 }
             }
 
@@ -107,11 +107,11 @@ namespace Shadowsocks.Controller
             return _config;
         }
 
-        private int FindFirstMatchServer(Server server, List<Server> servers)
+        private int FindFirstMatchServer(Server server, IReadOnlyList<Server> servers)
         {
             for (var i = 0; i < servers.Count; ++i)
             {
-                if (server.isMatchServer(servers[i]))
+                if (server.IsMatchServer(servers[i]))
                 {
                     return i;
                 }
@@ -119,7 +119,7 @@ namespace Shadowsocks.Controller
             return -1;
         }
 
-        public void AppendConfiguration(Configuration mergeConfig, List<Server> servers)
+        public void AppendConfiguration(Configuration mergeConfig, IReadOnlyList<Server> servers)
         {
             if (servers != null)
             {
@@ -133,19 +133,19 @@ namespace Shadowsocks.Controller
             }
         }
 
-        public List<Server> MergeConfiguration(Configuration mergeConfig, List<Server> servers)
+        public List<Server> MergeConfiguration(Configuration mergeConfig, IReadOnlyList<Server> servers)
         {
             var missingServers = new List<Server>();
             if (servers != null)
             {
-                for (var j = 0; j < servers.Count; ++j)
+                foreach (var server in servers)
                 {
-                    var i = FindFirstMatchServer(servers[j], mergeConfig.configs);
+                    var i = FindFirstMatchServer(server, mergeConfig.configs);
                     if (i != -1)
                     {
-                        var enable = servers[j].enable;
-                        servers[j].CopyServer(mergeConfig.configs[i]);
-                        servers[j].enable = enable;
+                        var enable = server.Enable;
+                        server.CopyServer(mergeConfig.configs[i]);
+                        server.Enable = enable;
                     }
                 }
             }
@@ -173,7 +173,7 @@ namespace Shadowsocks.Controller
         public void MergeConfiguration(Configuration mergeConfig)
         {
             AppendConfiguration(_config, mergeConfig.configs);
-            SaveConfig(_config);
+            Save();
         }
 
         public bool SaveServersConfig(string config)
@@ -223,7 +223,7 @@ namespace Shadowsocks.Controller
                             index = _config.configs.Count;
                         _config.configs.Insert(index, server);
                     }
-                    SaveConfig(_config);
+                    Save();
                     return true;
                 }
                 catch (Exception e)
@@ -232,41 +232,44 @@ namespace Shadowsocks.Controller
                     return false;
                 }
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         public void ToggleMode(ProxyMode mode)
         {
             _config.sysProxyMode = (int)mode;
-            SaveConfig(_config);
+            Save();
             ToggleModeChanged?.Invoke(this, new EventArgs());
         }
 
         public void ToggleRuleMode(int mode)
         {
             _config.proxyRuleMode = mode;
-            SaveConfig(_config);
+            Save();
             ToggleRuleModeChanged?.Invoke(this, new EventArgs());
         }
 
         public void ToggleSelectRandom(bool enabled)
         {
             _config.random = enabled;
-            SaveConfig(_config);
+            Save();
         }
 
         public void ToggleSameHostForSameTargetRandom(bool enabled)
         {
             _config.sameHostForSameTarget = enabled;
-            SaveConfig(_config);
+            Save();
         }
 
         public void SelectServerIndex(int index)
         {
             _config.index = index;
+            Save();
+        }
+
+        public void Save()
+        {
             SaveConfig(_config);
         }
 
@@ -288,13 +291,11 @@ namespace Shadowsocks.Controller
             }
 
             _listener?.Stop();
-#if !_CONSOLE
             privoxyRunner?.Stop();
             if (_config.sysProxyMode != (int)ProxyMode.NoModify && _config.sysProxyMode != (int)ProxyMode.Direct)
             {
-                SystemProxy.Update(_config, true);
+                SystemProxy.Update(_config, true, null);
             }
-#endif
             ServerTransferTotal.Save(_transfer);
         }
 
@@ -307,7 +308,7 @@ namespace Shadowsocks.Controller
                 {
                     if (_transfer.servers.ContainsKey(server.server))
                     {
-                        server.ServerSpeedLog().ClearTrans();
+                        server.SpeedLog.ClearTrans();
                     }
                 }
             }
@@ -338,7 +339,7 @@ namespace Shadowsocks.Controller
             gfwListUpdater?.UpdateOnlinePAC(_config, url);
         }
 
-        protected void Reload()
+        private void Reload()
         {
             if (_port_map_listener != null)
             {
@@ -351,18 +352,18 @@ namespace Shadowsocks.Controller
             // some logic in configuration updated the config when saving, we need to read it again
             _config = MergeGetConfiguration(_config);
             _config.FlushPortMapCache();
+            Logging.save_to_file = _config.logEnable;
+            Logging.OpenLogFile();
             ReloadIPRange();
 
             var hostMap = new HostMap();
             hostMap.LoadHostFile();
             HostMap.Instance().Clear(hostMap);
 
-#if !_CONSOLE
             if (privoxyRunner == null)
             {
                 privoxyRunner = new HttpProxyRunner();
             }
-#endif
             if (_pacServer == null)
             {
                 _pacServer = new PACServer();
@@ -391,10 +392,8 @@ namespace Shadowsocks.Controller
             // http://stackoverflow.com/questions/10235093/socket-doesnt-close-after-application-exits-if-a-launched-process-is-open
             try
             {
-#if !_CONSOLE
                 privoxyRunner.Stop();
                 privoxyRunner.Start(_config);
-#endif
 
                 var local = new Local(_config, _transfer, _rangeSet);
                 var services = new List<Listener.Service>
@@ -402,9 +401,7 @@ namespace Shadowsocks.Controller
                     local,
                     _pacServer,
                     new APIServer(this, _config),
-#if !_CONSOLE
                     new HttpPortForwarder(privoxyRunner.RunningPort, _config)
-#endif
                 };
                 _listener = new Listener(services);
                 _listener.Start(_config, 0);
@@ -476,12 +473,10 @@ namespace Shadowsocks.Controller
 
         private void UpdateSystemProxy()
         {
-#if !_CONSOLE
             if (_config.sysProxyMode != (int)ProxyMode.NoModify)
             {
-                SystemProxy.Update(_config, false);
+                SystemProxy.Update(_config, false, _pacServer);
             }
-#endif
         }
 
         private void pacServer_PACFileChanged(object sender, EventArgs e)
@@ -533,11 +528,15 @@ namespace Shadowsocks.Controller
         public void DisconnectAllConnections()
         {
             var config = GetCurrentConfiguration();
-            for (var id = 0; id < config.configs.Count; ++id)
+            foreach (var server in config.configs)
             {
-                var server = config.configs[id];
                 server.GetConnections().CloseAll();
             }
+        }
+
+        public void CopyPacUrl()
+        {
+            Clipboard.SetDataObject(_pacServer.PacUrl);
         }
 
         #region Memory Management

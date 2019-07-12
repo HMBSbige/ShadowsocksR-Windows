@@ -8,9 +8,9 @@ namespace Shadowsocks.Proxy
 {
     class HttpPraser
     {
-        public bool httpProxy = false;
+        public bool httpProxy;
         public byte[] httpRequestBuffer;
-        public int httpContentLength = 0;
+        public int httpContentLength;
         //public byte[] lastContentBuffer;
         public string httpAuthUser;
         public string httpAuthPass;
@@ -77,9 +77,9 @@ namespace Shadowsocks.Proxy
             }
             if (url.StartsWith(":"))
             {
-                if (url.StartsWith(":" + port.ToString()))
+                if (url.StartsWith(":" + port))
                 {
-                    url = url.Substring((":" + port.ToString()).Length);
+                    url = url.Substring((":" + port).Length);
                 }
             }
             if (!url.StartsWith("/"))
@@ -113,7 +113,7 @@ namespace Shadowsocks.Proxy
                     remoteHeaderSendBuffer = new byte[2 + host.Length + 2];
                     remoteHeaderSendBuffer[0] = 3;
                     remoteHeaderSendBuffer[1] = (byte)host.Length;
-                    System.Text.Encoding.UTF8.GetBytes(host).CopyTo(remoteHeaderSendBuffer, 2);
+                    Encoding.UTF8.GetBytes(host).CopyTo(remoteHeaderSendBuffer, 2);
                 }
                 else
                 {
@@ -146,17 +146,15 @@ namespace Shadowsocks.Proxy
                     Packet = new byte[0];
                     return -1;
                 }
-                else
-                {
-                    int len = PacketLength - httpContentLength;
-                    byte[] nextbuffer = new byte[len];
-                    Array.Copy(Packet, httpContentLength, nextbuffer, 0, len);
-                    Packet = nextbuffer;
-                    PacketLength -= httpContentLength;
-                    httpContentLength = 0;
-                }
+
+                int len = PacketLength - httpContentLength;
+                byte[] nextbuffer = new byte[len];
+                Array.Copy(Packet, httpContentLength, nextbuffer, 0, len);
+                Packet = nextbuffer;
+                PacketLength -= httpContentLength;
+                httpContentLength = 0;
             }
-            byte[] block = new byte[] { (byte)'\r', (byte)'\n', (byte)'\r', (byte)'\n' };
+            byte[] block = { (byte)'\r', (byte)'\n', (byte)'\r', (byte)'\n' };
             int pos;
             if (httpRequestBuffer == null)
             {
@@ -174,11 +172,11 @@ namespace Shadowsocks.Proxy
         protected Dictionary<string, string> ParseHttpHeader(string header)
         {
             Dictionary<string, string> header_dict = new Dictionary<string, string>();
-            string[] lines = header.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] lines = header.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
             string[] cmdItems = lines[0].Split(new[] { ' ' }, 3);
             for (int index = 1; index < lines.Length; ++index)
             {
-                string[] parts = lines[index].Split(new string[] { ": " }, 2, StringSplitOptions.RemoveEmptyEntries);
+                string[] parts = lines[index].Split(new[] { ": " }, 2, StringSplitOptions.RemoveEmptyEntries);
                 if (parts.Length > 1)
                 {
                     header_dict[parts[0]] = parts[1];
@@ -215,21 +213,21 @@ namespace Shadowsocks.Proxy
             {
                 return 1;
             }
-            string data = System.Text.Encoding.UTF8.GetString(httpRequestBuffer, 0, pos + 4);
+            string data = Encoding.UTF8.GetString(httpRequestBuffer, 0, pos + 4);
             {
                 byte[] nextbuffer = new byte[httpRequestBuffer.Length - (pos + 4)];
                 Array.Copy(httpRequestBuffer, pos + 4, nextbuffer, 0, nextbuffer.Length);
                 httpRequestBuffer = nextbuffer;
             }
             Dictionary<string, string> header_dict = ParseHttpHeader(data);
-            this.httpPort = 80;
+            httpPort = 80;
             if (header_dict["@0"] == "CONNECT")
             {
-                this.httpHost = ParseHostAndPort(header_dict["@1"], ref this.httpPort);
+                httpHost = ParseHostAndPort(header_dict["@1"], ref httpPort);
             }
             else if (header_dict.ContainsKey("Host"))
             {
-                this.httpHost = ParseHostAndPort(header_dict["Host"], ref this.httpPort);
+                httpHost = ParseHostAndPort(header_dict["Host"], ref httpPort);
             }
             else
             {
@@ -239,7 +237,7 @@ namespace Shadowsocks.Proxy
             {
                 httpContentLength = Convert.ToInt32(header_dict["Content-Length"]) + 2;
             }
-            HostToHandshakeBuffer(this.httpHost, this.httpPort, ref remoteHeaderSendBuffer);
+            HostToHandshakeBuffer(httpHost, httpPort, ref remoteHeaderSendBuffer);
             if (redir)
             {
                 if (header_dict.ContainsKey("Proxy-Connection"))
@@ -249,7 +247,7 @@ namespace Shadowsocks.Proxy
                 }
                 string httpRequest = HeaderDictToString(header_dict);
                 int len = remoteHeaderSendBuffer.Length;
-                byte[] httpData = System.Text.Encoding.UTF8.GetBytes(httpRequest);
+                byte[] httpData = Encoding.UTF8.GetBytes(httpRequest);
                 Array.Resize(ref remoteHeaderSendBuffer, len + httpData.Length);
                 httpData.CopyTo(remoteHeaderSendBuffer, len);
                 httpProxy = true;
@@ -263,7 +261,7 @@ namespace Shadowsocks.Proxy
             {
                 string authString = header_dict["Proxy-Authorization"].Substring("Basic ".Length);
                 string authStr = httpAuthUser + ":" + (httpAuthPass ?? "");
-                string httpAuthString = System.Convert.ToBase64String(Encoding.UTF8.GetBytes(authStr));
+                string httpAuthString = Convert.ToBase64String(Encoding.UTF8.GetBytes(authStr));
                 if (httpAuthString == authString)
                 {
                     auth_ok = true;

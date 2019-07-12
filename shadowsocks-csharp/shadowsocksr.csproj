@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net4.8</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+	
+	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyName>ShadowsocksR</AssemblyName>
+    <RootNamespace>Shadowsocks</RootNamespace>
+    <ApplicationIcon>shadowsocks.ico</ApplicationIcon>
+    <StartupObject>Shadowsocks.Program</StartupObject>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <LangVersion>8</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;PROTOCOL_STATISTICS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;PROTOCOL_STATISTICS</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+	<DefineConstants Condition=" $(TargetFramework.StartsWith(netcoreapp)) ">$(DefineConstants);IsDotNetCore</DefineConstants>
+	<DefineConstants Condition=" '$(SelfContained)' == 'true' ">$(DefineConstants);IsSelfContainedDotNetCore</DefineConstants>
+	<DefineConstants Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">$(DefineConstants);Is64Bit</DefineConstants>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Remove="Controls\MaskedTextBox.xaml" />
+    <None Remove="Controls\NumberUpDown.xaml" />
+    <None Remove="View\ConfigWindow.xaml" />
+    <None Remove="View\InputPasswordWindow.xaml" />
+    <None Remove="View\LogWindow.xaml" />
+    <None Remove="View\PortSettingsWindow.xaml" />
+    <None Remove="View\QRCodeSplashWindow.xaml" />
+    <None Remove="View\ResetPassword.xaml" />
+    <None Remove="View\ServerLogWindow.xaml" />
+    <None Remove="View\ShowTextWindow.xaml" />
+    <None Remove="View\SubscribeWindow.xaml" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Costura.Fody" Version="4.0.0" Condition=" '$(SelfContained)' != 'true' " />
+    <PackageReference Include="DnsClient" Version="1.2.0" />
+    <PackageReference Include="Fody" Version="5.0.6" Condition=" '$(SelfContained)' != 'true' ">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.6" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' ">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.IO.Compression" />
+  </ItemGroup>
+
+</Project>

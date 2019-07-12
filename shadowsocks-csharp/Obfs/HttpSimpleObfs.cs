@@ -16,23 +16,21 @@ namespace Shadowsocks.Obfs
         }
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
                 //modify original protocol, wrap protocol, obfs param
-                {"http_simple", new int[] {0, 1, 1}},
-                {"http_post", new int[] {0, 1, 1}},
-                {"random_head", new int[] {0, 1, 0}},
+                {"http_simple", new[] {0, 1, 1}},
+                {"http_post", new[] {0, 1, 1}},
+                {"random_head", new[] {0, 1, 0}}
         };
-        private static string[] _request_path = new string[]
-        {
+        private static string[] _request_path = {
             "", "",
             "login.php?redir=", "",
             "register.php?code=", "",
             "?keyword=", "",
             "search?src=typd&q=", "&lang=en",
             "s?ie=utf-8&f=8&rsv_bp=1&rsv_idx=1&ch=&bar=&wd=", "&rn=",
-            "post.php?id=", "&goto=view.php",
+            "post.php?id=", "&goto=view.php"
         };
 
-        private static string[] _request_useragent = new string[]
-        {
+        private static string[] _request_useragent = {
             "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0",
             "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:40.0) Gecko/20100101 Firefox/44.0",
             "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36",
@@ -44,7 +42,7 @@ namespace Shadowsocks.Obfs
             "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko",
             "Mozilla/5.0 (Linux; Android 4.4; Nexus 5 Build/BuildID) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/30.0.0.0 Mobile Safari/537.36",
             "Mozilla/5.0 (iPad; CPU OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3",
-            "Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3",
+            "Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3"
         };
         private static int _useragent_index = new Random().Next(_request_useragent.Length);
 
@@ -94,116 +92,114 @@ namespace Shadowsocks.Obfs
                 outlength = datalength;
                 return encryptdata;
             }
-            else
-            {
-                byte[] outdata = new byte[datalength + 4096];
-                byte[] headdata;
-                if (Method == "random_head")
-                {
-                    if (has_sent_header)
-                    {
-                        outlength = 0;
-                        if (datalength > 0)
-                        {
-                            byte[] data = new byte[datalength];
-                            Array.Copy(encryptdata, 0, data, 0, datalength);
-                            data_buffer.Add(data);
-                        }
-                        else
-                        {
-                            foreach (byte[] data in data_buffer)
-                            {
-                                Array.Copy(data, 0, outdata, outlength, data.Length);
-                                SentLength += data.Length;
-                                outlength += data.Length;
-                            }
-                            data_buffer.Clear();
-                            raw_trans_sent = true;
-                        }
-                    }
-                    else
-                    {
-                        int size = random.Next(96) + 8;
-                        byte[] rnd = new byte[size];
-                        random.NextBytes(rnd);
-                        Util.CRC32.SetCRC32(rnd);
-                        rnd.CopyTo(outdata, 0);
-                        outlength = rnd.Length;
 
+            byte[] outdata = new byte[datalength + 4096];
+            byte[] headdata;
+            if (Method == "random_head")
+            {
+                if (has_sent_header)
+                {
+                    outlength = 0;
+                    if (datalength > 0)
+                    {
                         byte[] data = new byte[datalength];
                         Array.Copy(encryptdata, 0, data, 0, datalength);
                         data_buffer.Add(data);
                     }
-                }
-                else if (Method == "http_simple" || Method == "http_post")
-                {
-                    int headsize = Server.iv.Length + Server.head_len;
-                    if (datalength - headsize > 64)
-                    {
-                        headdata = new byte[headsize + random.Next(0, 64)];
-                    }
                     else
                     {
-                        headdata = new byte[datalength];
-                    }
-                    Array.Copy(encryptdata, 0, headdata, 0, headdata.Length);
-                    int request_path_index = new Random().Next(_request_path.Length / 2) * 2;
-                    string host = Server.host;
-                    string custom_head = "";
-                    if (Server.param.Length > 0)
-                    {
-                        string[] custom_heads = Server.param.Split(new char[] { '#' }, 2);
-                        string param = Server.param;
-                        if (custom_heads.Length > 1)
+                        foreach (byte[] data in data_buffer)
                         {
-                            custom_head = custom_heads[1];
-                            param = custom_heads[0];
+                            Array.Copy(data, 0, outdata, outlength, data.Length);
+                            SentLength += data.Length;
+                            outlength += data.Length;
                         }
-                        string[] hosts = param.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                        if (hosts != null && hosts.Length > 0)
-                        {
-                            host = hosts[random.Next(hosts.Length)];
-                            host = host.Trim(' ');
-                        }
+                        data_buffer.Clear();
+                        raw_trans_sent = true;
                     }
-                    string http_buf =
-                        (Method == "http_post" ? "POST /" : "GET /") + _request_path[request_path_index] + data2urlencode(headdata, headdata.Length) + _request_path[request_path_index + 1] + " HTTP/1.1\r\n"
-                        + "Host: " + host + (Server.port == 80 ? "" : ":" + Server.port.ToString()) + "\r\n";
-                    if (custom_head.Length > 0)
-                    {
-                        http_buf += custom_head.Replace("\\n", "\r\n") + "\r\n\r\n";
-                    }
-                    else
-                    {
-                        http_buf +=
-                        "User-Agent: " + _request_useragent[_useragent_index] + "\r\n"
-                        + "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n"
-                        + "Accept-Language: en-US,en;q=0.8\r\n"
-                        + "Accept-Encoding: gzip, deflate\r\n"
-                        + (Method == "http_post" ? "Content-Type: multipart/form-data; boundary=" + boundary() + "\r\n" : "")
-                        + "DNT: 1\r\n"
-                        + "Connection: keep-alive\r\n"
-                        + "\r\n";
-                    }
-                    for (int i = 0; i < http_buf.Length; ++i)
-                    {
-                        outdata[i] = (byte)http_buf[i];
-                    }
-                    if (headdata.Length < datalength)
-                    {
-                        Array.Copy(encryptdata, headdata.Length, outdata, http_buf.Length, datalength - headdata.Length);
-                    }
-                    SentLength += headdata.Length;
-                    outlength = http_buf.Length + datalength - headdata.Length;
-                    raw_trans_sent = true;
                 }
                 else
                 {
-                    outlength = 0;
+                    int size = random.Next(96) + 8;
+                    byte[] rnd = new byte[size];
+                    random.NextBytes(rnd);
+                    Util.CRC32.SetCRC32(rnd);
+                    rnd.CopyTo(outdata, 0);
+                    outlength = rnd.Length;
+
+                    byte[] data = new byte[datalength];
+                    Array.Copy(encryptdata, 0, data, 0, datalength);
+                    data_buffer.Add(data);
                 }
-                has_sent_header = true;
-                return outdata;
             }
+            else if (Method == "http_simple" || Method == "http_post")
+            {
+                int headsize = Server.iv.Length + Server.head_len;
+                if (datalength - headsize > 64)
+                {
+                    headdata = new byte[headsize + random.Next(0, 64)];
+                }
+                else
+                {
+                    headdata = new byte[datalength];
+                }
+                Array.Copy(encryptdata, 0, headdata, 0, headdata.Length);
+                int request_path_index = new Random().Next(_request_path.Length / 2) * 2;
+                string host = Server.host;
+                string custom_head = "";
+                if (Server.param.Length > 0)
+                {
+                    string[] custom_heads = Server.param.Split(new[] { '#' }, 2);
+                    string param = Server.param;
+                    if (custom_heads.Length > 1)
+                    {
+                        custom_head = custom_heads[1];
+                        param = custom_heads[0];
+                    }
+                    string[] hosts = param.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (hosts != null && hosts.Length > 0)
+                    {
+                        host = hosts[random.Next(hosts.Length)];
+                        host = host.Trim(' ');
+                    }
+                }
+                string http_buf =
+                        (Method == "http_post" ? "POST /" : "GET /") + _request_path[request_path_index] + data2urlencode(headdata, headdata.Length) + _request_path[request_path_index + 1] + " HTTP/1.1\r\n"
+                        + "Host: " + host + (Server.port == 80 ? "" : ":" + Server.port) + "\r\n";
+                if (custom_head.Length > 0)
+                {
+                    http_buf += custom_head.Replace("\\n", "\r\n") + "\r\n\r\n";
+                }
+                else
+                {
+                    http_buf +=
+                            "User-Agent: " + _request_useragent[_useragent_index] + "\r\n"
+                            + "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n"
+                            + "Accept-Language: en-US,en;q=0.8\r\n"
+                            + "Accept-Encoding: gzip, deflate\r\n"
+                            + (Method == "http_post" ? "Content-Type: multipart/form-data; boundary=" + boundary() + "\r\n" : "")
+                            + "DNT: 1\r\n"
+                            + "Connection: keep-alive\r\n"
+                            + "\r\n";
+                }
+                for (int i = 0; i < http_buf.Length; ++i)
+                {
+                    outdata[i] = (byte)http_buf[i];
+                }
+                if (headdata.Length < datalength)
+                {
+                    Array.Copy(encryptdata, headdata.Length, outdata, http_buf.Length, datalength - headdata.Length);
+                }
+                SentLength += headdata.Length;
+                outlength = http_buf.Length + datalength - headdata.Length;
+                raw_trans_sent = true;
+            }
+            else
+            {
+                outlength = 0;
+            }
+            has_sent_header = true;
+            return outdata;
         }
 
         private int FindSubArray(byte[] array, int length, byte[] subArray)
@@ -232,33 +228,29 @@ namespace Shadowsocks.Obfs
                 needsendback = false;
                 return encryptdata;
             }
+
+            byte[] outdata = new byte[datalength];
+            if (Method == "random_head")
+            {
+                outlength = 0;
+                raw_trans_recv = true;
+                needsendback = true;
+                return encryptdata;
+            }
+
+            int pos = FindSubArray(encryptdata, datalength, new[] { (byte)'\r', (byte)'\n', (byte)'\r', (byte)'\n' });
+            if (pos > 0)
+            {
+                outlength = datalength - (pos + 4);
+                Array.Copy(encryptdata, pos + 4, outdata, 0, outlength);
+                raw_trans_recv = true;
+            }
             else
             {
-                byte[] outdata = new byte[datalength];
-                if (Method == "random_head")
-                {
-                    outlength = 0;
-                    raw_trans_recv = true;
-                    needsendback = true;
-                    return encryptdata;
-                }
-                else
-                {
-                    int pos = FindSubArray(encryptdata, datalength, new byte[] { (byte)'\r', (byte)'\n', (byte)'\r', (byte)'\n' });
-                    if (pos > 0)
-                    {
-                        outlength = datalength - (pos + 4);
-                        Array.Copy(encryptdata, pos + 4, outdata, 0, outlength);
-                        raw_trans_recv = true;
-                    }
-                    else
-                    {
-                        outlength = 0;
-                    }
-                    needsendback = false;
-                }
-                return outdata;
+                outlength = 0;
             }
+            needsendback = false;
+            return outdata;
         }
     }
     public class TlsAuthData
@@ -277,15 +269,15 @@ namespace Shadowsocks.Obfs
                 fastauth = true;
         }
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
-                {"tls1.2_ticket_auth", new int[]  {0, 1, 1}},
-                {"tls1.2_ticket_fastauth", new int[]  {0, 1, 1}},
+                {"tls1.2_ticket_auth", new[]  {0, 1, 1}},
+                {"tls1.2_ticket_fastauth", new[]  {0, 1, 1}}
         };
 
         private int handshake_status;
         private List<byte[]> data_sent_buffer = new List<byte[]>();
         private byte[] data_recv_buffer = new byte[0];
-        private uint send_id = 0;
-        private bool fastauth = false;
+        private uint send_id;
+        private bool fastauth;
 
         protected static RNGCryptoServiceProvider g_random = new RNGCryptoServiceProvider();
         protected Random random = new Random();
@@ -343,10 +335,8 @@ namespace Shadowsocks.Obfs
             {
                 return (byte)(c - 'a' + 10);
             }
-            else
-            {
-                return (byte)(c - '0');
-            }
+
+            return (byte)(c - '0');
         }
 
         protected byte[] to_bin(string str)
@@ -363,7 +353,7 @@ namespace Shadowsocks.Obfs
         {
             byte[] key = new byte[Server.key.Length + 32];
             Server.key.CopyTo(key, 0);
-            ((TlsAuthData)this.Server.data).clientID.CopyTo(key, Server.key.Length);
+            ((TlsAuthData)Server.data).clientID.CopyTo(key, Server.key.Length);
 
             HMACSHA1 sha1 = new HMACSHA1(key);
             byte[] sha1data = sha1.ComputeHash(data, 0, length - 10);
@@ -379,7 +369,7 @@ namespace Shadowsocks.Obfs
                 g_random.GetBytes(randomdata);
                 randomdata.CopyTo(outdata, 4);
             }
-            TlsAuthData authData = (TlsAuthData)this.Server.data;
+            TlsAuthData authData = (TlsAuthData)Server.data;
             lock (authData)
             {
                 if (authData.clientID == null)
@@ -388,8 +378,8 @@ namespace Shadowsocks.Obfs
                     g_random.GetBytes(authData.clientID);
                 }
             }
-            UInt64 utc_time_second = (UInt64)Math.Floor(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
-            UInt32 utc_time = (UInt32)(utc_time_second);
+            ulong utc_time_second = (ulong)Math.Floor(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
+            uint utc_time = (uint)(utc_time_second);
             byte[] time_bytes = BitConverter.GetBytes(utc_time);
             Array.Reverse(time_bytes);
             Array.Copy(time_bytes, 0, outdata, 0, 4);
@@ -457,7 +447,7 @@ namespace Shadowsocks.Obfs
                 outlength = 0;
                 if ((handshake_status & 2) == 0)
                 {
-                    int[] finish_len_set = new int[] { 32 }; //, 40, 64
+                    int[] finish_len_set = { 32 }; //, 40, 64
                     int finish_len = finish_len_set[random.Next(finish_len_set.Length)];
                     byte[] hmac_data = new byte[11 + finish_len];
                     byte[] rnd = new byte[finish_len - 10];
@@ -499,7 +489,7 @@ namespace Shadowsocks.Obfs
                 string str_buf = "001cc02bc02fcca9cca8cc14cc13c00ac014c009c013009c0035002f000a0100";
                 ssl_buf.AddRange(rnd);
                 ssl_buf.Add(32);
-                ssl_buf.AddRange(((TlsAuthData)this.Server.data).clientID);
+                ssl_buf.AddRange(((TlsAuthData)Server.data).clientID);
                 ssl_buf.AddRange(to_bin(str_buf));
 
                 str_buf = "ff01000100";
@@ -507,7 +497,7 @@ namespace Shadowsocks.Obfs
                 string host = Server.host;
                 if (Server.param.Length > 0)
                 {
-                    string[] hosts = Server.param.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] hosts = Server.param.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                     if (hosts != null && hosts.Length > 0)
                     {
                         host = hosts[random.Next(hosts.Length)];
@@ -522,7 +512,7 @@ namespace Shadowsocks.Obfs
                 string str_buf2 = "001700000023";
                 ext_buf.AddRange(to_bin(str_buf2));
                 {
-                    TlsAuthData authData = (TlsAuthData)this.Server.data;
+                    TlsAuthData authData = (TlsAuthData)Server.data;
                     byte[] ticket = null;
                     lock (authData)
                     {
@@ -554,23 +544,23 @@ namespace Shadowsocks.Obfs
 
                 ssl_buf.AddRange(ext_buf);
                 // client version
-                ssl_buf.Insert(0, (byte)3); // version
-                ssl_buf.Insert(0, (byte)3);
+                ssl_buf.Insert(0, 3); // version
+                ssl_buf.Insert(0, 3);
                 // length
                 ssl_buf.Insert(0, (byte)(ssl_buf.Count % 256));
                 ssl_buf.Insert(0, (byte)((ssl_buf.Count - 1) / 256));
-                ssl_buf.Insert(0, (byte)0);
-                ssl_buf.Insert(0, (byte)1); // client hello
+                ssl_buf.Insert(0, 0);
+                ssl_buf.Insert(0, 1); // client hello
                 // length
                 ssl_buf.Insert(0, (byte)(ssl_buf.Count % 256));
                 ssl_buf.Insert(0, (byte)((ssl_buf.Count - 1) / 256));
                 //
-                ssl_buf.Insert(0, (byte)0x1); // version
-                ssl_buf.Insert(0, (byte)0x3);
-                ssl_buf.Insert(0, (byte)0x16);
+                ssl_buf.Insert(0, 0x1); // version
+                ssl_buf.Insert(0, 0x3);
+                ssl_buf.Insert(0, 0x16);
                 for (int i = 0; i < ssl_buf.Count; ++i)
                 {
-                    outdata[i] = (byte)ssl_buf[i];
+                    outdata[i] = ssl_buf[i];
                 }
                 outlength = ssl_buf.Count;
 
@@ -587,7 +577,8 @@ namespace Shadowsocks.Obfs
                 needsendback = false;
                 return encryptdata;
             }
-            else if ((handshake_status & 8) == 8)
+
+            if ((handshake_status & 8) == 8)
             {
                 Array.Resize(ref data_recv_buffer, data_recv_buffer.Length + datalength);
                 Array.Copy(encryptdata, 0, data_recv_buffer, data_recv_buffer.Length - datalength, datalength);
@@ -636,7 +627,7 @@ namespace Shadowsocks.Obfs
                     {
                         headerlength = 0;
                         while (headerlength < data_recv_buffer.Length &&
-                            (data_recv_buffer[headerlength] == 0x14 || data_recv_buffer[headerlength] == 0x16))
+                               (data_recv_buffer[headerlength] == 0x14 || data_recv_buffer[headerlength] == 0x16))
                         {
                             headerlength += 5;
                             if (headerlength >= data_recv_buffer.Length)

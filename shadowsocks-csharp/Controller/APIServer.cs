@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
-using Shadowsocks.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Newtonsoft.Json;
+using Shadowsocks.Model;
 
 namespace Shadowsocks.Controller
 {
@@ -29,12 +29,12 @@ namespace Shadowsocks.Controller
             try
             {
                 string request = Encoding.UTF8.GetString(firstPacket, 0, length);
-                string[] lines = request.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                string[] lines = request.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                 bool hostMatch = false, pathMatch = false;
                 string req = "";
                 foreach (string line in lines)
                 {
-                    string[] kv = line.Split(new char[] { ':' }, 2);
+                    string[] kv = line.Split(new[] { ':' }, 2);
                     if (kv.Length == 2)
                     {
                         if (kv[0] == "Host")
@@ -72,7 +72,7 @@ namespace Shadowsocks.Controller
                     {
                         connection_request = request;
                         socket.BeginReceive(connetionRecvBuffer, 0, RecvSize, 0,
-                            new AsyncCallback(HttpHandshakeRecv), null);
+                            HttpHandshakeRecv, null);
                     }
                     return true;
                 }
@@ -93,7 +93,7 @@ namespace Shadowsocks.Controller
                 {
                     string head = request.Substring(0, newline_pos);
                     string tail = request.Substring(newline_pos + 4);
-                    string[] lines = head.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] lines = head.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (string line in lines)
                     {
                         if (line.StartsWith("Content-Length: "))
@@ -139,7 +139,7 @@ namespace Shadowsocks.Controller
                     else
                     {
                         _local.BeginReceive(connetionRecvBuffer, 0, RecvSize, 0,
-                            new AsyncCallback(HttpHandshakeRecv), null);
+                            HttpHandshakeRecv, null);
                     }
                 }
                 else
@@ -210,23 +210,24 @@ namespace Shadowsocks.Controller
                         Dictionary<string, object> servers = new Dictionary<string, object>();
                         for (int i = 0; i < config.configs.Count; ++i)
                         {
-                            _ServerSpeedLogList[i] = config.configs[i].ServerSpeedLog().Translate();
-                            servers[config.configs[i].id] = _ServerSpeedLogList[i];
+                            _ServerSpeedLogList[i] = config.configs[i].SpeedLog.Translate();
+                            servers[config.configs[i].Id] = _ServerSpeedLogList[i];
                         }
                         string content = JsonConvert.SerializeObject(servers, Formatting.Indented);
 
-                        string text = String.Format(@"HTTP/1.1 200 OK
+                        string text = string.Format(@"HTTP/1.1 200 OK
 Server: ShadowsocksR
 Content-Type: text/plain
 Content-Length: {0}
 Connection: Close
 
-", System.Text.Encoding.UTF8.GetBytes(content).Length) + content;
-                        byte[] response = System.Text.Encoding.UTF8.GetBytes(text);
-                        _local.BeginSend(response, 0, response.Length, 0, new AsyncCallback(SendCallback), _local);
+", Encoding.UTF8.GetBytes(content).Length) + content;
+                        byte[] response = Encoding.UTF8.GetBytes(text);
+                        _local.BeginSend(response, 0, response.Length, 0, SendCallback, _local);
                         return "";
                     }
-                    else if (params_dict["action"] == "config")
+
+                    if (params_dict["action"] == "config")
                     {
                         if (params_dict.ContainsKey("config"))
                         {
@@ -236,15 +237,15 @@ Connection: Close
                             {
                                 ret_code = "403 Forbid";
                             }
-                            string text = String.Format(@"HTTP/1.1 {0}
+                            string text = string.Format(@"HTTP/1.1 {0}
 Server: ShadowsocksR
 Content-Type: text/plain
 Content-Length: {1}
 Connection: Close
 
-", ret_code, System.Text.Encoding.UTF8.GetBytes(content).Length) + content;
-                            byte[] response = System.Text.Encoding.UTF8.GetBytes(text);
-                            _local.BeginSend(response, 0, response.Length, 0, new AsyncCallback(SendCallback), _local);
+", ret_code, Encoding.UTF8.GetBytes(content).Length) + content;
+                            byte[] response = Encoding.UTF8.GetBytes(text);
+                            _local.BeginSend(response, 0, response.Length, 0, SendCallback, _local);
                             return "";
                         }
                         else
@@ -254,23 +255,23 @@ Connection: Close
                             string content = JsonConvert.SerializeObject(_config, Formatting.Indented);
                             _config.token = token;
 
-                            string text = String.Format(@"HTTP/1.1 200 OK
+                            string text = string.Format(@"HTTP/1.1 200 OK
 Server: ShadowsocksR
 Content-Type: text/plain
 Content-Length: {0}
 Connection: Close
 
-", System.Text.Encoding.UTF8.GetBytes(content).Length) + content;
-                            byte[] response = System.Text.Encoding.UTF8.GetBytes(text);
-                            _local.BeginSend(response, 0, response.Length, 0, new AsyncCallback(SendCallback), _local);
+", Encoding.UTF8.GetBytes(content).Length) + content;
+                            byte[] response = Encoding.UTF8.GetBytes(text);
+                            _local.BeginSend(response, 0, response.Length, 0, SendCallback, _local);
                             return "";
                         }
                     }
                 }
             }
             {
-                byte[] response = System.Text.Encoding.UTF8.GetBytes("");
-                _local.BeginSend(response, 0, response.Length, 0, new AsyncCallback(SendCallback), _local);
+                byte[] response = Encoding.UTF8.GetBytes("");
+                _local.BeginSend(response, 0, response.Length, 0, SendCallback, _local);
             }
             return "";
         }

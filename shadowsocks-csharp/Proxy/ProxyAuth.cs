@@ -460,7 +460,7 @@ namespace Shadowsocks.Proxy
                 else if (err == 2)
                 {
                     string dataSend = httpProxyState.Http407();
-                    byte[] httpData = System.Text.Encoding.UTF8.GetBytes(dataSend);
+                    byte[] httpData = Encoding.UTF8.GetBytes(dataSend);
                     _connection.Send(httpData);
                     if (HttpHandshakeRecv())
                         break;
@@ -479,7 +479,7 @@ namespace Shadowsocks.Proxy
                 else if (err == 500)
                 {
                     string dataSend = httpProxyState.Http500();
-                    byte[] httpData = System.Text.Encoding.UTF8.GetBytes(dataSend);
+                    byte[] httpData = Encoding.UTF8.GetBytes(dataSend);
                     _connection.Send(httpData);
                     if (HttpHandshakeRecv())
                         break;
@@ -503,11 +503,9 @@ namespace Shadowsocks.Proxy
                     _firstPacketLength = bytesRead;
                     return false;
                 }
-                else
-                {
-                    Console.WriteLine("failed to recv data in HttpHandshakeRecv");
-                    Close();
-                }
+
+                Console.WriteLine("failed to recv data in HttpHandshakeRecv");
+                Close();
             }
             catch (Exception e)
             {
@@ -519,19 +517,29 @@ namespace Shadowsocks.Proxy
 
         private void Connect()
         {
-            Handler.GetCurrentServer getCurrentServer = delegate (int localPort, ServerSelectStrategy.FilterFunc filter, string targetURI, bool cfgRandom, bool usingRandom, bool forceRandom) { return _config.GetCurrentServer(localPort, filter, targetURI, cfgRandom, usingRandom, forceRandom); };
-            Handler.KeepCurrentServer keepCurrentServer = delegate (int localPort, string targetURI, string id) { _config.KeepCurrentServer(localPort, targetURI, id); };
+            Server GetCurrentServer(int localPort, ServerSelectStrategy.FilterFunc filter, string targetURI, bool cfgRandom, bool usingRandom, bool forceRandom)
+            => _config.GetCurrentServer(localPort, filter, targetURI, cfgRandom, usingRandom, forceRandom);
+
+            void KeepCurrentServer(int localPort, string targetURI, string id)
+            {
+                _config.KeepCurrentServer(localPort, targetURI, id);
+            }
 
             int local_port = ((IPEndPoint)_connection.LocalEndPoint).Port;
-            Handler handler = new Handler();
+            Handler handler = new Handler
+            {
+                getCurrentServer = GetCurrentServer,
+                keepCurrentServer = KeepCurrentServer,
+                connection = new ProxySocketTunLocal(_connection),
+                connectionUDP = _connectionUDP,
+                cfg =
+                    {
+                            ReconnectTimesRemain = _config.reconnectTimes,
+                            Random = _config.random,
+                            ForceRandom = _config.random
+                    }
+            };
 
-            handler.getCurrentServer = getCurrentServer;
-            handler.keepCurrentServer = keepCurrentServer;
-            handler.connection = new ProxySocketTunLocal(_connection);
-            handler.connectionUDP = _connectionUDP;
-            handler.cfg.ReconnectTimesRemain = _config.reconnectTimes;
-            handler.cfg.Random = _config.random;
-            handler.cfg.ForceRandom = _config.random;
             handler.setServerTransferTotal(_transfer);
             if (_config.proxyEnable)
             {
@@ -556,19 +564,19 @@ namespace Shadowsocks.Proxy
             if (_config.GetPortMapCache().ContainsKey(local_port))
             {
                 PortMapConfigCache cfg = _config.GetPortMapCache()[local_port];
-                if (cfg.server == null || cfg.id == cfg.server.id)
+                if (cfg.server == null || cfg.id == cfg.server.Id)
                 {
                     if (cfg.server != null)
                     {
-                        handler.select_server = delegate (Server server, Server selServer) { return server.id == cfg.server.id; };
+                        handler.select_server = delegate (Server server, Server selServer) { return server.Id == cfg.server.Id; };
                     }
                     else if (!string.IsNullOrEmpty(cfg.id))
                     {
-                        handler.select_server = delegate (Server server, Server selServer) { return server.group == cfg.id; };
+                        handler.select_server = delegate (Server server, Server selServer) { return server.Group == cfg.id; };
                     }
                     if (cfg.type == PortMapType.Forward) // tunnel
                     {
-                        byte[] addr = System.Text.Encoding.UTF8.GetBytes(cfg.server_addr);
+                        byte[] addr = Encoding.UTF8.GetBytes(cfg.server_addr);
                         byte[] newFirstPacket = new byte[_firstPacketLength + addr.Length + 4];
                         newFirstPacket[0] = 3;
                         newFirstPacket[1] = (byte)addr.Length;

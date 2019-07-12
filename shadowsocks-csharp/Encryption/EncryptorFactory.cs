@@ -1,6 +1,7 @@
-﻿using Shadowsocks.Encryption.Stream;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using Shadowsocks.Encryption.Stream;
 
 namespace Shadowsocks.Encryption
 {
@@ -44,6 +45,15 @@ namespace Shadowsocks.Encryption
                     _registeredEncryptors.Add(method, typeof(StreamMbedTLSEncryptor));
                 }
             }
+
+            var allEncryptor = new StringBuilder(Environment.NewLine);
+            allEncryptor.AppendLine(@"============================");
+            foreach (var encryptor in _registeredEncryptors)
+            {
+                allEncryptor.AppendLine($@"{encryptor.Key}  {encryptor.Value.Name}");
+            }
+            allEncryptor.AppendLine(@"============================");
+            Console.WriteLine(allEncryptor);
         }
 
         public static Dictionary<string, Type> GetEncryptor()
@@ -81,7 +91,7 @@ namespace Shadowsocks.Encryption
             {
                 throw new Exception("Invalid ctor");
             }
-            var result = (IEncryptor)c.Invoke(new object[] { method, "0"});
+            var result = (IEncryptor)c.Invoke(new object[] { method, "0" });
             var info = result.getInfo();
             result.Dispose();
             return info;

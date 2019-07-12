@@ -12,7 +12,7 @@ namespace Shadowsocks.Encryption.Stream
 
         private static Dictionary<string, EncryptorInfo> _ciphers = new Dictionary<string, EncryptorInfo>
         {
-                {"none", new EncryptorInfo(16, 0, true, 1)},
+                {"none", new EncryptorInfo(16, 0, true, 1)}
         };
 
         public static List<string> SupportedCiphers()
@@ -29,7 +29,7 @@ namespace Shadowsocks.Encryption.Stream
         {
             if (_disposed)
             {
-                throw new ObjectDisposedException(this.ToString());
+                throw new ObjectDisposedException(ToString());
             }
 
             Array.Copy(buf, outbuf, length);

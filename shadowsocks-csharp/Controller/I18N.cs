@@ -1,8 +1,6 @@
-﻿using Shadowsocks.Properties;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Shadowsocks.Properties;
 
 namespace Shadowsocks.Controller
 {
@@ -52,10 +50,8 @@ namespace Shadowsocks.Controller
             {
                 return Strings[key];
             }
-            else
-            {
-                return key;
-            }
+
+            return key;
         }
     }
 }

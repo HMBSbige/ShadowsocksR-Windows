@@ -34,7 +34,7 @@ namespace Shadowsocks.Encryption.Stream
             { "camellia-256-cfb", new EncryptorInfo(32, 16, false, CIPHER_CAMELLIA, "CAMELLIA-256-CFB128") },
             { "rc4", new EncryptorInfo(16, 0, true, CIPHER_RC4, "ARC4-128") },
             { "rc4-md5", new EncryptorInfo(16, 16, true, CIPHER_RC4, "ARC4-128") },
-            { "rc4-md5-6", new EncryptorInfo(16, 6, true, CIPHER_RC4, "ARC4-128") },
+            { "rc4-md5-6", new EncryptorInfo(16, 6, true, CIPHER_RC4, "ARC4-128") }
         };
 
         public static IEnumerable<string> SupportedCiphers()
@@ -101,7 +101,7 @@ namespace Shadowsocks.Encryption.Stream
             // C# could be multi-threaded
             if (_disposed)
             {
-                throw new ObjectDisposedException(this.ToString());
+                throw new ObjectDisposedException(ToString());
             }
             if (MbedTLS.cipher_update(isCipher ? _encryptCtx : _decryptCtx, buf, length, outbuf, ref length) != 0)
             {

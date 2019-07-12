@@ -1,29 +1,44 @@
-﻿using Newtonsoft.Json;
-using Shadowsocks.Model;
-using System;
+﻿using System;
 using System.Dynamic;
 using System.Net;
 using System.Text;
+using Newtonsoft.Json;
+using Shadowsocks.Model;
 
 namespace Shadowsocks.Controller
 {
     public class UpdateChecker
     {
-        private const string UpdateURL = @"https://api.github.com/repos/HMBSbige/ShadowsocksR-Windows/releases/latest";
+        private const string UpdateUrl = @"https://api.github.com/repos/HMBSbige/ShadowsocksR-Windows/releases/latest";
 
-        private const string USER_AGENT = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36";
+        private const string UserAgent = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36";
 
         public string LatestVersionNumber;
-        public string LatestVersionURL;
+        public string LatestVersionUrl;
         public bool Found;
         public event EventHandler NewVersionFound;
         public event EventHandler NewVersionNotFound;
 
         public const string Name = @"ShadowsocksR";
         public const string Copyright = @"Copyright © HMBSbige 2019 & BreakWa11 2017. Fork from Shadowsocks by clowwindy";
-        public const string Version = @"4.9.5.2";
+        public const string Version = @"5.0.0.1";
 
         public const string FullVersion = Version +
+#if IsDotNetCore
+        @" .Net Core" +
+#else
+        @"" +
+#endif
+#if IsSelfContainedDotNetCore
+        @" SelfContained" +
+#if Is64Bit
+            @" x64" +
+#else
+            @"" +
+#endif
+#else
+        @"" +
+#endif
 #if DEBUG
         @" Debug";
 #else
@@ -37,7 +52,7 @@ namespace Shadowsocks.Controller
             try
             {
                 var http = new WebClient { Encoding = Encoding.UTF8 };
-                http.Headers.Add(@"User-Agent", string.IsNullOrEmpty(config.proxyUserAgent) ? USER_AGENT : config.proxyUserAgent);
+                http.Headers.Add(@"User-Agent", string.IsNullOrEmpty(config.proxyUserAgent) ? UserAgent : config.proxyUserAgent);
                 if (UseProxy)
                 {
                     var proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
@@ -60,7 +75,7 @@ namespace Shadowsocks.Controller
                 {
                     http.DownloadStringCompleted += http_DownloadStringCompleted2;
                 }
-                http.DownloadStringAsync(new Uri($@"{UpdateURL}?rnd={Util.Utils.RandUInt32()}"));
+                http.DownloadStringAsync(new Uri($@"{UpdateUrl}?rnd={Util.Utils.RandUInt32()}"));
             }
             catch (Exception e)
             {
@@ -114,7 +129,7 @@ namespace Shadowsocks.Controller
             }
 
             Found = true;
-            LatestVersionURL = url;
+            LatestVersionUrl = url;
             LatestVersionNumber = version;
             NewVersionFound?.Invoke(this, new EventArgs());
         }
