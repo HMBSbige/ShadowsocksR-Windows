@@ -73,7 +73,7 @@ namespace Shadowsocks
             Logging.DefaultOut = Console.Out;
             Logging.DefaultError = Console.Error;
 
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
 
             _viewController = new MenuViewController(_controller);
             SystemEvents.SessionEnding += _viewController.Quit_Click;
