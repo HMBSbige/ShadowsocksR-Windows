@@ -178,13 +178,10 @@ namespace Shadowsocks.View
 
             var name = @"Courier New";
             var familyNames = LogTextBox.FontFamily.FamilyNames.Values;
-            if (familyNames != null)
+            var names = familyNames.ToArray();
+            if (names.Length > 0)
             {
-                var names = familyNames.ToArray();
-                if (names.Length > 0)
-                {
-                    name = names[0];
-                }
+                name = names[0];
             }
 
             var font = new System.Drawing.Font(name, Convert.ToSingle(LogTextBox.FontSize * 72.0 / 96.0), style, System.Drawing.GraphicsUnit.Point, 0);

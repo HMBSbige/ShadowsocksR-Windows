@@ -19,9 +19,9 @@ namespace Shadowsocks.Proxy.SystemProxy
             }
             var global = sysProxyMode == (int)ProxyMode.Global;
             var enabled = sysProxyMode != (int)ProxyMode.Direct;
-            using var proxy = new SetSystemProxy();
             try
             {
+                using var proxy = new SetSystemProxy();
                 if (enabled)
                 {
                     if (global)
