@@ -691,26 +691,6 @@ namespace Shadowsocks.Util
             return cfgData;
         }
 
-        public static void RegistrySetValue(RegistryKey registry, string name, object value)
-        {
-            try
-            {
-                registry.SetValue(name, value);
-            }
-            catch (Exception e)
-            {
-                Logging.LogUsefulException(e);
-            }
-        }
-
-        public static RegistryKey OpenUserRegKey(string name, bool writable)
-        {
-            var userKey = RegistryKey.OpenRemoteBaseKey(RegistryHive.CurrentUser, string.Empty,
-                    Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32
-            ).OpenSubKey(name, writable);
-            return userKey;
-        }
-
         public static void BringToFront(this FrameworkElement element)
         {
             if (element?.Parent is Panel parent)
