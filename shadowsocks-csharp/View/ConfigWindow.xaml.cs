@@ -19,7 +19,11 @@ namespace Shadowsocks.View
             InitializeComponent();
             SizeChanged += (o, args) => { GenQr(LinkTextBox.Text); };
             Splitter2.DragDelta += (o, args) => { GenQr(LinkTextBox.Text); };
-            Closed += (o, e) => { _controller.ConfigChanged -= controller_ConfigChanged; };
+            Closed += (o, e) =>
+            {
+                _controller.ConfigChanged -= controller_ConfigChanged;
+                ServerViewModel.ServersChanged -= ServerViewModel_ServersChanged;
+            };
 
             _controller = controller;
             foreach (var name in EncryptorFactory.GetEncryptor().Keys)
@@ -42,7 +46,7 @@ namespace Shadowsocks.View
             _controller.ConfigChanged += controller_ConfigChanged;
 
             LoadCurrentConfiguration();
-            ServerViewModel.ServersChanged += (o, e) => { ApplyButton.IsEnabled = true; };
+            ServerViewModel.ServersChanged += ServerViewModel_ServersChanged;
 
             if (focusIndex == -1)
             {
@@ -57,6 +61,11 @@ namespace Shadowsocks.View
             {
                 SetServerListSelectedIndex(focusIndex);
             }
+        }
+
+        private void ServerViewModel_ServersChanged(object sender, EventArgs e)
+        {
+            ApplyButton.IsEnabled = true;
         }
 
         private static readonly string[] Protocols = {
@@ -143,6 +152,10 @@ namespace Shadowsocks.View
 
         public void SetServerListSelectedIndex(int index)
         {
+            if (index < 0)
+            {
+                return;
+            }
             if (index < ServersListBox.Items.Count)
             {
                 ServersListBox.SelectedIndex = index;
@@ -281,7 +294,7 @@ namespace Shadowsocks.View
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             var index = ServersListBox.SelectedIndex;
-            foreach (Server selectedItem in ServersListBox.SelectedItems.Cast<object>().ToArray())
+            foreach (var selectedItem in ServersListBox.SelectedItems.Cast<Server>().ToArray())
             {
                 var position = ServerViewModel.ServerCollection.IndexOf(selectedItem);
                 ServerViewModel.ServerCollection.Remove(selectedItem);
