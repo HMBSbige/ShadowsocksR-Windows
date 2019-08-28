@@ -104,22 +104,22 @@ namespace Shadowsocks.View
         {
             UpdateTitle();
 
-            foreach (var c in Utils.FindVisualChildren<Label>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<Label>(this))
             {
                 c.Content = I18N.GetString(c.Content.ToString());
             }
 
-            foreach (var c in Utils.FindVisualChildren<Button>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<Button>(this))
             {
                 c.Content = I18N.GetString(c.Content.ToString());
             }
 
-            foreach (var c in Utils.FindVisualChildren<CheckBox>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<CheckBox>(this))
             {
                 c.Content = I18N.GetString(c.Content.ToString());
             }
 
-            foreach (var c in Utils.FindVisualChildren<GroupBox>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<GroupBox>(this))
             {
                 c.Header = I18N.GetString(c.Header.ToString());
             }
@@ -210,7 +210,7 @@ namespace Shadowsocks.View
             if (e.ChangedButton == MouseButton.Left)
             {
                 var textBox = (TextBox)sender;
-                textBox.Dispatcher.BeginInvoke(new Action(() => { textBox.SelectAll(); }));
+                textBox.Dispatcher?.BeginInvoke(new Action(() => { textBox.SelectAll(); }));
             }
         }
 

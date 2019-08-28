@@ -61,4 +61,8 @@
     <Reference Include="System.IO.Compression" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Util\SingleInstance\" />
+  </ItemGroup>
+
 </Project>

@@ -43,17 +43,17 @@ namespace Shadowsocks.View
         {
             Title = I18N.GetString(@"Subscribe Settings");
 
-            foreach (var c in Utils.FindVisualChildren<Label>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<Label>(this))
             {
                 c.Content = I18N.GetString(c.Content.ToString());
             }
 
-            foreach (var c in Utils.FindVisualChildren<Button>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<Button>(this))
             {
                 c.Content = I18N.GetString(c.Content.ToString());
             }
 
-            foreach (var c in Utils.FindVisualChildren<CheckBox>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<CheckBox>(this))
             {
                 c.Content = I18N.GetString(c.Content.ToString());
             }
