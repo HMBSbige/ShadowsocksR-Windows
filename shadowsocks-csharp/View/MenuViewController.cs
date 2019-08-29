@@ -152,40 +152,15 @@ namespace Shadowsocks.View
             var global = config.sysProxyMode == (int)ProxyMode.Global;
             var random = config.random;
 
-            var icon = Resources.ss24;
-            double mul_a = 1.0, mul_r = 1.0, mul_g = 1.0, mul_b = 1.0;
-            if (!enabled)
-            {
-                mul_g = 0.4;
-            }
-            else if (!global)
-            {
-                mul_b = 0.4;
-                mul_g = 0.8;
-            }
+            var colorMask = ViewUtils.SelectColorMask(enabled, global);
+            var icon = ViewUtils.ChangeBitmapColor(Resources.ss128, colorMask, random);
+            var size = ViewUtils.GetIconSize();
+            var newIcon = Icon.FromHandle(ViewUtils.ResizeBitmap(icon, size.Width, size.Height).GetHicon());
 
-            if (!random)
+            if (_notifyIcon.Icon != null)
             {
-                mul_r = 0.4;
+                ViewUtils.DestroyIcon(_notifyIcon.Icon.Handle);
             }
-
-            var iconCopy = new Bitmap(icon);
-            for (var x = 0; x < iconCopy.Width; ++x)
-            {
-                for (var y = 0; y < iconCopy.Height; ++y)
-                {
-                    var color = icon.GetPixel(x, y);
-                    iconCopy.SetPixel(x, y,
-                            Color.FromArgb((byte)(color.A * mul_a),
-                                    (byte)(color.R * mul_r),
-                                    (byte)(color.G * mul_g),
-                                    (byte)(color.B * mul_b)));
-                }
-            }
-
-            var newIcon = Icon.FromHandle(iconCopy.GetHicon());
-            icon.Dispose();
-            iconCopy.Dispose();
 
             _notifyIcon.Icon = newIcon;
 
