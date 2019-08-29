@@ -14,7 +14,7 @@ namespace Shadowsocks.Util
 {
     public static class QrCodeUtils
     {
-        private static BitmapImage ToBitmapImage(Bitmap src)
+        private static BitmapImage ToBitmapImage(Image src)
         {
             var ms = new MemoryStream();
             src.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);

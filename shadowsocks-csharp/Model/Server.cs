@@ -607,7 +607,8 @@ namespace Shadowsocks.Model
                    && obfs == serverObject.obfs
                    && ObfsParam == serverObject.ObfsParam
                    && Password == serverObject.Password
-                   && UdpOverTcp == serverObject.UdpOverTcp;
+                   && UdpOverTcp == serverObject.UdpOverTcp
+                   && Remarks == serverObject.Remarks;
         }
 
         private string GetSsLink()

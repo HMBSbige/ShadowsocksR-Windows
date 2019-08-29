@@ -5,6 +5,7 @@ using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using System.Windows;
@@ -123,19 +124,21 @@ namespace Shadowsocks.Controller
         {
             if (servers != null)
             {
-                for (var j = 0; j < servers.Count; ++j)
+                Application.Current.Dispatcher?.Invoke(() =>
                 {
-                    if (FindFirstMatchServer(servers[j], mergeConfig.configs) == -1)
+                    foreach (var server in servers)
                     {
-                        mergeConfig.configs.Add(servers[j]);
+                        if (FindFirstMatchServer(server, mergeConfig.configs) == -1)
+                        {
+                            mergeConfig.configs.Add(server);
+                        }
                     }
-                }
+                });
             }
         }
 
-        public List<Server> MergeConfiguration(Configuration mergeConfig, IReadOnlyList<Server> servers)
+        public IEnumerable<Server> MergeConfiguration(Configuration mergeConfig, IReadOnlyList<Server> servers)
         {
-            var missingServers = new List<Server>();
             if (servers != null)
             {
                 foreach (var server in servers)
@@ -149,15 +152,8 @@ namespace Shadowsocks.Controller
                     }
                 }
             }
-            for (var i = 0; i < mergeConfig.configs.Count; ++i)
-            {
-                var j = FindFirstMatchServer(mergeConfig.configs[i], servers);
-                if (j == -1)
-                {
-                    missingServers.Add(mergeConfig.configs[i]);
-                }
-            }
-            return missingServers;
+
+            return from t in mergeConfig.configs let j = FindFirstMatchServer(t, servers) where j == -1 select t;
         }
 
         public Configuration MergeGetConfiguration(Configuration mergeConfig)
@@ -240,14 +236,14 @@ namespace Shadowsocks.Controller
         {
             _config.sysProxyMode = (int)mode;
             Save();
-            ToggleModeChanged?.Invoke(this, new EventArgs());
+            Application.Current.Dispatcher?.Invoke(() => { ToggleModeChanged?.Invoke(this, new EventArgs()); });
         }
 
         public void ToggleRuleMode(int mode)
         {
             _config.proxyRuleMode = mode;
             Save();
-            ToggleRuleModeChanged?.Invoke(this, new EventArgs());
+            Application.Current.Dispatcher?.Invoke(() => { ToggleRuleModeChanged?.Invoke(this, new EventArgs()); });
         }
 
         public void ToggleSelectRandom(bool enabled)
@@ -459,7 +455,7 @@ namespace Shadowsocks.Controller
                 }
             }
 
-            ConfigChanged?.Invoke(this, new EventArgs());
+            Application.Current.Dispatcher?.Invoke(() => { ConfigChanged?.Invoke(this, new EventArgs()); });
 
             UpdateSystemProxy();
             Utils.ReleaseMemory();

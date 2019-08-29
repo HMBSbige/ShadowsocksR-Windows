@@ -1,4 +1,5 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
+using Microsoft.Win32;
 using Shadowsocks.Controller;
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
@@ -15,19 +16,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms;
 using System.Windows.Input;
 using ZXing;
 using ZXing.Common;
 using ZXing.QrCode;
-using BitmapLuminanceSource = ZXing.Windows.Compatibility.BitmapLuminanceSource;
-using Clipboard = System.Windows.Clipboard;
-using ContextMenu = System.Windows.Controls.ContextMenu;
-using Control = System.Windows.Controls.Control;
-using DataFormats = System.Windows.DataFormats;
-using MenuItem = System.Windows.Controls.MenuItem;
-using MessageBox = System.Windows.MessageBox;
-using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
 namespace Shadowsocks.View
 {
@@ -994,33 +986,26 @@ namespace Shadowsocks.View
 
         private void Import_Click(object sender, RoutedEventArgs e)
         {
-            bool? res = null;
-            string name = null;
             Task.Run(() =>
             {
                 var dlg = new OpenFileDialog
                 {
                     InitialDirectory = Directory.GetCurrentDirectory()
                 };
-                res = dlg.ShowDialog();
-                if (res == true)
+                if (dlg.ShowDialog() == true)
                 {
-                    name = dlg.FileName;
+                    var name = dlg.FileName;
+                    var cfg = Configuration.LoadFile(name);
+                    if (cfg.configs.Count == 1 && cfg.configs[0].server == Configuration.GetDefaultServer().server)
+                    {
+                        MessageBox.Show(@"Load config file failed", UpdateChecker.Name);
+                    }
+                    else
+                    {
+                        controller.MergeConfiguration(cfg);
+                    }
                 }
-            }).Wait();
-            if (res == true)
-            {
-                var cfg = Configuration.LoadFile(name);
-                if (cfg.configs.Count == 1 && cfg.configs[0].server == Configuration.GetDefaultServer().server)
-                {
-                    MessageBox.Show(@"Load config file failed", UpdateChecker.Name);
-                }
-                else
-                {
-                    controller.MergeConfiguration(cfg);
-                    LoadCurrentConfiguration();
-                }
-            }
+            });
         }
 
         private void Setting_Click(object sender, RoutedEventArgs e)
@@ -1048,7 +1033,7 @@ namespace Shadowsocks.View
                 timerDelayCheckUpdate = null;
             }
             _notifyIcon.Dispose();
-            System.Windows.Application.Current.Shutdown();
+            Application.Current.Shutdown();
         }
 
         private void OpenWiki_Click(object sender, RoutedEventArgs e)
@@ -1103,47 +1088,47 @@ namespace Shadowsocks.View
 
         private void NoModifyItem_Click(object sender, RoutedEventArgs e)
         {
-            controller.ToggleMode(ProxyMode.NoModify);
+            Task.Run(() => { controller.ToggleMode(ProxyMode.NoModify); });
         }
 
         private void EnableItem_Click(object sender, RoutedEventArgs e)
         {
-            controller.ToggleMode(ProxyMode.Direct);
+            Task.Run(() => { controller.ToggleMode(ProxyMode.Direct); });
         }
 
         private void GlobalModeItem_Click(object sender, RoutedEventArgs e)
         {
-            controller.ToggleMode(ProxyMode.Global);
+            Task.Run(() => { controller.ToggleMode(ProxyMode.Global); });
         }
 
         private void PACModeItem_Click(object sender, RoutedEventArgs e)
         {
-            controller.ToggleMode(ProxyMode.Pac);
+            Task.Run(() => { controller.ToggleMode(ProxyMode.Pac); });
         }
 
         private void RuleBypassLanItem_Click(object sender, RoutedEventArgs e)
         {
-            controller.ToggleRuleMode((int)ProxyRuleMode.BypassLan);
+            Task.Run(() => { controller.ToggleRuleMode((int)ProxyRuleMode.BypassLan); });
         }
 
         private void RuleBypassChinaItem_Click(object sender, RoutedEventArgs e)
         {
-            controller.ToggleRuleMode((int)ProxyRuleMode.BypassLanAndChina);
+            Task.Run(() => { controller.ToggleRuleMode((int)ProxyRuleMode.BypassLanAndChina); });
         }
 
         private void RuleBypassNotChinaItem_Click(object sender, RoutedEventArgs e)
         {
-            controller.ToggleRuleMode((int)ProxyRuleMode.BypassLanAndNotChina);
+            Task.Run(() => { controller.ToggleRuleMode((int)ProxyRuleMode.BypassLanAndNotChina); });
         }
 
         private void RuleUserItem_Click(object sender, RoutedEventArgs e)
         {
-            controller.ToggleRuleMode((int)ProxyRuleMode.UserCustom);
+            Task.Run(() => { controller.ToggleRuleMode((int)ProxyRuleMode.UserCustom); });
         }
 
         private void RuleBypassDisableItem_Click(object sender, RoutedEventArgs e)
         {
-            controller.ToggleRuleMode((int)ProxyRuleMode.Disable);
+            Task.Run(() => { controller.ToggleRuleMode((int)ProxyRuleMode.Disable); });
         }
 
         private void SelectRandomItem_Click(object sender, RoutedEventArgs e)
@@ -1298,34 +1283,41 @@ namespace Shadowsocks.View
 
         #region QRCode
 
+        [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
         private void ScanQRCodeItem_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var screen in Screen.AllScreens)
+            Task.Run(() =>
             {
-                using var fullImage = new Bitmap(screen.Bounds.Width, screen.Bounds.Height);
+                var w = (int)SystemParameters.VirtualScreenWidth;
+                var h = (int)SystemParameters.VirtualScreenHeight;
+                var x = (int)SystemParameters.VirtualScreenLeft;
+                var y = (int)SystemParameters.VirtualScreenTop;
+                using var fullImage = new Bitmap(w, h);
                 using (var g = Graphics.FromImage(fullImage))
                 {
-                    g.CopyFromScreen(screen.Bounds.X,
-                            screen.Bounds.Y,
+                    g.CopyFromScreen(x, y,
                             0, 0,
                             fullImage.Size,
                             CopyPixelOperation.SourceCopy);
                 }
+
                 const int maxTry = 10;
                 for (var i = 0; i < maxTry; i++)
                 {
                     var marginLeft = (int)((double)fullImage.Width * i / 2.5 / maxTry);
                     var marginTop = (int)((double)fullImage.Height * i / 2.5 / maxTry);
-                    var cropRect = new Rectangle(marginLeft, marginTop, fullImage.Width - marginLeft * 2, fullImage.Height - marginTop * 2);
-                    var target = new Bitmap(screen.Bounds.Width, screen.Bounds.Height);
+                    var cropRect = new Rectangle(marginLeft, marginTop, fullImage.Width - marginLeft * 2,
+                            fullImage.Height - marginTop * 2);
+                    var target = new Bitmap(w, h);
 
-                    var imageScale = screen.Bounds.Width / (double)cropRect.Width;
+                    var imageScale = w / (double)cropRect.Width;
                     using (var g = Graphics.FromImage(target))
                     {
                         g.DrawImage(fullImage, new Rectangle(0, 0, target.Width, target.Height),
                                 cropRect,
                                 GraphicsUnit.Pixel);
                     }
+
                     var source = new BitmapLuminanceSource(target);
                     var bitmap = new BinaryBitmap(new HybridBinarizer(source));
                     var reader = new QRCodeReader();
@@ -1333,45 +1325,52 @@ namespace Shadowsocks.View
                     if (result != null)
                     {
                         var success = controller.AddServerBySSURL(result.Text);
-                        var splash = new QRCodeSplashWindow();
-                        if (success)
+                        Application.Current.Dispatcher?.Invoke(() =>
                         {
-                            splash.Closed += Splash_Closed;
-                        }
-                        else
-                        {
-                            _urlToOpen = result.Text;
-                            splash.Closed += Splash_Closed2;
-                        }
-                        double minX = int.MaxValue, minY = int.MaxValue, maxX = 0, maxY = 0;
-                        foreach (var point in result.ResultPoints)
-                        {
-                            minX = Math.Min(minX, point.X);
-                            minY = Math.Min(minY, point.Y);
-                            maxX = Math.Max(maxX, point.X);
-                            maxY = Math.Max(maxY, point.Y);
-                        }
-                        minX /= imageScale;
-                        minY /= imageScale;
-                        maxX /= imageScale;
-                        maxY /= imageScale;
-                        // make it 20% larger
-                        var margin = (maxX - minX) * 0.20f;
-                        minX += -margin + marginLeft;
-                        maxX += margin + marginLeft;
-                        minY += -margin + marginTop;
-                        maxY += margin + marginTop;
-                        splash.Left = screen.Bounds.X;
-                        splash.Top = screen.Bounds.Y;
-                        splash.TargetRect = new Rectangle((int)minX, (int)minY, (int)maxX - (int)minX, (int)maxY - (int)minY);
-                        splash.Width = fullImage.Width;
-                        splash.Height = fullImage.Height;
-                        splash.Show();
+                            var splash = new QRCodeSplashWindow();
+                            if (success)
+                            {
+                                splash.Closed += Splash_Closed;
+                            }
+                            else
+                            {
+                                _urlToOpen = result.Text;
+                                splash.Closed += Splash_Closed2;
+                            }
+
+                            double minX = int.MaxValue, minY = int.MaxValue, maxX = 0, maxY = 0;
+                            foreach (var point in result.ResultPoints)
+                            {
+                                minX = Math.Min(minX, point.X);
+                                minY = Math.Min(minY, point.Y);
+                                maxX = Math.Max(maxX, point.X);
+                                maxY = Math.Max(maxY, point.Y);
+                            }
+
+                            minX /= imageScale;
+                            minY /= imageScale;
+                            maxX /= imageScale;
+                            maxY /= imageScale;
+                            // make it 20% larger
+                            var margin = (maxX - minX) * 0.20f;
+                            minX += -margin + marginLeft;
+                            maxX += margin + marginLeft;
+                            minY += -margin + marginTop;
+                            maxY += margin + marginTop;
+                            splash.Left = x;
+                            splash.Top = y;
+                            splash.TargetRect = new Rectangle((int)minX, (int)minY, (int)maxX - (int)minX,
+                                    (int)maxY - (int)minY);
+                            splash.Width = fullImage.Width;
+                            splash.Height = fullImage.Height;
+                            splash.Show();
+                        });
                         return;
                     }
                 }
-            }
-            MessageBox.Show(I18N.GetString("No QRCode found. Try to zoom in or move it to the center of the screen."));
+
+                MessageBox.Show(I18N.GetString(@"No QRCode found. Try to zoom in or move it to the center of the screen."));
+            });
         }
 
         private void Splash_Closed(object sender, EventArgs e)
