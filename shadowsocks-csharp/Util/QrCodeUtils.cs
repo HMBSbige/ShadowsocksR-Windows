@@ -6,7 +6,6 @@ using System.Windows.Media.Imaging;
 using ZXing;
 using ZXing.QrCode;
 using ZXing.QrCode.Internal;
-using BarcodeWriter = ZXing.Windows.Compatibility.BarcodeWriter;
 using Brush = System.Drawing.Brush;
 using Color = System.Drawing.Color;
 
