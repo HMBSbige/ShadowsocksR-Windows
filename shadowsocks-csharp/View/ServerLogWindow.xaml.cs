@@ -1,11 +1,8 @@
 ﻿using Shadowsocks.Controller;
 using Shadowsocks.Model;
-using Shadowsocks.Proxy;
-using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -150,10 +147,6 @@ namespace Shadowsocks.View
                         ServerLogViewModel.ServersCollection[id].SpeedLog.ClearError();
                         ServerLogViewModel.ServersCollection[id].Enable = true;
                     }
-                    else if (header == I18N.GetString(@"Latency"))
-                    {
-                        TestOne(id);
-                    }
                     else
                     {
                         ServerDataGrid.SelectedCells.Clear();
@@ -188,9 +181,6 @@ namespace Shadowsocks.View
             WindowMenuItem.Header = I18N.GetString(@"_Window");
             AutoSizeMenuItem.Header = I18N.GetString(@"Auto _size");
             AlwaysTopMenuItem.Header = I18N.GetString(@"Always On _Top");
-
-            TestMenuItem.Header = I18N.GetString(@"Experimental");
-            TestSelectedMenuItem.Header = I18N.GetString(@"Test selected server");
 
             foreach (var column in ServerDataGrid.Columns)
             {
@@ -299,61 +289,6 @@ namespace Shadowsocks.View
             var config = _controller.GetCurrentConfiguration();
             var link = config.configs.Aggregate(string.Empty, (current, t) => current + $@"{t.SsrLink}{Environment.NewLine}");
             Clipboard.SetDataObject(link);
-        }
-
-        private void TestSelectedMenuItem_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (ServerDataGrid.SelectedCells.Count > 0 && ServerDataGrid.SelectedCells[0].Column != null)
-            {
-                if (ServerDataGrid.SelectedCells[0].Item is Server serverObject)
-                {
-                    var id = serverObject.Index - 1;
-                    TestOne(id);
-                }
-            }
-        }
-
-        private async void TestOne(int id)
-        {
-            await Task.Run(() =>
-            {
-                var port = HttpProxyRunner.GetFreePort();
-                while (_controller.GetCurrentConfiguration().portMap.ContainsKey(port.ToString()))
-                {
-                    port = HttpProxyRunner.GetFreePort();
-                }
-                var server = _controller.GetCurrentConfiguration().configs[id];
-
-                var portMap = _controller.GetCurrentConfiguration().portMap;
-                var portMapConfig = new PortMapConfig
-                {
-                    enable = true,
-                    id = server.Id,
-                    remarks = $@"Test {server.FriendlyName} by HMBSbige",
-                    type = PortMapType.ForceProxy,
-                    server_addr = @"",
-                    server_port = 0
-                };
-                portMap[port.ToString()] = portMapConfig;
-                Dispatcher.Invoke(_controller.Save);
-                _controller.GetCurrentConfiguration().FlushPortMapCache();
-
-                var config = _controller.GetCurrentConfiguration();
-                server = _controller.GetCurrentConfiguration().configs[id];
-                var pass = config.authPass;
-                var user = config.authUser;
-                if (SimpleSocksProxy.TestLocalSocks5(Convert.ToUInt16(port), pass, user))
-                {
-                    server.Enable = true;
-                }
-                else
-                {
-                    server.Enable = false;
-                    server.GetConnections().CloseAll();
-                }
-                _controller.GetCurrentConfiguration().portMap.Remove(port.ToString());
-                Dispatcher.Invoke(_controller.Save);
-            });
         }
 
         private void ServerLogWindow_OnStateChanged(object sender, EventArgs e)
