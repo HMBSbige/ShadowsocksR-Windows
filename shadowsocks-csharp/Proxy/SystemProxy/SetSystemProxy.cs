@@ -116,10 +116,23 @@ namespace Shadowsocks.Proxy.SystemProxy
             }
 
             // copy the array over into that spot in memory ...
-            for (var i = 0; i < perOption.Length; ++i)
+            if (Environment.Is64BitProcess)
             {
-                var opt = new IntPtr(optionsPtr.ToInt32() + i * optSize);
-                Marshal.StructureToPtr(perOption[i], opt, false);
+                var baseAddress = optionsPtr.ToInt64(); //long
+                for (var i = 0; i < perOption.Length; ++i)
+                {
+                    var opt = new IntPtr(baseAddress + i * optSize);
+                    Marshal.StructureToPtr(perOption[i], opt, false);
+                }
+            }
+            else
+            {
+                var baseAddress = optionsPtr.ToInt32(); //Int
+                for (var i = 0; i < perOption.Length; ++i)
+                {
+                    var opt = new IntPtr(baseAddress + i * optSize);
+                    Marshal.StructureToPtr(perOption[i], opt, false);
+                }
             }
 
             options.pOptions = optionsPtr;
