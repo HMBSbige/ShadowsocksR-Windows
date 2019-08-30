@@ -210,14 +210,22 @@ namespace Shadowsocks.View
 
         private static MenuItem CreateMenuItem(string text, RoutedEventHandler click)
         {
-            var t = new MenuItem { Header = I18N.GetString(text) };
+            var t = new MenuItem
+            {
+                Header = I18N.GetString(text),
+                BorderThickness = new Thickness(3)
+            };
             t.Click += click;
             return t;
         }
 
         private static MenuItem CreateMenuGroup(string text, IEnumerable items)
         {
-            var t = new MenuItem { Header = I18N.GetString(text) };
+            var t = new MenuItem
+            {
+                Header = I18N.GetString(text),
+                BorderThickness = new Thickness(3)
+            };
             foreach (var item in items)
             {
                 t.Items.Add(item);
