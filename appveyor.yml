@@ -10,8 +10,8 @@ build_script:
 - cmd: build.cmd
 after_build:
 - cmd: >-    
-    7z a ShadowsocksR-net48.zip %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\net48\ShadowsocksR.exe
+    7z a ShadowsocksR-netcore.zip %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\ShadowsocksR.exe %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\ShadowsocksR.dll %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\ShadowsocksR.runtimeconfig.json
 test: off
 artifacts:
-- path: ShadowsocksR-net48.zip
-  name: ShadowsocksR-net48.zip
+- path: ShadowsocksR-netcore.zip
+  name: ShadowsocksR-netcore.zip

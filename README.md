@@ -18,11 +18,11 @@ ShadowsocksR for Windows
     * 文件小
 
 * `ShadowsocksR-netcore-win32.zip`
-    * 无需任何运行时
+    * 无需额外安装任何运行时（会在 `%temp%\.net\ShadowsocksR\` 释放运行库）
     * 文件大
 
 * `ShadowsocksR-netcore-win64.zip`
-    * 无需任何运行时
+    * 无需额外安装任何运行时（会在 `%temp%\.net\ShadowsocksR\` 释放运行库）
     * 文件大
 
 #### Donate

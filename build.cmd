@@ -9,13 +9,13 @@ REM dotnet publish -c Release -f netcoreapp3.0 -r win-x64 --self-contained
 
 cd shadowsocks-csharp
 
-REM echo Building .NET Core
-REM msbuild -v:m -t:Restore -p:Configuration=Release -p:TargetFramework=netcoreapp3.0 || goto :error
-REM msbuild -v:m -t:Publish -p:Configuration=Release -p:TargetFramework=netcoreapp3.0 || goto :error
+echo Building .NET Core
+msbuild -v:m -t:Restore -p:Configuration=Release -p:TargetFramework=netcoreapp3.0 || goto :error
+msbuild -v:m -t:Publish -p:Configuration=Release -p:TargetFramework=netcoreapp3.0 || goto :error
 
-echo Building .NET Framework x86 and x64
-msbuild -v:m -t:Restore -p:Configuration=Release -p:TargetFramework=net48 || goto :error
-msbuild -v:m -t:Build -p:Configuration=Release -p:TargetFramework=net48 || goto :error
+REM echo Building .NET Framework x86 and x64
+REM msbuild -v:m -t:Restore -p:Configuration=Release -p:TargetFramework=net48 || goto :error
+REM msbuild -v:m -t:Build -p:Configuration=Release -p:TargetFramework=net48 || goto :error
 
 REM echo Building .NET Core SelfContained x86
 REM msbuild -v:m -t:Restore -p:Configuration=Release -p:TargetFramework=netcoreapp3.0 -p:RuntimeIdentifier=win-x86 -p:SelfContained=True -p:PublishSingleFile=true|| goto :error

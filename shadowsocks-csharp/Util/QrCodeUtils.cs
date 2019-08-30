@@ -4,8 +4,12 @@ using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ZXing;
+using ZXing.Common;
 using ZXing.QrCode;
 using ZXing.QrCode.Internal;
+#if IsDotNetCore
+using ZXing.Windows.Compatibility;
+#endif
 using Brush = System.Drawing.Brush;
 using Color = System.Drawing.Color;
 
@@ -75,6 +79,14 @@ namespace Shadowsocks.Util
             }
 
             return ToBitmapImage(drawArea);
+        }
+
+        public static Result ScanBitmap(Bitmap target)
+        {
+            var source = new BitmapLuminanceSource(target);
+            var bitmap = new BinaryBitmap(new HybridBinarizer(source));
+            var reader = new QRCodeReader();
+            return reader.decode(bitmap);
         }
     }
 }

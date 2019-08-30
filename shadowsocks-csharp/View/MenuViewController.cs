@@ -17,9 +17,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using ZXing;
-using ZXing.Common;
-using ZXing.QrCode;
 
 namespace Shadowsocks.View
 {
@@ -1292,15 +1289,13 @@ namespace Shadowsocks.View
                     var imageScale = w / (double)cropRect.Width;
                     using (var g = Graphics.FromImage(target))
                     {
-                        g.DrawImage(fullImage, new Rectangle(0, 0, target.Width, target.Height),
+                        g.DrawImage(fullImage,
+                        new Rectangle(0, 0, target.Width, target.Height),
                                 cropRect,
                                 GraphicsUnit.Pixel);
                     }
 
-                    var source = new BitmapLuminanceSource(target);
-                    var bitmap = new BinaryBitmap(new HybridBinarizer(source));
-                    var reader = new QRCodeReader();
-                    var result = reader.decode(bitmap);
+                    var result = QrCodeUtils.ScanBitmap(target);
                     if (result != null)
                     {
                         var success = controller.AddServerBySSURL(result.Text);
