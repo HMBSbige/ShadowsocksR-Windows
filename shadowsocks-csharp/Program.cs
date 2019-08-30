@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using Shadowsocks.Controller;
+using Shadowsocks.Model;
+using Shadowsocks.Util;
+using Shadowsocks.Util.SingleInstance;
+using Shadowsocks.View;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Windows;
-using Microsoft.Win32;
-using Shadowsocks.Controller;
-using Shadowsocks.Model;
-using Shadowsocks.Util;
-using Shadowsocks.View;
 
 namespace Shadowsocks
 {
@@ -21,7 +22,7 @@ namespace Shadowsocks
         private static void Main(string[] args)
         {
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Utils.GetExecutablePath()) ?? throw new InvalidOperationException());
-            if (args.Any(arg => arg == @"--setautorun"))
+            if (args.Contains(@"--setautorun"))
             {
                 if (!AutoStartup.Switch())
                 {
@@ -30,14 +31,15 @@ namespace Shadowsocks
                 return;
             }
 
-            using var mutex = new Mutex(false, $@"Global\ShadowsocksR_{Directory.GetCurrentDirectory().GetDeterministicHashCode()}");
-            if (!mutex.WaitOne(0, false))
+            var identifier = $@"Global\{UpdateChecker.Name}_{Directory.GetCurrentDirectory().GetDeterministicHashCode()}";
+            using var singleInstance = new SingleInstance(identifier);
+            if (!singleInstance.IsFirstInstance)
             {
-                MessageBox.Show(I18N.GetString("Find Shadowsocks icon in your notify tray.") + Environment.NewLine +
-                                I18N.GetString("If you want to start multiple Shadowsocks, make a copy in another directory."),
-                        I18N.GetString("ShadowsocksR is already running."));
+                singleInstance.PassArgumentsToFirstInstance(args.Append(@"--show"));
                 return;
             }
+            singleInstance.ArgumentsReceived += SingleInstance_ArgumentsReceived;
+            singleInstance.ListenForArgumentsFromSuccessiveInstances();
 
             var app = new Application
             {
@@ -73,8 +75,7 @@ namespace Shadowsocks
             Logging.DefaultOut = Console.Out;
             Logging.DefaultError = Console.Error;
 
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12 |
-                SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
             _viewController = new MenuViewController(_controller);
             SystemEvents.SessionEnding += _viewController.Quit_Click;
@@ -145,6 +146,16 @@ namespace Shadowsocks
                 $@"{I18N.GetString(@"Unexpected error, ShadowsocksR will exit.")}{Environment.NewLine}{e.ExceptionObject}",
                     UpdateChecker.Name, MessageBoxButton.OK, MessageBoxImage.Error);
                 Application.Current.Shutdown();
+            }
+        }
+
+        private static void SingleInstance_ArgumentsReceived(object sender, ArgumentsReceivedEventArgs e)
+        {
+            if (e.Args.Contains(@"--show"))
+            {
+                MessageBox.Show(I18N.GetString("Find Shadowsocks icon in your notify tray.") + Environment.NewLine +
+                                I18N.GetString("If you want to start multiple Shadowsocks, make a copy in another directory."),
+                        I18N.GetString("ShadowsocksR is already running."), MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
     }

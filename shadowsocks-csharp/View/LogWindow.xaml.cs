@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Shadowsocks.Controller;
+using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
-using Shadowsocks.Controller;
+using WpfColorFontDialog;
 
 namespace Shadowsocks.View
 {
@@ -138,74 +137,18 @@ namespace Shadowsocks.View
 
         private void FontMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            #region Get current font
-
-            var style = LogTextBox.FontWeight == FontWeights.Bold
-                    ? System.Drawing.FontStyle.Bold
-                    : System.Drawing.FontStyle.Regular;
-            if (LogTextBox.FontStyle == FontStyles.Italic)
+            var dialog = new ColorFontDialog
             {
-                style |= System.Drawing.FontStyle.Italic;
-            }
-
-            var isUnderline = true;
-            foreach (var td in TextDecorations.Underline)
-            {
-                if (!LogTextBox.TextDecorations.Contains(td))
-                {
-                    isUnderline = false;
-                    break;
-                }
-            }
-            if (isUnderline)
-            {
-                style |= System.Drawing.FontStyle.Underline;
-            }
-
-            var isStrikeout = true;
-            foreach (var td in TextDecorations.Strikethrough)
-            {
-                if (!LogTextBox.TextDecorations.Contains(td))
-                {
-                    isStrikeout = false;
-                    break;
-                }
-            }
-            if (isStrikeout)
-            {
-                style |= System.Drawing.FontStyle.Strikeout;
-            }
-
-            var name = @"Courier New";
-            var familyNames = LogTextBox.FontFamily.FamilyNames.Values;
-            if (familyNames != null)
-            {
-                var names = familyNames.ToArray();
-                if (names.Length > 0)
-                {
-                    name = names[0];
-                }
-            }
-
-            var font = new System.Drawing.Font(name, Convert.ToSingle(LogTextBox.FontSize * 72.0 / 96.0), style, System.Drawing.GraphicsUnit.Point, 0);
-
-            #endregion
-
-            using var fontDialog = new System.Windows.Forms.FontDialog
-            {
-                Font = font
+                Font = FontInfo.GetControlFont(LogTextBox)
             };
-            if (fontDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                LogTextBox.FontFamily = new FontFamily(fontDialog.Font.Name);
-                LogTextBox.FontSize = fontDialog.Font.Size * 96.0 / 72.0;
-                LogTextBox.FontWeight = fontDialog.Font.Bold ? FontWeights.Bold : FontWeights.Regular;
-                LogTextBox.FontStyle = fontDialog.Font.Italic ? FontStyles.Italic : FontStyles.Normal;
 
-                var tdc = new TextDecorationCollection();
-                if (fontDialog.Font.Underline) tdc.Add(TextDecorations.Underline);
-                if (fontDialog.Font.Strikeout) tdc.Add(TextDecorations.Strikethrough);
-                LogTextBox.TextDecorations = tdc;
+            if (dialog.ShowDialog() == true)
+            {
+                var font = dialog.Font;
+                if (font != null)
+                {
+                    FontInfo.ApplyFont(LogTextBox, font);
+                }
             }
         }
 

@@ -22,7 +22,7 @@ namespace Shadowsocks.View
         {
             LoadLanguage();
             _controller.ConfigChanged += controller_ConfigChanged;
-            foreach (var c in Utils.FindVisualChildren<TextBox>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<TextBox>(this))
             {
                 //Not Child of NumberUpDown
                 if (c.Name.EndsWith(@"TextBox"))
@@ -30,26 +30,26 @@ namespace Shadowsocks.View
                     c.TextChanged += (o, e) => { ApplyButton.IsEnabled = true; };
                 }
             }
-            foreach (var c in Utils.FindVisualChildren<PasswordBox>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<PasswordBox>(this))
             {
                 c.PasswordChanged += (o, e) => { ApplyButton.IsEnabled = true; };
             }
-            foreach (var c in Utils.FindVisualChildren<CheckBox>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<CheckBox>(this))
             {
                 c.Checked += (o, e) => { ApplyButton.IsEnabled = true; };
                 c.Unchecked += (o, e) => { ApplyButton.IsEnabled = true; };
             }
-            foreach (var c in Utils.FindVisualChildren<ComboBox>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<ComboBox>(this))
             {
                 c.SelectionChanged += (o, e) => { ApplyButton.IsEnabled = true; };
             }
-            foreach (var c in Utils.FindVisualChildren<NumberUpDown>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<NumberUpDown>(this))
             {
                 c.ValueChanged += (o, e) => { ApplyButton.IsEnabled = true; };
             }
 
             //Fix Width
-            foreach (var c in Utils.FindVisualChildren<GroupBox>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<GroupBox>(this))
             {
                 c.MaxWidth = c.ActualWidth;
                 c.MinWidth = c.ActualWidth;
@@ -72,22 +72,22 @@ namespace Shadowsocks.View
         {
             UpdateTitle();
 
-            foreach (var c in Utils.FindVisualChildren<Label>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<Label>(this))
             {
                 c.Content = I18N.GetString(c.Content.ToString());
             }
 
-            foreach (var c in Utils.FindVisualChildren<Button>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<Button>(this))
             {
                 c.Content = I18N.GetString(c.Content.ToString());
             }
 
-            foreach (var c in Utils.FindVisualChildren<CheckBox>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<CheckBox>(this))
             {
                 c.Content = I18N.GetString(c.Content.ToString());
             }
 
-            foreach (var c in Utils.FindVisualChildren<GroupBox>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<GroupBox>(this))
             {
                 c.Header = I18N.GetString(c.Header.ToString());
             }

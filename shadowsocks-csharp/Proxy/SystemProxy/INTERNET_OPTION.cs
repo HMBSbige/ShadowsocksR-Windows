@@ -1,6 +1,6 @@
 ﻿namespace Shadowsocks.Proxy.SystemProxy
 {
-    public enum INTERNET_OPTION
+    internal enum INTERNET_OPTION
     {
         // Sets or retrieves an INTERNET_PER_CONN_OPTION_LIST structure that specifies
         // a list of options for a particular connection.
@@ -18,6 +18,5 @@
         // To alert all available WinInet instances, set the Buffer parameter of
         // InternetSetOption to NULL and BufferLength to 0 when passing this option.
         INTERNET_OPTION_PROXY_SETTINGS_CHANGED = 95
-
     }
 }

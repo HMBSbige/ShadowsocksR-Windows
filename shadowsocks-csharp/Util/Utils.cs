@@ -16,9 +16,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace Shadowsocks.Util
 {
@@ -689,58 +686,6 @@ namespace Shadowsocks.Util
 
             Array.Resize(ref cfgData, dataLen);
             return cfgData;
-        }
-
-        public static void RegistrySetValue(RegistryKey registry, string name, object value)
-        {
-            try
-            {
-                registry.SetValue(name, value);
-            }
-            catch (Exception e)
-            {
-                Logging.LogUsefulException(e);
-            }
-        }
-
-        public static RegistryKey OpenUserRegKey(string name, bool writable)
-        {
-            var userKey = RegistryKey.OpenRemoteBaseKey(RegistryHive.CurrentUser, string.Empty,
-                    Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32
-            ).OpenSubKey(name, writable);
-            return userKey;
-        }
-
-        public static void BringToFront(this FrameworkElement element)
-        {
-            if (element?.Parent is Panel parent)
-            {
-                var maxZ = parent.Children.OfType<UIElement>()
-                        .Where(x => x != element)
-                        .Select(Panel.GetZIndex)
-                        .Max();
-                Panel.SetZIndex(element, maxZ + 1);
-            }
-        }
-
-        public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
-        {
-            if (depObj != null)
-            {
-                for (var i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
-                {
-                    var child = VisualTreeHelper.GetChild(depObj, i);
-                    if (child is T dependencyObject)
-                    {
-                        yield return dependencyObject;
-                    }
-
-                    foreach (var childOfChild in FindVisualChildren<T>(child))
-                    {
-                        yield return childOfChild;
-                    }
-                }
-            }
         }
 
         public static string FormatBytes(long bytes)

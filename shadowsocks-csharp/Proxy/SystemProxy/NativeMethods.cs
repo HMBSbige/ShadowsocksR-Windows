@@ -5,7 +5,14 @@ namespace Shadowsocks.Proxy.SystemProxy
 {
     internal static class NativeMethods
     {
-        [DllImport(@"wininet.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern bool InternetSetOption(IntPtr hInternet, int dwOption, IntPtr lpBuffer, int dwBufferLength);
+        /// <summary>
+        /// Sets an Internet option.
+        /// </summary>
+        [DllImport(@"WinINet.dll", CharSet = CharSet.Ansi, SetLastError = true)]
+        internal static extern bool InternetSetOption(
+            IntPtr hInternet,
+            INTERNET_OPTION dwOption,
+            IntPtr lpBuffer,
+            int lpdwBufferLength);
     }
 }

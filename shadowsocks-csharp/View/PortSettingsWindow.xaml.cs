@@ -30,7 +30,7 @@ namespace Shadowsocks.View
             _controller.ConfigChanged += controller_ConfigChanged;
             ValueChanged += PortSettingsWindow_ValueChanged;
 
-            foreach (var c in Utils.FindVisualChildren<TextBox>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<TextBox>(this))
             {
                 //Not Child of NumberUpDown
                 if (c.Name.EndsWith(@"TextBox"))
@@ -41,7 +41,7 @@ namespace Shadowsocks.View
                     };
                 }
             }
-            foreach (var c in Utils.FindVisualChildren<CheckBox>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<CheckBox>(this))
             {
                 c.Checked += (o, e) =>
                 {
@@ -52,14 +52,14 @@ namespace Shadowsocks.View
                     ValueChanged?.Invoke(this, new EventArgs());
                 };
             }
-            foreach (var c in Utils.FindVisualChildren<ComboBox>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<ComboBox>(this))
             {
                 c.SelectionChanged += (o, e) =>
                 {
                     ValueChanged?.Invoke(this, new EventArgs());
                 };
             }
-            foreach (var c in Utils.FindVisualChildren<NumberUpDown>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<NumberUpDown>(this))
             {
                 c.ValueChanged += (o, e) =>
                 {
@@ -80,22 +80,22 @@ namespace Shadowsocks.View
         {
             Title = I18N.GetString(@"Port Settings");
 
-            foreach (var c in Utils.FindVisualChildren<Label>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<Label>(this))
             {
                 c.Content = I18N.GetString(c.Content.ToString());
             }
 
-            foreach (var c in Utils.FindVisualChildren<Button>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<Button>(this))
             {
                 c.Content = I18N.GetString(c.Content.ToString());
             }
 
-            foreach (var c in Utils.FindVisualChildren<CheckBox>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<CheckBox>(this))
             {
                 c.Content = I18N.GetString(c.Content.ToString());
             }
 
-            foreach (var c in Utils.FindVisualChildren<GroupBox>(this))
+            foreach (var c in ViewUtils.FindVisualChildren<GroupBox>(this))
             {
                 c.Header = I18N.GetString(c.Header.ToString());
             }
