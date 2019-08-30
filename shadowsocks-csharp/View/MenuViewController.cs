@@ -1007,6 +1007,10 @@ namespace Shadowsocks.View
                 timerDelayCheckUpdate.Stop();
                 timerDelayCheckUpdate = null;
             }
+            if (_notifyIcon.Icon != null)
+            {
+                ViewUtils.DestroyIcon(_notifyIcon.Icon.Handle);
+            }
             _notifyIcon.Dispose();
             Application.Current.Shutdown();
         }
