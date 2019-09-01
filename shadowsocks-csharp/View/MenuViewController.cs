@@ -330,7 +330,7 @@ namespace Shadowsocks.View
                         }
                         case @"ImportSsrLinksFromClipboard":
                         {
-                            menuItem.Click += CopyAddress_Click;
+                            menuItem.Click += ImportAddressFromClipboard_Click;
                             break;
                         }
                         case @"Help":
@@ -448,7 +448,7 @@ namespace Shadowsocks.View
                         // ignored
                     }
                 }
-                URL_Split(updateFreeNodeChecker.FreeNodeResult, ref urls);
+                Utils.URL_Split(updateFreeNodeChecker.FreeNodeResult, ref urls);
                 for (var i = urls.Count - 1; i >= 0; --i)
                 {
                     if (!urls[i].StartsWith("ssr"))
@@ -1290,44 +1290,25 @@ namespace Shadowsocks.View
             controller.DisconnectAllConnections();
         }
 
-        private void URL_Split(string text, ref List<string> out_urls)
+        public void ImportAddress(string text)
         {
-            if (string.IsNullOrEmpty(text))
+            var urls = new List<string>();
+            Utils.URL_Split(text, ref urls);
+            var count = urls.Count(url => controller.AddServerBySSURL(url));
+            if (count > 0)
             {
-                return;
-            }
-            var ss_index = text.IndexOf("ss://", 1, StringComparison.OrdinalIgnoreCase);
-            var ssr_index = text.IndexOf("ssr://", 1, StringComparison.OrdinalIgnoreCase);
-            var index = ss_index;
-            if (index == -1 || index > ssr_index && ssr_index != -1) index = ssr_index;
-            if (index == -1)
-            {
-                out_urls.Insert(0, text);
-            }
-            else
-            {
-                out_urls.Insert(0, text.Substring(0, index));
-                URL_Split(text.Substring(index), ref out_urls);
+                ShowConfigForm(true);
             }
         }
 
-        private void CopyAddress_Click(object sender, RoutedEventArgs e)
+        private void ImportAddressFromClipboard_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 var iData = Clipboard.GetDataObject();
                 if (iData != null && iData.GetDataPresent(DataFormats.Text))
                 {
-                    var urls = new List<string>();
-                    URL_Split((string)iData.GetData(DataFormats.Text), ref urls);
-                    var count = 0;
-                    foreach (var url in urls)
-                    {
-                        if (controller.AddServerBySSURL(url))
-                            ++count;
-                    }
-                    if (count > 0)
-                        ShowConfigForm(true);
+                    ImportAddress((string)iData.GetData(DataFormats.Text));
                 }
             }
             catch
