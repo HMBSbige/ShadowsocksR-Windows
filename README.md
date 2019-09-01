@@ -17,12 +17,14 @@ ShadowsocksR for Windows
     * 需要安装 [.NET Framework 4.8](https://dotnet.microsoft.com/download) （最新版 Win10 自带）
     * 文件小
 
+**以下版本首次运行会在 `%temp%\.net\ShadowsocksR\` 释放运行库，若有各种清理软件、Windows 更新等误删则会造成运行出错，删除该目录下的所有文件即可重新释放**
+
 * `ShadowsocksR-netcore-win32.zip`
-    * 无需额外安装任何运行时（会在 `%temp%\.net\ShadowsocksR\` 释放运行库）
+    * 无需额外安装任何运行时
     * 文件大
 
 * `ShadowsocksR-netcore-win64.zip`
-    * 无需额外安装任何运行时（会在 `%temp%\.net\ShadowsocksR\` 释放运行库）
+    * 无需额外安装任何运行时
     * 文件大
 
 #### Donate

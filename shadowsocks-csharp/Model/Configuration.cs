@@ -143,7 +143,8 @@ namespace Shadowsocks.Model
 
         public int keepVisitTime;
 
-        public bool isHideTips;
+        public bool isPreRelease;
+        public bool AutoCheckUpdate;
 
         public bool nodeFeedAutoUpdate;
         public List<ServerSubscribe> serverSubscribes;
@@ -383,6 +384,8 @@ namespace Shadowsocks.Model
             sysProxyMode = (int)ProxyMode.NoModify;
             proxyRuleMode = (int)ProxyRuleMode.Disable;
 
+            AutoCheckUpdate = true;
+            isPreRelease = false;
             nodeFeedAutoUpdate = true;
 
             serverSubscribes = new List<ServerSubscribe>();
@@ -420,7 +423,8 @@ namespace Shadowsocks.Model
             logEnable = config.logEnable;
             sameHostForSameTarget = config.sameHostForSameTarget;
             keepVisitTime = config.keepVisitTime;
-            isHideTips = config.isHideTips;
+            AutoCheckUpdate = config.AutoCheckUpdate;
+            isPreRelease = config.isPreRelease;
             nodeFeedAutoUpdate = config.nodeFeedAutoUpdate;
             serverSubscribes = config.serverSubscribes;
         }

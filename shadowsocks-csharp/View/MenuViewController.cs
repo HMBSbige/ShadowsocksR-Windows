@@ -44,7 +44,7 @@ namespace Shadowsocks.View
         private readonly UpdateSubscribeManager updateSubscribeManager;
 
         private readonly TaskbarIcon _notifyIcon;
-        private readonly ContextMenu _contextMenu = new ContextMenu();
+        private ContextMenu _contextMenu;
 
         private MenuItem noModifyItem;
         private MenuItem enableItem;
@@ -57,11 +57,13 @@ namespace Shadowsocks.View
         private MenuItem ruleUser;
         private MenuItem ruleDisableBypass;
 
-        private Separator SeperatorItem;
+        private Separator SeparatorItem;
         private MenuItem ServersItem;
         private MenuItem SelectRandomItem;
         private MenuItem sameHostForSameTargetItem;
         private MenuItem UpdateItem;
+        private MenuItem AutoCheckUpdateItem;
+        private MenuItem AllowPreReleaseItem;
         private ConfigWindow _configWindow;
         private SettingsWindow _settingsWindow;
 
@@ -110,6 +112,7 @@ namespace Shadowsocks.View
             updateChecker = new UpdateChecker();
             updateChecker.NewVersionFound += updateChecker_NewVersionFound;
             updateChecker.NewVersionNotFound += updateChecker_NewVersionNotFound;
+            updateChecker.NewVersionFoundFailed += UpdateChecker_NewVersionFoundFailed;
 
             updateFreeNodeChecker = new UpdateFreeNode();
             updateFreeNodeChecker.NewFreeNodeFound += updateFreeNodeChecker_NewFreeNodeFound;
@@ -128,8 +131,10 @@ namespace Shadowsocks.View
             timerDelayCheckUpdate.Interval = 1000.0 * 60 * 60 * 1;// 1 hours
 
             var cfg = controller.GetCurrentConfiguration();
-
-            updateChecker.CheckUpdate(cfg, false);
+            if (cfg.AutoCheckUpdate)
+            {
+                updateChecker.Check(cfg, false);
+            }
 
             if (cfg.IsDefaultConfig() || cfg.nodeFeedAutoUpdate)
             {
@@ -208,16 +213,13 @@ namespace Shadowsocks.View
             _notifyIcon.ToolTipText = text;
         }
 
-        private static MenuItem CreateMenuItem(string text, RoutedEventHandler click)
-        {
-            var t = new MenuItem { Header = I18N.GetString(text) };
-            t.Click += click;
-            return t;
-        }
-
         private static MenuItem CreateMenuGroup(string text, IEnumerable items)
         {
-            var t = new MenuItem { Header = I18N.GetString(text) };
+            var t = new MenuItem
+            {
+                Header = text,
+                BorderThickness = new Thickness(3)
+            };
             foreach (var item in items)
             {
                 t.Items.Add(item);
@@ -227,90 +229,136 @@ namespace Shadowsocks.View
 
         private void LoadMenu()
         {
-            _contextMenu.Items.Clear();
-            var modeMenu = CreateMenuGroup(@"Mode", new Control[]
+            if (Application.Current.FindResource(@"SysTrayMenu") is ContextMenu menu)
             {
-                    enableItem = CreateMenuItem(@"Disable system proxy", EnableItem_Click),
-                    PACModeItem = CreateMenuItem(@"PAC", PACModeItem_Click),
-                    globalModeItem = CreateMenuItem(@"Global", GlobalModeItem_Click),
-                    new Separator(),
-                    noModifyItem = CreateMenuItem(@"No modify system proxy", NoModifyItem_Click)
-            });
-            _contextMenu.Items.Add(modeMenu);
-            var pacMenu = CreateMenuGroup(@"PAC ", new Control[]
+                _contextMenu = menu;
+            }
+
+            I18NUtil.SetLanguage(_contextMenu);
+            foreach (var obj in _contextMenu.Items)
             {
-                    CreateMenuItem(@"Update local PAC from Lan IP list", UpdatePACFromLanIPListItem_Click),
-                    new Separator(),
-                    CreateMenuItem(@"Update local PAC from Chn Domain list", UpdatePACFromCNWhiteListItem_Click),
-                    CreateMenuItem(@"Update local PAC from Chn Domain and IP list", UpdatePACFromCNIPListItem_Click),
-                    CreateMenuItem(@"Update local PAC from GFWList", UpdatePACFromGFWListItem_Click),
-                    new Separator(),
-                    CreateMenuItem(@"Update local PAC from Chn Only list", UpdatePACFromCNOnlyListItem_Click),
-                    new Separator(),
-                    CreateMenuItem(@"Copy PAC URL", CopyPacUrlItem_Click),
-                    CreateMenuItem(@"Edit local PAC file...", EditPACFileItem_Click),
-                    CreateMenuItem(@"Edit user rule for GFWList...", EditUserRuleFileForGFWListItem_Click)
-            });
-            _contextMenu.Items.Add(pacMenu);
+                if (obj is MenuItem menuItem)
+                {
+                    switch (menuItem.Name)
+                    {
+                        case @"Mode":
+                        {
+                            enableItem = (MenuItem)menuItem.Items[0];
+                            PACModeItem = (MenuItem)menuItem.Items[1];
+                            globalModeItem = (MenuItem)menuItem.Items[2];
+                            noModifyItem = (MenuItem)menuItem.Items[4];
+                            enableItem.Click += EnableItem_Click;
+                            PACModeItem.Click += PACModeItem_Click;
+                            globalModeItem.Click += GlobalModeItem_Click;
+                            noModifyItem.Click += NoModifyItem_Click;
+                            break;
+                        }
+                        case @"PAC":
+                        {
+                            ((MenuItem)menuItem.Items[0]).Click += UpdatePACFromLanIPListItem_Click;
+                            ((MenuItem)menuItem.Items[2]).Click += UpdatePACFromCNWhiteListItem_Click;
+                            ((MenuItem)menuItem.Items[3]).Click += UpdatePACFromCNIPListItem_Click;
+                            ((MenuItem)menuItem.Items[4]).Click += UpdatePACFromGFWListItem_Click;
+                            ((MenuItem)menuItem.Items[6]).Click += UpdatePACFromCNOnlyListItem_Click;
+                            ((MenuItem)menuItem.Items[8]).Click += CopyPacUrlItem_Click;
+                            ((MenuItem)menuItem.Items[9]).Click += EditPACFileItem_Click;
+                            ((MenuItem)menuItem.Items[10]).Click += EditUserRuleFileForGFWListItem_Click;
+                            break;
+                        }
+                        case @"ProxyRule":
+                        {
+                            ruleBypassLan = (MenuItem)menuItem.Items[0];
+                            ruleBypassChina = (MenuItem)menuItem.Items[1];
+                            ruleBypassNotChina = (MenuItem)menuItem.Items[2];
+                            ruleUser = (MenuItem)menuItem.Items[3];
+                            ruleDisableBypass = (MenuItem)menuItem.Items[5];
 
-            var proxyRule = CreateMenuGroup(@"Proxy rule", new Control[]
-            {
-                    ruleBypassLan = CreateMenuItem(@"Bypass LAN", RuleBypassLanItem_Click),
-                    ruleBypassChina = CreateMenuItem(@"Bypass LAN && China", RuleBypassChinaItem_Click),
-                    ruleBypassNotChina = CreateMenuItem(@"Bypass LAN && not China", RuleBypassNotChinaItem_Click),
-                    ruleUser = CreateMenuItem(@"User custom", RuleUserItem_Click),
-                    new Separator(),
-                    ruleDisableBypass = CreateMenuItem(@"Disable bypass", RuleBypassDisableItem_Click)
-            });
-            _contextMenu.Items.Add(proxyRule);
-            _contextMenu.Items.Add(new Separator());
+                            ruleBypassLan.Click += RuleBypassLanItem_Click;
+                            ruleBypassChina.Click += RuleBypassChinaItem_Click;
+                            ruleBypassNotChina.Click += RuleBypassNotChinaItem_Click;
+                            ruleUser.Click += RuleUserItem_Click;
+                            ruleDisableBypass.Click += RuleBypassDisableItem_Click;
+                            break;
+                        }
+                        case @"Servers":
+                        {
+                            ServersItem = menuItem;
+                            SeparatorItem = (Separator)menuItem.Items[0];
+                            SelectRandomItem = (MenuItem)menuItem.Items[4];
+                            sameHostForSameTargetItem = (MenuItem)menuItem.Items[5];
 
-            ServersItem = CreateMenuGroup(@"Servers", new Control[]
-            {
-                    SeperatorItem = new Separator(),
-                    CreateMenuItem(@"Edit servers...", Config_Click),
-                    CreateMenuItem(@"Import servers from file...", Import_Click),
-                    new Separator(),
-                    SelectRandomItem = CreateMenuItem(@"Load balance", SelectRandomItem_Click),
-                    sameHostForSameTargetItem = CreateMenuItem(@"Same host for same address",SelectSameHostForSameTargetItem_Click),
-                    new Separator(),
-                    CreateMenuItem(@"Server statistic...", ShowServerLogItem_Click),
-                    CreateMenuItem(@"Disconnect current", DisconnectCurrent_Click)
-            });
-            _contextMenu.Items.Add(ServersItem);
+                            ((MenuItem)menuItem.Items[1]).Click += Config_Click;
+                            ((MenuItem)menuItem.Items[2]).Click += Import_Click;
+                            SelectRandomItem.Click += SelectRandomItem_Click;
+                            sameHostForSameTargetItem.Click += SelectSameHostForSameTargetItem_Click;
+                            ((MenuItem)menuItem.Items[7]).Click += ShowServerLogItem_Click;
+                            ((MenuItem)menuItem.Items[8]).Click += DisconnectCurrent_Click;
+                            break;
+                        }
+                        case @"ServersSubscribe":
+                        {
+                            ((MenuItem)menuItem.Items[0]).Click += SubscribeSetting_Click;
+                            ((MenuItem)menuItem.Items[1]).Click += CheckNodeUpdate_Click;
+                            ((MenuItem)menuItem.Items[2]).Click += CheckNodeUpdateBypassProxy_Click;
+                            break;
+                        }
+                        case @"GlobalSettings":
+                        {
+                            menuItem.Click += Setting_Click;
+                            break;
+                        }
+                        case @"PortSettings":
+                        {
+                            menuItem.Click += ShowPortMapItem_Click;
+                            break;
+                        }
+                        case @"ShowLogs":
+                        {
+                            menuItem.Click += ShowLogItem_Click;
+                            break;
+                        }
+                        case @"UpdateAvailable":
+                        {
+                            UpdateItem = menuItem;
+                            UpdateItem.Click += UpdateItem_Clicked;
+                            break;
+                        }
+                        case @"ScanQrCode":
+                        {
+                            menuItem.Click += ScanQRCodeItem_Click;
+                            break;
+                        }
+                        case @"ImportSsrLinksFromClipboard":
+                        {
+                            menuItem.Click += CopyAddress_Click;
+                            break;
+                        }
+                        case @"Help":
+                        {
 
-            var subMenu = CreateMenuGroup(@"Servers Subscribe", new[]
-            {
-                    CreateMenuItem(@"Subscribe setting...", SubscribeSetting_Click),
-                    CreateMenuItem(@"Update subscribe SSR node", CheckNodeUpdate_Click),
-                    CreateMenuItem(@"Update subscribe SSR node(bypass proxy)", CheckNodeUpdateBypassProxy_Click)
-            });
-            _contextMenu.Items.Add(subMenu);
+                            ((MenuItem)menuItem.Items[0]).Click += OpenWiki_Click;
+                            ((MenuItem)menuItem.Items[1]).Click += FeedbackItem_Click;
+                            ((MenuItem)menuItem.Items[2]).Click += DonateMenuItem_Click;
+                            ((MenuItem)menuItem.Items[4]).Click += showURLFromQRCode;
+                            ((MenuItem)menuItem.Items[5]).Click += ResetPasswordItem_Click;
+                            ((MenuItem)menuItem.Items[8]).Click += AboutItem_Click;
 
-            _contextMenu.Items.Add(CreateMenuItem(@"Global settings...", Setting_Click));
-            _contextMenu.Items.Add(CreateMenuItem(@"Port settings...", ShowPortMapItem_Click));
-            _contextMenu.Items.Add(CreateMenuItem(@"Show logs...", ShowLogItem_Click));
-            _contextMenu.Items.Add(UpdateItem = CreateMenuItem(@"Update available", UpdateItem_Clicked));
-            _contextMenu.Items.Add(new Separator());
-
-            _contextMenu.Items.Add(CreateMenuItem(@"Scan QRCode from screen...", ScanQRCodeItem_Click));
-            _contextMenu.Items.Add(CreateMenuItem(@"Import SSR links from clipboard...", CopyAddress_Click));
-            _contextMenu.Items.Add(new Separator());
-
-            var helpMenu = CreateMenuGroup(@"Help", new Control[]
-            {
-                    CreateMenuItem(@"Check update", CheckUpdate_Click),
-                    CreateMenuItem(@"Open wiki...", OpenWiki_Click),
-                    CreateMenuItem(@"Feedback...", FeedbackItem_Click),
-                    new Separator(),
-                    CreateMenuItem(@"Gen custom QRCode...", showURLFromQRCode),
-                    CreateMenuItem(@"Reset password...", ResetPasswordItem_Click),
-                    new Separator(),
-                    CreateMenuItem(@"About...", AboutItem_Click)
-            });
-            _contextMenu.Items.Add(helpMenu);
-            _contextMenu.Items.Add(CreateMenuItem(@"Quit", Quit_Click));
-            UpdateItem.Visibility = Visibility.Collapsed;
+                            var updateMenu = (MenuItem)menuItem.Items[7];
+                            ((MenuItem)updateMenu.Items[0]).Click += CheckUpdate_Click;
+                            AutoCheckUpdateItem = (MenuItem)updateMenu.Items[2];
+                            AllowPreReleaseItem = (MenuItem)updateMenu.Items[3];
+                            AutoCheckUpdateItem.Click += AutoCheckUpdateItem_Click;
+                            AllowPreReleaseItem.Click += AllowPreRelease_Click;
+                            break;
+                        }
+                        case @"Quit":
+                        {
+                            menuItem.Click += Quit_Click;
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         private void controller_ConfigChanged(object sender, EventArgs e)
@@ -635,21 +683,33 @@ namespace Shadowsocks.View
 
         private void updateChecker_NewVersionFound(object sender, EventArgs e)
         {
-            if (updateChecker.Found)
+            Application.Current.Dispatcher?.Invoke(() =>
             {
-                if (UpdateItem.Visibility != Visibility.Visible)
+                if (updateChecker.Found)
                 {
-                    _notifyIcon.ShowBalloonTip(string.Format(I18N.GetString("{0} {1} Update Found"), UpdateChecker.Name, updateChecker.LatestVersionNumber),
-                        I18N.GetString("Click menu to download"), BalloonIcon.Info);
+                    if (UpdateItem.Visibility != Visibility.Visible)
+                    {
+                        _notifyIcon.ShowBalloonTip(
+                                string.Format(I18NUtil.GetAppStringValue(@"NewVersionFound"), UpdateChecker.Name,
+                                        updateChecker.LatestVersionNumber),
+                                I18NUtil.GetAppStringValue(@"ClickMenuToDownload"), BalloonIcon.Info);
+                    }
+                    UpdateItem.Visibility = Visibility.Visible;
+                    UpdateItem.Header = string.Format(I18NUtil.GetAppStringValue(@"NewVersionAvailable"),
+                            UpdateChecker.Name, updateChecker.LatestVersionNumber);
                 }
-                UpdateItem.Visibility = Visibility.Visible;
-                UpdateItem.Header = string.Format(I18N.GetString("New version {0} {1} available"), UpdateChecker.Name, updateChecker.LatestVersionNumber);
-            }
+            });
         }
 
         private void updateChecker_NewVersionNotFound(object sender, EventArgs e)
         {
-            _notifyIcon.ShowBalloonTip($@"{I18N.GetString(@"ShadowsocksR")} {UpdateChecker.FullVersion}", I18N.GetString(@"No newer version was found"), BalloonIcon.Info);
+            _notifyIcon.ShowBalloonTip($@"ShadowsocksR {UpdateChecker.FullVersion}", I18NUtil.GetAppStringValue(@"NewVersionNotFound"), BalloonIcon.Info);
+        }
+
+        private void UpdateChecker_NewVersionFoundFailed(object sender, EventArgs e)
+        {
+            _notifyIcon.ShowBalloonTip($@"ShadowsocksR {UpdateChecker.FullVersion}",
+                    I18NUtil.GetAppStringValue(@"NewVersionFoundFailed"), BalloonIcon.Info);
         }
 
         private void UpdateItem_Clicked(object sender, RoutedEventArgs e)
@@ -695,12 +755,14 @@ namespace Shadowsocks.View
 
             SelectRandomItem.IsChecked = config.random;
             sameHostForSameTargetItem.IsChecked = config.sameHostForSameTarget;
+            AutoCheckUpdateItem.IsChecked = config.AutoCheckUpdate;
+            AllowPreReleaseItem.IsChecked = config.isPreRelease;
         }
 
         private void UpdateServersMenu()
         {
             var items = ServersItem.Items;
-            while (!Equals(items[0], SeperatorItem))
+            while (!Equals(items[0], SeparatorItem))
             {
                 items.RemoveAt(0);
             }
@@ -1034,6 +1096,11 @@ namespace Shadowsocks.View
             Utils.OpenURL(@"https://github.com/HMBSbige/ShadowsocksR-Windows");
         }
 
+        private void DonateMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Utils.OpenURL(@"https://github.com/HMBSbige/ShadowsocksR-Windows/blob/master/pic/wechat.jpg");
+        }
+
         private void notifyIcon_TrayLeftMouseUp(object sender, RoutedEventArgs e)
         {
             var key = Keyboard.IsKeyDown(Key.LeftShift) ? 1 : 0;
@@ -1113,6 +1180,18 @@ namespace Shadowsocks.View
             controller.ToggleSelectRandom(SelectRandomItem.IsChecked);
         }
 
+        private void AutoCheckUpdateItem_Click(object sender, RoutedEventArgs e)
+        {
+            AutoCheckUpdateItem.IsChecked = !AutoCheckUpdateItem.IsChecked;
+            controller.ToggleSelectAutoCheckUpdate(AutoCheckUpdateItem.IsChecked);
+        }
+
+        private void AllowPreRelease_Click(object sender, RoutedEventArgs e)
+        {
+            AllowPreReleaseItem.IsChecked = !AllowPreReleaseItem.IsChecked;
+            controller.ToggleSelectAllowPreRelease(AllowPreReleaseItem.IsChecked);
+        }
+
         private void SelectSameHostForSameTargetItem_Click(object sender, RoutedEventArgs e)
         {
             sameHostForSameTargetItem.IsChecked = !sameHostForSameTargetItem.IsChecked;
@@ -1173,7 +1252,7 @@ namespace Shadowsocks.View
 
         private void CheckUpdate_Click(object sender, RoutedEventArgs e)
         {
-            updateChecker.CheckUpdate(controller.GetCurrentConfiguration());
+            updateChecker.Check(controller.GetCurrentConfiguration(), true);
         }
 
         private void CheckNodeUpdate_Click(object sender, RoutedEventArgs e)

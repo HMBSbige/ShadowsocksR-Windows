@@ -258,6 +258,18 @@ namespace Shadowsocks.Controller
             Save();
         }
 
+        public void ToggleSelectAutoCheckUpdate(bool enabled)
+        {
+            _config.AutoCheckUpdate = enabled;
+            Save();
+        }
+
+        public void ToggleSelectAllowPreRelease(bool enabled)
+        {
+            _config.isPreRelease = enabled;
+            Save();
+        }
+
         public void SelectServerIndex(int index)
         {
             _config.index = index;
