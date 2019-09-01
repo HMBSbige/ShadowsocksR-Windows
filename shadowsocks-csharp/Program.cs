@@ -48,6 +48,9 @@ namespace Shadowsocks
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
+            I18NUtil.SetLanguage(app.Resources, @"App");
+            ViewUtils.SetResource(app.Resources, @"../View/NotifyIconResources.xaml", 1);
+
             SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
             app.Exit += App_Exit;
 
@@ -158,5 +161,6 @@ namespace Shadowsocks
                         I18N.GetString("ShadowsocksR is already running."), MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
+
     }
 }

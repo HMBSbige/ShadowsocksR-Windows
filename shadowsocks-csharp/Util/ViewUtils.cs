@@ -151,5 +151,18 @@ namespace Shadowsocks.Util
             }
             return size;
         }
+
+        public static void SetResource(ResourceDictionary resources, string filename, int index)
+        {
+            var url = new Uri(filename, UriKind.Relative);
+            if (resources.MergedDictionaries.Count > index)
+            {
+                resources.MergedDictionaries[index].Source = url;
+            }
+            else if (Application.LoadComponent(url) is ResourceDictionary langRd)
+            {
+                resources.MergedDictionaries.Add(langRd);
+            }
+        }
     }
 }
