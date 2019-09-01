@@ -58,7 +58,6 @@
         <MenuItem x:Name="ImportSsrLinksFromClipboard" Style="{StaticResource TrayMenuItem}" />
         <Separator />
         <MenuItem x:Name="Help" Style="{StaticResource TrayMenuItem}">
-            <MenuItem x:Name="CheckUpdate" Style="{StaticResource TrayMenuItem}" />
             <MenuItem x:Name="OpenWiki" Style="{StaticResource TrayMenuItem}" />
             <MenuItem x:Name="Feedback" Style="{StaticResource TrayMenuItem}" />
             <MenuItem x:Name="Donate" Style="{StaticResource TrayMenuItem}" />
@@ -66,6 +65,12 @@
             <MenuItem x:Name="GenQrCode" Style="{StaticResource TrayMenuItem}" />
             <MenuItem x:Name="ResetPassword" Style="{StaticResource TrayMenuItem}" />
             <Separator />
+            <MenuItem x:Name="Update" Style="{StaticResource TrayMenuItem}">
+                <MenuItem x:Name="CheckUpdate" Style="{StaticResource TrayMenuItem}" />
+                <Separator />
+                <MenuItem x:Name="AutoCheckUpdate" Style="{StaticResource TrayMenuItem}" />
+                <MenuItem x:Name="AllowPreRelease" Style="{StaticResource TrayMenuItem}" />
+            </MenuItem>
             <MenuItem x:Name="About" Style="{StaticResource TrayMenuItem}" />
         </MenuItem>
         <MenuItem x:Name="Quit" Style="{StaticResource TrayMenuItem}" />

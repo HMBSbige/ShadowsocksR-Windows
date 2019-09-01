@@ -62,6 +62,8 @@ namespace Shadowsocks.View
         private MenuItem SelectRandomItem;
         private MenuItem sameHostForSameTargetItem;
         private MenuItem UpdateItem;
+        private MenuItem AutoCheckUpdateItem;
+        private MenuItem AllowPreReleaseItem;
         private ConfigWindow _configWindow;
         private SettingsWindow _settingsWindow;
 
@@ -110,6 +112,7 @@ namespace Shadowsocks.View
             updateChecker = new UpdateChecker();
             updateChecker.NewVersionFound += updateChecker_NewVersionFound;
             updateChecker.NewVersionNotFound += updateChecker_NewVersionNotFound;
+            updateChecker.NewVersionFoundFailed += UpdateChecker_NewVersionFoundFailed;
 
             updateFreeNodeChecker = new UpdateFreeNode();
             updateFreeNodeChecker.NewFreeNodeFound += updateFreeNodeChecker_NewFreeNodeFound;
@@ -128,8 +131,10 @@ namespace Shadowsocks.View
             timerDelayCheckUpdate.Interval = 1000.0 * 60 * 60 * 1;// 1 hours
 
             var cfg = controller.GetCurrentConfiguration();
-
-            updateChecker.CheckUpdate(cfg, false);
+            if (cfg.AutoCheckUpdate)
+            {
+                updateChecker.Check(cfg, false);
+            }
 
             if (cfg.IsDefaultConfig() || cfg.nodeFeedAutoUpdate)
             {
@@ -330,13 +335,20 @@ namespace Shadowsocks.View
                         }
                         case @"Help":
                         {
-                            ((MenuItem)menuItem.Items[0]).Click += CheckUpdate_Click;
-                            ((MenuItem)menuItem.Items[1]).Click += OpenWiki_Click;
-                            ((MenuItem)menuItem.Items[2]).Click += FeedbackItem_Click;
-                            ((MenuItem)menuItem.Items[3]).Click += DonateMenuItem_Click;
-                            ((MenuItem)menuItem.Items[5]).Click += showURLFromQRCode;
-                            ((MenuItem)menuItem.Items[6]).Click += ResetPasswordItem_Click;
+
+                            ((MenuItem)menuItem.Items[0]).Click += OpenWiki_Click;
+                            ((MenuItem)menuItem.Items[1]).Click += FeedbackItem_Click;
+                            ((MenuItem)menuItem.Items[2]).Click += DonateMenuItem_Click;
+                            ((MenuItem)menuItem.Items[4]).Click += showURLFromQRCode;
+                            ((MenuItem)menuItem.Items[5]).Click += ResetPasswordItem_Click;
                             ((MenuItem)menuItem.Items[8]).Click += AboutItem_Click;
+
+                            var updateMenu = (MenuItem)menuItem.Items[7];
+                            ((MenuItem)updateMenu.Items[0]).Click += CheckUpdate_Click;
+                            AutoCheckUpdateItem = (MenuItem)updateMenu.Items[2];
+                            AllowPreReleaseItem = (MenuItem)updateMenu.Items[3];
+                            AutoCheckUpdateItem.Click += AutoCheckUpdateItem_Click;
+                            AllowPreReleaseItem.Click += AllowPreRelease_Click;
                             break;
                         }
                         case @"Quit":
@@ -671,21 +683,33 @@ namespace Shadowsocks.View
 
         private void updateChecker_NewVersionFound(object sender, EventArgs e)
         {
-            if (updateChecker.Found)
+            Application.Current.Dispatcher?.Invoke(() =>
             {
-                if (UpdateItem.Visibility != Visibility.Visible)
+                if (updateChecker.Found)
                 {
-                    _notifyIcon.ShowBalloonTip(string.Format(I18N.GetString("{0} {1} Update Found"), UpdateChecker.Name, updateChecker.LatestVersionNumber),
-                        I18N.GetString("Click menu to download"), BalloonIcon.Info);
+                    if (UpdateItem.Visibility != Visibility.Visible)
+                    {
+                        _notifyIcon.ShowBalloonTip(
+                                string.Format(I18NUtil.GetAppStringValue(@"NewVersionFound"), UpdateChecker.Name,
+                                        updateChecker.LatestVersionNumber),
+                                I18NUtil.GetAppStringValue(@"ClickMenuToDownload"), BalloonIcon.Info);
+                    }
+                    UpdateItem.Visibility = Visibility.Visible;
+                    UpdateItem.Header = string.Format(I18NUtil.GetAppStringValue(@"NewVersionAvailable"),
+                            UpdateChecker.Name, updateChecker.LatestVersionNumber);
                 }
-                UpdateItem.Visibility = Visibility.Visible;
-                UpdateItem.Header = string.Format(I18N.GetString("New version {0} {1} available"), UpdateChecker.Name, updateChecker.LatestVersionNumber);
-            }
+            });
         }
 
         private void updateChecker_NewVersionNotFound(object sender, EventArgs e)
         {
-            _notifyIcon.ShowBalloonTip($@"{I18N.GetString(@"ShadowsocksR")} {UpdateChecker.FullVersion}", I18N.GetString(@"No newer version was found"), BalloonIcon.Info);
+            _notifyIcon.ShowBalloonTip($@"ShadowsocksR {UpdateChecker.FullVersion}", I18NUtil.GetAppStringValue(@"NewVersionNotFound"), BalloonIcon.Info);
+        }
+
+        private void UpdateChecker_NewVersionFoundFailed(object sender, EventArgs e)
+        {
+            _notifyIcon.ShowBalloonTip($@"ShadowsocksR {UpdateChecker.FullVersion}",
+                    I18NUtil.GetAppStringValue(@"NewVersionFoundFailed"), BalloonIcon.Info);
         }
 
         private void UpdateItem_Clicked(object sender, RoutedEventArgs e)
@@ -731,6 +755,8 @@ namespace Shadowsocks.View
 
             SelectRandomItem.IsChecked = config.random;
             sameHostForSameTargetItem.IsChecked = config.sameHostForSameTarget;
+            AutoCheckUpdateItem.IsChecked = config.AutoCheckUpdate;
+            AllowPreReleaseItem.IsChecked = config.isPreRelease;
         }
 
         private void UpdateServersMenu()
@@ -1154,6 +1180,18 @@ namespace Shadowsocks.View
             controller.ToggleSelectRandom(SelectRandomItem.IsChecked);
         }
 
+        private void AutoCheckUpdateItem_Click(object sender, RoutedEventArgs e)
+        {
+            AutoCheckUpdateItem.IsChecked = !AutoCheckUpdateItem.IsChecked;
+            controller.ToggleSelectAutoCheckUpdate(AutoCheckUpdateItem.IsChecked);
+        }
+
+        private void AllowPreRelease_Click(object sender, RoutedEventArgs e)
+        {
+            AllowPreReleaseItem.IsChecked = !AllowPreReleaseItem.IsChecked;
+            controller.ToggleSelectAllowPreRelease(AllowPreReleaseItem.IsChecked);
+        }
+
         private void SelectSameHostForSameTargetItem_Click(object sender, RoutedEventArgs e)
         {
             sameHostForSameTargetItem.IsChecked = !sameHostForSameTargetItem.IsChecked;
@@ -1214,7 +1252,7 @@ namespace Shadowsocks.View
 
         private void CheckUpdate_Click(object sender, RoutedEventArgs e)
         {
-            updateChecker.CheckUpdate(controller.GetCurrentConfiguration());
+            updateChecker.Check(controller.GetCurrentConfiguration(), true);
         }
 
         private void CheckNodeUpdate_Click(object sender, RoutedEventArgs e)

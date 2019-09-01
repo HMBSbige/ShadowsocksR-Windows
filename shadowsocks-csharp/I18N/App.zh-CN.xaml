@@ -47,7 +47,10 @@
     <sys:String x:Key="ImportSsrLinksFromClipboard">剪贴板批量导入ssr://链接...</sys:String>
 
     <sys:String x:Key="Help">帮助</sys:String>
+    <sys:String x:Key="Update">更新...</sys:String>
     <sys:String x:Key="CheckUpdate">检查更新</sys:String>
+    <sys:String x:Key="AutoCheckUpdate">自动检查更新</sys:String>
+    <sys:String x:Key="AllowPreRelease">包括测试版更新</sys:String>
     <sys:String x:Key="OpenWiki">打开Wiki文档...</sys:String>
     <sys:String x:Key="Feedback">问题反馈...</sys:String>
     <sys:String x:Key="GenQrCode">自定义生成二维码</sys:String>
@@ -56,5 +59,11 @@
     <sys:String x:Key="Donate">捐助...</sys:String>
 
     <sys:String x:Key="Quit">退出</sys:String>
+
+    <sys:String x:Key="NewVersionNotFound">没有找到新版本</sys:String>
+    <sys:String x:Key="NewVersionFound">{0} {1} 更新</sys:String>
+    <sys:String x:Key="ClickMenuToDownload">点击菜单项下载</sys:String>
+    <sys:String x:Key="NewVersionAvailable">【点击下载新版本 {0} {1}】</sys:String>
+    <sys:String x:Key="NewVersionFoundFailed">检查更新失败</sys:String>
 
 </ResourceDictionary>

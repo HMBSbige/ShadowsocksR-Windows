@@ -47,7 +47,10 @@
     <sys:String x:Key="ImportSsrLinksFromClipboard">Import SSR links from clipboard...</sys:String>
 
     <sys:String x:Key="Help">Help</sys:String>
+    <sys:String x:Key="Update">Update...</sys:String>
     <sys:String x:Key="CheckUpdate">Check update</sys:String>
+    <sys:String x:Key="AutoCheckUpdate">Auto check update</sys:String>
+    <sys:String x:Key="AllowPreRelease">Include prerelease version</sys:String>
     <sys:String x:Key="OpenWiki">Open wiki...</sys:String>
     <sys:String x:Key="Feedback">Feedback...</sys:String>
     <sys:String x:Key="GenQrCode">Gen custom QRCode...</sys:String>
@@ -56,5 +59,11 @@
     <sys:String x:Key="Donate">Donate...</sys:String>
 
     <sys:String x:Key="Quit">Quit</sys:String>
+
+    <sys:String x:Key="NewVersionNotFound">No newer version was found</sys:String>
+    <sys:String x:Key="NewVersionFound">{0} {1} Update Found</sys:String>
+    <sys:String x:Key="ClickMenuToDownload">Click menu to download</sys:String>
+    <sys:String x:Key="NewVersionAvailable">New version {0} {1} available</sys:String>
+    <sys:String x:Key="NewVersionFoundFailed">Check for update failure</sys:String>
 
 </ResourceDictionary>
