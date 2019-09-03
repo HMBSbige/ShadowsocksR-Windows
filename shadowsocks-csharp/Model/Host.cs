@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
-using System.Text;
 
 namespace Shadowsocks.Model
 {
@@ -56,7 +56,7 @@ namespace Shadowsocks.Model
             IPAddress ip_addr = null;
             if (IPAddress.TryParse(host, out ip_addr))
             {
-                string[] addr_parts = addr.Split(new char[] { ' ', '\t', }, 2, StringSplitOptions.RemoveEmptyEntries);
+                string[] addr_parts = addr.Split(new[] { ' ', '\t' }, 2, StringSplitOptions.RemoveEmptyEntries);
                 if (addr_parts.Length >= 2)
                 {
                     ips.insert(new IPAddressCmp(host), new IPAddressCmp(addr_parts[0]), addr_parts[1]);
@@ -128,12 +128,12 @@ namespace Shadowsocks.Model
         public bool LoadHostFile()
         {
             string filename = HOST_FILENAME;
-            string absFilePath = System.IO.Path.Combine(System.Windows.Forms.Application.StartupPath, filename);
-            if (System.IO.File.Exists(absFilePath))
+            string absFilePath = Path.Combine(Directory.GetCurrentDirectory(), filename);
+            if (File.Exists(absFilePath))
             {
                 try
                 {
-                    using (System.IO.StreamReader stream = System.IO.File.OpenText(absFilePath))
+                    using (StreamReader stream = File.OpenText(absFilePath))
                     {
                         while (true)
                         {
@@ -142,7 +142,7 @@ namespace Shadowsocks.Model
                                 break;
                             if (line.Length > 0 && line.StartsWith("#"))
                                 continue;
-                            string[] parts = line.Split(new char[] { ' ', '\t', }, 2, StringSplitOptions.RemoveEmptyEntries);
+                            string[] parts = line.Split(new[] { ' ', '\t' }, 2, StringSplitOptions.RemoveEmptyEntries);
                             if (parts.Length < 2)
                                 continue;
                             AddHost(parts[0], parts[1]);

@@ -1,9 +1,9 @@
-﻿using Shadowsocks.Model;
-using Shadowsocks.Proxy;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using Shadowsocks.Model;
+using Shadowsocks.Proxy;
 
 namespace Shadowsocks.Controller
 {
@@ -14,13 +14,13 @@ namespace Shadowsocks.Controller
 
         public HttpPortForwarder(int targetPort, Configuration config)
         {
-            this._targetPort = targetPort;
-            this._config = config;
+            _targetPort = targetPort;
+            _config = config;
         }
 
         public bool Handle(byte[] firstPacket, int length, Socket socket)
         {
-            new Handler().Start(_config, firstPacket, length, socket, this._targetPort);
+            new Handler().Start(_config, firstPacket, length, socket, _targetPort);
             return true;
         }
 
@@ -31,7 +31,7 @@ namespace Shadowsocks.Controller
             private int _targetPort;
             private Socket _local;
             private Socket _remote;
-            private bool _closed = false;
+            private bool _closed;
             private Configuration _config;
             HttpPraser httpProxyState;
             public const int RecvSize = 4096;
@@ -47,7 +47,7 @@ namespace Shadowsocks.Controller
                 _local = socket;
                 _targetPort = targetPort;
                 _config = config;
-                if ((_config.authUser ?? "").Length == 0 || Util.Utils.isMatchSubNet(((IPEndPoint)this._local.RemoteEndPoint).Address, "127.0.0.0/8"))
+                if ((_config.authUser ?? "").Length == 0 || Util.Utils.isMatchSubNet(((IPEndPoint)_local.RemoteEndPoint).Address, "127.0.0.0/8"))
                 {
                     Connect();
                 }
@@ -69,13 +69,13 @@ namespace Shadowsocks.Controller
                 if (err == 1)
                 {
                     _local.BeginReceive(connetionRecvBuffer, 0, _firstPacket.Length, 0,
-                        new AsyncCallback(HttpHandshakeRecv), null);
+                        HttpHandshakeRecv, null);
                 }
                 else if (err == 2)
                 {
                     string dataSend = httpProxyState.Http407();
                     byte[] httpData = System.Text.Encoding.UTF8.GetBytes(dataSend);
-                    _local.BeginSend(httpData, 0, httpData.Length, 0, new AsyncCallback(HttpHandshakeAuthEndSend), null);
+                    _local.BeginSend(httpData, 0, httpData.Length, 0, HttpHandshakeAuthEndSend, null);
                 }
                 else if (err == 3)
                 {
@@ -89,13 +89,13 @@ namespace Shadowsocks.Controller
                 {
                     string dataSend = httpProxyState.Http200();
                     byte[] httpData = System.Text.Encoding.UTF8.GetBytes(dataSend);
-                    _local.BeginSend(httpData, 0, httpData.Length, 0, new AsyncCallback(StartConnect), null);
+                    _local.BeginSend(httpData, 0, httpData.Length, 0, StartConnect, null);
                 }
                 else if (err == 500)
                 {
                     string dataSend = httpProxyState.Http500();
                     byte[] httpData = System.Text.Encoding.UTF8.GetBytes(dataSend);
-                    _local.BeginSend(httpData, 0, httpData.Length, 0, new AsyncCallback(HttpHandshakeAuthEndSend), null);
+                    _local.BeginSend(httpData, 0, httpData.Length, 0, HttpHandshakeAuthEndSend, null);
                 }
             }
 
@@ -137,7 +137,7 @@ namespace Shadowsocks.Controller
                 {
                     _local.EndSend(ar);
                     _local.BeginReceive(connetionRecvBuffer, 0, _firstPacket.Length, 0,
-                        new AsyncCallback(HttpHandshakeRecv), null);
+                        HttpHandshakeRecv, null);
                 }
                 catch (Exception e)
                 {
@@ -175,7 +175,7 @@ namespace Shadowsocks.Controller
 
                     // Connect to the remote endpoint.
                     _remote.BeginConnect(remoteEP,
-                        new AsyncCallback(ConnectCallback), null);
+                        ConnectCallback, null);
                 }
                 catch (Exception e)
                 {
@@ -210,7 +210,7 @@ namespace Shadowsocks.Controller
                 }
                 try
                 {
-                    _remote.BeginSend(_firstPacket, 0, _firstPacketLength, 0, new AsyncCallback(StartPipe), null);
+                    _remote.BeginSend(_firstPacket, 0, _firstPacketLength, 0, StartPipe, null);
                 }
                 catch (Exception e)
                 {
@@ -230,9 +230,9 @@ namespace Shadowsocks.Controller
                 {
                     _remote.EndSend(ar);
                     _remote.BeginReceive(remoteRecvBuffer, 0, RecvSize, 0,
-                        new AsyncCallback(PipeRemoteReceiveCallback), null);
+                        PipeRemoteReceiveCallback, null);
                     _local.BeginReceive(connetionRecvBuffer, 0, RecvSize, 0,
-                        new AsyncCallback(PipeConnectionReceiveCallback), null);
+                        PipeConnectionReceiveCallback, null);
                 }
                 catch (Exception e)
                 {
@@ -253,7 +253,7 @@ namespace Shadowsocks.Controller
 
                     if (bytesRead > 0)
                     {
-                        _local.BeginSend(remoteRecvBuffer, 0, bytesRead, 0, new AsyncCallback(PipeConnectionSendCallback), null);
+                        _local.BeginSend(remoteRecvBuffer, 0, bytesRead, 0, PipeConnectionSendCallback, null);
                     }
                     else
                     {
@@ -279,7 +279,7 @@ namespace Shadowsocks.Controller
 
                     if (bytesRead > 0)
                     {
-                        _remote.BeginSend(connetionRecvBuffer, 0, bytesRead, 0, new AsyncCallback(PipeRemoteSendCallback), null);
+                        _remote.BeginSend(connetionRecvBuffer, 0, bytesRead, 0, PipeRemoteSendCallback, null);
                     }
                     else
                     {
@@ -302,8 +302,8 @@ namespace Shadowsocks.Controller
                 try
                 {
                     _remote.EndSend(ar);
-                    _local.BeginReceive(this.connetionRecvBuffer, 0, RecvSize, 0,
-                        new AsyncCallback(PipeConnectionReceiveCallback), null);
+                    _local.BeginReceive(connetionRecvBuffer, 0, RecvSize, 0,
+                        PipeConnectionReceiveCallback, null);
                 }
                 catch (Exception e)
                 {
@@ -321,8 +321,8 @@ namespace Shadowsocks.Controller
                 try
                 {
                     _local.EndSend(ar);
-                    _remote.BeginReceive(this.remoteRecvBuffer, 0, RecvSize, 0,
-                        new AsyncCallback(PipeRemoteReceiveCallback), null);
+                    _remote.BeginReceive(remoteRecvBuffer, 0, RecvSize, 0,
+                        PipeRemoteReceiveCallback, null);
                 }
                 catch (Exception e)
                 {

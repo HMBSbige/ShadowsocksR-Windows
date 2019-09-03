@@ -1,13 +1,13 @@
-﻿using Shadowsocks.Model;
-using Shadowsocks.Proxy;
-using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using Shadowsocks.Model;
+using Shadowsocks.Proxy;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller
 {
@@ -79,7 +79,7 @@ namespace Shadowsocks.Controller
                                 {
                                     if (_config.proxyRuleMode == (int)ProxyRuleMode.UserCustom)
                                     {
-                                        Shadowsocks.Model.HostMap hostMap = HostMap.Instance();
+                                        HostMap hostMap = HostMap.Instance();
                                         if (hostMap.GetHost(host, out var host_addr))
                                         {
                                             if (!string.IsNullOrEmpty(host_addr))
@@ -91,15 +91,18 @@ namespace Shadowsocks.Controller
                                                 {
                                                     return CONNECT_DIRECT;
                                                 }
-                                                else if (lower_host_addr.StartsWith("localproxy"))
+
+                                                if (lower_host_addr.StartsWith("localproxy"))
                                                 {
                                                     return CONNECT_LOCALPROXY;
                                                 }
-                                                else if (lower_host_addr.StartsWith("remoteproxy"))
+
+                                                if (lower_host_addr.StartsWith("remoteproxy"))
                                                 {
                                                     return CONNECT_REMOTEPROXY;
                                                 }
-                                                else if (lower_host_addr.IndexOf('.') >= 0 || lower_host_addr.IndexOf(':') >= 0)
+
+                                                if (lower_host_addr.IndexOf('.') >= 0 || lower_host_addr.IndexOf(':') >= 0)
                                                 {
                                                     if (!IPAddress.TryParse(lower_host_addr, out ipAddress))
                                                     {
@@ -147,7 +150,7 @@ namespace Shadowsocks.Controller
                 {
                     if (_config.proxyRuleMode == (int)ProxyRuleMode.UserCustom)
                     {
-                        Shadowsocks.Model.HostMap hostMap = HostMap.Instance();
+                        HostMap hostMap = HostMap.Instance();
                         string host_addr;
                         if (hostMap.GetIP(ipAddress, out host_addr))
                         {
@@ -158,11 +161,13 @@ namespace Shadowsocks.Controller
                             {
                                 return CONNECT_DIRECT;
                             }
-                            else if (lower_host_addr.StartsWith("localproxy"))
+
+                            if (lower_host_addr.StartsWith("localproxy"))
                             {
                                 return CONNECT_LOCALPROXY;
                             }
-                            else if (lower_host_addr.StartsWith("remoteproxy"))
+
+                            if (lower_host_addr.StartsWith("remoteproxy"))
                             {
                                 return CONNECT_REMOTEPROXY;
                             }
@@ -170,7 +175,7 @@ namespace Shadowsocks.Controller
                     }
                     else
                     {
-                        if (Util.Utils.isLAN(ipAddress))
+                        if (Utils.isLAN(ipAddress))
                         {
                             return CONNECT_DIRECT;
                         }
@@ -200,8 +205,8 @@ namespace Shadowsocks.Controller
             private ProxySocketTunLocal _local;
             private ProxySocketTun _remote;
 
-            private bool _closed = false;
-            private bool _local_proxy = false;
+            private bool _closed;
+            private bool _local_proxy;
             private string _remote_host;
             private int _remote_port;
 
@@ -210,7 +215,7 @@ namespace Shadowsocks.Controller
             private byte[] remoteRecvBuffer = new byte[RecvSize];
             // connection receive buffer
             private byte[] connetionRecvBuffer = new byte[RecvSize];
-            private int _totalRecvSize = 0;
+            private int _totalRecvSize;
 
             protected int TTL = 600;
             protected System.Timers.Timer timer;
@@ -243,7 +248,7 @@ namespace Shadowsocks.Controller
                             ipAddress = new IPAddress(addr);
                             _targetPort = (_firstPacket[5] << 8) | _firstPacket[6];
                             _remote_host = ipAddress.ToString();
-                            Logging.Info((_local_proxy ? "Local proxy" : "Direct") + " connect " + _remote_host + ":" + _targetPort.ToString());
+                            Logging.Info((_local_proxy ? "Local proxy" : "Direct") + " connect " + _remote_host + ":" + _targetPort);
                         }
                         else if (_firstPacket[0] == 4)
                         {
@@ -252,7 +257,7 @@ namespace Shadowsocks.Controller
                             ipAddress = new IPAddress(addr);
                             _targetPort = (_firstPacket[17] << 8) | _firstPacket[18];
                             _remote_host = ipAddress.ToString();
-                            Logging.Info((_local_proxy ? "Local proxy" : "Direct") + " connect " + _remote_host + ":" + _targetPort.ToString());
+                            Logging.Info((_local_proxy ? "Local proxy" : "Direct") + " connect " + _remote_host + ":" + _targetPort);
                         }
                         else if (_firstPacket[0] == 3)
                         {
@@ -261,7 +266,7 @@ namespace Shadowsocks.Controller
                             Array.Copy(_firstPacket, 2, addr, 0, addr.Length);
                             _remote_host = Encoding.UTF8.GetString(_firstPacket, 2, len);
                             _targetPort = (_firstPacket[len + 2] << 8) | _firstPacket[len + 3];
-                            Logging.Info((_local_proxy ? "Local proxy" : "Direct") + " connect " + _remote_host + ":" + _targetPort.ToString());
+                            Logging.Info((_local_proxy ? "Local proxy" : "Direct") + " connect " + _remote_host + ":" + _targetPort);
 
                             //if (!_local_proxy)
                             {
@@ -269,7 +274,7 @@ namespace Shadowsocks.Controller
                                 {
                                     if (_config.proxyRuleMode == (int)ProxyRuleMode.UserCustom)
                                     {
-                                        Shadowsocks.Model.HostMap hostMap = HostMap.Instance();
+                                        HostMap hostMap = HostMap.Instance();
                                         if (hostMap.GetHost(_remote_host, out var host_addr))
                                         {
                                             if (!string.IsNullOrEmpty(host_addr))
@@ -280,7 +285,8 @@ namespace Shadowsocks.Controller
                                                     Close();
                                                     return;
                                                 }
-                                                else if (lower_host_addr.IndexOf('.') >= 0 || lower_host_addr.IndexOf(':') >= 0)
+
+                                                if (lower_host_addr.IndexOf('.') >= 0 || lower_host_addr.IndexOf(':') >= 0)
                                                 {
                                                     if (!IPAddress.TryParse(lower_host_addr, out ipAddress))
                                                     {
@@ -315,7 +321,7 @@ namespace Shadowsocks.Controller
                     }
                     if (ipAddress != null && _config.proxyRuleMode == (int)ProxyRuleMode.UserCustom)
                     {
-                        Shadowsocks.Model.HostMap hostMap = HostMap.Instance();
+                        HostMap hostMap = HostMap.Instance();
                         string host_addr;
                         if (hostMap.GetIP(ipAddress, out host_addr))
                         {
@@ -356,15 +362,14 @@ namespace Shadowsocks.Controller
                     bool ret = _remote.ConnectSocks5ProxyServer(strRemoteHost, iRemotePort, false, _config.proxyAuthUser, _config.proxyAuthPass);
                     return ret;
                 }
-                else if (_config.proxyType == 1)
+
+                if (_config.proxyType == 1)
                 {
                     bool ret = _remote.ConnectHttpProxyServer(strRemoteHost, iRemotePort, _config.proxyAuthUser, _config.proxyAuthPass, _config.proxyUserAgent);
                     return ret;
                 }
-                else
-                {
-                    return true;
-                }
+
+                return true;
             }
 
             private void ConnectCallback(IAsyncResult ar)
@@ -455,9 +460,9 @@ namespace Shadowsocks.Controller
                 {
                     Server.GetForwardServerRef().GetConnections().AddRef(this);
                     _remote.BeginReceive(remoteRecvBuffer, RecvSize, 0,
-                        new AsyncCallback(PipeRemoteReceiveCallback), null);
+                        PipeRemoteReceiveCallback, null);
                     _local.BeginReceive(connetionRecvBuffer, RecvSize, 0,
-                        new AsyncCallback(PipeConnectionReceiveCallback), null);
+                        PipeConnectionReceiveCallback, null);
 
                     _local.Send(connetionRecvBuffer, 0, 0);
                     ResetTimeout(TTL);
@@ -488,7 +493,7 @@ namespace Shadowsocks.Controller
                         if (_totalRecvSize <= 1024 * 1024 * 2)
                         {
                             _remote.BeginReceive(remoteRecvBuffer, RecvSize, 0,
-                                new AsyncCallback(PipeRemoteReceiveCallback), null);
+                                PipeRemoteReceiveCallback, null);
                         }
                         else
                             PipeRemoteReceiveLoop();
@@ -535,13 +540,11 @@ namespace Shadowsocks.Controller
                             {
                                 _totalRecvSize = 0;
                                 _remote.BeginReceive(remoteRecvBuffer, RecvSize, 0,
-                                    new AsyncCallback(PipeRemoteReceiveCallback), null);
+                                    PipeRemoteReceiveCallback, null);
                                 return;
                             }
-                            else
-                            {
-                                beforeReceive = now;
-                            }
+
+                            beforeReceive = now;
                         }
                         else
                         {
@@ -575,7 +578,7 @@ namespace Shadowsocks.Controller
                         //_remote.BeginSend(connetionRecvBuffer, bytesRead, 0, new AsyncCallback(PipeRemoteSendCallback), null);
                         _remote.Send(connetionRecvBuffer, bytesRead, 0);
                         _local.BeginReceive(connetionRecvBuffer, RecvSize, 0,
-                            new AsyncCallback(PipeConnectionReceiveCallback), null);
+                            PipeConnectionReceiveCallback, null);
                     }
                     else
                     {

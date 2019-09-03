@@ -1,10 +1,10 @@
-﻿using Shadowsocks.Obfs;
-using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using Shadowsocks.Obfs;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller
 {
@@ -14,7 +14,7 @@ namespace Shadowsocks.Controller
         Info,
         Warn,
         Error,
-        Assert,
+        Assert
     }
 
     public class Logging
@@ -27,6 +27,8 @@ namespace Shadowsocks.Controller
         private static StreamWriterWithTimestamp _logStreamWriter;
         private static readonly object _lock = new object();
         public static bool save_to_file = true;
+        public static TextWriter DefaultOut;
+        public static TextWriter DefaultError;
 
         public static bool OpenLogFile()
         {
@@ -51,8 +53,8 @@ namespace Shadowsocks.Controller
                 }
                 else
                 {
-                    Console.SetOut(Console.Out);
-                    Console.SetError(Console.Error);
+                    Console.SetOut(DefaultOut);
+                    Console.SetError(DefaultError);
                 }
 
                 return true;
@@ -66,7 +68,9 @@ namespace Shadowsocks.Controller
 
         private static void CloseLogFile()
         {
+            _logStreamWriter?.Close();
             _logStreamWriter?.Dispose();
+            _logFileStream?.Close();
             _logFileStream?.Dispose();
 
             _logStreamWriter = null;
@@ -197,16 +201,19 @@ namespace Shadowsocks.Controller
                     + oe.Message);
                 return true;
             }
-            else if (e is NullReferenceException)
+
+            if (e is NullReferenceException)
             {
                 return true;
             }
-            else if (e is ObjectDisposedException)
+
+            if (e is ObjectDisposedException)
             {
                 // ignore
                 return true;
             }
-            else if (e is SocketException)
+
+            if (e is SocketException)
             {
                 SocketException se = (SocketException)e;
                 if ((uint)se.SocketErrorCode == 0x80004005)
@@ -214,49 +221,53 @@ namespace Shadowsocks.Controller
                     // already closed
                     return true;
                 }
-                else if (se.ErrorCode == 11004)
+
+                if (se.ErrorCode == 11004)
                 {
                     Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
-                        + "DNS lookup failed");
+                                       + "DNS lookup failed");
                     return true;
                 }
-                else if (se.SocketErrorCode == SocketError.HostNotFound)
+
+                if (se.SocketErrorCode == SocketError.HostNotFound)
                 {
                     Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
-                        + "Host not found");
+                                       + "Host not found");
                     return true;
                 }
-                else if (se.SocketErrorCode == SocketError.ConnectionRefused)
+
+                if (se.SocketErrorCode == SocketError.ConnectionRefused)
                 {
                     Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
-                        + "connection refused");
+                                       + "connection refused");
                     return true;
                 }
-                else if (se.SocketErrorCode == SocketError.NetworkUnreachable)
+
+                if (se.SocketErrorCode == SocketError.NetworkUnreachable)
                 {
                     Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
-                        + "network unreachable");
+                                       + "network unreachable");
                     return true;
                 }
-                else if (se.SocketErrorCode == SocketError.TimedOut)
+
+                if (se.SocketErrorCode == SocketError.TimedOut)
                 {
                     //Logging.Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
                     //    + "connection timeout");
                     return true;
                 }
-                else if (se.SocketErrorCode == SocketError.Shutdown)
+
+                if (se.SocketErrorCode == SocketError.Shutdown)
                 {
                     return true;
                 }
-                else
-                {
-                    Log(LogLevel.Info, "Proxy server [" + remarks + "(" + server + ")] "
-                        + Convert.ToString(se.SocketErrorCode) + ":" + se.Message);
 
-                    Debug(ToString(new StackTrace().GetFrames()));
+                Log(LogLevel.Info, "Proxy server [" + remarks + "(" + server + ")] "
+                                   + Convert.ToString(se.SocketErrorCode) + ":" + se.Message);
 
-                    return true;
-                }
+                Debug(ToString(new StackTrace().GetFrames()));
+
+                return true;
             }
             return false;
         }
@@ -269,7 +280,7 @@ namespace Shadowsocks.Controller
                 "Info",
                 "Warn",
                 "Error",
-                "Assert",
+                "Assert"
             };
             Console.WriteLine($@"[{strMap[(int)level]}] {s}");
         }

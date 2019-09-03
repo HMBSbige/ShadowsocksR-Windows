@@ -1,10 +1,10 @@
-﻿using Shadowsocks.Controller;
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
+using Shadowsocks.Controller;
 
 namespace Shadowsocks.Util
 {
@@ -107,24 +107,18 @@ namespace Shadowsocks.Util
                 var zipFilePath = $@"{Path.Combine(Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path))}.zip";
                 using (var zipFileToOpen = new FileStream(zipFilePath, FileMode.Create))
                 {
-                    using (var archive = new ZipArchive(zipFileToOpen, ZipArchiveMode.Create))
+                    using var archive = new ZipArchive(zipFileToOpen, ZipArchiveMode.Create);
+                    var readMeEntry = archive.CreateEntry(filename);
+                    using var zipStream = readMeEntry.Open();
+                    using var stream = File.Open(path, FileMode.Open);
+                    var bytes = new byte[(int)stream.Length];
+                    var totalBytesRead = 0;
+                    while (totalBytesRead < bytes.Length)
                     {
-                        var readMeEntry = archive.CreateEntry(filename);
-                        using (var zipStream = readMeEntry.Open())
-                        {
-                            using (var stream = File.Open(path, FileMode.Open))
-                            {
-                                var bytes = new byte[(int)stream.Length];
-                                var totalBytesRead = 0;
-                                while (totalBytesRead < bytes.Length)
-                                {
-                                    totalBytesRead += await stream.ReadAsync(bytes, totalBytesRead, bytes.Length - totalBytesRead);
-                                }
-
-                                await zipStream.WriteAsync(bytes, 0, bytes.Length);
-                            }
-                        }
+                        totalBytesRead += await stream.ReadAsync(bytes, totalBytesRead, bytes.Length - totalBytesRead);
                     }
+
+                    await zipStream.WriteAsync(bytes, 0, bytes.Length);
                 }
                 return true;
             }
@@ -143,11 +137,9 @@ namespace Shadowsocks.Util
         {
             try
             {
-                using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                using (var sr = new StreamReader(fs, encoding))
-                {
-                    return sr.ReadToEnd();
-                }
+                using var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var sr = new StreamReader(fs, encoding);
+                return sr.ReadToEnd();
             }
             catch (Exception ex)
             {

@@ -20,8 +20,7 @@ namespace Shadowsocks.Util
         {
             if (trim)
                 return Convert.ToBase64String(val).Replace('+', '-').Replace('/', '_').TrimEnd('=');
-            else
-                return Convert.ToBase64String(val).Replace('+', '-').Replace('/', '_');
+            return Convert.ToBase64String(val).Replace('+', '-').Replace('/', '_');
         }
 
         public static byte[] DecodeUrlSafeBase64ToBytes(string val)

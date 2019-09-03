@@ -1,0 +1,86 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+	
+	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyName>ShadowsocksR</AssemblyName>
+    <RootNamespace>Shadowsocks</RootNamespace>
+    <ApplicationIcon>shadowsocks.ico</ApplicationIcon>
+    <StartupObject>Shadowsocks.Program</StartupObject>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <LangVersion>8</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;PROTOCOL_STATISTICS</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;PROTOCOL_STATISTICS</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+	<DefineConstants Condition=" $(TargetFramework.StartsWith(netcoreapp)) ">$(DefineConstants);IsDotNetCore</DefineConstants>
+	<DefineConstants Condition=" '$(SelfContained)' == 'true' ">$(DefineConstants);IsSelfContainedDotNetCore</DefineConstants>
+	<DefineConstants Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">$(DefineConstants);Is64Bit</DefineConstants>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Remove="Controls\MaskedTextBox.xaml" />
+    <None Remove="Controls\NumberUpDown.xaml" />
+    <None Remove="View\ConfigWindow.xaml" />
+    <None Remove="View\InputPasswordWindow.xaml" />
+    <None Remove="View\LogWindow.xaml" />
+    <None Remove="View\PortSettingsWindow.xaml" />
+    <None Remove="View\QRCodeSplashWindow.xaml" />
+    <None Remove="View\ResetPassword.xaml" />
+    <None Remove="View\ServerLogWindow.xaml" />
+    <None Remove="View\ShowTextWindow.xaml" />
+    <None Remove="View\SubscribeWindow.xaml" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Costura.Fody" Version="4.1.0" Condition=" '$(SelfContained)' != 'true' " />
+    <PackageReference Include="DnsClient" Version="1.2.0" />
+    <PackageReference Include="Fody" Version="6.0.0" Condition=" '$(SelfContained)' != 'true' ">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.0.8" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="WpfColorFontDialog" Version="1.0.5" />
+    <PackageReference Include="ZXing.Net" Version="0.16.4" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' " />
+    <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.6" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' == 'true' " />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' ">
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.IO.Compression" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Util\SingleInstance\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

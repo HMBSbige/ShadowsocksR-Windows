@@ -1,36 +1,33 @@
-﻿using Shadowsocks.Model;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Net;
+using Shadowsocks.Model;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller
 {
     public class UpdateFreeNode
     {
-        private const string UpdateURL = "https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/freenodeplain.txt";
+        private const string DefaultUpdateUrl = "https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/freenodeplain.txt";
+
+        private const string UserAgent = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36";
 
         public event EventHandler NewFreeNodeFound;
         public string FreeNodeResult;
-        public ServerSubscribe subscribeTask;
-        public bool noitify;
+        public ServerSubscribe SubscribeTask;
+        public bool Notify;
 
-        public const string Name = "ShadowsocksR";
-
-        public void CheckUpdate(Configuration config, ServerSubscribe subscribeTask, bool use_proxy, bool noitify)
+        public void CheckUpdate(Configuration config, ServerSubscribe subscribeTask, bool useProxy, bool notify)
         {
             FreeNodeResult = null;
-            this.noitify = noitify;
+            Notify = notify;
             try
             {
-                WebClient http = new WebClient();
-                http.Headers.Add("User-Agent",
-                    String.IsNullOrEmpty(config.proxyUserAgent) ?
-                    "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.3319.102 Safari/537.36"
-                    : config.proxyUserAgent);
-                http.QueryString["rnd"] = Util.Utils.RandUInt32().ToString();
-                if (use_proxy)
+                var http = new WebClient();
+                http.Headers.Add(@"User-Agent", string.IsNullOrEmpty(config.proxyUserAgent) ? UserAgent : config.proxyUserAgent);
+                http.QueryString[@"rnd"] = Utils.RandUInt32().ToString();
+                if (useProxy)
                 {
-                    WebProxy proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
+                    var proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
                     if (!string.IsNullOrEmpty(config.authPass))
                     {
                         proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);
@@ -41,18 +38,12 @@ namespace Shadowsocks.Controller
                 {
                     http.Proxy = null;
                 }
-                //UseProxy = !UseProxy;
-                this.subscribeTask = subscribeTask;
-                string URL = subscribeTask.URL;
 
-                //add support for tls1.2+
-                if (URL.StartsWith("https", StringComparison.OrdinalIgnoreCase))
-                {
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 | SecurityProtocolType.Tls;
-                }
+                SubscribeTask = subscribeTask;
+                var url = subscribeTask.URL;
 
                 http.DownloadStringCompleted += http_DownloadStringCompleted;
-                http.DownloadStringAsync(new Uri(URL != null ? URL : UpdateURL));
+                http.DownloadStringAsync(new Uri(url ?? DefaultUpdateUrl));
             }
             catch (Exception e)
             {
@@ -64,13 +55,10 @@ namespace Shadowsocks.Controller
         {
             try
             {
-                string response = e.Result;
+                var response = e.Result;
                 FreeNodeResult = response;
 
-                if (NewFreeNodeFound != null)
-                {
-                    NewFreeNodeFound(this, new EventArgs());
-                }
+                NewFreeNodeFound?.Invoke(this, new EventArgs());
             }
             catch (Exception ex)
             {
@@ -79,70 +67,7 @@ namespace Shadowsocks.Controller
                     Logging.Debug(e.Error.ToString());
                 }
                 Logging.Debug(ex.ToString());
-                if (NewFreeNodeFound != null)
-                {
-                    NewFreeNodeFound(this, new EventArgs());
-                }
-                return;
-            }
-        }
-    }
-
-    public class UpdateSubscribeManager
-    {
-        private Configuration _config;
-        private List<ServerSubscribe> _serverSubscribes;
-        private UpdateFreeNode _updater;
-        private string _URL;
-        private bool _use_proxy;
-        public bool _noitify;
-
-        public void CreateTask(Configuration config, UpdateFreeNode updater, int index, bool use_proxy, bool noitify)
-        {
-            if (_config == null)
-            {
-                _config = config;
-                _updater = updater;
-                _use_proxy = use_proxy;
-                _noitify = noitify;
-                if (index < 0)
-                {
-                    _serverSubscribes = new List<ServerSubscribe>();
-                    for (int i = 0; i < config.serverSubscribes.Count; ++i)
-                    {
-                        _serverSubscribes.Add(config.serverSubscribes[i]);
-                    }
-                }
-                else if (index < _config.serverSubscribes.Count)
-                {
-                    _serverSubscribes = new List<ServerSubscribe>();
-                    _serverSubscribes.Add(config.serverSubscribes[index]);
-                }
-                Next();
-            }
-        }
-
-        public bool Next()
-        {
-            if (_serverSubscribes.Count == 0)
-            {
-                _config = null;
-                return false;
-            }
-            else
-            {
-                _URL = _serverSubscribes[0].URL;
-                _updater.CheckUpdate(_config, _serverSubscribes[0], _use_proxy, _noitify);
-                _serverSubscribes.RemoveAt(0);
-                return true;
-            }
-        }
-
-        public string URL
-        {
-            get
-            {
-                return _URL;
+                NewFreeNodeFound?.Invoke(this, new EventArgs());
             }
         }
     }

@@ -1,9 +1,9 @@
-﻿using Shadowsocks.Controller;
-using Shadowsocks.Properties;
-using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Shadowsocks.Controller;
+using Shadowsocks.Properties;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.Encryption
 {
@@ -38,12 +38,10 @@ namespace Shadowsocks.Encryption
                 {
                     if (sodium_init() == -1)
                     {
-                        throw new System.Exception(@"Failed to initialize sodium");
+                        throw new Exception(@"Failed to initialize sodium");
                     }
-                    else /* 1 means already initialized; 0 means success */
-                    {
-                        _initialized = true;
-                    }
+
+                    _initialized = true;
 
                     AES256GCMAvailable = crypto_aead_aes256gcm_is_available() == 1;
                     Logging.Debug($@"sodium: AES256GCMAvailable is {AES256GCMAvailable}");

@@ -1,9 +1,9 @@
-﻿using Shadowsocks.Controller;
-using Shadowsocks.Encryption;
-using Shadowsocks.Encryption.Stream;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using Shadowsocks.Controller;
+using Shadowsocks.Encryption;
+using Shadowsocks.Encryption.Stream;
 
 namespace Shadowsocks.Obfs
 {
@@ -27,7 +27,7 @@ namespace Shadowsocks.Obfs
         }
 
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
-            {"auth_akarin_rand", new int[]{1, 0, 1}},
+            {"auth_akarin_rand", new[]{1, 0, 1}}
         };
 
         protected bool has_sent_header;
@@ -209,7 +209,7 @@ namespace Shadowsocks.Obfs
         {
             const int authhead_len = 4 + 8 + 4 + 16 + 4;
             byte[] encrypt = new byte[24];
-            AuthDataAesChain authData = this.Server.data as AuthDataAesChain;
+            AuthDataAesChain authData = Server.data as AuthDataAesChain;
 
             lock (authData)
             {
@@ -221,7 +221,7 @@ namespace Shadowsocks.Obfs
                 {
                     authData.clientID = new byte[4];
                     g_random.GetBytes(authData.clientID);
-                    authData.connectionID = (UInt32)BitConverter.ToInt32(authData.clientID, 0) % 0xFFFFFD;
+                    authData.connectionID = (uint)BitConverter.ToInt32(authData.clientID, 0) % 0xFFFFFD;
                 }
                 authData.connectionID += 1;
                 Array.Copy(authData.clientID, 0, encrypt, 4, 4);
@@ -234,8 +234,8 @@ namespace Shadowsocks.Obfs
             Server.iv.CopyTo(key, 0);
             Server.key.CopyTo(key, Server.iv.Length);
 
-            UInt64 utc_time_second = (UInt64)Math.Floor(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
-            UInt32 utc_time = (UInt32)(utc_time_second);
+            ulong utc_time_second = (ulong)Math.Floor(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
+            uint utc_time = (uint)(utc_time_second);
             Array.Copy(BitConverter.GetBytes(utc_time), 0, encrypt, 0, 4);
 
             encrypt[12] = (byte)(Server.overhead);
@@ -284,7 +284,7 @@ namespace Shadowsocks.Obfs
 
                 byte[] encrypt_key = user_key;
 
-                var encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("aes-128-cbc", System.Convert.ToBase64String(encrypt_key) + SALT);
+                var encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("aes-128-cbc", Convert.ToBase64String(encrypt_key) + SALT);
                 int enc_outlen;
 
                 encryptor.SetIV(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
@@ -301,7 +301,7 @@ namespace Shadowsocks.Obfs
                 Array.Copy(md5data, 0, encrypt, 20, 4);
             }
             encrypt.CopyTo(outdata, 12);
-            encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("chacha20", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(last_client_hash, 0, 16));
+            encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("chacha20", Convert.ToBase64String(user_key) + Convert.ToBase64String(last_client_hash, 0, 16));
             {
                 byte[] iv = new byte[8];
                 Array.Copy(last_client_hash, iv, 8);
@@ -335,7 +335,8 @@ namespace Shadowsocks.Obfs
             {
                 return null;
             }
-            else if (data == send_buffer)
+
+            if (data == send_buffer)
             {
                 datalength = send_buffer.Length;
                 send_buffer = null;
@@ -346,14 +347,12 @@ namespace Shadowsocks.Obfs
                 {
                     return outdata;
                 }
-                else
-                {
-                    Array.Resize(ref send_buffer, send_buffer.Length + datalength);
-                    Array.Copy(data, 0, send_buffer, send_buffer.Length - datalength, datalength);
-                    data = send_buffer;
-                    datalength = send_buffer.Length;
-                    send_buffer = null;
-                }
+
+                Array.Resize(ref send_buffer, send_buffer.Length + datalength);
+                Array.Copy(data, 0, send_buffer, send_buffer.Length - datalength, datalength);
+                data = send_buffer;
+                datalength = send_buffer.Length;
+                send_buffer = null;
             }
             int unit_len = Server.tcp_mss - Server.overhead;
             int ogn_datalength = datalength;
@@ -514,7 +513,7 @@ namespace Shadowsocks.Obfs
             byte[] rand_data = new byte[rand_len];
             random.NextBytes(rand_data);
             outlength = datalength + rand_len + 8;
-            encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("chacha20", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(md5data, 0, 16));
+            encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("chacha20", Convert.ToBase64String(user_key) + Convert.ToBase64String(md5data, 0, 16));
             {
                 byte[] iv = new byte[8];
                 Array.Copy(Server.key, iv, 8);
@@ -555,7 +554,7 @@ namespace Shadowsocks.Obfs
             md5data = md5.ComputeHash(plaindata, datalength - 8, 7);
             int rand_len = UdpGetRandLen(random_server, md5data);
             outlength = datalength - rand_len - 8;
-            encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("chacha20", System.Convert.ToBase64String(user_key) + System.Convert.ToBase64String(md5data, 0, 16));
+            encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("chacha20", Convert.ToBase64String(user_key) + Convert.ToBase64String(md5data, 0, 16));
             {
                 int temp;
                 byte[] iv = new byte[8];
@@ -576,11 +575,11 @@ namespace Shadowsocks.Obfs
         }
 
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
-            {"auth_akarin_spec_a", new int[]{1, 0, 1}},
+            {"auth_akarin_spec_a", new[]{1, 0, 1}}
         };
 
-        protected int[] data_size_list = null;
-        protected int[] data_size_list2 = null;
+        protected int[] data_size_list;
+        protected int[] data_size_list2;
 
         public static new List<string> SupportedObfs()
         {

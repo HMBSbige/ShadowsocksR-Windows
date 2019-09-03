@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="Shadowsocks.Controls.NumberUpDown"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             x:Name="Uc"
+             Loaded="UserControl_Loaded">
+    <Grid LostFocus="Grid_LostFocus">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="12" />
+        </Grid.ColumnDefinitions>
+        <TextBox x:FieldModifier="private" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" x:Name="TxtNum"
+        Text="{Binding Value , Mode=TwoWay, ElementName=Uc,UpdateSourceTrigger=PropertyChanged}" TextChanged="TxtNum_TextChanged" VerticalContentAlignment="Center"/>
+        <RepeatButton Grid.Row="0" Grid.Column="1" Content="▲" Click="Up_Click" FontSize="6" />
+        <RepeatButton Grid.Row="1" Grid.Column="1" Content="▼" Click="Down_Click" FontSize="6" />
+    </Grid>
+</UserControl>

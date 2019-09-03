@@ -1,0 +1,69 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="ResourceDictionaryName">zh-TW</sys:String>
+
+    <sys:String x:Key="Mode">系統代理模式</sys:String>
+    <sys:String x:Key="DisableProxy">直連模式</sys:String>
+    <sys:String x:Key="PacProxy">PAC 模式</sys:String>
+    <sys:String x:Key="GlobalProxy">全局模式</sys:String>
+    <sys:String x:Key="NoProxy">保持當前狀態不修改</sys:String>
+
+    <sys:String x:Key="Pac">PAC</sys:String>
+    <sys:String x:Key="UpdateLanPac">更新PAC為繞過區域網路IP</sys:String>
+    <sys:String x:Key="UpdateChnDomainPac">更新PAC為繞過大陸域名</sys:String>
+    <sys:String x:Key="UpdateChnDomainIpPac">更新PAC為繞過大陸域名和IP</sys:String>
+    <sys:String x:Key="UpdateGfwList">更新PAC為GFWList</sys:String>
+    <sys:String x:Key="UpdateChnOnlyPac">更新PAC為僅通過大陸常見域名（國外訪問大陸）</sys:String>
+    <sys:String x:Key="CopyPacUrl">複製 PAC URL</sys:String>
+    <sys:String x:Key="EditPacFile">編輯本地 PAC 文件...</sys:String>
+    <sys:String x:Key="EditGfwListUserRule">編輯 GFWList 的用戶規則...</sys:String>
+
+    <sys:String x:Key="ProxyRule">代理規則</sys:String>
+    <sys:String x:Key="BypassLan">繞過區域網路</sys:String>
+    <sys:String x:Key="BypassLanChina">繞過區域網路和大陸</sys:String>
+    <sys:String x:Key="BypassLanNotChina">繞過區域網路和非大陸</sys:String>
+    <sys:String x:Key="UserCustom">用戶自定義</sys:String>
+    <sys:String x:Key="DisableBypass">全局</sys:String>
+
+    <sys:String x:Key="Servers">伺服器</sys:String>
+    <sys:String x:Key="EditServers">編輯伺服器...</sys:String>
+    <sys:String x:Key="ImportServers">從文件導入伺服器...</sys:String>
+    <sys:String x:Key="LoadBalance">伺服器負載均衡</sys:String>
+    <sys:String x:Key="SameHostForSameAddress">優先相同節點連接同一位址</sys:String>
+    <sys:String x:Key="ServerStatistic">伺服器連接統計...</sys:String>
+    <sys:String x:Key="DisconnectCurrent">斷開當前所有連接</sys:String>
+
+    <sys:String x:Key="ServersSubscribe">伺服器訂閱</sys:String>
+    <sys:String x:Key="SubscribeSetting">SSR伺服器訂閱設置...</sys:String>
+    <sys:String x:Key="UpdateSubscribeSsrNode">更新SSR伺服器訂閱</sys:String>
+    <sys:String x:Key="UpdateSubscribeSsrNodeBypassProxy">更新SSR伺服器訂閱（不通過代理）</sys:String>
+
+    <sys:String x:Key="GlobalSettings">選項設置...</sys:String>
+    <sys:String x:Key="PortSettings">連接埠設置...</sys:String>
+    <sys:String x:Key="ShowLogs">顯示日誌...</sys:String>
+    <sys:String x:Key="UpdateAvailable">可用更新</sys:String>
+    <sys:String x:Key="ScanQrCode">QR 碼掃描...</sys:String>
+    <sys:String x:Key="ImportSsrLinksFromClipboard">剪貼板批量導入ssr://連結...</sys:String>
+
+    <sys:String x:Key="Help">幫助</sys:String>
+    <sys:String x:Key="Update">更新...</sys:String>
+    <sys:String x:Key="CheckUpdate">檢查更新</sys:String>
+    <sys:String x:Key="AutoCheckUpdate">自動檢查更新</sys:String>
+    <sys:String x:Key="AllowPreRelease">包括測試版更新</sys:String>
+    <sys:String x:Key="OpenWiki">打開Wiki文檔...</sys:String>
+    <sys:String x:Key="Feedback">問題反饋...</sys:String>
+    <sys:String x:Key="GenQrCode">自定義生成 QR 碼</sys:String>
+    <sys:String x:Key="ResetPassword">設置客戶端密碼...</sys:String>
+    <sys:String x:Key="About">關於...</sys:String>
+    <sys:String x:Key="Donate">捐助...</sys:String>
+
+    <sys:String x:Key="Quit">退出</sys:String>
+
+    <sys:String x:Key="NewVersionNotFound">沒有找到新版本</sys:String>
+    <sys:String x:Key="NewVersionFound">{0} {1} 更新</sys:String>
+    <sys:String x:Key="ClickMenuToDownload">點擊菜單項下載</sys:String>
+    <sys:String x:Key="NewVersionAvailable">【點擊下載新版本 {0} {1}】</sys:String>
+    <sys:String x:Key="NewVersionFoundFailed">檢查更新失敗</sys:String>
+
+</ResourceDictionary>

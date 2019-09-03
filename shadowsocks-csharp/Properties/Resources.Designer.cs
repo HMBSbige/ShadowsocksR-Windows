@@ -125,12 +125,13 @@ namespace Shadowsocks.Properties {
         
         /// <summary>
         ///   查找类似 listen-address __PRIVOXY_BIND_IP__:__PRIVOXY_BIND_PORT__
+        ///toggle 0
+        ///logfile ShadowsocksR.log
         ///show-on-task-bar 0
         ///activity-animation 0
         ///forward-socks5 / 127.0.0.1:__SOCKS_PORT__ .
+        ///max-client-connections 2048
         ///hide-console
-        ///__BYPASS_ACTION__
-        ///
         /// 的本地化字符串。
         /// </summary>
         internal static string privoxy_conf {
@@ -162,39 +163,9 @@ namespace Shadowsocks.Properties {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap ss16 {
+        internal static System.Drawing.Bitmap ss128 {
             get {
-                object obj = ResourceManager.GetObject("ss16", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap ss20 {
-            get {
-                object obj = ResourceManager.GetObject("ss20", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap ss24 {
-            get {
-                object obj = ResourceManager.GetObject("ss24", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap ssw128 {
-            get {
-                object obj = ResourceManager.GetObject("ssw128", resourceCulture);
+                object obj = ResourceManager.GetObject("ss128", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

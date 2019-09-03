@@ -1,8 +1,9 @@
-﻿using Shadowsocks.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
+using System.Diagnostics;
 using System.Text;
+using Shadowsocks.Model;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.Encryption.Stream
 {
@@ -54,7 +55,7 @@ namespace Shadowsocks.Encryption.Stream
         }
         public override byte[] getKey()
         {
-            byte[] key = (byte[])_key.Clone();
+            var key = (byte[])_key.Clone();
             Array.Resize(ref key, keyLen);
             return key;
         }
@@ -67,7 +68,7 @@ namespace Shadowsocks.Encryption.Stream
         {
             method = method.ToLower();
             _method = method;
-            string k = method + ":" + password;
+            var k = method + ":" + password;
             ciphers = getCiphers();
             _cipherInfo = ciphers[_method];
             _innerLibName = string.IsNullOrWhiteSpace(_cipherInfo.name) ? method : _cipherInfo.name;
@@ -84,9 +85,8 @@ namespace Shadowsocks.Encryption.Stream
                 {
                     if (!CachedKeys.ContainsKey(k))
                     {
-                        byte[] passbuf = Encoding.UTF8.GetBytes(password);
+                        var passbuf = Encoding.UTF8.GetBytes(password);
                         _key = new byte[32];
-                        byte[] iv = new byte[16];
                         bytesToKey(passbuf, _key);
                         CachedKeys.Set(k, _key);
                         CachedKeys.Sweep();
@@ -96,37 +96,30 @@ namespace Shadowsocks.Encryption.Stream
             if (_key == null)
                 _key = CachedKeys.Get(k);
             Array.Resize(ref _iv, ivLen);
-            randBytes(_iv, ivLen);
+            Utils.RandBytes(_iv, ivLen);
         }
 
         public static void bytesToKey(byte[] password, byte[] key)
         {
-            byte[] result = new byte[password.Length + 16];
-            int i = 0;
-            byte[] md5sum = null;
+            var result = new byte[password.Length + 16];
+            var i = 0;
+            byte[] md5Sum = null;
             while (i < key.Length)
             {
                 if (i == 0)
                 {
-                    md5sum = MbedTLS.MD5(password);
+                    md5Sum = MbedTLS.MD5(password);
                 }
                 else
                 {
-                    md5sum.CopyTo(result, 0);
-                    password.CopyTo(result, md5sum.Length);
-                    md5sum = MbedTLS.MD5(result);
+                    Debug.Assert(md5Sum != null, $@"{nameof(md5Sum)} != null");
+                    md5Sum.CopyTo(result, 0);
+                    password.CopyTo(result, md5Sum.Length);
+                    md5Sum = MbedTLS.MD5(result);
                 }
-                md5sum.CopyTo(key, i);
-                i += md5sum.Length;
+                md5Sum.CopyTo(key, i);
+                i += md5Sum.Length;
             }
-        }
-
-        protected static void randBytes(byte[] buf, int length)
-        {
-            byte[] temp = new byte[length];
-            RNGCryptoServiceProvider rngServiceProvider = new RNGCryptoServiceProvider();
-            rngServiceProvider.GetBytes(temp);
-            temp.CopyTo(buf, 0);
         }
 
         protected virtual void initCipher(byte[] iv, bool isCipher)
@@ -171,7 +164,7 @@ namespace Shadowsocks.Encryption.Stream
         {
             if (_decryptIVReceived <= ivLen)
             {
-                int start_pos = ivLen;
+                var start_pos = ivLen;
                 if (_decryptIVReceived + length < ivLen)
                 {
                     if (_decryptIV == null)
@@ -191,7 +184,7 @@ namespace Shadowsocks.Encryption.Stream
                 else
                 {
                     start_pos = ivLen - _decryptIVReceived;
-                    byte[] temp_buf = new byte[ivLen];
+                    var temp_buf = new byte[ivLen];
                     Buffer.BlockCopy(_decryptIV, 0, temp_buf, 0, _decryptIVReceived);
                     Buffer.BlockCopy(buf, 0, temp_buf, _decryptIVReceived, start_pos);
                     initCipher(temp_buf, false);
@@ -217,7 +210,7 @@ namespace Shadowsocks.Encryption.Stream
         public override void ResetEncrypt()
         {
             _encryptIVSent = false;
-            randBytes(_iv, ivLen);
+            Utils.RandBytes(_iv, ivLen);
         }
 
         public override void ResetDecrypt()

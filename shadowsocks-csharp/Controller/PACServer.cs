@@ -1,16 +1,16 @@
-﻿using Shadowsocks.Model;
-using Shadowsocks.Properties;
-using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Shadowsocks.Model;
+using Shadowsocks.Properties;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller
 {
-    class PACServer : Listener.Service
+    public class PACServer : Listener.Service
     {
         public static string gfwlist_FILE = @"gfwlist.txt";
 
@@ -23,6 +23,8 @@ namespace Shadowsocks.Controller
         public static string WHITELIST_FILE = @"whitelist.txt";
 
         public static string USER_WHITELIST_TEMPLATE_FILE = @"user_whitelist_temp.txt";
+
+        public string PacUrl { get; private set; } = "";
 
         FileSystemWatcher PACFileWatcher;
         FileSystemWatcher UserRuleFileWatcher;
@@ -40,6 +42,7 @@ namespace Shadowsocks.Controller
         public void UpdateConfiguration(Configuration config)
         {
             _config = config;
+            PacUrl = $@"http://127.0.0.1:{config.localPort}/pac?auth={config.localAuthPassword}&t={Utils.GetTimestamp(DateTime.Now)}";
         }
 
         public bool Handle(byte[] firstPacket, int length, Socket socket)
@@ -133,11 +136,9 @@ namespace Shadowsocks.Controller
             {
                 return PAC_FILE;
             }
-            else
-            {
-                FileManager.DecompressFile(PAC_FILE, Resources.proxy_pac_txt);
-                return PAC_FILE;
-            }
+
+            FileManager.DecompressFile(PAC_FILE, Resources.proxy_pac_txt);
+            return PAC_FILE;
         }
 
         public static string TouchUserRuleFile()
@@ -146,11 +147,9 @@ namespace Shadowsocks.Controller
             {
                 return USER_RULE_FILE;
             }
-            else
-            {
-                File.WriteAllText(USER_RULE_FILE, Resources.user_rule);
-                return USER_RULE_FILE;
-            }
+
+            File.WriteAllText(USER_RULE_FILE, Resources.user_rule);
+            return USER_RULE_FILE;
         }
 
         private string GetPACContent()
@@ -159,10 +158,8 @@ namespace Shadowsocks.Controller
             {
                 return File.ReadAllText(PAC_FILE, Encoding.UTF8);
             }
-            else
-            {
-                return Utils.UnGzip(Resources.proxy_pac_txt);
-            }
+
+            return Utils.UnGzip(Resources.proxy_pac_txt);
         }
 
         public void SendResponse(Socket socket, int socksType, string setProxy)

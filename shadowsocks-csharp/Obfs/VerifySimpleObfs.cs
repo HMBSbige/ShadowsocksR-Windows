@@ -1,6 +1,6 @@
-﻿using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.Obfs
 {
@@ -18,7 +18,7 @@ namespace Shadowsocks.Obfs
         protected const int RecvBufferSize = 65536 * 2;
 
         protected byte[] recv_buf = new byte[RecvBufferSize];
-        protected int recv_buf_len = 0;
+        protected int recv_buf_len;
         protected Random random = new Random();
 
         public override object InitData()
@@ -47,7 +47,7 @@ namespace Shadowsocks.Obfs
                 int r = r1 + r2;
                 if (r == max) return mid - 1;
                 if (r < mid) return mid - r - 1;
-                else return max - r + mid - 1;
+                return max - r + mid - 1;
             }
             else
             {
@@ -56,7 +56,7 @@ namespace Shadowsocks.Obfs
                 r2 = random.Next(mid + 1);
                 int r = r1 + r2;
                 if (r < mid) return mid - r - 1;
-                else return max - r + mid - 1;
+                return max - r + mid - 1;
             }
         }
 
@@ -101,7 +101,7 @@ namespace Shadowsocks.Obfs
         {
         }
         private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
-                {"verify_deflate", new int[]{1, 0, 1}},
+                {"verify_deflate", new[]{1, 0, 1}}
         };
 
         public static List<string> SupportedObfs()
@@ -122,7 +122,7 @@ namespace Shadowsocks.Obfs
             outdata[0] = (byte)(outlength >> 8);
             outdata[1] = (byte)(outlength);
             Array.Copy(comdata, 0, outdata, 2, outlen);
-            ulong adler = Util.Adler32.CalcAdler32(data, datalength);
+            ulong adler = Adler32.CalcAdler32(data, datalength);
             outdata[outlength - 4] = (byte)(adler >> 24);
             outdata[outlength - 3] = (byte)(adler >> 16);
             outdata[outlength - 2] = (byte)(adler >> 8);
@@ -145,7 +145,7 @@ namespace Shadowsocks.Obfs
             {
                 int outlen;
                 PackData(data, unit_len, packdata, out outlen);
-                Util.Utils.SetArrayMinSize2(ref outdata, outlength + outlen);
+                Utils.SetArrayMinSize2(ref outdata, outlength + outlen);
                 Array.Copy(packdata, 0, outdata, outlength, outlen);
                 outlength += outlen;
                 datalength -= unit_len;
@@ -157,7 +157,7 @@ namespace Shadowsocks.Obfs
             {
                 int outlen;
                 PackData(data, datalength, packdata, out outlen);
-                Util.Utils.SetArrayMinSize2(ref outdata, outlength + outlen);
+                Utils.SetArrayMinSize2(ref outdata, outlength + outlen);
                 Array.Copy(packdata, 0, outdata, outlength, outlen);
                 outlength += outlen;
             }
@@ -184,7 +184,7 @@ namespace Shadowsocks.Obfs
                 byte[] buf = FileManager.DeflateDecompress(recv_buf, 2, len - 6, out outlen);
                 if (buf != null)
                 {
-                    ulong alder = Util.Adler32.CalcAdler32(buf, outlen);
+                    ulong alder = Adler32.CalcAdler32(buf, outlen);
                     if (recv_buf[len - 4] == (byte)(alder >> 24)
                         && recv_buf[len - 3] == (byte)(alder >> 16)
                         && recv_buf[len - 2] == (byte)(alder >> 8)
@@ -196,7 +196,7 @@ namespace Shadowsocks.Obfs
                     {
                         throw new ObfsException("ClientPostDecrypt data decompress ERROR");
                     }
-                    Util.Utils.SetArrayMinSize2(ref outdata, outlength + outlen);
+                    Utils.SetArrayMinSize2(ref outdata, outlength + outlen);
                     Array.Copy(buf, 0, outdata, outlength, outlen);
                     outlength += outlen;
                     recv_buf_len -= len;
