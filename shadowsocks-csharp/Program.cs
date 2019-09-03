@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace Shadowsocks
@@ -98,43 +99,35 @@ namespace Shadowsocks
             switch (e.Mode)
             {
                 case PowerModes.Resume:
+                {
+                    Logging.Info("os wake up");
                     if (_controller != null)
                     {
-                        var timer = new System.Timers.Timer(5 * 1000);
-                        timer.Elapsed += Timer_Elapsed;
-                        timer.AutoReset = false;
-                        timer.Enabled = true;
-                        timer.Start();
+                        Task.Run(() =>
+                        {
+                            Thread.Sleep(10 * 1000);
+                            try
+                            {
+                                _controller.Start();
+                                Logging.Info("controller started");
+                            }
+                            catch (Exception ex)
+                            {
+                                Logging.LogUsefulException(ex);
+                            }
+                        });
                     }
                     break;
-                case PowerModes.Suspend:
-                    _controller?.Stop();
-                    break;
-            }
-        }
-
-        private static void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            try
-            {
-                _controller?.Start();
-            }
-            catch (Exception ex)
-            {
-                Logging.LogUsefulException(ex);
-            }
-            finally
-            {
-                try
-                {
-                    var timer = (System.Timers.Timer)sender;
-                    timer.Enabled = false;
-                    timer.Stop();
-                    timer.Dispose();
                 }
-                catch (Exception ex)
+                case PowerModes.Suspend:
                 {
-                    Logging.LogUsefulException(ex);
+                    if (_controller != null)
+                    {
+                        _controller.Stop();
+                        Logging.Info("controller stopped");
+                    }
+                    Logging.Info("os suspend");
+                    break;
                 }
             }
         }
