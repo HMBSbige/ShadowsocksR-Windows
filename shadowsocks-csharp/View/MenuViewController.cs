@@ -1076,7 +1076,7 @@ namespace Shadowsocks.View
 
         private void OpenWiki_Click(object sender, RoutedEventArgs e)
         {
-            Utils.OpenURL(@"https://github.com/HMBSbige/shadowsocks-rss/wiki");
+            Utils.OpenURL(@"https://github.com/HMBSbige/ShadowsocksR-Windows/wiki");
         }
 
         private void FeedbackItem_Click(object sender, RoutedEventArgs e)
