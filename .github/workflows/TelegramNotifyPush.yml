@@ -1,0 +1,17 @@
+on: [push]
+
+name: Telegram Notify Push
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    name: Telegram Notify Push
+    steps:
+    - name: Telegram Notify Push
+      uses: appleboy/telegram-action@master
+      env:
+        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN_BOT }}
+        TELEGRAM_TO: ${{ secrets.TELEGRAM_TO_MYSELF }}
+      with:
+        args: "{{ repo }}： A new commit has been pushed. commit sha: {{ commit.sha }}"
