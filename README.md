@@ -1,7 +1,9 @@
-<img src="shadowsocks-csharp/Resources/ssw128.png" alt="[logo]" width="48"/>ShadowsocksR for Windows
+<img src="shadowsocks-csharp/Resources/ssw128.png" width="48"/>ShadowsocksR for Windows
 =======================
+![](https://github.com/HMBSbige/ShadowsocksR-Windows/workflows/.NET%20Build/badge.svg)
 
 [![Build Status]][Appveyor]
+
 #### [Wiki](https://github.com/HMBSbige/ShadowsocksR-Windows/wiki)
 
 #### Download
