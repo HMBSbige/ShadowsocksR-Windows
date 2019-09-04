@@ -1,6 +1,6 @@
 on: [watch]
 
-name: Telegram Notify watch
+name: Telegram Notify Watch
 
 jobs:
 
@@ -11,7 +11,7 @@ jobs:
     - name: Telegram Notify Watch
       uses: appleboy/telegram-action@master
       env:
-        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-        TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
+        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN_BOT }}
+        TELEGRAM_TO: ${{ secrets.TELEGRAM_TO_MYSELF }}
       with:
         args: "{{ repo }}:\n多一个 star(｀・ω・´)"
