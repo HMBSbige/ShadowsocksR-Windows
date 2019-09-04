@@ -1,8 +1,15 @@
 <img src="shadowsocks-csharp/Resources/ssw128.png" width="48"/>ShadowsocksR for Windows
 =======================
-![](https://github.com/HMBSbige/ShadowsocksR-Windows/workflows/.NET%20Build/badge.svg)
+
+[![](https://img.shields.io/badge/Telegram-Channel-blue)](https://t.me/ShadowsocksR_Windows)
+[![](https://img.shields.io/badge/Telegram-Group-green)](https://t.me/joinchat/Gn-Aa0-j4HeNckZklRAh7w)
+
+#### Build
+
+[![](https://github.com/HMBSbige/ShadowsocksR-Windows/workflows/.NET%20Build/badge.svg)](https://github.com/HMBSbige/ShadowsocksR-Windows)
 
 [![Build Status]][Appveyor]
+
 
 #### [Wiki](https://github.com/HMBSbige/ShadowsocksR-Windows/wiki)
 
