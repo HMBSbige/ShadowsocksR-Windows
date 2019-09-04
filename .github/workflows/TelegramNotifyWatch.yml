@@ -1,0 +1,17 @@
+on: [watch]
+
+name: Telegram Notify watch
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    name: Telegram Notify Watch
+    steps:
+    - name: Telegram Notify Watch
+      uses: appleboy/telegram-action@master
+      env:
+        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
+      with:
+        args: "{{ repo }}:\n多一个 star(｀・ω・´)"
