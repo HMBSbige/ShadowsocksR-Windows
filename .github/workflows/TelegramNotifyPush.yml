@@ -14,4 +14,4 @@ jobs:
         TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN_BOT }}
         TELEGRAM_TO: ${{ secrets.TELEGRAM_TO_MYSELF }}
       with:
-        args: "{{ repo }}： A new commit has been pushed. commit sha: {{ commit.sha }}"
+        args: "{{ repo }}:\nA new commit has been pushed. commit sha: {{ commit.sha }}"
