@@ -42,7 +42,11 @@ namespace Shadowsocks.ViewModel
         public void ReadConfig(ShadowsocksController controller)
         {
             var config = controller.GetCurrentConfiguration();
-            ServersCollection = config.configs;
+            ServersCollection.Clear();
+            foreach (var server in config.configs)
+            {
+                ServersCollection.Add(server);
+            }
             SelectedServer = null;
             var index = 1;
 
