@@ -43,14 +43,8 @@ namespace Shadowsocks.ViewModel
         {
             var config = controller.GetCurrentConfiguration();
             ServersCollection.Clear();
-            foreach (var server in config.configs)
-            {
-                ServersCollection.Add(server);
-            }
-            SelectedServer = null;
             var index = 1;
-
-            foreach (var server in ServersCollection)
+            foreach (var server in config.configs)
             {
                 server.Index = index++;
                 if (config.index == server.Index - 1)
@@ -62,6 +56,7 @@ namespace Shadowsocks.ViewModel
                 {
                     server.IsSelected = false;
                 }
+                ServersCollection.Add(server);
             }
         }
     }
