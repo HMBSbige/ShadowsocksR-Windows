@@ -3,6 +3,7 @@ using Shadowsocks.GitHubRelease;
 using Shadowsocks.Model;
 using System;
 using System.Collections.Generic;
+using System.Net;
 
 namespace Shadowsocks.Controller
 {
@@ -24,7 +25,7 @@ namespace Shadowsocks.Controller
 
         public const string Name = @"ShadowsocksR";
         public const string Copyright = @"Copyright © HMBSbige 2019 & BreakWa11 2017. Fork from Shadowsocks by clowwindy";
-        public const string Version = @"5.0.1.2";
+        public const string Version = @"5.0.2";
 
         public const string FullVersion = Version +
 #if IsDotNetCore
@@ -47,6 +48,15 @@ namespace Shadowsocks.Controller
 #else
         "";
 #endif
+        public static IWebProxy CreateProxy(Configuration config)
+        {
+            var proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
+            if (!string.IsNullOrEmpty(config.authPass))
+            {
+                proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);
+            }
+            return proxy;
+        }
 
         public async void Check(Configuration config, bool notifyNoFound)
         {
@@ -54,7 +64,7 @@ namespace Shadowsocks.Controller
             {
                 BeforeCheckVersion?.Invoke(this, new EventArgs());
                 var updater = new GitHubRelease.GitHubRelease(Owner, Repo);
-                var json = await updater.GetAllReleaseAsync();
+                var json = await updater.GetAllReleaseAsync(CreateProxy(config));
                 var releases = JsonConvert.DeserializeObject<List<Release>>(json);
                 var latestRelease = VersionUtil.GetLatestRelease(releases, config.isPreRelease);
                 if (VersionUtil.CompareVersion(latestRelease.tag_name, Version) > 0)

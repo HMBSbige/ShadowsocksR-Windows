@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -20,21 +21,21 @@ namespace Shadowsocks.GitHubRelease
             _repo = repo;
         }
 
-        public async Task<string> GetLatestAsync()
+        public async Task<string> GetLatestAsync(IWebProxy proxy)
         {
-            return await Get(LatestReleaseUrl, true);
+            return await Get(LatestReleaseUrl, proxy);
         }
 
-        public async Task<string> GetAllReleaseAsync()
+        public async Task<string> GetAllReleaseAsync(IWebProxy proxy)
         {
-            return await Get(AllReleaseUrl, true);
+            return await Get(AllReleaseUrl, proxy);
         }
 
-        private static async Task<string> Get(string url, bool useProxy = false)
+        private static async Task<string> Get(string url, IWebProxy proxy)
         {
             var httpClientHandler = new HttpClientHandler
             {
-                UseProxy = useProxy
+                Proxy = proxy
             };
 
             var httpClient = new HttpClient(httpClientHandler);

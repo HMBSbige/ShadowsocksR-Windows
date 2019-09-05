@@ -1,7 +1,17 @@
-ShadowsocksR for Windows
+<img src="shadowsocks-csharp/Resources/ssw128.png" width="48"/>ShadowsocksR for Windows
 =======================
 
+[![](https://img.shields.io/badge/Telegram-Channel-blue)](https://t.me/ShadowsocksR_Windows)
+[![](https://img.shields.io/badge/Telegram-Group-green)](https://t.me/joinchat/Gn-Aa0-j4HeNckZklRAh7w)
+
+#### Build
+
+[![](https://github.com/HMBSbige/ShadowsocksR-Windows/workflows/.NET%20Build/badge.svg)](https://github.com/HMBSbige/ShadowsocksR-Windows)
+
 [![Build Status]][Appveyor]
+
+
+#### [Wiki](https://github.com/HMBSbige/ShadowsocksR-Windows/wiki)
 
 #### Download
 
@@ -10,14 +20,16 @@ ShadowsocksR for Windows
 
 #### Artifacts
 * `ShadowsocksR-netcore.zip` 
-    * 需要安装 [.NET Core 3.0 Runtime](https://dotnet.microsoft.com/download/dotnet-core/3.0)
+    * 需要安装 [.NET Core 3.0 SDK](https://dotnet.microsoft.com/download/dotnet-core/3.0)
     * 文件小
 
 * `ShadowsocksR-net48.zip` 
-    * 需要安装 [.NET Framework 4.8](https://dotnet.microsoft.com/download) （最新版 Win10 自带）
+    * 需要安装 [.NET Framework 4.8 Runtime](https://dotnet.microsoft.com/download/thank-you/net48-offline) （Windows 10 1903 以上自带）
     * 文件小
 
 **以下版本首次运行会在 `%temp%\.net\ShadowsocksR\` 释放运行库，若有各种清理软件、Windows 更新等误删则会造成运行出错，删除该目录下的所有文件即可重新释放**
+
+**运行文件夹内 clean.cmd 即可清理释放的文件** 
 
 * `ShadowsocksR-netcore-win32.zip`
     * 无需额外安装任何运行时
