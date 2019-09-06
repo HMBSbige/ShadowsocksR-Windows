@@ -66,4 +66,11 @@
     <sys:String x:Key="NewVersionAvailable">【點擊下載新版本 {0} {1}】</sys:String>
     <sys:String x:Key="NewVersionFoundFailed">檢查更新失敗</sys:String>
 
+    <sys:String x:Key="UnexpectedError">Unexpected error, ShadowsocksR will exit.</sys:String>
+    <sys:String x:Key="SuccessiveInstancesMessage1">請在工作列裡尋找 ShadowsocksR 圖標。</sys:String>
+    <sys:String x:Key="SuccessiveInstancesMessage2">如果想啟動多份，可以另外複製一份到別的目錄。</sys:String>
+    <sys:String x:Key="SuccessiveInstancesCaption">ShadowsocksR 已經在運行</sys:String>
+
+    <sys:String x:Key="NewServer">未配置的伺服器</sys:String>
+
 </ResourceDictionary>

@@ -66,4 +66,11 @@
     <sys:String x:Key="NewVersionAvailable">New version {0} {1} available</sys:String>
     <sys:String x:Key="NewVersionFoundFailed">Check for update failure</sys:String>
 
+    <sys:String x:Key="UnexpectedError">Unexpected error, ShadowsocksR will exit.</sys:String>
+    <sys:String x:Key="SuccessiveInstancesMessage1">Find Shadowsocks icon in your notify tray.</sys:String>
+    <sys:String x:Key="SuccessiveInstancesMessage2">If you want to start multiple Shadowsocks, make a copy in another directory.</sys:String>
+    <sys:String x:Key="SuccessiveInstancesCaption">ShadowsocksR is already running</sys:String>
+
+    <sys:String x:Key="NewServer">New server</sys:String>
+
 </ResourceDictionary>

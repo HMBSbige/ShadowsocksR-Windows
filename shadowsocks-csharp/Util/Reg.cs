@@ -2,13 +2,13 @@
 {
     public static class Reg
     {
-        public static bool SetUrlProtocol()
+        public static bool SetUrlProtocol(string link)
         {
             try
             {
                 var path = Utils.GetExecutablePath();
                 using var runKey = Utils.OpenRegKey(@"Software\Classes", true);
-                using var ssr = runKey?.CreateSubKey(@"ssr");
+                using var ssr = runKey?.CreateSubKey(link);
                 if (ssr != null)
                 {
                     ssr.SetValue(null, @"URL:ShadowsocksR Link");

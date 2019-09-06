@@ -86,7 +86,7 @@ namespace Shadowsocks
             SystemEvents.SessionEnding += _viewController.Quit_Click;
 
             _controller.Start();
-            Reg.SetUrlProtocol();
+            Reg.SetUrlProtocol(@"ssr");
             singleInstance.ListenForArgumentsFromSuccessiveInstances();
             app.Run();
         }
@@ -142,7 +142,7 @@ namespace Shadowsocks
             {
                 Logging.Log(LogLevel.Error, $@"{e.ExceptionObject}");
                 MessageBox.Show(
-                $@"{I18N.GetString(@"Unexpected error, ShadowsocksR will exit.")}{Environment.NewLine}{e.ExceptionObject}",
+                $@"{I18NUtil.GetAppStringValue(@"UnexpectedError")}{Environment.NewLine}{e.ExceptionObject}",
                     UpdateChecker.Name, MessageBoxButton.OK, MessageBoxImage.Error);
                 Application.Current.Shutdown();
             }
@@ -152,9 +152,9 @@ namespace Shadowsocks
         {
             if (e.Args.Contains(Constants.ParameterMultiplyInstance))
             {
-                MessageBox.Show(I18N.GetString("Find Shadowsocks icon in your notify tray.") + Environment.NewLine +
-                                I18N.GetString("If you want to start multiple Shadowsocks, make a copy in another directory."),
-                        I18N.GetString("ShadowsocksR is already running."), MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(I18NUtil.GetAppStringValue(@"SuccessiveInstancesMessage1") + Environment.NewLine +
+                                I18NUtil.GetAppStringValue(@"SuccessiveInstancesMessage2"),
+                        I18NUtil.GetAppStringValue(@"SuccessiveInstancesCaption"), MessageBoxButton.OK, MessageBoxImage.Information);
             }
             Application.Current.Dispatcher?.Invoke(() =>
             {

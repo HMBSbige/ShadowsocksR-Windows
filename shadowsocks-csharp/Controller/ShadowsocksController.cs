@@ -12,14 +12,6 @@ using System.Windows;
 
 namespace Shadowsocks.Controller
 {
-    public enum ProxyMode
-    {
-        NoModify,
-        Direct,
-        Pac,
-        Global
-    }
-
     public class ShadowsocksController
     {
         // controller:
@@ -91,7 +83,7 @@ namespace Shadowsocks.Controller
         {
             _rangeSet = new IPRangeSet();
             _rangeSet.LoadChn();
-            if (_config.proxyRuleMode == (int)ProxyRuleMode.BypassLanAndNotChina)
+            if (_config.proxyRuleMode == ProxyRuleMode.BypassLanAndNotChina)
             {
                 _rangeSet.Reverse();
             }
@@ -201,13 +193,17 @@ namespace Shadowsocks.Controller
             _config.FlushPortMapCache();
         }
 
-        public bool AddServerBySSURL(string ssURL, string force_group = null, bool toLast = false)
+        public bool AddServerBySsUrl(string ssUrLs, string force_group = null, bool toLast = false)
         {
-            if (ssURL.StartsWith("ss://", StringComparison.OrdinalIgnoreCase) || ssURL.StartsWith("ssr://", StringComparison.OrdinalIgnoreCase))
+            try
             {
-                try
+                var urls = new List<string>();
+                Utils.URL_Split(ssUrLs, ref urls);
+                var i = 0;
+                foreach (var url in urls.Where(url => url.StartsWith(@"ss://", StringComparison.OrdinalIgnoreCase) || url.StartsWith(@"ssr://", StringComparison.OrdinalIgnoreCase)))
                 {
-                    var server = new Server(ssURL, force_group);
+                    ++i;
+                    var server = new Server(url, force_group);
                     if (toLast)
                     {
                         _config.configs.Add(server);
@@ -219,27 +215,29 @@ namespace Shadowsocks.Controller
                             index = _config.configs.Count;
                         _config.configs.Insert(index, server);
                     }
+                }
+                if (i > 0)
+                {
                     Save();
                     return true;
                 }
-                catch (Exception e)
-                {
-                    Logging.LogUsefulException(e);
-                    return false;
-                }
             }
-
+            catch (Exception e)
+            {
+                Logging.LogUsefulException(e);
+                return false;
+            }
             return false;
         }
 
         public void ToggleMode(ProxyMode mode)
         {
-            _config.sysProxyMode = (int)mode;
+            _config.sysProxyMode = mode;
             Save();
             Application.Current.Dispatcher?.Invoke(() => { ToggleModeChanged?.Invoke(this, new EventArgs()); });
         }
 
-        public void ToggleRuleMode(int mode)
+        public void ToggleRuleMode(ProxyRuleMode mode)
         {
             _config.proxyRuleMode = mode;
             Save();
@@ -300,7 +298,7 @@ namespace Shadowsocks.Controller
 
             _listener?.Stop();
             privoxyRunner?.Stop();
-            if (_config.sysProxyMode != (int)ProxyMode.NoModify && _config.sysProxyMode != (int)ProxyMode.Direct)
+            if (_config.sysProxyMode != ProxyMode.NoModify && _config.sysProxyMode != ProxyMode.Direct)
             {
                 SystemProxy.Update(_config, true, null);
             }
@@ -481,7 +479,7 @@ namespace Shadowsocks.Controller
 
         private void UpdateSystemProxy()
         {
-            if (_config.sysProxyMode != (int)ProxyMode.NoModify)
+            if (_config.sysProxyMode != ProxyMode.NoModify)
             {
                 SystemProxy.Update(_config, false, _pacServer);
             }
