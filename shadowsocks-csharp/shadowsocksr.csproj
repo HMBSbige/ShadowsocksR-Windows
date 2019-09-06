@@ -33,6 +33,7 @@
   <ItemGroup>
     <None Remove="Controls\MaskedTextBox.xaml" />
     <None Remove="Controls\NumberUpDown.xaml" />
+    <None Remove="Resources\ssw128.png" />
     <None Remove="View\ConfigWindow.xaml" />
     <None Remove="View\InputPasswordWindow.xaml" />
     <None Remove="View\LogWindow.xaml" />
