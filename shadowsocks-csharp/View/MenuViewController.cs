@@ -1292,10 +1292,7 @@ namespace Shadowsocks.View
 
         public void ImportAddress(string text)
         {
-            var urls = new List<string>();
-            Utils.URL_Split(text, ref urls);
-            var count = urls.Count(url => controller.AddServerBySSURL(url));
-            if (count > 0)
+            if (controller.AddServerBySsUrl(text))
             {
                 ShowConfigForm(true);
             }
@@ -1358,7 +1355,7 @@ namespace Shadowsocks.View
                     var result = QrCodeUtils.ScanBitmap(target);
                     if (result != null)
                     {
-                        var success = controller.AddServerBySSURL(result.Text);
+                        var success = controller.AddServerBySsUrl(result.Text);
                         Application.Current.Dispatcher?.Invoke(() =>
                         {
                             var splash = new QRCodeSplashWindow();

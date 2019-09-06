@@ -201,13 +201,17 @@ namespace Shadowsocks.Controller
             _config.FlushPortMapCache();
         }
 
-        public bool AddServerBySSURL(string ssURL, string force_group = null, bool toLast = false)
+        public bool AddServerBySsUrl(string ssUrLs, string force_group = null, bool toLast = false)
         {
-            if (ssURL.StartsWith("ss://", StringComparison.OrdinalIgnoreCase) || ssURL.StartsWith("ssr://", StringComparison.OrdinalIgnoreCase))
+            try
             {
-                try
+                var urls = new List<string>();
+                Utils.URL_Split(ssUrLs, ref urls);
+                var i = 0;
+                foreach (var url in urls.Where(url => url.StartsWith(@"ss://", StringComparison.OrdinalIgnoreCase) || url.StartsWith(@"ssr://", StringComparison.OrdinalIgnoreCase)))
                 {
-                    var server = new Server(ssURL, force_group);
+                    ++i;
+                    var server = new Server(url, force_group);
                     if (toLast)
                     {
                         _config.configs.Add(server);
@@ -219,16 +223,18 @@ namespace Shadowsocks.Controller
                             index = _config.configs.Count;
                         _config.configs.Insert(index, server);
                     }
+                }
+                if (i > 0)
+                {
                     Save();
                     return true;
                 }
-                catch (Exception e)
-                {
-                    Logging.LogUsefulException(e);
-                    return false;
-                }
             }
-
+            catch (Exception e)
+            {
+                Logging.LogUsefulException(e);
+                return false;
+            }
             return false;
         }
 
