@@ -35,4 +35,6 @@
     <sys:String x:Key="Cancel">取消</sys:String>
     <sys:String x:Key="Apply">套用</sys:String>
 
+    <sys:String x:Key="NoServer">請添加至少一個伺服器</sys:String>
+
 </ResourceDictionary>

@@ -211,7 +211,7 @@ namespace Shadowsocks.View
         {
             if (_modifiedConfiguration.configs.Count == 0)
             {
-                MessageBox.Show(I18N.GetString(@"Please add at least one server"));
+                MessageBox.Show(this.GetWindowStringValue(@"NoServer"));
                 return false;
             }
 
