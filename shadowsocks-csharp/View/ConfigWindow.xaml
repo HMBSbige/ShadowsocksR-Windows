@@ -7,7 +7,7 @@
         xmlns:model="clr-namespace:Shadowsocks.Model"
         mc:Ignorable="d"
         x:Name="Cw" 
-        Title="ConfigWindow" Height="560" Width="1200" WindowStartupLocation="CenterScreen"
+        Title="ConfigWindow" Height="560" Width="800" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded">
 
     <Window.Resources>
@@ -56,7 +56,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <GridSplitter Grid.Column="0" Grid.RowSpan="3"
                       HorizontalAlignment="Right"
@@ -66,7 +66,7 @@
         <GridSplitter x:Name="Splitter2" Grid.Row="0" Grid.Column="1" Grid.RowSpan="3"
                       HorizontalAlignment="Right"
                       VerticalAlignment="Stretch"
-                      Width="3" />
+                      Width="3" Visibility="Collapsed"/>
 
         <ListBox x:Name="ServersListBox" Grid.Row="0" Grid.Column="0" Margin="10,0,10,0"
                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
@@ -91,6 +91,7 @@
             <Button Grid.Row="0" Grid.Column="0" Content="{DynamicResource Up}" FontSize="14" Click="UpButton_Click"></Button>
             <Button Grid.Row="0" Grid.Column="1" Content="{DynamicResource Down}" FontSize="14" Click="DownButton_Click"></Button>
         </Grid>
+        <Button x:Name="ShowQrCodeButton" Grid.Row="1" Grid.Column="1" Margin="10,10,10,0" Content=">>" HorizontalAlignment="Right" Width="40" Click="ShowQrCodeButton_OnClick"/>
         <Grid Grid.Row="2" Grid.Column="1" Margin="5,10,10,10" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
@@ -221,7 +222,7 @@
                 </Grid>
             </StackPanel>
         </GroupBox>
-        <Image x:Name="PictureQrCode" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3"
+        <Image x:Name="PictureQrCode" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3" Visibility="Collapsed"
         Stretch="Uniform" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,0,10,0" StretchDirection="Both" />
 
     </Grid>
