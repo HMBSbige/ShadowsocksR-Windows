@@ -50,7 +50,7 @@ namespace Shadowsocks.Controller
 
         private int IsHandle(byte[] firstPacket, int length, Socket socket)
         {
-            if (length >= 7 && _config.proxyRuleMode != (int)ProxyRuleMode.Disable)
+            if (length >= 7 && _config.proxyRuleMode != ProxyRuleMode.Disable)
             {
                 IPAddress ipAddress = null;
                 if (firstPacket[0] == 1)
@@ -73,11 +73,11 @@ namespace Shadowsocks.Controller
                         }
                         else
                         {
-                            if ((_config.proxyRuleMode == (int)ProxyRuleMode.BypassLanAndChina || _config.proxyRuleMode == (int)ProxyRuleMode.BypassLanAndNotChina) && _IPRange != null || _config.proxyRuleMode == (int)ProxyRuleMode.UserCustom)
+                            if ((_config.proxyRuleMode == ProxyRuleMode.BypassLanAndChina || _config.proxyRuleMode == ProxyRuleMode.BypassLanAndNotChina) && _IPRange != null || _config.proxyRuleMode == ProxyRuleMode.UserCustom)
                             {
                                 if (!IPAddress.TryParse(host, out ipAddress))
                                 {
-                                    if (_config.proxyRuleMode == (int)ProxyRuleMode.UserCustom)
+                                    if (_config.proxyRuleMode == ProxyRuleMode.UserCustom)
                                     {
                                         HostMap hostMap = HostMap.Instance();
                                         if (hostMap.GetHost(host, out var host_addr))
@@ -148,7 +148,7 @@ namespace Shadowsocks.Controller
                 }
                 if (ipAddress != null)
                 {
-                    if (_config.proxyRuleMode == (int)ProxyRuleMode.UserCustom)
+                    if (_config.proxyRuleMode == ProxyRuleMode.UserCustom)
                     {
                         HostMap hostMap = HostMap.Instance();
                         string host_addr;
@@ -179,7 +179,7 @@ namespace Shadowsocks.Controller
                         {
                             return CONNECT_DIRECT;
                         }
-                        if ((_config.proxyRuleMode == (int)ProxyRuleMode.BypassLanAndChina || _config.proxyRuleMode == (int)ProxyRuleMode.BypassLanAndNotChina) && _IPRange != null
+                        if ((_config.proxyRuleMode == ProxyRuleMode.BypassLanAndChina || _config.proxyRuleMode == ProxyRuleMode.BypassLanAndNotChina) && _IPRange != null
                             && ipAddress.AddressFamily == AddressFamily.InterNetwork
                             )
                         {
@@ -272,7 +272,7 @@ namespace Shadowsocks.Controller
                             {
                                 if (!IPAddress.TryParse(_remote_host, out ipAddress))
                                 {
-                                    if (_config.proxyRuleMode == (int)ProxyRuleMode.UserCustom)
+                                    if (_config.proxyRuleMode == ProxyRuleMode.UserCustom)
                                     {
                                         HostMap hostMap = HostMap.Instance();
                                         if (hostMap.GetHost(_remote_host, out var host_addr))
@@ -319,7 +319,7 @@ namespace Shadowsocks.Controller
                         }
                         _remote_port = _targetPort;
                     }
-                    if (ipAddress != null && _config.proxyRuleMode == (int)ProxyRuleMode.UserCustom)
+                    if (ipAddress != null && _config.proxyRuleMode == ProxyRuleMode.UserCustom)
                     {
                         HostMap hostMap = HostMap.Instance();
                         string host_addr;

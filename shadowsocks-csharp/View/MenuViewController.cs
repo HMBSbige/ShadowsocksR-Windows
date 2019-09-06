@@ -150,8 +150,8 @@ namespace Shadowsocks.View
         private void UpdateTrayIcon()
         {
             var config = controller.GetCurrentConfiguration();
-            var enabled = config.sysProxyMode != (int)ProxyMode.NoModify && config.sysProxyMode != (int)ProxyMode.Direct;
-            var global = config.sysProxyMode == (int)ProxyMode.Global;
+            var enabled = config.sysProxyMode != ProxyMode.NoModify && config.sysProxyMode != ProxyMode.Direct;
+            var global = config.sysProxyMode == ProxyMode.Global;
             var random = config.random;
 
             var colorMask = ViewUtils.SelectColorMask(enabled, global);
@@ -730,19 +730,19 @@ namespace Shadowsocks.View
 
         private void UpdateSysProxyMode(Configuration config)
         {
-            noModifyItem.IsChecked = config.sysProxyMode == (int)ProxyMode.NoModify;
-            enableItem.IsChecked = config.sysProxyMode == (int)ProxyMode.Direct;
-            PACModeItem.IsChecked = config.sysProxyMode == (int)ProxyMode.Pac;
-            globalModeItem.IsChecked = config.sysProxyMode == (int)ProxyMode.Global;
+            noModifyItem.IsChecked = config.sysProxyMode == ProxyMode.NoModify;
+            enableItem.IsChecked = config.sysProxyMode == ProxyMode.Direct;
+            PACModeItem.IsChecked = config.sysProxyMode == ProxyMode.Pac;
+            globalModeItem.IsChecked = config.sysProxyMode == ProxyMode.Global;
         }
 
         private void UpdateProxyRule(Configuration config)
         {
-            ruleDisableBypass.IsChecked = config.proxyRuleMode == (int)ProxyRuleMode.Disable;
-            ruleBypassLan.IsChecked = config.proxyRuleMode == (int)ProxyRuleMode.BypassLan;
-            ruleBypassChina.IsChecked = config.proxyRuleMode == (int)ProxyRuleMode.BypassLanAndChina;
-            ruleBypassNotChina.IsChecked = config.proxyRuleMode == (int)ProxyRuleMode.BypassLanAndNotChina;
-            ruleUser.IsChecked = config.proxyRuleMode == (int)ProxyRuleMode.UserCustom;
+            ruleDisableBypass.IsChecked = config.proxyRuleMode == ProxyRuleMode.Disable;
+            ruleBypassLan.IsChecked = config.proxyRuleMode == ProxyRuleMode.BypassLan;
+            ruleBypassChina.IsChecked = config.proxyRuleMode == ProxyRuleMode.BypassLanAndChina;
+            ruleBypassNotChina.IsChecked = config.proxyRuleMode == ProxyRuleMode.BypassLanAndNotChina;
+            ruleUser.IsChecked = config.proxyRuleMode == ProxyRuleMode.UserCustom;
         }
 
         private void LoadCurrentConfiguration()
@@ -1151,27 +1151,27 @@ namespace Shadowsocks.View
 
         private void RuleBypassLanItem_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(() => { controller.ToggleRuleMode((int)ProxyRuleMode.BypassLan); });
+            Task.Run(() => { controller.ToggleRuleMode(ProxyRuleMode.BypassLan); });
         }
 
         private void RuleBypassChinaItem_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(() => { controller.ToggleRuleMode((int)ProxyRuleMode.BypassLanAndChina); });
+            Task.Run(() => { controller.ToggleRuleMode(ProxyRuleMode.BypassLanAndChina); });
         }
 
         private void RuleBypassNotChinaItem_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(() => { controller.ToggleRuleMode((int)ProxyRuleMode.BypassLanAndNotChina); });
+            Task.Run(() => { controller.ToggleRuleMode(ProxyRuleMode.BypassLanAndNotChina); });
         }
 
         private void RuleUserItem_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(() => { controller.ToggleRuleMode((int)ProxyRuleMode.UserCustom); });
+            Task.Run(() => { controller.ToggleRuleMode(ProxyRuleMode.UserCustom); });
         }
 
         private void RuleBypassDisableItem_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(() => { controller.ToggleRuleMode((int)ProxyRuleMode.Disable); });
+            Task.Run(() => { controller.ToggleRuleMode(ProxyRuleMode.Disable); });
         }
 
         private void SelectRandomItem_Click(object sender, RoutedEventArgs e)
