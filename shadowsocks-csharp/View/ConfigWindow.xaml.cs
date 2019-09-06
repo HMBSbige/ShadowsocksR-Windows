@@ -6,6 +6,7 @@ using Shadowsocks.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,6 +18,7 @@ namespace Shadowsocks.View
         public ConfigWindow(ShadowsocksController controller, int focusIndex)
         {
             InitializeComponent();
+            I18NUtil.SetLanguage(Resources, @"ConfigWindow");
             SizeChanged += (o, args) => { GenQr(LinkTextBox.Text); };
             Splitter2.DragDelta += (o, args) => { GenQr(LinkTextBox.Text); };
             Closed += (o, e) =>
@@ -26,13 +28,9 @@ namespace Shadowsocks.View
             };
 
             _controller = controller;
-            foreach (var name in EncryptorFactory.GetEncryptor().Keys)
+            foreach (var name in from name in EncryptorFactory.GetEncryptor().Keys let info = EncryptorFactory.GetEncryptorInfo(name) where info.display select name)
             {
-                var info = EncryptorFactory.GetEncryptorInfo(name);
-                if (info.display)
-                {
-                    EncryptionComboBox.Items.Add(name);
-                }
+                EncryptionComboBox.Items.Add(name);
             }
             foreach (var protocol in Protocols)
             {
@@ -101,39 +99,12 @@ namespace Shadowsocks.View
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            LoadLanguage();
+            UpdateTitle();
         }
 
         private void UpdateTitle()
         {
-            Title = $@"{I18N.GetString(@"Edit Servers")}({(_controller.GetCurrentConfiguration().shareOverLan ? I18N.GetString(@"Any") : I18N.GetString(@"Local"))}:{_controller.GetCurrentConfiguration().localPort} {I18N.GetString(@"Version")}:{UpdateChecker.FullVersion})";
-        }
-
-        private void LoadLanguage()
-        {
-            UpdateTitle();
-
-            foreach (var c in ViewUtils.FindVisualChildren<Label>(this))
-            {
-                c.Content = I18N.GetString(c.Content.ToString());
-            }
-
-            foreach (var c in ViewUtils.FindVisualChildren<Button>(this))
-            {
-                c.Content = I18N.GetString(c.Content.ToString());
-            }
-
-            foreach (var c in ViewUtils.FindVisualChildren<CheckBox>(this))
-            {
-                c.Content = I18N.GetString(c.Content.ToString());
-            }
-
-            foreach (var c in ViewUtils.FindVisualChildren<GroupBox>(this))
-            {
-                c.Header = I18N.GetString(c.Header.ToString());
-            }
-
-            TextBlock1.Text = I18N.GetString(TextBlock1.Text);
+            Title = $@"{this.GetWindowStringValue(@"Title")}({(_controller.GetCurrentConfiguration().shareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{_controller.GetCurrentConfiguration().localPort} {this.GetWindowStringValue(@"Version")}:{UpdateChecker.FullVersion})";
         }
 
         private void controller_ConfigChanged(object sender, EventArgs e)
@@ -173,10 +144,14 @@ namespace Shadowsocks.View
 
         private void GenQr(string text)
         {
+            if (PictureQrCode.Visibility != Visibility.Visible)
+            {
+                return;
+            }
             try
             {
                 var h = Convert.ToInt32(MainGrid.ActualHeight);
-                var w = Convert.ToInt32(MainGrid.ColumnDefinitions[2].ActualWidth - PictureQrCode.Margin.Left - PictureQrCode.Margin.Right);
+                var w = Convert.ToInt32(MainGrid.ColumnDefinitions[^1].ActualWidth - PictureQrCode.Margin.Left - PictureQrCode.Margin.Right);
                 if (h <= 0 || w <= 0)
                 {
                     PictureQrCode.Source = null;
@@ -392,6 +367,38 @@ namespace Shadowsocks.View
             if (ServersListBox.SelectedItem != null)
             {
                 ServersListBox.ScrollIntoView(ServersListBox.SelectedItem);
+            }
+        }
+
+        private double _oldWidth = 400.0;
+        private void ShowQrCodeButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (PictureQrCode.Visibility != Visibility.Visible)
+            {
+                Task.Run(() =>
+                {
+                    Dispatcher?.Invoke(() =>
+                    {
+                        PictureQrCode.Visibility = Splitter2.Visibility = Visibility.Visible;
+                        Width += _oldWidth;
+                        MainGrid.ColumnDefinitions[^1].Width = new GridLength(_oldWidth, GridUnitType.Pixel);
+                        ShowQrCodeButton.Content = @"<<";
+                    });
+                }).ContinueWith(task =>
+                {
+                    Dispatcher?.Invoke(() =>
+                    {
+                        GenQr(LinkTextBox.Text);
+                    });
+                });
+            }
+            else
+            {
+                PictureQrCode.Visibility = Splitter2.Visibility = Visibility.Collapsed;
+                _oldWidth = MainGrid.ColumnDefinitions[^1].ActualWidth;
+                Width -= _oldWidth;
+                MainGrid.ColumnDefinitions[^1].Width = new GridLength(0);
+                ShowQrCodeButton.Content = @">>";
             }
         }
     }

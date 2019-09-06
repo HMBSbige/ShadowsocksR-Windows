@@ -1,21 +1,22 @@
-﻿using System;
-using System.IO;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using Shadowsocks.Util;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace Shadowsocks.Controller
 {
-    class AutoStartup
+    internal static class AutoStartup
     {
-        static string Key = "ShadowsocksR_" + Directory.GetCurrentDirectory().GetDeterministicHashCode();
-        static string RegistryRunPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
+        private static readonly string Key = $@"ShadowsocksR_{Directory.GetCurrentDirectory().GetDeterministicHashCode()}";
+        private const string RegistryRunPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
 
         public static bool Set(bool enabled)
         {
             RegistryKey runKey = null;
             try
             {
-                string path = Utils.GetExecutablePath();
+                var path = Utils.GetExecutablePath();
                 runKey = Utils.OpenRegKey(RegistryRunPath, true);
                 if (enabled)
                 {
@@ -31,7 +32,7 @@ namespace Shadowsocks.Controller
             catch //(Exception e)
             {
                 //Logging.LogUsefulException(e);
-                return Utils.RunAsAdmin("--setautorun") == 0;
+                return Utils.RunAsAdmin(Constants.ParameterSetautorun) == 0;
             }
             finally
             {
@@ -51,11 +52,11 @@ namespace Shadowsocks.Controller
 
         public static bool Switch()
         {
-            bool enabled = !Check();
+            var enabled = !Check();
             RegistryKey runKey = null;
             try
             {
-                string path = Utils.GetExecutablePath();
+                var path = Utils.GetExecutablePath();
                 runKey = Utils.OpenRegKey(RegistryRunPath, true);
                 if (enabled)
                 {
@@ -95,14 +96,9 @@ namespace Shadowsocks.Controller
             try
             {
                 runKey = Utils.OpenRegKey(RegistryRunPath, false);
-                string[] runList = runKey.GetValueNames();
+                var runList = runKey.GetValueNames();
                 runKey.Close();
-                foreach (string item in runList)
-                {
-                    if (item.Equals(Key))
-                        return true;
-                }
-                return false;
+                return runList.Any(item => item.Equals(Key));
             }
             catch (Exception e)
             {

@@ -33,6 +33,7 @@
   <ItemGroup>
     <None Remove="Controls\MaskedTextBox.xaml" />
     <None Remove="Controls\NumberUpDown.xaml" />
+    <None Remove="Resources\ssw128.png" />
     <None Remove="View\ConfigWindow.xaml" />
     <None Remove="View\InputPasswordWindow.xaml" />
     <None Remove="View\LogWindow.xaml" />
@@ -81,6 +82,18 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="I18N\ConfigWindow.en-US.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\ConfigWindow.zh-CN.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\ConfigWindow.zh-TW.xaml">
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
 </Project>

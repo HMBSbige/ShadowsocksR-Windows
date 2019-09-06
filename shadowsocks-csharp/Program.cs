@@ -23,7 +23,7 @@ namespace Shadowsocks
         private static void Main(string[] args)
         {
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Utils.GetExecutablePath()) ?? throw new InvalidOperationException());
-            if (args.Contains(@"--setautorun"))
+            if (args.Contains(Constants.ParameterSetautorun))
             {
                 if (!AutoStartup.Switch())
                 {
@@ -36,11 +36,12 @@ namespace Shadowsocks
             using var singleInstance = new SingleInstance(identifier);
             if (!singleInstance.IsFirstInstance)
             {
-                singleInstance.PassArgumentsToFirstInstance(args.Append(@"--show"));
+                singleInstance.PassArgumentsToFirstInstance(args.Length == 0
+                        ? args.Append(Constants.ParameterMultiplyInstance)
+                        : args);
                 return;
             }
             singleInstance.ArgumentsReceived += SingleInstance_ArgumentsReceived;
-            singleInstance.ListenForArgumentsFromSuccessiveInstances();
 
             var app = new Application
             {
@@ -85,6 +86,8 @@ namespace Shadowsocks
             SystemEvents.SessionEnding += _viewController.Quit_Click;
 
             _controller.Start();
+            Reg.SetUrlProtocol();
+            singleInstance.ListenForArgumentsFromSuccessiveInstances();
             app.Run();
         }
 
@@ -147,13 +150,16 @@ namespace Shadowsocks
 
         private static void SingleInstance_ArgumentsReceived(object sender, ArgumentsReceivedEventArgs e)
         {
-            if (e.Args.Contains(@"--show"))
+            if (e.Args.Contains(Constants.ParameterMultiplyInstance))
             {
                 MessageBox.Show(I18N.GetString("Find Shadowsocks icon in your notify tray.") + Environment.NewLine +
                                 I18N.GetString("If you want to start multiple Shadowsocks, make a copy in another directory."),
                         I18N.GetString("ShadowsocksR is already running."), MessageBoxButton.OK, MessageBoxImage.Information);
             }
+            Application.Current.Dispatcher?.Invoke(() =>
+            {
+                _viewController.ImportAddress(string.Join(Environment.NewLine, e.Args));
+            });
         }
-
     }
 }
