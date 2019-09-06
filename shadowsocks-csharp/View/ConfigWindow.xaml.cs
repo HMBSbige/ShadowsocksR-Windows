@@ -151,7 +151,7 @@ namespace Shadowsocks.View
             try
             {
                 var h = Convert.ToInt32(MainGrid.ActualHeight);
-                var w = Convert.ToInt32(MainGrid.ColumnDefinitions[^1].ActualWidth - PictureQrCode.Margin.Left - PictureQrCode.Margin.Right);
+                var w = Convert.ToInt32(MainGrid.ColumnDefinitions[2].ActualWidth - PictureQrCode.Margin.Left - PictureQrCode.Margin.Right);
                 if (h <= 0 || w <= 0)
                 {
                     PictureQrCode.Source = null;
@@ -381,7 +381,7 @@ namespace Shadowsocks.View
                     {
                         PictureQrCode.Visibility = Splitter2.Visibility = Visibility.Visible;
                         Width += _oldWidth;
-                        MainGrid.ColumnDefinitions[^1].Width = new GridLength(_oldWidth, GridUnitType.Pixel);
+                        MainGrid.ColumnDefinitions[2].Width = new GridLength(_oldWidth, GridUnitType.Pixel);
                         ShowQrCodeButton.Content = @"<<";
                     });
                 }).ContinueWith(task =>
@@ -395,9 +395,9 @@ namespace Shadowsocks.View
             else
             {
                 PictureQrCode.Visibility = Splitter2.Visibility = Visibility.Collapsed;
-                _oldWidth = MainGrid.ColumnDefinitions[^1].ActualWidth;
+                _oldWidth = MainGrid.ColumnDefinitions[2].ActualWidth;
                 Width -= _oldWidth;
-                MainGrid.ColumnDefinitions[^1].Width = new GridLength(0);
+                MainGrid.ColumnDefinitions[2].Width = new GridLength(0);
                 ShowQrCodeButton.Content = @">>";
             }
         }
