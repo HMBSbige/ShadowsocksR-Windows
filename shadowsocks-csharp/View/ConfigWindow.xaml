@@ -11,34 +11,40 @@
         Loaded="Window_Loaded">
 
     <Window.Resources>
-        <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="LightGray" />
-        <Style TargetType="{x:Type TextBox}">
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="{StaticResource DisabledBackgroundBrush}" />
-                </Trigger>
-                <Trigger Property="IsReadOnly" Value="True">
-                    <Setter Property="Background" Value="{StaticResource DisabledBackgroundBrush}" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        <BooleanToVisibilityConverter x:Key="Bool2Visibility" />
-        <DataTemplate x:Key="ListBoxTemplate" DataType="model:Server">
-            <StackPanel Margin="3">
-                <DockPanel>
-                    <TextBlock Text="{Binding GroupName}" Foreground="Green" FontWeight="Bold" />
-                </DockPanel>
-                <DockPanel>
-                    <TextBlock FontWeight="Bold" Text="{Binding RemarkName}" Foreground="DarkOrange" DockPanel.Dock="Left" />
-                </DockPanel>
-                <DockPanel
-                     Visibility="{Binding IsChecked,ElementName=ServerIpCheckBox,Converter={StaticResource Bool2Visibility}}">
-                    <TextBlock Text="{Binding server}" />
-                    <TextBlock Text=":" />
-                    <TextBlock Text="{Binding Server_Port}" />
-                </DockPanel>
-            </StackPanel>
-        </DataTemplate>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../I18N/ConfigWindow.en-US.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="LightGray" />
+            <Style TargetType="{x:Type TextBox}">
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Background" Value="{StaticResource DisabledBackgroundBrush}" />
+                    </Trigger>
+                    <Trigger Property="IsReadOnly" Value="True">
+                        <Setter Property="Background" Value="{StaticResource DisabledBackgroundBrush}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <BooleanToVisibilityConverter x:Key="Bool2Visibility" />
+            <DataTemplate x:Key="ListBoxTemplate" DataType="model:Server">
+                <StackPanel Margin="3">
+                    <DockPanel>
+                        <TextBlock Text="{Binding GroupName}" Foreground="Green" FontWeight="Bold" />
+                    </DockPanel>
+                    <DockPanel>
+                        <TextBlock FontWeight="Bold" Text="{Binding RemarkName}" Foreground="DarkOrange"
+                                   DockPanel.Dock="Left" />
+                    </DockPanel>
+                    <DockPanel
+                        Visibility="{Binding IsChecked,ElementName=ServerIpCheckBox,Converter={StaticResource Bool2Visibility}}">
+                        <TextBlock Text="{Binding server}" />
+                        <TextBlock Text=":" />
+                        <TextBlock Text="{Binding Server_Port}" />
+                    </DockPanel>
+                </StackPanel>
+            </DataTemplate>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Grid x:Name="MainGrid">
@@ -74,16 +80,16 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Button Grid.Row="0" Grid.Column="0" Content="Add" FontSize="14" Click="AddButton_Click"></Button>
-            <Button Grid.Row="0" Grid.Column="1" Content="Delete" FontSize="14" Click="DeleteButton_Click"></Button>
+            <Button Grid.Row="0" Grid.Column="0" Content="{DynamicResource Add}" FontSize="14" Click="AddButton_Click"></Button>
+            <Button Grid.Row="0" Grid.Column="1" Content="{DynamicResource Delete}" FontSize="14" Click="DeleteButton_Click"></Button>
         </Grid>
         <Grid Grid.Row="2" Grid.Column="0" Margin="10,10,10,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Button Grid.Row="0" Grid.Column="0" Content="Up" FontSize="14" Click="UpButton_Click"></Button>
-            <Button Grid.Row="0" Grid.Column="1" Content="Down" FontSize="14" Click="DownButton_Click"></Button>
+            <Button Grid.Row="0" Grid.Column="0" Content="{DynamicResource Up}" FontSize="14" Click="UpButton_Click"></Button>
+            <Button Grid.Row="0" Grid.Column="1" Content="{DynamicResource Down}" FontSize="14" Click="DownButton_Click"></Button>
         </Grid>
         <Grid Grid.Row="2" Grid.Column="1" Margin="5,10,10,10" >
             <Grid.ColumnDefinitions>
@@ -91,11 +97,11 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="OK" FontSize="14" Click="OkButton_Click"></Button>
-            <Button Grid.Column="1" Content="Cancel" FontSize="14" Click="CancelButton_Click"></Button>
-            <Button x:Name="ApplyButton" Grid.Column="2" Content="Apply" FontSize="14" Click="ApplyButton_Click"></Button>
+            <Button Grid.Column="0" Content="{DynamicResource Ok}" FontSize="14" Click="OkButton_Click"></Button>
+            <Button Grid.Column="1" Content="{DynamicResource Cancel}" FontSize="14" Click="CancelButton_Click"></Button>
+            <Button x:Name="ApplyButton" Grid.Column="2" Content="{DynamicResource Apply}" FontSize="14" Click="ApplyButton_Click"></Button>
         </Grid>
-        <GroupBox x:Name="ServerGroupBox" Grid.Row="0" Grid.Column="1" Header="Server" Margin="5,0,5,0">
+        <GroupBox x:Name="ServerGroupBox" Grid.Row="0" Grid.Column="1" Header="{DynamicResource Server}" Margin="5,0,5,0">
             <StackPanel >
                 <Grid>
                     <Grid.RowDefinitions>
@@ -119,20 +125,20 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <CheckBox x:Name="ServerIpCheckBox" Grid.Row="0" Grid.Column="0" Content="Server IP" VerticalAlignment="Center" Margin="0,10,5,0" IsChecked="{Binding PlainMode,Mode=TwoWay,ElementName=ServerIpTextBox}" ContentStringFormat="*{0}" HorizontalAlignment="Right"
+                    <CheckBox x:Name="ServerIpCheckBox" Grid.Row="0" Grid.Column="0" Content="{DynamicResource ServerIp}" VerticalAlignment="Center" Margin="0,10,5,0" IsChecked="{Binding PlainMode,Mode=TwoWay,ElementName=ServerIpTextBox}" ContentStringFormat="*{0}" HorizontalAlignment="Right"
                     Checked="ServerIpCheckBox_IsCheckedChanged" Unchecked="ServerIpCheckBox_IsCheckedChanged" />
                     <controls:MaskedTextBox x:Name="ServerIpTextBox" Grid.Row="0" Grid.Column="1"
                                             Height="23.24" Margin="0,10,0,0"
                                             PlainMode="False"
                                             Text="{Binding SelectedItem.server,Mode=TwoWay,ElementName=ServersListBox,UpdateSourceTrigger=PropertyChanged}" />
 
-                    <Label Grid.Row="1" Grid.Column="0" Content="Server Port" ContentStringFormat="*{0}" Margin="0,5,0,0" HorizontalAlignment="Right" />
+                    <Label Grid.Row="1" Grid.Column="0" Content="{DynamicResource ServerPort}" ContentStringFormat="*{0}" Margin="0,5,0,0" HorizontalAlignment="Right" />
                     <controls:NumberUpDown Grid.Row="1" Grid.Column="1" Height="23.24" Margin="0,5,0,0"
                                            VerticalAlignment="Center" MinNum="0" MaxNum="65535"
                                            Value="{Binding SelectedItem.Server_Port,Mode=TwoWay,ElementName=ServersListBox,UpdateSourceTrigger=PropertyChanged}" />
 
                     <CheckBox Grid.Row="2" Grid.Column="0"
-                              Content="Password" VerticalAlignment="Center"
+                              Content="{DynamicResource Password}" VerticalAlignment="Center"
                               Margin="0,5,5,0" IsChecked="{Binding PlainMode,Mode=TwoWay,ElementName=PasswordTextBox}"
                               ContentStringFormat="*{0}" HorizontalAlignment="Right" />
                     <controls:MaskedTextBox x:Name="PasswordTextBox" Grid.Row="2" Grid.Column="1"
@@ -140,46 +146,46 @@
                                             PlainMode="False"
                                             Text="{Binding SelectedItem.Password,Mode=TwoWay,ElementName=ServersListBox,UpdateSourceTrigger=PropertyChanged}" />
 
-                    <Label Grid.Row="3" Grid.Column="0" Content="Encryption" ContentStringFormat="*{0}"
+                    <Label Grid.Row="3" Grid.Column="0" Content="{DynamicResource Encryption}" ContentStringFormat="*{0}"
                            Margin="0,5,0,0" HorizontalAlignment="Right" />
                     <ComboBox x:Name="EncryptionComboBox" Grid.Row="3" Grid.Column="1"
                               Height="23.24" Margin="0,5,0,0" IsEditable="True"
                               Text="{Binding SelectedItem.Method,Mode=TwoWay,ElementName=ServersListBox,UpdateSourceTrigger=PropertyChanged}" />
 
-                    <Label Grid.Row="4" Grid.Column="0" Content="Protocol" ContentStringFormat="*{0}"
+                    <Label Grid.Row="4" Grid.Column="0" Content="{DynamicResource Protocol}" ContentStringFormat="*{0}"
                            Margin="0,5,0,0" HorizontalAlignment="Right" Foreground="#FF8000C0" />
                     <ComboBox x:Name="ProtocolComboBox" Grid.Row="4" Grid.Column="1"
                               Height="23.24" Margin="0,5,0,0" IsEditable="True"
                               Text="{Binding SelectedItem.Protocol,Mode=TwoWay,ElementName=ServersListBox,UpdateSourceTrigger=PropertyChanged}" />
 
-                    <Label Grid.Row="5" Grid.Column="0" Content="Protocol param"
+                    <Label Grid.Row="5" Grid.Column="0" Content="{DynamicResource ProtocolParam}"
                            Margin="0,5,0,0" HorizontalAlignment="Right" Foreground="#FF8000C0" />
                     <TextBox Grid.Row="5" Grid.Column="1" Height="23.24" Margin="0,5,0,0" 
                              Text="{Binding SelectedItem.ProtocolParam,Mode=TwoWay,ElementName=ServersListBox,UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <Label Grid.Row="6" Grid.Column="0" Content="Obfs" ContentStringFormat="*{0}"
+                    <Label Grid.Row="6" Grid.Column="0" Content="{DynamicResource Obfs}" ContentStringFormat="*{0}"
                            Margin="0,5,0,0" HorizontalAlignment="Right" Foreground="#FF8000C0" />
                     <ComboBox x:Name="ObfsComboBox" Grid.Row="6" Grid.Column="1"
                               Height="23.24" Margin="0,5,0,0" IsEditable="True" SelectionChanged="ObfsComboBox_SelectionChanged"
                               Text="{Binding SelectedItem.obfs,Mode=TwoWay,ElementName=ServersListBox,UpdateSourceTrigger=PropertyChanged}" />
 
-                    <Label Grid.Row="7" Grid.Column="0" Content="Obfs param"
+                    <Label Grid.Row="7" Grid.Column="0" Content="{DynamicResource ObfsParam}"
                            Margin="0,5,0,0" HorizontalAlignment="Right" Foreground="#FF8000C0" />
                     <TextBox x:Name="ObfsParamTextBox" Grid.Row="7" Grid.Column="1" Height="23.24" Margin="0,5,0,0"
                              Text="{Binding SelectedItem.ObfsParam,Mode=TwoWay,ElementName=ServersListBox,UpdateSourceTrigger=PropertyChanged}" />
 
-                    <Label Grid.Row="8" Grid.Column="0" Content="Remarks"
+                    <Label Grid.Row="8" Grid.Column="0" Content="{DynamicResource Remarks}"
                            Margin="0,5,0,0" HorizontalAlignment="Right" />
                     <TextBox Grid.Row="8" Grid.Column="1" Height="23.24" Margin="0,5,0,0" 
                     Text="{Binding SelectedItem.Remarks,Mode=TwoWay,ElementName=ServersListBox,UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <Label Grid.Row="9" Grid.Column="0" Content="Group"
+                    <Label Grid.Row="9" Grid.Column="0" Content="{DynamicResource Group}"
                            Margin="0,5,0,0" HorizontalAlignment="Right" />
                     <TextBox Grid.Row="9" Grid.Column="1" Height="23.24" Margin="0,5,0,0"
                              Text="{Binding SelectedItem.Group,Mode=TwoWay,ElementName=ServersListBox,UpdateSourceTrigger=PropertyChanged}" />
 
                     <CheckBox Grid.Row="10" Grid.Column="0"
-                              Content="SSR Link" VerticalAlignment="Center"
+                              Content="{DynamicResource SsrLink}" VerticalAlignment="Center"
                               Margin="0,5,5,0"
                               HorizontalAlignment="Right"
                               DataContext="{Binding Path=ServerViewModel, ElementName=Cw}"
@@ -190,14 +196,13 @@
                     Text="{Binding SsLink,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" TextChanged="LinkTextBox_TextChanged" />
 
                     <CheckBox x:Name="AdvSettingCheckBox" Grid.Row="11" Grid.Column="0"
-                              Content="Adv. Setting" VerticalAlignment="Center"
+                              Content="{DynamicResource AdvSetting}" VerticalAlignment="Center"
                               Margin="0,5,5,0"
                               HorizontalAlignment="Right"
                               IsChecked="{Binding SelectedItem.ShowAdvSetting ,Mode=OneWay ,ElementName=ServersListBox}" />
-                    <TextBlock x:Name="TextBlock1" Grid.Row="11" Grid.Column="1" Margin="0,5,0,0"
-                    Text="NOT all server support belows"/>
+                    <TextBlock Grid.Row="11" Grid.Column="1" Margin="0,5,0,0" Text="{DynamicResource AdvSettingDescription}"/>
 
-                    <Label Grid.Row="12" Grid.Column="0" Content="UDP Port"
+                    <Label Grid.Row="12" Grid.Column="0" Content="{DynamicResource UdpPort}"
                            Margin="0,5,0,0" HorizontalAlignment="Right"
                            Visibility="{Binding IsChecked,ElementName=AdvSettingCheckBox,Converter={StaticResource Bool2Visibility}}" />
                     <controls:NumberUpDown Grid.Row="12" Grid.Column="1" Height="23.24" Margin="0,5,0,0"
@@ -205,11 +210,11 @@
                                            Visibility="{Binding IsChecked,ElementName=AdvSettingCheckBox,Converter={StaticResource Bool2Visibility}}"
                                            Value="{Binding SelectedItem.Server_Udp_Port,Mode=TwoWay,ElementName=ServersListBox,UpdateSourceTrigger=PropertyChanged}" />
 
-                    <Label Grid.Row="13" Grid.Column="0" Content="UDP over TCP"
+                    <Label Grid.Row="13" Grid.Column="0" Content="{DynamicResource UdpOverTcp}"
                            Margin="0,5,0,0" HorizontalAlignment="Right"
                            Visibility="{Binding IsChecked,ElementName=AdvSettingCheckBox,Converter={StaticResource Bool2Visibility}}" />
                     <CheckBox Grid.Row="13" Grid.Column="1"
-                              Content="UDP over TCP if not checked" VerticalAlignment="Center"
+                              Content="{DynamicResource UdpOverTcpCheckBox}" VerticalAlignment="Center"
                               Margin="0,5,5,0"
                               Visibility="{Binding IsChecked,ElementName=AdvSettingCheckBox,Converter={StaticResource Bool2Visibility}}" 
                               IsChecked="{Binding SelectedItem.UdpOverTcp,Mode=TwoWay,ElementName=ServersListBox,UpdateSourceTrigger=PropertyChanged}" />

@@ -1,0 +1,38 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="ResourceDictionaryName">zh-TW</sys:String>
+
+    <sys:String x:Key="Add">新增</sys:String>
+    <sys:String x:Key="Delete">刪除</sys:String>
+    <sys:String x:Key="Up">上移</sys:String>
+    <sys:String x:Key="Down">下移</sys:String>
+
+    <sys:String x:Key="Title">編輯伺服器</sys:String>
+    <sys:String x:Key="Any">任意地址</sys:String>
+    <sys:String x:Key="Local">本機地址</sys:String>
+    <sys:String x:Key="Version">版本</sys:String>
+
+    <sys:String x:Key="Server">伺服器</sys:String>
+    <sys:String x:Key="ServerIp">伺服器 IP</sys:String>
+    <sys:String x:Key="ServerPort">伺服器連接埠</sys:String>
+    <sys:String x:Key="Password">密碼</sys:String>
+    <sys:String x:Key="Encryption">加密</sys:String>
+    <sys:String x:Key="Protocol">協議</sys:String>
+    <sys:String x:Key="ProtocolParam">協議參數</sys:String>
+    <sys:String x:Key="Obfs">混淆</sys:String>
+    <sys:String x:Key="ObfsParam">混淆參數</sys:String>
+    <sys:String x:Key="Remarks">備註</sys:String>
+    <sys:String x:Key="Group">群組名</sys:String>
+    <sys:String x:Key="SsrLink">SSR連結</sys:String>
+    <sys:String x:Key="AdvSetting">高級選項</sys:String>
+    <sys:String x:Key="AdvSettingDescription">以下選項不是所有伺服器都支持</sys:String>
+    <sys:String x:Key="UdpPort">UDP連接埠</sys:String>
+    <sys:String x:Key="UdpOverTcp">UDP over TCP</sys:String>
+    <sys:String x:Key="UdpOverTcpCheckBox">不打勾使用原生 UDP</sys:String>
+
+    <sys:String x:Key="Ok">確定</sys:String>
+    <sys:String x:Key="Cancel">取消</sys:String>
+    <sys:String x:Key="Apply">套用</sys:String>
+
+</ResourceDictionary>

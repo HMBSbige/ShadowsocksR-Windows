@@ -45,7 +45,7 @@ namespace Shadowsocks.Util
             return key;
         }
 
-        public static string GetWindowStringValue(Window window, string key)
+        public static string GetWindowStringValue(this Window window, string key)
         {
             if (window.Resources.MergedDictionaries[0][key] is string str)
             {
