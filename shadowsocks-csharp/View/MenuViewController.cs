@@ -1230,6 +1230,11 @@ namespace Shadowsocks.View
             {
                 ShowConfigForm(true);
             }
+
+            if (controller.AddSubscribeUrl(text))
+            {
+                ShowSubscribeSettingForm();
+            }
         }
 
         private void ImportAddressFromClipboard_Click(object sender, RoutedEventArgs e)
@@ -1290,14 +1295,19 @@ namespace Shadowsocks.View
                     if (result != null)
                     {
                         var success = controller.AddServerBySsUrl(result.Text);
+                        var successSub = controller.AddSubscribeUrl(result.Text);
                         Application.Current.Dispatcher?.Invoke(() =>
                         {
                             var splash = new QRCodeSplashWindow();
+                            if (successSub)
+                            {
+                                splash.Closed += Splash_Closed0;
+                            }
                             if (success)
                             {
                                 splash.Closed += Splash_Closed;
                             }
-                            else
+                            if (!(successSub || success))
                             {
                                 _urlToOpen = result.Text;
                                 splash.Closed += Splash_Closed2;
@@ -1341,6 +1351,11 @@ namespace Shadowsocks.View
         private void Splash_Closed(object sender, EventArgs e)
         {
             ShowConfigForm(true);
+        }
+
+        private void Splash_Closed0(object sender, EventArgs e)
+        {
+            ShowSubscribeSettingForm();
         }
 
         private void showURLFromQRCode()

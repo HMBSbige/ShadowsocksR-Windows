@@ -1,4 +1,5 @@
-﻿using Shadowsocks.Controller;
+﻿using Newtonsoft.Json;
+using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.ViewModel;
 using System;
@@ -33,8 +34,10 @@ namespace Shadowsocks.Model
             }
         }
 
+        [JsonIgnore]
         public string OriginGroup => group;
 
+        [JsonIgnore]
         public string UrlMd5 => BitConverter.ToString(MbedTLS.MD5(Encoding.UTF8.GetBytes(Url))).Replace(@"-", string.Empty);
 
         public string Group
