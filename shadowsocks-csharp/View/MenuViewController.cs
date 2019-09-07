@@ -497,10 +497,10 @@ namespace Shadowsocks.View
                             }
 
                             //found in old server
-                            foreach (var (id, _) in oldServers.Where(pair => server.IsMatchServer(pair.Value)))
+                            foreach (var oldServer in oldServers.Where(pair => server.IsMatchServer(pair.Value)))
                             {
                                 match = true;
-                                oldServers.Remove(id);
+                                oldServers.Remove(oldServer.Key);
                                 ++count;
                                 break;
                             }
