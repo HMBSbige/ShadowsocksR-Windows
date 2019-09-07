@@ -493,7 +493,7 @@ namespace Shadowsocks.View
                     }
                     foreach (var serverSubscribe in config.serverSubscribes)
                     {
-                        if (subscribeURL == serverSubscribe.URL)
+                        if (subscribeURL == serverSubscribe.Url)
                         {
                             lastGroup = serverSubscribe.Group;
                             serverSubscribe.Group = curGroup;
@@ -645,7 +645,7 @@ namespace Shadowsocks.View
                     }
                     if (count > 0)
                     {
-                        foreach (var serverSubscribe in config.serverSubscribes.Where(serverSubscribe => serverSubscribe.URL == updateFreeNodeChecker.SubscribeTask.URL))
+                        foreach (var serverSubscribe in config.serverSubscribes.Where(serverSubscribe => serverSubscribe.Url == updateFreeNodeChecker.SubscribeTask.Url))
                         {
                             serverSubscribe.LastUpdateTime = (ulong)Math.Floor(DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
                         }

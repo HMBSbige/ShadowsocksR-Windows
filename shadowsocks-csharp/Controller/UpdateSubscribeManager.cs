@@ -43,7 +43,7 @@ namespace Shadowsocks.Controller
                 return false;
             }
 
-            Url = _serverSubscribes[0].URL;
+            Url = _serverSubscribes[0].Url;
             _updater.CheckUpdate(_config, _serverSubscribes[0], _useProxy, _notify);
             _serverSubscribes.RemoveAt(0);
             return true;

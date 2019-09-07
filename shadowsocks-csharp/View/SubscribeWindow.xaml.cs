@@ -12,6 +12,7 @@ namespace Shadowsocks.View
         public SubscribeWindow(ShadowsocksController controller)
         {
             InitializeComponent();
+            I18NUtil.SetLanguage(Resources, @"SubscribeWindow");
             Closed += (o, e) => { controller.ConfigChanged -= controller_ConfigChanged; };
             _controller = controller;
         }
@@ -22,7 +23,7 @@ namespace Shadowsocks.View
 
         private void Window_Loaded(object sender, RoutedEventArgs _)
         {
-            LoadLanguage();
+            Title = this.GetWindowStringValue(@"Title");
             _controller.ConfigChanged += controller_ConfigChanged;
 
             UrlTextBox.TextChanged += (o, e) =>
@@ -37,26 +38,6 @@ namespace Shadowsocks.View
 
             LoadCurrentConfiguration();
             ApplyButton.IsEnabled = false;
-        }
-
-        private void LoadLanguage()
-        {
-            Title = I18N.GetString(@"Subscribe Settings");
-
-            foreach (var c in ViewUtils.FindVisualChildren<Label>(this))
-            {
-                c.Content = I18N.GetString(c.Content.ToString());
-            }
-
-            foreach (var c in ViewUtils.FindVisualChildren<Button>(this))
-            {
-                c.Content = I18N.GetString(c.Content.ToString());
-            }
-
-            foreach (var c in ViewUtils.FindVisualChildren<CheckBox>(this))
-            {
-                c.Content = I18N.GetString(c.Content.ToString());
-            }
         }
 
         private void controller_ConfigChanged(object sender, EventArgs e)
@@ -86,7 +67,7 @@ namespace Shadowsocks.View
             ServerSubscribeListBox.Items.Clear();
             foreach (var ss in _modifiedConfiguration.serverSubscribes)
             {
-                ServerSubscribeListBox.Items.Add($@"{(string.IsNullOrEmpty(ss.Group) ? @"    " : ss.Group + @" - ")}{ss.URL}");
+                ServerSubscribeListBox.Items.Add($@"{(string.IsNullOrEmpty(ss.Group) ? @"    " : ss.Group + @" - ")}{ss.Url}");
             }
         }
 
@@ -95,7 +76,7 @@ namespace Shadowsocks.View
             if (index >= 0 && index < _modifiedConfiguration.serverSubscribes.Count)
             {
                 var ss = _modifiedConfiguration.serverSubscribes[index];
-                UrlTextBox.Text = ss.URL;
+                UrlTextBox.Text = ss.Url;
                 GroupTextBox.Text = ss.Group;
                 _oldSelectIndex = index;
                 if (ss.LastUpdateTime != 0)
@@ -124,9 +105,9 @@ namespace Shadowsocks.View
             if (index >= 0 && index < _modifiedConfiguration.serverSubscribes.Count)
             {
                 var ss = _modifiedConfiguration.serverSubscribes[index];
-                if (ss.URL != UrlTextBox.Text)
+                if (ss.Url != UrlTextBox.Text)
                 {
-                    ss.URL = UrlTextBox.Text;
+                    ss.Url = UrlTextBox.Text;
                     ss.Group = string.Empty;
                     ss.LastUpdateTime = 0;
                 }

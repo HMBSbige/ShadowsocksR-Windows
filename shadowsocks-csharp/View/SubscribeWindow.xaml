@@ -11,14 +11,19 @@
         Loaded="Window_Loaded">
 
     <Window.Resources>
-        <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="LightGray" />
-        <Style TargetType="{x:Type TextBox}">
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="{StaticResource DisabledBackgroundBrush}" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../I18N/SubscribeWindow.en-US.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="LightGray" />
+            <Style TargetType="{x:Type TextBox}">
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Background" Value="{StaticResource DisabledBackgroundBrush}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
@@ -47,13 +52,13 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Row="0" Grid.Column="0" Content="URL"></Label>
-                <Label Grid.Row="1" Grid.Column="0" Content="Group name"></Label>
-                <Label Grid.Row="2" Grid.Column="0" Content="Last Update"></Label>
+                <Label Grid.Row="0" Grid.Column="0" Content="{DynamicResource Url}"></Label>
+                <Label Grid.Row="1" Grid.Column="0" Content="{DynamicResource GroupName}"></Label>
+                <Label Grid.Row="2" Grid.Column="0" Content="{DynamicResource LastUpdate}"></Label>
                 <TextBox x:Name="UrlTextBox" Grid.Row="0" Grid.Column="1"></TextBox>
                 <TextBox x:Name="GroupTextBox" Grid.Row="1" Grid.Column="1" IsReadOnly="True" Background="{StaticResource DisabledBackgroundBrush}"></TextBox>
                 <TextBox x:Name="UpdateTextBox" Grid.Row="2" Grid.Column="1" IsReadOnly="True" Background="{StaticResource DisabledBackgroundBrush}"></TextBox>
-                <CheckBox x:Name="AutoUpdateCheckBox" Grid.Row="3" Grid.Column="1" Content="Auto update" VerticalAlignment="Center" Margin="0,5,0,0" ></CheckBox>
+                <CheckBox x:Name="AutoUpdateCheckBox" Grid.Row="3" Grid.Column="1" Content="{DynamicResource AutoUpdate}" VerticalAlignment="Center" Margin="0,5,0,0" ></CheckBox>
             </Grid>
         </StackPanel>
         <Grid Grid.Row="1" Grid.Column="0" Margin="10,10,0,10">
@@ -61,8 +66,8 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="Add" FontSize="14" Click="AddButton_Click"></Button>
-            <Button Grid.Column="1" Content="Delete" FontSize="14" Click="DeleteButton_Click"></Button>
+            <Button Grid.Column="0" Content="{DynamicResource Add}" FontSize="14" Click="AddButton_Click"></Button>
+            <Button Grid.Column="1" Content="{DynamicResource Delete}" FontSize="14" Click="DeleteButton_Click"></Button>
         </Grid>
         <Grid Grid.Row="1" Grid.Column="1" Margin="10,10,10,10">
             <Grid.ColumnDefinitions>
@@ -70,9 +75,9 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="OK" FontSize="14" Click="OkButton_Click" ></Button>
-            <Button Grid.Column="1" Content="Cancel" FontSize="14" Click="CancelButton_Click"></Button>
-            <Button x:Name="ApplyButton" Grid.Column="2" Content="Apply" FontSize="14" Click="ApplyButton_Click"></Button>
+            <Button Grid.Column="0" Content="{DynamicResource Ok}" FontSize="14" Click="OkButton_Click" ></Button>
+            <Button Grid.Column="1" Content="{DynamicResource Cancel}" FontSize="14" Click="CancelButton_Click"></Button>
+            <Button x:Name="ApplyButton" Grid.Column="2" Content="{DynamicResource Apply}" FontSize="14" Click="ApplyButton_Click"></Button>
         </Grid>
     </Grid>
 </Window>
