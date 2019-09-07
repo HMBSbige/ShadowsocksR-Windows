@@ -16,7 +16,8 @@ namespace Shadowsocks.Model
 
         public ServerSubscribe()
         {
-            Url = UpdateFreeNode.DefaultUpdateUrl;
+            url = UpdateFreeNode.DefaultUpdateUrl;
+            autoCheckUpdate = true;
         }
 
         public string Url

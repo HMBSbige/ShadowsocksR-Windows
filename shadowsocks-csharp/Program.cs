@@ -87,12 +87,15 @@ namespace Shadowsocks
 
             _controller.Start();
             Reg.SetUrlProtocol(@"ssr");
+            Reg.SetUrlProtocol(@"sub");
             singleInstance.ListenForArgumentsFromSuccessiveInstances();
             app.Run();
         }
 
         private static void App_Exit(object sender, ExitEventArgs e)
         {
+            Reg.RemoveUrlProtocol(@"ssr");
+            Reg.RemoveUrlProtocol(@"sub");
             _controller?.Stop();
             _controller = null;
         }

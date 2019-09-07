@@ -208,6 +208,8 @@ namespace Shadowsocks.View
 
         private bool SaveConfig()
         {
+            _modifiedConfiguration.configs.Clear();
+            _modifiedConfiguration.configs.AddRange(ServerViewModel.ServerCollection);
             if (_modifiedConfiguration.configs.Count == 0)
             {
                 MessageBox.Show(this.GetWindowStringValue(@"NoServer"));
