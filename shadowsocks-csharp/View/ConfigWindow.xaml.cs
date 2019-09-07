@@ -6,7 +6,6 @@ using Shadowsocks.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -209,6 +208,8 @@ namespace Shadowsocks.View
 
         private bool SaveConfig()
         {
+            _modifiedConfiguration.configs.Clear();
+            _modifiedConfiguration.configs.AddRange(ServerViewModel.ServerCollection);
             if (_modifiedConfiguration.configs.Count == 0)
             {
                 MessageBox.Show(this.GetWindowStringValue(@"NoServer"));
@@ -375,22 +376,10 @@ namespace Shadowsocks.View
         {
             if (PictureQrCode.Visibility != Visibility.Visible)
             {
-                Task.Run(() =>
-                {
-                    Dispatcher?.Invoke(() =>
-                    {
-                        PictureQrCode.Visibility = Splitter2.Visibility = Visibility.Visible;
-                        Width += _oldWidth;
-                        MainGrid.ColumnDefinitions[2].Width = new GridLength(_oldWidth, GridUnitType.Pixel);
-                        ShowQrCodeButton.Content = @"<<";
-                    });
-                }).ContinueWith(task =>
-                {
-                    Dispatcher?.Invoke(() =>
-                    {
-                        GenQr(LinkTextBox.Text);
-                    });
-                });
+                PictureQrCode.Visibility = Splitter2.Visibility = Visibility.Visible;
+                MainGrid.ColumnDefinitions[2].Width = new GridLength(_oldWidth, GridUnitType.Pixel);
+                Width += _oldWidth;
+                ShowQrCodeButton.Content = @"<<";
             }
             else
             {

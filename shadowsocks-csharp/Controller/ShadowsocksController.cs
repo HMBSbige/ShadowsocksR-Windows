@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -215,6 +216,35 @@ namespace Shadowsocks.Controller
                             index = _config.configs.Count;
                         _config.configs.Insert(index, server);
                     }
+                }
+                if (i > 0)
+                {
+                    Save();
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Logging.LogUsefulException(e);
+                return false;
+            }
+            return false;
+        }
+
+        public bool AddSubscribeUrl(string str)
+        {
+            try
+            {
+                var urls = str.Split(new[] { "\r\n", "\r", "\n", " " }, StringSplitOptions.RemoveEmptyEntries);
+                var i = 0;
+                foreach (var url in urls.Where(url => url.StartsWith(@"sub://", StringComparison.OrdinalIgnoreCase)))
+                {
+                    var sub = Regex.Match(url, "sub://([A-Za-z0-9_-]+)", RegexOptions.IgnoreCase);
+                    if (!sub.Success)
+                        throw new FormatException();
+                    var res = Base64.DecodeUrlSafeBase64(sub.Groups[1].Value);
+                    _config.serverSubscribes.Add(new ServerSubscribe { Url = res });
+                    ++i;
                 }
                 if (i > 0)
                 {

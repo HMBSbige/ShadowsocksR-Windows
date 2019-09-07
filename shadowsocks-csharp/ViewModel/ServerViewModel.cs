@@ -14,7 +14,11 @@ namespace Shadowsocks.ViewModel
 
         public void ReadConfig(Configuration config)
         {
-            ServerCollection = config.configs;
+            ServerCollection.Clear();
+            foreach (var server in config.configs)
+            {
+                ServerCollection.Add(server);
+            }
             if (config.index >= 0 && config.index < ServerCollection.Count)
             {
                 SelectedServer = ServerCollection[config.index];

@@ -3,22 +3,43 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:model="clr-namespace:Shadowsocks.Model"
+        xmlns:controls="clr-namespace:Shadowsocks.Controls"
         mc:Ignorable="d"
-        Title="SubscribeWindow"
+        x:Name="Sw"
+        Title="{DynamicResource Title}"
         Height="360" Width="680"
         MinHeight="360" MinWidth="680"
         WindowStartupLocation="CenterScreen"
+        DataContext="{Binding SubscribeWindowViewModel,ElementName=Sw}"
         Loaded="Window_Loaded">
 
     <Window.Resources>
-        <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="LightGray" />
-        <Style TargetType="{x:Type TextBox}">
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Background" Value="{StaticResource DisabledBackgroundBrush}" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../I18N/SubscribeWindow.en-US.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <SolidColorBrush x:Key="DisabledBackgroundBrush" Color="LightGray" />
+            <Style TargetType="{x:Type TextBox}">
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled" Value="False">
+                        <Setter Property="Background" Value="{StaticResource DisabledBackgroundBrush}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <DataTemplate x:Key="ListBoxTemplate" DataType="model:ServerSubscribe">
+                <StackPanel Margin="3">
+                    <DockPanel>
+                        <TextBlock Text="{Binding Group}" Foreground="Green" FontWeight="Bold" />
+                    </DockPanel>
+                    <DockPanel>
+                        <TextBlock FontWeight="Bold" Text="{Binding Url}" Foreground="DarkOrange"
+                                   DockPanel.Dock="Left" />
+                    </DockPanel>
+                </StackPanel>
+            </DataTemplate>
+            <controls:UlongToDateTimeString x:Key="UlongToDateTimeString" />
+        </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
@@ -30,14 +51,24 @@
             <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <ListBox x:Name="ServerSubscribeListBox" Grid.Row="0" Grid.Column="0" Margin="10,0,0,0" 
+        <GridSplitter Grid.Column="0" Grid.RowSpan="2"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Stretch"
+                      Width="3" />
+
+        <ListBox x:Name="ServerSubscribeListBox" Grid.Row="0" Grid.Column="0" Margin="10,0,5,0" 
         SelectionChanged="ServerSubscribeListBox_SelectionChanged" 
         ScrollViewer.HorizontalScrollBarVisibility="Auto" 
-        ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" >
+        ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" 
+        ItemsSource="{Binding SubscribeCollection}"
+        ItemTemplate="{StaticResource ListBoxTemplate}"
+        SelectedItem="{Binding SelectedServer,Mode=TwoWay}">
         </ListBox>
-		<StackPanel Grid.Row="0" Grid.Column="1" Margin="10,0,10,0" >
-            <Grid >
+        <StackPanel Grid.Row="0" Grid.Column="1" Margin="5,0,10,0" >
+            <Grid x:Name="InfoGrid">
                 <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
@@ -47,32 +78,40 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Row="0" Grid.Column="0" Content="URL"></Label>
-                <Label Grid.Row="1" Grid.Column="0" Content="Group name"></Label>
-                <Label Grid.Row="2" Grid.Column="0" Content="Last Update"></Label>
-                <TextBox x:Name="UrlTextBox" Grid.Row="0" Grid.Column="1"></TextBox>
-                <TextBox x:Name="GroupTextBox" Grid.Row="1" Grid.Column="1" IsReadOnly="True" Background="{StaticResource DisabledBackgroundBrush}"></TextBox>
-                <TextBox x:Name="UpdateTextBox" Grid.Row="2" Grid.Column="1" IsReadOnly="True" Background="{StaticResource DisabledBackgroundBrush}"></TextBox>
-                <CheckBox x:Name="AutoUpdateCheckBox" Grid.Row="3" Grid.Column="1" Content="Auto update" VerticalAlignment="Center" Margin="0,5,0,0" ></CheckBox>
+                <Label Grid.Row="0" Grid.Column="0" Content="{DynamicResource Url}"></Label>
+                <Label Grid.Row="1" Grid.Column="0" Content="{DynamicResource GroupName}"></Label>
+                <Label Grid.Row="2" Grid.Column="0" Content="{DynamicResource LastUpdate}"></Label>
+                <TextBox Grid.Row="0" Grid.Column="1"
+                Text="{Binding SelectedServer.Url,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Grid.Row="1" Grid.Column="1"
+                Text="{Binding SelectedServer.Group,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Grid.Row="2" Grid.Column="1" IsReadOnly="True" Background="{StaticResource DisabledBackgroundBrush}"
+                Text="{Binding SelectedServer.LastUpdateTime,Converter={StaticResource UlongToDateTimeString},Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                <CheckBox Grid.Row="3" Grid.Column="1" Content="{DynamicResource AutoUpdate}" VerticalAlignment="Center" Margin="0,5,0,0" 
+                IsChecked="{Binding SelectedServer.AutoCheckUpdate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Grid.Row="4" Grid.Column="1" Content="{DynamicResource Update}" Margin="0,5,0,0" Click="UpdateButton_OnClick"/>
+                <Button Grid.Row="5" Grid.Column="1" Content="{DynamicResource UpdateBypassProxy}" Margin="0,5,0,0" Click="UpdateBypassProxyButton_OnClick"/>
             </Grid>
         </StackPanel>
-        <Grid Grid.Row="1" Grid.Column="0" Margin="10,10,0,10">
+        <Grid Grid.Row="1" Grid.Column="0" Margin="10,10,5,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="Add" FontSize="14" Click="AddButton_Click"></Button>
-            <Button Grid.Column="1" Content="Delete" FontSize="14" Click="DeleteButton_Click"></Button>
+            <Button Grid.Column="0" Content="{DynamicResource Add}" FontSize="14" Click="AddButton_Click"></Button>
+            <Button Grid.Column="1" Content="{DynamicResource Delete}" FontSize="14" Click="DeleteButton_Click"></Button>
+            <Button Grid.Column="2" Content="{DynamicResource DeleteAll}" FontSize="14" Click="DeleteAllButton_Click"></Button>
         </Grid>
-        <Grid Grid.Row="1" Grid.Column="1" Margin="10,10,10,10">
+        <Grid Grid.Row="1" Grid.Column="1" Margin="5,10,10,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="OK" FontSize="14" Click="OkButton_Click" ></Button>
-            <Button Grid.Column="1" Content="Cancel" FontSize="14" Click="CancelButton_Click"></Button>
-            <Button x:Name="ApplyButton" Grid.Column="2" Content="Apply" FontSize="14" Click="ApplyButton_Click"></Button>
+            <Button Grid.Column="0" Content="{DynamicResource Ok}" FontSize="14" Click="OkButton_Click" ></Button>
+            <Button Grid.Column="1" Content="{DynamicResource Cancel}" FontSize="14" Click="CancelButton_Click"></Button>
+            <Button x:Name="ApplyButton" Grid.Column="2" Content="{DynamicResource Apply}" FontSize="14" Click="ApplyButton_Click"></Button>
         </Grid>
     </Grid>
 </Window>

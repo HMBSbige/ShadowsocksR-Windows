@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using Shadowsocks.Model;
+﻿using Shadowsocks.Model;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Shadowsocks.Controller
 {
@@ -11,25 +12,32 @@ namespace Shadowsocks.Controller
         private bool _useProxy;
         private bool _notify;
 
-        public void CreateTask(Configuration config, UpdateFreeNode updater, int index, bool useProxy, bool notify)
+        public void CreateTask(Configuration config, UpdateFreeNode updater, bool useProxy, bool updateManually, ServerSubscribe serverSubscribe = null)
         {
             if (_config == null)
             {
                 _config = config;
                 _updater = updater;
                 _useProxy = useProxy;
-                _notify = notify;
-                if (index < 0)
+                _notify = updateManually;
+                _serverSubscribes = new List<ServerSubscribe>();
+                if (serverSubscribe != null)
                 {
-                    _serverSubscribes = new List<ServerSubscribe>();
-                    foreach (var server in config.serverSubscribes)
-                    {
-                        _serverSubscribes.Add(server);
-                    }
+                    _serverSubscribes.Add(serverSubscribe);
                 }
-                else if (index < _config.serverSubscribes.Count)
+                else
                 {
-                    _serverSubscribes = new List<ServerSubscribe> { config.serverSubscribes[index] };
+                    if (updateManually)
+                    {
+                        _serverSubscribes.AddRange(config.serverSubscribes);
+                    }
+                    else
+                    {
+                        foreach (var server in config.serverSubscribes.Where(server => server.AutoCheckUpdate))
+                        {
+                            _serverSubscribes.Add(server);
+                        }
+                    }
                 }
                 Next();
             }
@@ -43,12 +51,12 @@ namespace Shadowsocks.Controller
                 return false;
             }
 
-            Url = _serverSubscribes[0].URL;
+            CurrentServerSubscribe = _serverSubscribes[0];
             _updater.CheckUpdate(_config, _serverSubscribes[0], _useProxy, _notify);
             _serverSubscribes.RemoveAt(0);
             return true;
         }
 
-        public string Url { get; private set; }
+        public ServerSubscribe CurrentServerSubscribe { get; private set; }
     }
 }

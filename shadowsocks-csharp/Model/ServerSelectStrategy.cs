@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace Shadowsocks.Model
 {
@@ -110,7 +109,7 @@ namespace Shadowsocks.Model
             return chance;
         }
 
-        protected int SubSelect(ObservableCollection<Server> configs, int curIndex, string algorithm, FilterFunc filter, bool forceChange)
+        protected int SubSelect(IList<Server> configs, int curIndex, string algorithm, FilterFunc filter, bool forceChange)
         {
             if (randomGennarator == null)
             {
@@ -336,7 +335,7 @@ namespace Shadowsocks.Model
             return -1;
         }
 
-        public int Select(ObservableCollection<Server> configs, int curIndex, string algorithm, FilterFunc filter, bool forceChange = false)
+        public int Select(IList<Server> configs, int curIndex, string algorithm, FilterFunc filter, bool forceChange = false)
         {
             lastSelectIndex = SubSelect(configs, curIndex, algorithm, filter, forceChange);
             if (lastSelectIndex >= 0 && lastSelectIndex < configs.Count)

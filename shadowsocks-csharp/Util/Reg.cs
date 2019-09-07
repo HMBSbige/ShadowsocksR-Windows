@@ -27,5 +27,19 @@
                 return false;
             }
         }
+
+        public static bool RemoveUrlProtocol(string link)
+        {
+            try
+            {
+                using var runKey = Utils.OpenRegKey(@"Software\Classes", true);
+                runKey?.DeleteSubKeyTree(link);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

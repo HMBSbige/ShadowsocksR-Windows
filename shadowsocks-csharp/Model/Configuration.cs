@@ -4,7 +4,6 @@ using Shadowsocks.Encryption;
 using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -16,7 +15,7 @@ namespace Shadowsocks.Model
     {
         #region Data
 
-        public ObservableCollection<Server> configs;
+        public List<Server> configs;
         public int index;
         public bool random;
         public ProxyMode sysProxyMode;
@@ -56,7 +55,6 @@ namespace Shadowsocks.Model
         public bool isPreRelease;
         public bool AutoCheckUpdate;
 
-        public bool nodeFeedAutoUpdate;
         public List<ServerSubscribe> serverSubscribes;
 
         public Dictionary<string, string> token = new Dictionary<string, string>();
@@ -296,11 +294,10 @@ namespace Shadowsocks.Model
 
             AutoCheckUpdate = true;
             isPreRelease = false;
-            nodeFeedAutoUpdate = true;
 
             serverSubscribes = new List<ServerSubscribe>();
 
-            configs = new ObservableCollection<Server>();
+            configs = new List<Server>();
         }
 
         public void CopyFrom(Configuration config)
@@ -335,7 +332,6 @@ namespace Shadowsocks.Model
             keepVisitTime = config.keepVisitTime;
             AutoCheckUpdate = config.AutoCheckUpdate;
             isPreRelease = config.isPreRelease;
-            nodeFeedAutoUpdate = config.nodeFeedAutoUpdate;
             serverSubscribes = config.serverSubscribes;
         }
 

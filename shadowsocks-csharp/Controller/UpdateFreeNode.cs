@@ -7,7 +7,7 @@ namespace Shadowsocks.Controller
 {
     public class UpdateFreeNode
     {
-        private const string DefaultUpdateUrl = "https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/freenodeplain.txt";
+        public const string DefaultUpdateUrl = "https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/freenodeplain.txt";
 
         private const string UserAgent = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36";
 
@@ -40,7 +40,7 @@ namespace Shadowsocks.Controller
                 }
 
                 SubscribeTask = subscribeTask;
-                var url = subscribeTask.URL;
+                var url = subscribeTask.Url;
 
                 http.DownloadStringCompleted += http_DownloadStringCompleted;
                 http.DownloadStringAsync(new Uri(url ?? DefaultUpdateUrl));
