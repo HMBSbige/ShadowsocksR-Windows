@@ -13,8 +13,10 @@
     <sys:String x:Key="Delete">删除</sys:String>
 
     <sys:String x:Key="Url">网址</sys:String>
-    <sys:String x:Key="GroupName">组名</sys:String>
+    <sys:String x:Key="GroupName">订阅备注</sys:String>
     <sys:String x:Key="LastUpdate">最近更新</sys:String>
     <sys:String x:Key="AutoUpdate">自动更新</sys:String>
+    <sys:String x:Key="Update">保存并更新</sys:String>
+    <sys:String x:Key="SaveError">订阅备注不能一样</sys:String>
 
 </ResourceDictionary>

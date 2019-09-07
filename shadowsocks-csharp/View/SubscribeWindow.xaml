@@ -3,11 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:model="clr-namespace:Shadowsocks.Model"
+        xmlns:controls="clr-namespace:Shadowsocks.Controls"
         mc:Ignorable="d"
-        Title="SubscribeWindow"
+        x:Name="Sw"
+        Title="{DynamicResource Title}"
         Height="360" Width="680"
         MinHeight="360" MinWidth="680"
         WindowStartupLocation="CenterScreen"
+        DataContext="{Binding SubscribeWindowViewModel,ElementName=Sw}"
         Loaded="Window_Loaded">
 
     <Window.Resources>
@@ -23,6 +27,18 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
+            <DataTemplate x:Key="ListBoxTemplate" DataType="model:ServerSubscribe">
+                <StackPanel Margin="3">
+                    <DockPanel>
+                        <TextBlock Text="{Binding Group}" Foreground="Green" FontWeight="Bold" />
+                    </DockPanel>
+                    <DockPanel>
+                        <TextBlock FontWeight="Bold" Text="{Binding Url}" Foreground="DarkOrange"
+                                   DockPanel.Dock="Left" />
+                    </DockPanel>
+                </StackPanel>
+            </DataTemplate>
+            <controls:UlongToDateTimeString x:Key="UlongToDateTimeString" />
         </ResourceDictionary>
     </Window.Resources>
 
@@ -38,11 +54,15 @@
         <ListBox x:Name="ServerSubscribeListBox" Grid.Row="0" Grid.Column="0" Margin="10,0,0,0" 
         SelectionChanged="ServerSubscribeListBox_SelectionChanged" 
         ScrollViewer.HorizontalScrollBarVisibility="Auto" 
-        ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" >
+        ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" 
+        ItemsSource="{Binding SubscribeCollection}"
+        ItemTemplate="{StaticResource ListBoxTemplate}"
+        SelectedItem="{Binding SelectedServer,Mode=TwoWay}">
         </ListBox>
-		<StackPanel Grid.Row="0" Grid.Column="1" Margin="10,0,10,0" >
-            <Grid >
+        <StackPanel Grid.Row="0" Grid.Column="1" Margin="10,0,10,0" >
+            <Grid x:Name="InfoGrid">
                 <Grid.RowDefinitions>
+                    <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
@@ -55,10 +75,15 @@
                 <Label Grid.Row="0" Grid.Column="0" Content="{DynamicResource Url}"></Label>
                 <Label Grid.Row="1" Grid.Column="0" Content="{DynamicResource GroupName}"></Label>
                 <Label Grid.Row="2" Grid.Column="0" Content="{DynamicResource LastUpdate}"></Label>
-                <TextBox x:Name="UrlTextBox" Grid.Row="0" Grid.Column="1"></TextBox>
-                <TextBox x:Name="GroupTextBox" Grid.Row="1" Grid.Column="1" IsReadOnly="True" Background="{StaticResource DisabledBackgroundBrush}"></TextBox>
-                <TextBox x:Name="UpdateTextBox" Grid.Row="2" Grid.Column="1" IsReadOnly="True" Background="{StaticResource DisabledBackgroundBrush}"></TextBox>
-                <CheckBox x:Name="AutoUpdateCheckBox" Grid.Row="3" Grid.Column="1" Content="{DynamicResource AutoUpdate}" VerticalAlignment="Center" Margin="0,5,0,0" ></CheckBox>
+                <TextBox Grid.Row="0" Grid.Column="1"
+                Text="{Binding SelectedServer.Url,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Grid.Row="1" Grid.Column="1"
+                Text="{Binding SelectedServer.Group,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBox Grid.Row="2" Grid.Column="1" IsReadOnly="True" Background="{StaticResource DisabledBackgroundBrush}"
+                Text="{Binding SelectedServer.LastUpdateTime,Converter={StaticResource UlongToDateTimeString},Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                <CheckBox Grid.Row="3" Grid.Column="1" Content="{DynamicResource AutoUpdate}" VerticalAlignment="Center" Margin="0,5,0,0" 
+                IsChecked="{Binding SelectedServer.AutoCheckUpdate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Grid.Row="4" Grid.Column="1" Content="{DynamicResource Update}" Margin="0,5,0,0" Click="UpdateButton_OnClick"/>
             </Grid>
         </StackPanel>
         <Grid Grid.Row="1" Grid.Column="0" Margin="10,10,0,10">

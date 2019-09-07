@@ -1,7 +1,9 @@
 ﻿using Shadowsocks.Controller;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
+using Shadowsocks.ViewModel;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -9,147 +11,89 @@ namespace Shadowsocks.View
 {
     public partial class SubscribeWindow
     {
-        public SubscribeWindow(ShadowsocksController controller)
+        public SubscribeWindow(ShadowsocksController controller, UpdateSubscribeManager updateSubscribeManager, UpdateFreeNode updateFreeNodeChecker)
         {
             InitializeComponent();
             I18NUtil.SetLanguage(Resources, @"SubscribeWindow");
-            Closed += (o, e) => { controller.ConfigChanged -= controller_ConfigChanged; };
+            Closed += (o, e) =>
+            {
+                controller.ConfigChanged -= controller_ConfigChanged;
+                SubscribeWindowViewModel.SubscribesChanged -= SubscribeWindowViewModel_SubscribesChanged;
+            };
             _controller = controller;
+            _updateSubscribeManager = updateSubscribeManager;
+            _updateFreeNodeChecker = updateFreeNodeChecker;
+            _controller.ConfigChanged += controller_ConfigChanged;
+            LoadCurrentConfiguration();
+            SubscribeWindowViewModel.SubscribesChanged += SubscribeWindowViewModel_SubscribesChanged;
+        }
+
+        private void SubscribeWindowViewModel_SubscribesChanged(object sender, EventArgs e)
+        {
+            ApplyButton.IsEnabled = true;
         }
 
         private readonly ShadowsocksController _controller;
+        private readonly UpdateFreeNode _updateFreeNodeChecker;
+        private readonly UpdateSubscribeManager _updateSubscribeManager;
         private Configuration _modifiedConfiguration;
-        private int _oldSelectIndex;
+
+        public SubscribeWindowViewModel SubscribeWindowViewModel { get; set; } = new SubscribeWindowViewModel();
 
         private void Window_Loaded(object sender, RoutedEventArgs _)
         {
-            Title = this.GetWindowStringValue(@"Title");
-            _controller.ConfigChanged += controller_ConfigChanged;
 
-            UrlTextBox.TextChanged += (o, e) =>
-            {
-                if (UrlTextBox.IsFocused)
-                {
-                    ApplyButton.IsEnabled = true;
-                }
-            };
-            AutoUpdateCheckBox.Checked += (o, e) => { ApplyButton.IsEnabled = true; };
-            AutoUpdateCheckBox.Unchecked += (o, e) => { ApplyButton.IsEnabled = true; };
-
-            LoadCurrentConfiguration();
-            ApplyButton.IsEnabled = false;
         }
 
         private void controller_ConfigChanged(object sender, EventArgs e)
         {
             LoadCurrentConfiguration();
-            ApplyButton.IsEnabled = false;
         }
 
         private void LoadCurrentConfiguration()
         {
             _modifiedConfiguration = _controller.GetConfiguration();
-            LoadAllSettings();
-            UrlTextBox.IsEnabled = ServerSubscribeListBox.Items.Count != 0;
-        }
+            SubscribeWindowViewModel.ReadConfig(_modifiedConfiguration);
 
-        private void LoadAllSettings()
-        {
-            const int selectIndex = 0;
-            AutoUpdateCheckBox.IsChecked = _modifiedConfiguration.nodeFeedAutoUpdate;
-            UpdateList();
-            UpdateSelected(selectIndex);
-            SetSelectIndex(selectIndex);
-        }
-
-        private void UpdateList()
-        {
-            ServerSubscribeListBox.Items.Clear();
-            foreach (var ss in _modifiedConfiguration.serverSubscribes)
-            {
-                ServerSubscribeListBox.Items.Add($@"{(string.IsNullOrEmpty(ss.Group) ? @"    " : ss.Group + @" - ")}{ss.Url}");
-            }
-        }
-
-        private void UpdateSelected(int index)
-        {
-            if (index >= 0 && index < _modifiedConfiguration.serverSubscribes.Count)
-            {
-                var ss = _modifiedConfiguration.serverSubscribes[index];
-                UrlTextBox.Text = ss.Url;
-                GroupTextBox.Text = ss.Group;
-                _oldSelectIndex = index;
-                if (ss.LastUpdateTime != 0)
-                {
-                    var now = new DateTime(1970, 1, 1, 0, 0, 0);
-                    now = now.AddSeconds(ss.LastUpdateTime);
-                    UpdateTextBox.Text = $@"{now.ToLongDateString()} {now.ToLongTimeString()}";
-                }
-                else
-                {
-                    UpdateTextBox.Text = @"(｢･ω･)｢";
-                }
-            }
-        }
-
-        private void SetSelectIndex(int index)
-        {
-            if (index >= 0 && index < _modifiedConfiguration.serverSubscribes.Count)
-            {
-                ServerSubscribeListBox.SelectedIndex = index;
-            }
-        }
-
-        private void SaveSelected(int index)
-        {
-            if (index >= 0 && index < _modifiedConfiguration.serverSubscribes.Count)
-            {
-                var ss = _modifiedConfiguration.serverSubscribes[index];
-                if (ss.Url != UrlTextBox.Text)
-                {
-                    ss.Url = UrlTextBox.Text;
-                    ss.Group = string.Empty;
-                    ss.LastUpdateTime = 0;
-                }
-            }
+            ApplyButton.IsEnabled = false;
         }
 
         private void ServerSubscribeListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var selectIndex = ServerSubscribeListBox.SelectedIndex;
-            if (selectIndex == -1 || _oldSelectIndex == selectIndex)
-            {
-                return;
-            }
-
-            SaveSelected(_oldSelectIndex);
-            UpdateList();
-            UpdateSelected(selectIndex);
-            SetSelectIndex(selectIndex);
-        }
-
-        private bool SaveSettings()
-        {
-            SaveSelected(ServerSubscribeListBox.SelectedIndex);
-            _modifiedConfiguration.nodeFeedAutoUpdate = AutoUpdateCheckBox.IsChecked.GetValueOrDefault();
-            return true;
+            InfoGrid.Visibility = ServerSubscribeListBox.SelectedIndex == -1 ? Visibility.Hidden : Visibility.Visible;
         }
 
         private bool SaveConfig()
         {
-            if (SaveSettings())
+            var remarks = new HashSet<string>();
+            foreach (var serverSubscribe in SubscribeWindowViewModel.SubscribeCollection)
             {
-                _controller.SaveServersConfig(_modifiedConfiguration);
-                return true;
+                if (remarks.Contains(serverSubscribe.Group))
+                {
+                    return false;
+                }
+                remarks.Add(serverSubscribe.Group);
             }
-            return false;
+            _modifiedConfiguration.serverSubscribes.Clear();
+            _modifiedConfiguration.serverSubscribes.AddRange(SubscribeWindowViewModel.SubscribeCollection);
+
+            _controller.SaveServersConfig(_modifiedConfiguration);
+            return true;
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
             if (ApplyButton.IsEnabled)
             {
-                SaveConfig();
+                if (SaveConfig())
+                {
+                    Close();
+                }
+                else
+                {
+                    SaveError();
+                    return;
+                }
             }
             Close();
         }
@@ -164,51 +108,78 @@ namespace Shadowsocks.View
             if (SaveConfig())
             {
                 ApplyButton.IsEnabled = false;
+                return;
             }
+            SaveError();
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            SaveSelected(_oldSelectIndex);
-            var selectIndex = _modifiedConfiguration.serverSubscribes.Count;
-            if (_oldSelectIndex >= 0 && _oldSelectIndex < _modifiedConfiguration.serverSubscribes.Count)
-            {
-                _modifiedConfiguration.serverSubscribes.Insert(selectIndex, new ServerSubscribe());
-            }
-            else
-            {
-                _modifiedConfiguration.serverSubscribes.Add(new ServerSubscribe());
-            }
-
-            UpdateList();
-            UpdateSelected(selectIndex);
-            SetSelectIndex(selectIndex);
-
-            UrlTextBox.IsEnabled = true;
-
-            ApplyButton.IsEnabled = true;
+            SubscribeWindowViewModel.SubscribeCollection.Add(new ServerSubscribe());
+            SetServerListSelectedIndex(SubscribeWindowViewModel.SubscribeCollection.Count - 1);
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            var selectIndex = ServerSubscribeListBox.SelectedIndex;
-            if (selectIndex >= 0 && selectIndex < _modifiedConfiguration.serverSubscribes.Count)
+            var index = ServerSubscribeListBox.SelectedIndex;
+            if (ServerSubscribeListBox.SelectedItem is ServerSubscribe serverSubscribe)
             {
-                _modifiedConfiguration.serverSubscribes.RemoveAt(selectIndex);
-                if (selectIndex >= _modifiedConfiguration.serverSubscribes.Count)
-                {
-                    selectIndex = _modifiedConfiguration.serverSubscribes.Count - 1;
-                }
-
-                UpdateList();
-                UpdateSelected(selectIndex);
-                SetSelectIndex(selectIndex);
-                ApplyButton.IsEnabled = true;
+                SubscribeWindowViewModel.SubscribeCollection.Remove(serverSubscribe);
             }
 
-            if (ServerSubscribeListBox.Items.Count == 0)
+            SetServerListSelectedIndex(index);
+        }
+
+        private void SetServerListSelectedIndex(int index)
+        {
+            if (index < 0)
             {
-                UrlTextBox.IsEnabled = false;
+                return;
+            }
+
+            if (index < ServerSubscribeListBox.Items.Count)
+            {
+                ServerSubscribeListBox.SelectedIndex = index;
+                ServerSubscribeListBox.ScrollIntoView(ServerSubscribeListBox.Items[index]);
+            }
+            else
+            {
+                ServerSubscribeListBox.SelectedIndex = ServerSubscribeListBox.Items.Count - 1;
+                if (ServerSubscribeListBox.SelectedIndex > 0)
+                {
+                    ServerSubscribeListBox.ScrollIntoView(ServerSubscribeListBox.Items[ServerSubscribeListBox.Items.Count - 1]);
+                }
+            }
+        }
+
+        private bool Save()
+        {
+            if (ApplyButton.IsEnabled)
+            {
+                return SaveConfig();
+            }
+            return true;
+        }
+
+        private void SaveError()
+        {
+            MessageBox.Show(this.GetWindowStringValue(@"SaveError"), UpdateChecker.Name, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        private void UpdateButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (ServerSubscribeListBox.SelectedItem is ServerSubscribe serverSubscribe)
+            {
+                if (Save())
+                {
+                    ApplyButton.IsEnabled = false;
+                    _updateSubscribeManager.CreateTask(_modifiedConfiguration, _updateFreeNodeChecker,
+                            !_modifiedConfiguration.IsDefaultConfig(), true, serverSubscribe);
+                }
+                else
+                {
+                    SaveError();
+                }
             }
         }
     }

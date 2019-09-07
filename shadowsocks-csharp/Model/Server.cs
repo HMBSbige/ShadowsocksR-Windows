@@ -25,6 +25,7 @@ namespace Shadowsocks.Model
         private string obfsparam;
         private string remarks_base64;
         private string group;
+        private string subTag;
         private bool enable;
         private bool udp_over_tcp;
 
@@ -330,6 +331,19 @@ namespace Shadowsocks.Model
             }
         }
 
+        public string SubTag
+        {
+            get => subTag;
+            set
+            {
+                if (subTag != value)
+                {
+                    subTag = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public string Remarks_Base64
         {
             get => remarks_base64;
@@ -380,20 +394,14 @@ namespace Shadowsocks.Model
             return new Server();
         }
 
-        public void CopyServer(Server Server)
+        public void CopyServer(Server oldServer)
         {
-            Protocoldata = Server.Protocoldata;
-            Obfsdata = Server.Obfsdata;
-            SpeedLog = Server.SpeedLog;
-            dnsBuffer = Server.dnsBuffer;
-            Connections = Server.Connections;
-            Enable = Server.Enable;
-        }
-
-        public void CopyServerInfo(Server Server)
-        {
-            Remarks = Server.Remarks;
-            Group = Server.Group;
+            Protocoldata = oldServer.Protocoldata;
+            Obfsdata = oldServer.Obfsdata;
+            SpeedLog = oldServer.SpeedLog;
+            dnsBuffer = oldServer.dnsBuffer;
+            Connections = oldServer.Connections;
+            Enable = oldServer.Enable;
         }
 
         public static Server GetForwardServerRef()
@@ -464,6 +472,7 @@ namespace Shadowsocks.Model
             Password = @"0";
             Remarks_Base64 = @"";
             Group = @"FreeSSR-public";
+            SubTag = @"";
             UdpOverTcp = false;
             Enable = true;
             var randId = new byte[16];
@@ -557,12 +566,8 @@ namespace Shadowsocks.Model
             {
                 Remarks = Base64.DecodeStandardSSRUrlSafeBase64(params_dict["remarks"]);
             }
-            if (params_dict.ContainsKey("group"))
-            {
-                Group = Base64.DecodeStandardSSRUrlSafeBase64(params_dict["group"]);
-            }
-            else
-                Group = "";
+            Group = params_dict.ContainsKey("group") ? Base64.DecodeStandardSSRUrlSafeBase64(params_dict["group"]) : string.Empty;
+
             if (params_dict.ContainsKey("uot"))
             {
                 UdpOverTcp = int.Parse(params_dict["uot"]) != 0;
@@ -572,7 +577,9 @@ namespace Shadowsocks.Model
                 Server_Udp_Port = ushort.Parse(params_dict["udpport"]);
             }
             if (!string.IsNullOrEmpty(forceGroup))
-                Group = forceGroup;
+            {
+                SubTag = forceGroup;
+            }
         }
 
         private void ServerFromSs(string ssUrl, string forceGroup)
@@ -593,7 +600,7 @@ namespace Shadowsocks.Model
             Password = match.Groups["password"].Value;
             server = match.Groups["hostname"].Value;
             Server_Port = ushort.Parse(match.Groups["port"].Value);
-            Group = !string.IsNullOrEmpty(forceGroup) ? forceGroup : string.Empty;
+            SubTag = !string.IsNullOrEmpty(forceGroup) ? forceGroup : string.Empty;
         }
 
         public bool IsMatchServer(Server serverObject)
@@ -608,7 +615,8 @@ namespace Shadowsocks.Model
                    && ObfsParam == serverObject.ObfsParam
                    && Password == serverObject.Password
                    && UdpOverTcp == serverObject.UdpOverTcp
-                   && Remarks == serverObject.Remarks;
+                   && Remarks == serverObject.Remarks
+                   && Group == serverObject.Group;
         }
 
         private string GetSsLink()
