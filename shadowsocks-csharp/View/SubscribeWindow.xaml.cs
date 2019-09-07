@@ -4,6 +4,7 @@ using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -42,7 +43,7 @@ namespace Shadowsocks.View
 
         private void Window_Loaded(object sender, RoutedEventArgs _)
         {
-
+            InfoGrid.Visibility = ServerSubscribeListBox.SelectedIndex == -1 ? Visibility.Hidden : Visibility.Visible;
         }
 
         private void controller_ConfigChanged(object sender, EventArgs e)
@@ -126,7 +127,18 @@ namespace Shadowsocks.View
             {
                 SubscribeWindowViewModel.SubscribeCollection.Remove(serverSubscribe);
             }
+            SetServerListSelectedIndex(index);
+        }
 
+        private void DeleteAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            var index = ServerSubscribeListBox.SelectedIndex;
+            if (ServerSubscribeListBox.SelectedItem is ServerSubscribe serverSubscribe)
+            {
+                var tag = serverSubscribe.Group;
+                _modifiedConfiguration.configs = _modifiedConfiguration.configs.Where(server => server.SubTag != tag).ToList();
+                SubscribeWindowViewModel.SubscribeCollection.Remove(serverSubscribe);
+            }
             SetServerListSelectedIndex(index);
         }
 
@@ -173,8 +185,23 @@ namespace Shadowsocks.View
                 if (Save())
                 {
                     ApplyButton.IsEnabled = false;
-                    _updateSubscribeManager.CreateTask(_modifiedConfiguration, _updateFreeNodeChecker,
-                            !_modifiedConfiguration.IsDefaultConfig(), true, serverSubscribe);
+                    _updateSubscribeManager.CreateTask(_modifiedConfiguration, _updateFreeNodeChecker, true, true, serverSubscribe);
+                }
+                else
+                {
+                    SaveError();
+                }
+            }
+        }
+
+        private void UpdateBypassProxyButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (ServerSubscribeListBox.SelectedItem is ServerSubscribe serverSubscribe)
+            {
+                if (Save())
+                {
+                    ApplyButton.IsEnabled = false;
+                    _updateSubscribeManager.CreateTask(_modifiedConfiguration, _updateFreeNodeChecker, false, true, serverSubscribe);
                 }
                 else
                 {

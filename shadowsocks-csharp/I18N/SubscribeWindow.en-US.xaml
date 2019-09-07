@@ -11,12 +11,14 @@
 
     <sys:String x:Key="Add">Add</sys:String>
     <sys:String x:Key="Delete">Delete</sys:String>
+    <sys:String x:Key="DeleteAll">Delete with servers</sys:String>
 
     <sys:String x:Key="Url">URL</sys:String>
     <sys:String x:Key="GroupName">Subscribe remark</sys:String>
     <sys:String x:Key="LastUpdate">Last Update</sys:String>
     <sys:String x:Key="AutoUpdate">Auto update</sys:String>
     <sys:String x:Key="Update">Save and Update</sys:String>
+    <sys:String x:Key="UpdateBypassProxy">Save and Update(bypass proxy)</sys:String>
     <sys:String x:Key="SaveError">Subscribe remarks cannot be the same</sys:String>
 
 </ResourceDictionary>

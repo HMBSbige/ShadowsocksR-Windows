@@ -51,7 +51,12 @@
             <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <ListBox x:Name="ServerSubscribeListBox" Grid.Row="0" Grid.Column="0" Margin="10,0,0,0" 
+        <GridSplitter Grid.Column="0" Grid.RowSpan="2"
+                      HorizontalAlignment="Right"
+                      VerticalAlignment="Stretch"
+                      Width="3" />
+
+        <ListBox x:Name="ServerSubscribeListBox" Grid.Row="0" Grid.Column="0" Margin="10,0,5,0" 
         SelectionChanged="ServerSubscribeListBox_SelectionChanged" 
         ScrollViewer.HorizontalScrollBarVisibility="Auto" 
         ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" 
@@ -59,9 +64,10 @@
         ItemTemplate="{StaticResource ListBoxTemplate}"
         SelectedItem="{Binding SelectedServer,Mode=TwoWay}">
         </ListBox>
-        <StackPanel Grid.Row="0" Grid.Column="1" Margin="10,0,10,0" >
+        <StackPanel Grid.Row="0" Grid.Column="1" Margin="5,0,10,0" >
             <Grid x:Name="InfoGrid">
                 <Grid.RowDefinitions>
+                    <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
@@ -84,17 +90,20 @@
                 <CheckBox Grid.Row="3" Grid.Column="1" Content="{DynamicResource AutoUpdate}" VerticalAlignment="Center" Margin="0,5,0,0" 
                 IsChecked="{Binding SelectedServer.AutoCheckUpdate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                 <Button Grid.Row="4" Grid.Column="1" Content="{DynamicResource Update}" Margin="0,5,0,0" Click="UpdateButton_OnClick"/>
+                <Button Grid.Row="5" Grid.Column="1" Content="{DynamicResource UpdateBypassProxy}" Margin="0,5,0,0" Click="UpdateBypassProxyButton_OnClick"/>
             </Grid>
         </StackPanel>
-        <Grid Grid.Row="1" Grid.Column="0" Margin="10,10,0,10">
+        <Grid Grid.Row="1" Grid.Column="0" Margin="10,10,5,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Content="{DynamicResource Add}" FontSize="14" Click="AddButton_Click"></Button>
             <Button Grid.Column="1" Content="{DynamicResource Delete}" FontSize="14" Click="DeleteButton_Click"></Button>
+            <Button Grid.Column="2" Content="{DynamicResource DeleteAll}" FontSize="14" Click="DeleteAllButton_Click"></Button>
         </Grid>
-        <Grid Grid.Row="1" Grid.Column="1" Margin="10,10,10,10">
+        <Grid Grid.Row="1" Grid.Column="1" Margin="5,10,10,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />

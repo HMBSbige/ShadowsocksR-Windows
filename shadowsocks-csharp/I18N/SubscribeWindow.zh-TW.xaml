@@ -11,12 +11,14 @@
 
     <sys:String x:Key="Add">新增</sys:String>
     <sys:String x:Key="Delete">刪除</sys:String>
+    <sys:String x:Key="DeleteAll">與伺服器一起刪除</sys:String>
 
     <sys:String x:Key="Url">網址</sys:String>
     <sys:String x:Key="GroupName">訂閱備註</sys:String>
     <sys:String x:Key="LastUpdate">最近更新</sys:String>
     <sys:String x:Key="AutoUpdate">自動更新</sys:String>
     <sys:String x:Key="Update">儲存並更新</sys:String>
+    <sys:String x:Key="UpdateBypassProxy">儲存並更新（不通過代理）</sys:String>
     <sys:String x:Key="SaveError">訂閱備註不能一樣</sys:String>
 
 </ResourceDictionary>
