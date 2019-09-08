@@ -240,11 +240,15 @@ namespace Shadowsocks.Controller
                 foreach (var url in urls.Where(url => url.StartsWith(@"sub://", StringComparison.OrdinalIgnoreCase)))
                 {
                     var sub = Regex.Match(url, "sub://([A-Za-z0-9_-]+)", RegexOptions.IgnoreCase);
-                    if (!sub.Success)
-                        throw new FormatException();
-                    var res = Base64.DecodeUrlSafeBase64(sub.Groups[1].Value);
-                    _config.serverSubscribes.Add(new ServerSubscribe { Url = res });
-                    ++i;
+                    if (sub.Success)
+                    {
+                        var res = Base64.DecodeUrlSafeBase64(sub.Groups[1].Value);
+                        if (_config.serverSubscribes.All(serverSubscribe => serverSubscribe.Url != res))
+                        {
+                            _config.serverSubscribes.Add(new ServerSubscribe { Url = res });
+                            ++i;
+                        }
+                    }
                 }
                 if (i > 0)
                 {
@@ -501,7 +505,7 @@ namespace Shadowsocks.Controller
             Utils.ReleaseMemory();
         }
 
-        protected void SaveConfig(Configuration newConfig)
+        private void SaveConfig(Configuration newConfig)
         {
             Configuration.Save(newConfig);
             Reload();
