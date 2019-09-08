@@ -400,7 +400,6 @@ namespace Shadowsocks.View
             _notifyIcon.ShowBalloonTip(I18N.GetString(@"ShadowsocksR"), result, BalloonIcon.Info);
         }
 
-        [SuppressMessage("ReSharper", "LoopVariableIsNeverChangedInsideLoop")]
         private void updateFreeNodeChecker_NewFreeNodeFound(object sender, EventArgs e)
         {
             if (configFrom_open)
@@ -432,7 +431,9 @@ namespace Shadowsocks.View
                 for (var i = urls.Count - 1; i >= 0; --i)
                 {
                     if (!urls[i].StartsWith(@"ssr://"))
+                    {
                         urls.RemoveAt(i);
+                    }
                 }
                 if (urls.Count > 0)
                 {
@@ -448,10 +449,17 @@ namespace Shadowsocks.View
                                 var server = new Server(url, null);
                                 if (!string.IsNullOrEmpty(server.Group))
                                 {
+                                    var hasSameGroup = config.serverSubscribes.Any(subscribe => subscribe.Group == server.Group);
+                                    if (hasSameGroup)
+                                    {
+                                        continue;
+                                    }
+
                                     foreach (var serverSubscribe in config.serverSubscribes.Where(serverSubscribe => serverSubscribe.Url == updateSubscribeManager.CurrentServerSubscribe.Url))
                                     {
                                         curGroup = serverSubscribe.Group = server.Group;
                                     }
+
                                     break;
                                 }
                             }
@@ -461,83 +469,54 @@ namespace Shadowsocks.View
                             }
                         }
                     }
-
                     if (string.IsNullOrWhiteSpace(curGroup))
                     {
                         curGroup = updateSubscribeManager.CurrentServerSubscribe.UrlMd5;
                     }
+
                     lastGroup = curGroup;
 
                     // import all, find difference
-                    var oldServers = new Dictionary<string, Server>();
-                    var oldInsertServers = new Dictionary<string, Server>();
-                    if (!string.IsNullOrEmpty(lastGroup))
+                    var oldServers = new List<Server>();
+
+                    //Find old servers
+                    for (var i = config.configs.Count - 1; i >= 0; --i)
                     {
-                        for (var i = config.configs.Count - 1; i >= 0; --i)
+                        if (lastGroup == config.configs[i].SubTag)
                         {
-                            if (lastGroup == config.configs[i].SubTag)
-                            {
-                                oldServers[config.configs[i].Id] = config.configs[i];
-                            }
+                            oldServers.Add(config.configs[i]);
                         }
                     }
 
-                    foreach (var url in urls)
+                    //Find new servers //try catch?
+                    var newServers = urls.Select(url => new Server(url, curGroup)).ToList();
+                    count = newServers.Count;
+
+                    var removeServers = oldServers.Except(newServers);
+                    var addServers = newServers.Except(oldServers);
+                    //Add servers
+                    foreach (var server in addServers)
                     {
-                        try
+                        var insertIndex = config.configs.Count;
+                        for (var index = config.configs.Count - 1; index >= 0; --index)
                         {
-                            var server = new Server(url, curGroup);
-                            var match = oldInsertServers.Any(pair => server.IsMatchServer(pair.Value));
-                            oldInsertServers[server.Id] = server;
-
-                            //already update
-                            if (match)
+                            if (config.configs[index].SubTag == curGroup)
                             {
-                                continue;
-                            }
-
-                            //found in old server
-                            foreach (var oldServer in oldServers.Where(pair => server.IsMatchServer(pair.Value)))
-                            {
-                                match = true;
-                                oldServers.Remove(oldServer.Key);
-                                ++count;
+                                insertIndex = index + 1;
                                 break;
                             }
-
-                            //already update
-                            if (match)
-                            {
-                                continue;
-                            }
-
-                            //Not found in old server
-                            var insertIndex = config.configs.Count;
-                            for (var index = config.configs.Count - 1; index >= 0; --index)
-                            {
-                                if (config.configs[index].SubTag == curGroup)
-                                {
-                                    insertIndex = index + 1;
-                                    break;
-                                }
-                            }
-
-                            config.configs.Insert(insertIndex, server);
-                            ++count;
                         }
-                        catch
-                        {
-                            // ignored
-                        }
+                        config.configs.Insert(insertIndex, server);
                     }
 
-                    //Remove servers not in the url
-                    foreach (var oldServer in oldServers)
+                    //Remove servers
+                    foreach (var server in removeServers)
                     {
                         for (var i = config.configs.Count - 1; i >= 0; --i)
                         {
-                            if (config.configs[i].Id == oldServer.Key)
+                            if (config.configs[i].Id == server.Id)
                             {
+                                config.configs[i].GetConnections().CloseAll();
                                 config.configs.RemoveAt(i);
                                 break;
                             }

@@ -758,5 +758,10 @@ namespace Shadowsocks.Util
                 break;
             }
         }
+
+        public static IEnumerable<Server> Except(this IEnumerable<Server> x, IList<Server> y)
+        {
+            return from xi in x let found = y.Any(xi.IsMatchServer) where !found select xi;
+        }
     }
 }
