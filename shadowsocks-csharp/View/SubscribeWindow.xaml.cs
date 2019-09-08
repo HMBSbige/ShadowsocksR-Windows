@@ -64,6 +64,13 @@ namespace Shadowsocks.View
             InfoGrid.Visibility = ServerSubscribeListBox.SelectedIndex == -1 ? Visibility.Hidden : Visibility.Visible;
         }
 
+        private void DeleteUnusedServer()
+        {
+            _modifiedConfiguration.configs.RemoveAll(server =>
+                    !string.IsNullOrEmpty(server.SubTag)
+                    && _modifiedConfiguration.serverSubscribes.All(subscribe => subscribe.Group != server.SubTag));
+        }
+
         private bool SaveConfig()
         {
             var remarks = new HashSet<string>();
@@ -78,6 +85,17 @@ namespace Shadowsocks.View
             _modifiedConfiguration.serverSubscribes.Clear();
             _modifiedConfiguration.serverSubscribes.AddRange(SubscribeWindowViewModel.SubscribeCollection);
 
+            if (_modifiedConfiguration.configs.Any(server =>
+            !string.IsNullOrEmpty(server.SubTag)
+            && _modifiedConfiguration.serverSubscribes.All(subscribe => subscribe.Group != server.SubTag)))
+            {
+                if (MessageBox.Show(this.GetWindowStringValue(@"SaveQuestion"),
+                        UpdateChecker.Name, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes)
+                        == MessageBoxResult.Yes)
+                {
+                    DeleteUnusedServer();
+                }
+            }
             _controller.SaveServersConfig(_modifiedConfiguration);
             return true;
         }

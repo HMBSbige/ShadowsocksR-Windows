@@ -95,9 +95,9 @@
         </StackPanel>
         <Grid Grid.Row="1" Grid.Column="0" Margin="10,10,5,10">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1.4*" />
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Content="{DynamicResource Add}" FontSize="14" Click="AddButton_Click"></Button>
             <Button Grid.Column="1" Content="{DynamicResource Delete}" FontSize="14" Click="DeleteButton_Click"></Button>
