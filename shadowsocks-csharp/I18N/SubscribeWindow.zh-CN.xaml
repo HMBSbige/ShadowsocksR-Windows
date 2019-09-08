@@ -21,4 +21,6 @@
     <sys:String x:Key="UpdateBypassProxy">保存并更新（不通过代理）</sys:String>
     <sys:String x:Key="SaveError">订阅备注不能一样</sys:String>
 
+    <sys:String x:Key="SaveQuestion" xml:space="preserve">发现不在订阅列表的订阅服务器&#13;是否删除？</sys:String>
+
 </ResourceDictionary>
