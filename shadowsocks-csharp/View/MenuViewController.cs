@@ -478,36 +478,36 @@ namespace Shadowsocks.View
 
                     // import all, find difference
                     var oldServers = new List<Server>();
-
+                    var firstInsertIndex = config.configs.Count;
                     //Find old servers
                     for (var i = config.configs.Count - 1; i >= 0; --i)
                     {
                         if (lastGroup == config.configs[i].SubTag)
                         {
                             oldServers.Add(config.configs[i]);
+                            firstInsertIndex = i;
                         }
                     }
 
-                    //Find new servers //try catch?
-                    var newServers = urls.Select(url => new Server(url, curGroup)).ToList();
+                    //Find new servers
+                    var newServers = new List<Server>();
+                    foreach (var url in urls)
+                    {
+                        try
+                        {
+                            var server = new Server(url, curGroup) { Index = firstInsertIndex++ };
+                            newServers.Add(server);
+                        }
+                        catch
+                        {
+                            // ignored
+                        }
+                    }
+
                     count = newServers.Count;
 
                     var removeServers = oldServers.Except(newServers);
                     var addServers = newServers.Except(oldServers);
-                    //Add servers
-                    foreach (var server in addServers)
-                    {
-                        var insertIndex = config.configs.Count;
-                        for (var index = config.configs.Count - 1; index >= 0; --index)
-                        {
-                            if (config.configs[index].SubTag == curGroup)
-                            {
-                                insertIndex = index + 1;
-                                break;
-                            }
-                        }
-                        config.configs.Insert(insertIndex, server);
-                    }
 
                     //Remove servers
                     foreach (var server in removeServers)
@@ -521,6 +521,12 @@ namespace Shadowsocks.View
                                 break;
                             }
                         }
+                    }
+
+                    //Add servers
+                    foreach (var server in addServers)
+                    {
+                        config.configs.Insert(server.Index, server);
                     }
 
                     controller.SaveServersConfig(config);
