@@ -570,6 +570,7 @@ namespace Shadowsocks.View
                         {
                             serverSubscribe.LastUpdateTime = (ulong)Math.Floor(DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
                         }
+                        config.configs.RemoveAll(server => server.IsMatchServer(Server.GetDefaultServer()));
                     }
                     controller.SaveServersConfig(config);
                 }
