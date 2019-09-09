@@ -1,5 +1,6 @@
 ﻿using Shadowsocks.Model;
 using Shadowsocks.Util;
+using Shadowsocks.Util.NetUtils;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -59,7 +60,7 @@ namespace Shadowsocks.Controller.Service
                     }
                     else if (kv.Length == 1)
                     {
-                        if (!Utils.isLocal(socket) || line.IndexOf($@"auth={_config.localAuthPassword}", StringComparison.Ordinal) > 0)
+                        if (!IPSubnet.IsLocal(socket) || line.IndexOf($@"auth={_config.localAuthPassword}", StringComparison.Ordinal) > 0)
                         {
                             if (line.IndexOf(" /pac?", StringComparison.Ordinal) > 0 && line.IndexOf("GET", StringComparison.Ordinal) == 0)
                             {

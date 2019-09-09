@@ -1,6 +1,7 @@
 ﻿using Shadowsocks.Model;
 using Shadowsocks.Proxy;
 using Shadowsocks.Util;
+using Shadowsocks.Util.NetUtils;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -125,7 +126,7 @@ namespace Shadowsocks.Controller.Service
                                         Utils.DnsBuffer.Set(host, new IPAddress(ipAddress.GetAddressBytes()));
                                         if (host.IndexOf('.') >= 0)
                                         {
-                                            if (Utils.isLAN(ipAddress)) // assume that it is polution if return LAN address
+                                            if (IPSubnet.IsLan(ipAddress)) // assume that it is polution if return LAN address
                                             {
                                                 return CONNECT_REMOTEPROXY;
                                             }
@@ -174,7 +175,7 @@ namespace Shadowsocks.Controller.Service
                     }
                     else
                     {
-                        if (Utils.isLAN(ipAddress))
+                        if (IPSubnet.IsLan(ipAddress))
                         {
                             return CONNECT_DIRECT;
                         }

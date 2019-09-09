@@ -1,4 +1,5 @@
 ﻿using Shadowsocks.Model;
+using Shadowsocks.Util.NetUtils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -205,7 +206,7 @@ namespace Shadowsocks.Controller.Service
             {
                 var conn = listener.EndAccept(ar);
 
-                if (!_shareOverLAN && !Util.Utils.isLocal(conn))
+                if (!_shareOverLAN && !IPSubnet.IsLocal(conn))
                 {
                     conn.Shutdown(SocketShutdown.Both);
                     conn.Close();
@@ -213,7 +214,7 @@ namespace Shadowsocks.Controller.Service
 
                 var localPort = ((IPEndPoint)conn.LocalEndPoint).Port;
 
-                if ((_authUser ?? string.Empty).Length == 0 && !Util.Utils.isLAN(conn)
+                if ((_authUser ?? string.Empty).Length == 0 && !IPSubnet.IsLan(conn)
                     && !(_config.GetPortMapCache().ContainsKey(localPort)
                     || _config.GetPortMapCache()[localPort].type == PortMapType.Forward))
                 {

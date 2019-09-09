@@ -1,6 +1,7 @@
 ﻿using Shadowsocks.Controller;
 using Shadowsocks.Controller.Service;
 using Shadowsocks.Model;
+using Shadowsocks.Util.NetUtils;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -99,11 +100,7 @@ namespace Shadowsocks.Proxy
             {
                 return true;
             }
-            if (Util.Utils.IsMatchSubNet(((IPEndPoint)_connection.RemoteEndPoint).Address, "127.0.0.0/8"))
-            {
-                return true;
-            }
-            return false;
+            return ((IPEndPoint)_connection.RemoteEndPoint).Address.IsInSubnet(@"127.0.0.0/8");
         }
 
         private void HandshakeReceive()
@@ -114,7 +111,7 @@ namespace Shadowsocks.Proxy
 
                 if (bytesRead > 1)
                 {
-                    if ((!string.IsNullOrEmpty(_config.authUser) || Util.Utils.IsMatchSubNet(((IPEndPoint)_connection.RemoteEndPoint).Address, "127.0.0.0/8"))
+                    if ((!string.IsNullOrEmpty(_config.authUser) || ((IPEndPoint)_connection.RemoteEndPoint).Address.IsInSubnet(@"127.0.0.0/8"))
                         && _firstPacket[0] == 4 && _firstPacketLength >= 9)
                     {
                         RspSocks4aHandshakeReceive();
@@ -223,7 +220,7 @@ namespace Shadowsocks.Proxy
                 HandshakeAuthReceiveCallback();
             }
             else if (string.IsNullOrEmpty(_config.authUser)
-                     || Util.Utils.IsMatchSubNet(((IPEndPoint)_connection.RemoteEndPoint).Address, "127.0.0.0/8"))
+                     || ((IPEndPoint)_connection.RemoteEndPoint).Address.IsInSubnet(@"127.0.0.0/8"))
             {
                 _connection.Send(response);
                 HandshakeReceive2Callback();
@@ -415,10 +412,10 @@ namespace Shadowsocks.Proxy
             {
                 httpProxyState = new HttpParser();
             }
-            if (Util.Utils.IsMatchSubNet(((IPEndPoint)_connection.RemoteEndPoint).Address, "127.0.0.0/8"))
+            if (((IPEndPoint)_connection.RemoteEndPoint).Address.IsInSubnet(@"127.0.0.0/8"))
             {
-                httpProxyState.httpAuthUser = "";
-                httpProxyState.httpAuthPass = "";
+                httpProxyState.httpAuthUser = string.Empty;
+                httpProxyState.httpAuthPass = string.Empty;
             }
             else
             {
