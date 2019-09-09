@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Shadowsocks.Proxy.SystemProxy
+namespace Shadowsocks.Controller.SystemProxy
 {
     /// <summary>
     /// Constants used in INTERNET_PER_CONN_OPTION_OptionUnion struct.

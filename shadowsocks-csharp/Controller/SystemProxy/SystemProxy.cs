@@ -1,8 +1,8 @@
-﻿using Shadowsocks.Controller;
+﻿using System;
+using Shadowsocks.Controller.Service;
 using Shadowsocks.Model;
-using System;
 
-namespace Shadowsocks.Proxy.SystemProxy
+namespace Shadowsocks.Controller.SystemProxy
 {
     public static class SystemProxy
     {

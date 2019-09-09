@@ -16,7 +16,7 @@ namespace Shadowsocks.Util
         {
                 {@"简体中文", @"zh-CN"},
                 {@"繁体中文", @"zh-TW"},
-                {@"English (United States)", @"en-US"},
+                {@"English (United States)", @"en-US"}
         };
 
         public static string GetLanguage(string name)

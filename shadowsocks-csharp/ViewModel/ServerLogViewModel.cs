@@ -1,6 +1,6 @@
-﻿using Shadowsocks.Controller;
+﻿using System.Collections.ObjectModel;
+using Shadowsocks.Controller;
 using Shadowsocks.Model;
-using System.Collections.ObjectModel;
 
 namespace Shadowsocks.ViewModel
 {

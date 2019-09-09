@@ -6,7 +6,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Shadowsocks.Model;
 
-namespace Shadowsocks.Controller
+namespace Shadowsocks.Controller.Service
 {
     class APIServer : Listener.Service
     {

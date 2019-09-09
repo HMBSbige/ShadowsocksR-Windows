@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json;
-using Shadowsocks.Controller;
-using Shadowsocks.Encryption;
-using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using Newtonsoft.Json;
+using Shadowsocks.Controller;
+using Shadowsocks.Encryption;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.Model
 {

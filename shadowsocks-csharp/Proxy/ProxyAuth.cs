@@ -1,22 +1,14 @@
-﻿using Shadowsocks.Controller;
-using Shadowsocks.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Shadowsocks.Controller;
+using Shadowsocks.Controller.Service;
+using Shadowsocks.Model;
 
 namespace Shadowsocks.Proxy
 {
-    public class ProtocolException : Exception
-    {
-        public ProtocolException(string info)
-            : base(info)
-        {
-
-        }
-    }
-
     class ProxyAuthHandler
     {
         private Configuration _config;
@@ -36,7 +28,7 @@ namespace Shadowsocks.Proxy
         public byte command;
         protected byte[] _remoteHeaderSendBuffer;
 
-        protected HttpPraser httpProxyState;
+        protected HttpParser httpProxyState;
 
         public ProxyAuthHandler(Configuration config, ServerTransferTotal transfer, IPRangeSet IPRange, byte[] firstPacket, int length, Socket socket)
         {
@@ -437,7 +429,7 @@ namespace Shadowsocks.Proxy
             command = 1; // Set TCP connect command
             if (httpProxyState == null)
             {
-                httpProxyState = new HttpPraser();
+                httpProxyState = new HttpParser();
             }
             if (Util.Utils.isMatchSubNet(((IPEndPoint)_connection.RemoteEndPoint).Address, "127.0.0.0/8"))
             {

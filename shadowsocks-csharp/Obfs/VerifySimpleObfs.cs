@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Shadowsocks.Controller;
 using Shadowsocks.Util;
 
 namespace Shadowsocks.Obfs

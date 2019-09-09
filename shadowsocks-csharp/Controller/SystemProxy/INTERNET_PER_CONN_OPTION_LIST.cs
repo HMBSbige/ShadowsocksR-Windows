@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Shadowsocks.Proxy.SystemProxy
+namespace Shadowsocks.Controller.SystemProxy
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
     internal struct INTERNET_PER_CONN_OPTION_LIST

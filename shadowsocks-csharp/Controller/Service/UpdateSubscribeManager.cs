@@ -1,8 +1,8 @@
-﻿using Shadowsocks.Model;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Shadowsocks.Model;
 
-namespace Shadowsocks.Controller
+namespace Shadowsocks.Controller.Service
 {
     public class UpdateSubscribeManager
     {

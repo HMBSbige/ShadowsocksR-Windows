@@ -1,163 +1,19 @@
-﻿using Shadowsocks.Controller;
-using Shadowsocks.Model;
-using Shadowsocks.Obfs;
-using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using Shadowsocks.Controller;
+using Shadowsocks.Controller.Service;
+using Shadowsocks.Model;
+using Shadowsocks.Obfs;
+using Shadowsocks.Util;
 using Timer = System.Timers.Timer;
 
 namespace Shadowsocks.Proxy
 {
-    class CallbackStatus
-    {
-        protected int status;
-
-        public CallbackStatus()
-        {
-            status = 0;
-        }
-
-        public void SetIfEqu(int newStatus, int oldStatus)
-        {
-            lock (this)
-            {
-                if (status == oldStatus)
-                {
-                    status = newStatus;
-                }
-            }
-        }
-
-        public int Status
-        {
-            get
-            {
-                lock (this)
-                {
-                    return status;
-                }
-            }
-            set
-            {
-                lock (this)
-                {
-                    status = value;
-                }
-            }
-        }
-    }
-
-    class Local : Listener.Service
-    {
-        private readonly Configuration _config;
-        private readonly ServerTransferTotal _transfer;
-        private readonly IPRangeSet _ipRange;
-
-        public Local(Configuration config, ServerTransferTotal transfer, IPRangeSet IPRange)
-        {
-            _config = config;
-            _transfer = transfer;
-            _ipRange = IPRange;
-        }
-
-        protected bool Accept(byte[] firstPacket, int length)
-        {
-            if (length < 2)
-            {
-                return false;
-            }
-            if (firstPacket[0] == 5 || firstPacket[0] == 4)
-            {
-                return true;
-            }
-            if (length > 8
-                && firstPacket[0] == 'C'
-                && firstPacket[1] == 'O'
-                && firstPacket[2] == 'N'
-                && firstPacket[3] == 'N'
-                && firstPacket[4] == 'E'
-                && firstPacket[5] == 'C'
-                && firstPacket[6] == 'T'
-                && firstPacket[7] == ' ')
-            {
-                return true;
-            }
-            return false;
-        }
-
-        public bool Handle(byte[] firstPacket, int length, Socket socket)
-        {
-            if (!_config.GetPortMapCache().ContainsKey(((IPEndPoint)socket.LocalEndPoint).Port) && !Accept(firstPacket, length))
-            {
-                return false;
-            }
-            Task.Run(() =>
-            {
-                var unused = new ProxyAuthHandler(_config, _transfer, _ipRange, firstPacket, length, socket);
-            });
-            return true;
-        }
-    }
-
-    class HandlerConfig : ICloneable
-    {
-        public string TargetHost;
-        public int TargetPort;
-
-        public double Ttl; // Second
-        public double ConnectTimeout;
-        public int TryKeepAlive;
-        public string LocalDnsServers;
-        public string DnsServers;
-        public bool ForceLocalDnsQuery;
-        // Server proxy
-        public int ProxyType;
-        public string Socks5RemoteHost;
-        public int Socks5RemotePort;
-        public string Socks5RemoteUsername;
-        public string Socks5RemotePassword;
-        public string ProxyUserAgent;
-        // auto ban
-        public bool AutoSwitchOff = true;
-        // Reconnect
-        public int ReconnectTimesRemain;
-        public int ReconnectTimes;
-        public bool Random;
-        public bool ForceRandom;
-
-        public object Clone()
-        {
-            var obj = new HandlerConfig
-            {
-                TargetHost = TargetHost,
-                TargetPort = TargetPort,
-                Ttl = Ttl,
-                ConnectTimeout = ConnectTimeout,
-                TryKeepAlive = TryKeepAlive,
-                LocalDnsServers = LocalDnsServers,
-                DnsServers = DnsServers,
-                ForceLocalDnsQuery = ForceLocalDnsQuery,
-                ProxyType = ProxyType,
-                Socks5RemoteHost = Socks5RemoteHost,
-                Socks5RemotePort = Socks5RemotePort,
-                Socks5RemoteUsername = Socks5RemoteUsername,
-                Socks5RemotePassword = Socks5RemotePassword,
-                ProxyUserAgent = ProxyUserAgent,
-                AutoSwitchOff = AutoSwitchOff,
-                ReconnectTimesRemain = ReconnectTimesRemain,
-                ReconnectTimes = ReconnectTimes,
-                Random = Random,
-                ForceRandom = ForceRandom
-            };
-            return obj;
-        }
-    }
-
     class Handler : IHandler
     {
         public delegate Server GetCurrentServer(int localPort, ServerSelectStrategy.FilterFunc filter, string targetURI = null, bool cfgRandom = false, bool usingRandom = false, bool forceRandom = false);
@@ -299,9 +155,9 @@ namespace Shadowsocks.Proxy
                     {
                         var s = server;
                         if (remote != null && cfg.ReconnectTimesRemain > 0
-                            //&& obfs != null && obfs.getSentLength() == 0
-                            && connectionSendBufferList != null
-                            && (State == ConnectState.CONNECTED || State == ConnectState.CONNECTING))
+                                           //&& obfs != null && obfs.getSentLength() == 0
+                                           && connectionSendBufferList != null
+                                           && (State == ConnectState.CONNECTED || State == ConnectState.CONNECTING))
                         {
                             if (lastErrCode == 0)
                             {
@@ -321,7 +177,7 @@ namespace Shadowsocks.Proxy
                         {
                             if (s != null
                                 && connectionSendBufferList != null
-                                )
+                            )
                             {
                                 if (lastErrCode == 0)
                                 {
@@ -562,7 +418,7 @@ namespace Shadowsocks.Proxy
                 || connectionUDP != null && server.UdpOverTcp)
             {
                 remote = new ProxyEncryptSocket(ipAddress.AddressFamily,
-                    SocketType.Stream, ProtocolType.Tcp);
+                        SocketType.Stream, ProtocolType.Tcp);
                 remote.GetSocket().NoDelay = true;
                 try
                 {
@@ -581,7 +437,7 @@ namespace Shadowsocks.Proxy
                 try
                 {
                     remoteUDP = new ProxyEncryptSocket(ipAddress.AddressFamily,
-                        SocketType.Dgram, ProtocolType.Udp);
+                            SocketType.Dgram, ProtocolType.Udp);
                     remoteUDP.GetSocket().Bind(new IPEndPoint(ipAddress.AddressFamily == AddressFamily.InterNetworkV6 ? IPAddress.IPv6Any : IPAddress.Any, 0));
 
                     remoteUDP.CreateEncryptor(server.Method, server.Password);
@@ -618,7 +474,7 @@ namespace Shadowsocks.Proxy
             {
                 speedTester.BeginConnect();
                 var result = remote.BeginConnect(remoteEP,
-                    ConnectCallback, new CallbackStatus());
+                        ConnectCallback, new CallbackStatus());
                 var t = cfg.ConnectTimeout <= 0 ? 30 : cfg.ConnectTimeout;
                 var success = result.AsyncWaitHandle.WaitOne((int)(t * 1000), true);
                 if (!success)
@@ -1033,7 +889,7 @@ namespace Shadowsocks.Proxy
                 var recv_size = remote == null ? RecvSize : remote.TcpMSS - remote.OverHead;
                 var buffer = new byte[recv_size];
                 connection.BeginReceive(buffer, recv_size, 0,
-                    PipeConnectionReceiveCallback, null);
+                        PipeConnectionReceiveCallback, null);
             }
         }
 
@@ -1058,7 +914,7 @@ namespace Shadowsocks.Proxy
                 EndPoint tempEP = sender;
                 var buffer = new byte[BufferSize];
                 connectionUDP.BeginReceiveFrom(buffer, 0, BufferSize, SocketFlags.None, ref tempEP,
-                    PipeConnectionUDPReceiveCallback, buffer);
+                        PipeConnectionUDPReceiveCallback, buffer);
             }
         }
 
@@ -1081,7 +937,7 @@ namespace Shadowsocks.Proxy
             {
                 remoteTCPIdle = false;
                 remote.BeginReceive(new byte[BufferSize], RecvSize, 0,
-                    PipeRemoteReceiveCallback, null);
+                        PipeRemoteReceiveCallback, null);
             }
         }
 
@@ -1115,7 +971,7 @@ namespace Shadowsocks.Proxy
                 var sender = new IPEndPoint(remoteUDP.AddressFamily == AddressFamily.InterNetworkV6 ? IPAddress.IPv6Any : IPAddress.Any, 0);
                 EndPoint tempEP = sender;
                 remoteUDP.BeginReceiveFrom(new byte[BufferSize], BufferSize, SocketFlags.None, ref tempEP,
-                    PipeRemoteUDPReceiveCallback, null);
+                        PipeRemoteUDPReceiveCallback, null);
             }
         }
 
@@ -1834,5 +1690,4 @@ namespace Shadowsocks.Proxy
             Close();
         }
     }
-
 }

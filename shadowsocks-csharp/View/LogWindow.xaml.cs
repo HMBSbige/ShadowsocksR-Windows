@@ -1,9 +1,9 @@
-﻿using Shadowsocks.Controller;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Shadowsocks.Controller;
 using WpfColorFontDialog;
 
 namespace Shadowsocks.View

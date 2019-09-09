@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
-using Shadowsocks.Controller;
+using Shadowsocks.Controller.Service;
 
 // 有关程序集的常规信息通过下列属性集
 // 控制。更改这些属性值可修改

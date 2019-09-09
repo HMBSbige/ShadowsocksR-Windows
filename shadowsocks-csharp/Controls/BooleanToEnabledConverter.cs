@@ -1,8 +1,8 @@
-﻿using Shadowsocks.Controller;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using Shadowsocks.Controller;
 
 namespace Shadowsocks.Controls
 {

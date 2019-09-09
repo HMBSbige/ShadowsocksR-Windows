@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
-using Shadowsocks.Util;
-using Shadowsocks.ViewModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using Shadowsocks.Util;
+using Shadowsocks.ViewModel;
 
 namespace Shadowsocks.Model
 {

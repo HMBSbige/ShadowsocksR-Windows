@@ -1,8 +1,8 @@
-﻿using Shadowsocks.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Shadowsocks.Model;
 
-namespace Shadowsocks.Controller
+namespace Shadowsocks.Controller.Service
 {
 
     class SpeedTester

@@ -4,9 +4,8 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
-using Shadowsocks.Controller;
 
-namespace Shadowsocks.Util
+namespace Shadowsocks.Controller
 {
     public static class FileManager
     {

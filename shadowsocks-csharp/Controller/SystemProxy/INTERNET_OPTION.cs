@@ -1,4 +1,4 @@
-﻿namespace Shadowsocks.Proxy.SystemProxy
+﻿namespace Shadowsocks.Controller.SystemProxy
 {
     internal enum INTERNET_OPTION
     {

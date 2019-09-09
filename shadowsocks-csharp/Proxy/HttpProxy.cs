@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Shadowsocks.Proxy
 {
-    class HttpPraser
+    class HttpParser
     {
         public bool httpProxy;
         public byte[] httpRequestBuffer;
@@ -18,7 +18,7 @@ namespace Shadowsocks.Proxy
         protected int httpPort;
         bool redir;
 
-        public HttpPraser(bool redir = false)
+        public HttpParser(bool redir = false)
         {
             this.redir = redir;
         }

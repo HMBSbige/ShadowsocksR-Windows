@@ -1,10 +1,5 @@
 ﻿namespace Shadowsocks.Proxy
 {
-    public abstract class IHandler
-    {
-        public abstract void Shutdown();
-    }
-
     public class CallbackState
     {
         public byte[] buffer;

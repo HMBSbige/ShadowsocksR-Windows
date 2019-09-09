@@ -1,8 +1,4 @@
-﻿using Shadowsocks.Model;
-using Shadowsocks.Proxy;
-using Shadowsocks.Proxy.SystemProxy;
-using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,6 +6,9 @@ using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using Shadowsocks.Controller.Service;
+using Shadowsocks.Model;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller
 {
@@ -334,7 +333,7 @@ namespace Shadowsocks.Controller
             privoxyRunner?.Stop();
             if (_config.sysProxyMode != ProxyMode.NoModify && _config.sysProxyMode != ProxyMode.Direct)
             {
-                SystemProxy.Update(_config, true, null);
+                SystemProxy.SystemProxy.Update(_config, true, null);
             }
             ServerTransferTotal.Save(_transfer);
         }
@@ -515,7 +514,7 @@ namespace Shadowsocks.Controller
         {
             if (_config.sysProxyMode != ProxyMode.NoModify)
             {
-                SystemProxy.Update(_config, false, _pacServer);
+                SystemProxy.SystemProxy.Update(_config, false, _pacServer);
             }
         }
 

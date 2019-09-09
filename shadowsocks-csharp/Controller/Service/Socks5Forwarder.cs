@@ -9,7 +9,7 @@ using Shadowsocks.Model;
 using Shadowsocks.Proxy;
 using Shadowsocks.Util;
 
-namespace Shadowsocks.Controller
+namespace Shadowsocks.Controller.Service
 {
     class Socks5Forwarder : Listener.Service
     {

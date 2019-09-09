@@ -6,7 +6,7 @@ using System.Text;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
 
-namespace Shadowsocks.Controller
+namespace Shadowsocks.Controller.Service
 {
     public class ChnDomainsAndIPUpdater
     {

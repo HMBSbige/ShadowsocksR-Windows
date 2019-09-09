@@ -1,10 +1,4 @@
-﻿using DnsClient;
-using DnsClient.Protocol;
-using Microsoft.Win32;
-using Shadowsocks.Controller;
-using Shadowsocks.Encryption;
-using Shadowsocks.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -16,6 +10,13 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
+using DnsClient;
+using DnsClient.Protocol;
+using Microsoft.Win32;
+using Shadowsocks.Controller;
+using Shadowsocks.Controller.Service;
+using Shadowsocks.Encryption;
+using Shadowsocks.Model;
 
 namespace Shadowsocks.Util
 {

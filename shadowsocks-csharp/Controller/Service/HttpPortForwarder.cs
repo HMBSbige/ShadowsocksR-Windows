@@ -5,7 +5,7 @@ using System.Threading;
 using Shadowsocks.Model;
 using Shadowsocks.Proxy;
 
-namespace Shadowsocks.Controller
+namespace Shadowsocks.Controller.Service
 {
     class HttpPortForwarder : Listener.Service
     {
@@ -33,7 +33,7 @@ namespace Shadowsocks.Controller
             private Socket _remote;
             private bool _closed;
             private Configuration _config;
-            HttpPraser httpProxyState;
+            HttpParser httpProxyState;
             public const int RecvSize = 4096;
             // remote receive buffer
             private byte[] remoteRecvBuffer = new byte[RecvSize];
@@ -60,7 +60,7 @@ namespace Shadowsocks.Controller
             {
                 if (httpProxyState == null)
                 {
-                    httpProxyState = new HttpPraser(true);
+                    httpProxyState = new HttpParser(true);
                 }
                 httpProxyState.httpAuthUser = _config.authUser;
                 httpProxyState.httpAuthPass = _config.authPass;

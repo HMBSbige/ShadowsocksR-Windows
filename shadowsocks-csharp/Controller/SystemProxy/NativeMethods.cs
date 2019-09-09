@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Shadowsocks.Proxy.SystemProxy
+namespace Shadowsocks.Controller.SystemProxy
 {
     internal static class NativeMethods
     {

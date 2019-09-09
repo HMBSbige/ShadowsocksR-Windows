@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace Shadowsocks.Proxy.SystemProxy
+namespace Shadowsocks.Controller.SystemProxy
 {
     internal sealed class SetSystemProxy : IDisposable
     {
@@ -11,8 +11,8 @@ namespace Shadowsocks.Proxy.SystemProxy
         {
             Direct = 1,
             Pac = 2,
-            Global = 3,
-        };
+            Global = 3
+        }
 
         private static readonly string[] LanIp =
         {
