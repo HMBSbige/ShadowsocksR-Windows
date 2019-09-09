@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Shadowsocks.Model;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Newtonsoft.Json;
-using Shadowsocks.Model;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -28,13 +28,12 @@ namespace Shadowsocks.Controller.Service
         {
             try
             {
-                string request = Encoding.UTF8.GetString(firstPacket, 0, length);
-                string[] lines = request.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                var request = Encoding.UTF8.GetString(firstPacket, 0, length);
+                var lines = request.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                 bool hostMatch = false, pathMatch = false;
-                string req = "";
-                foreach (string line in lines)
+                foreach (var line in lines)
                 {
-                    string[] kv = line.Split(new[] { ':' }, 2);
+                    var kv = line.Split(new[] { ':' }, 2);
                     if (kv.Length == 2)
                     {
                         if (kv[0] == "Host")
@@ -47,15 +46,13 @@ namespace Shadowsocks.Controller.Service
                     }
                     else if (kv.Length == 1)
                     {
-                        if (line.IndexOf("auth=" + _config.localAuthPassword) > 0)
+                        if (line.IndexOf("auth=" + _config.localAuthPassword, StringComparison.Ordinal) > 0)
                         {
-                            if (line.IndexOf(" /api?") > 0)
+                            if (line.IndexOf(" /api?", StringComparison.Ordinal) > 0)
                             {
-                                req = line.Substring(line.IndexOf("api?") + 4);
-                                if (line.IndexOf("GET ") == 0 || line.IndexOf("POST ") == 0)
+                                if (line.IndexOf("GET ", StringComparison.Ordinal) == 0 || line.IndexOf("POST ", StringComparison.Ordinal) == 0)
                                 {
                                     pathMatch = true;
-                                    req = req.Substring(0, req.IndexOf(" "));
                                 }
                             }
                         }
@@ -86,21 +83,21 @@ namespace Shadowsocks.Controller.Service
 
         private bool CheckEnd(string request)
         {
-            int newline_pos = request.IndexOf("\r\n\r\n");
+            var newline_pos = request.IndexOf("\r\n\r\n", StringComparison.Ordinal);
             if (request.StartsWith("POST "))
             {
                 if (newline_pos > 0)
                 {
-                    string head = request.Substring(0, newline_pos);
-                    string tail = request.Substring(newline_pos + 4);
-                    string[] lines = head.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string line in lines)
+                    var head = request.Substring(0, newline_pos);
+                    var tail = request.Substring(newline_pos + 4);
+                    var lines = head.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var line in lines)
                     {
                         if (line.StartsWith("Content-Length: "))
                         {
                             try
                             {
-                                int length = int.Parse(line.Substring("Content-Length: ".Length));
+                                var length = int.Parse(line.Substring("Content-Length: ".Length));
                                 if (length <= tail.Length)
                                     return true;
                             }
@@ -127,10 +124,10 @@ namespace Shadowsocks.Controller.Service
         {
             try
             {
-                int bytesRead = _local.EndReceive(ar);
+                var bytesRead = _local.EndReceive(ar);
                 if (bytesRead > 0)
                 {
-                    string request = Encoding.UTF8.GetString(connetionRecvBuffer, 0, bytesRead);
+                    var request = Encoding.UTF8.GetString(connetionRecvBuffer, 0, bytesRead);
                     connection_request += request;
                     if (CheckEnd(connection_request))
                     {
@@ -144,7 +141,7 @@ namespace Shadowsocks.Controller.Service
                 }
                 else
                 {
-                    Console.WriteLine("APIServer: failed to recv data in HttpHandshakeRecv");
+                    Console.WriteLine(@"APIServer: failed to recv data in HttpHandshakeRecv");
                     _local.Shutdown(SocketShutdown.Both);
                     _local.Close();
                 }
@@ -158,39 +155,41 @@ namespace Shadowsocks.Controller.Service
                     _local.Close();
                 }
                 catch
-                { }
+                {
+                    // ignored
+                }
             }
         }
 
         protected string process(string request)
         {
             string req;
-            req = request.Substring(0, request.IndexOf("\r\n"));
-            req = req.Substring(req.IndexOf("api?") + 4);
-            req = req.Substring(0, req.IndexOf(" "));
+            req = request.Substring(0, request.IndexOf("\r\n", StringComparison.Ordinal));
+            req = req.Substring(req.IndexOf("api?", StringComparison.Ordinal) + 4);
+            req = req.Substring(0, req.IndexOf(" ", StringComparison.Ordinal));
 
-            string[] get_params = req.Split('&');
-            Dictionary<string, string> params_dict = new Dictionary<string, string>();
-            foreach (string p in get_params)
+            var get_params = req.Split('&');
+            var params_dict = new Dictionary<string, string>();
+            foreach (var p in get_params)
             {
                 if (p.IndexOf('=') > 0)
                 {
-                    int index = p.IndexOf('=');
+                    var index = p.IndexOf('=');
                     string key, val;
                     key = p.Substring(0, index);
                     val = p.Substring(index + 1);
                     params_dict[key] = val;
                 }
             }
-            if (request.IndexOf("POST ") == 0)
+            if (request.IndexOf("POST ", StringComparison.Ordinal) == 0)
             {
-                string post_params = request.Substring(request.IndexOf("\r\n\r\n") + 4);
+                var post_params = request.Substring(request.IndexOf("\r\n\r\n", StringComparison.Ordinal) + 4);
                 get_params = post_params.Split('&');
-                foreach (string p in get_params)
+                foreach (var p in get_params)
                 {
                     if (p.IndexOf('=') > 0)
                     {
-                        int index = p.IndexOf('=');
+                        var index = p.IndexOf('=');
                         string key, val;
                         key = p.Substring(0, index);
                         val = p.Substring(index + 1);
@@ -205,24 +204,24 @@ namespace Shadowsocks.Controller.Service
                 {
                     if (params_dict["action"] == "statistics")
                     {
-                        Configuration config = _config;
-                        ServerSpeedLogShow[] _ServerSpeedLogList = new ServerSpeedLogShow[config.configs.Count];
-                        Dictionary<string, object> servers = new Dictionary<string, object>();
-                        for (int i = 0; i < config.configs.Count; ++i)
+                        var config = _config;
+                        var _ServerSpeedLogList = new ServerSpeedLogShow[config.configs.Count];
+                        var servers = new Dictionary<string, object>();
+                        for (var i = 0; i < config.configs.Count; ++i)
                         {
                             _ServerSpeedLogList[i] = config.configs[i].SpeedLog.Translate();
                             servers[config.configs[i].Id] = _ServerSpeedLogList[i];
                         }
-                        string content = JsonConvert.SerializeObject(servers, Formatting.Indented);
+                        var content = JsonConvert.SerializeObject(servers, Formatting.Indented);
 
-                        string text = string.Format(@"HTTP/1.1 200 OK
+                        var text = string.Format(@"HTTP/1.1 200 OK
 Server: ShadowsocksR
 Content-Type: text/plain
 Content-Length: {0}
 Connection: Close
 
 ", Encoding.UTF8.GetBytes(content).Length) + content;
-                        byte[] response = Encoding.UTF8.GetBytes(text);
+                        var response = Encoding.UTF8.GetBytes(text);
                         _local.BeginSend(response, 0, response.Length, 0, SendCallback, _local);
                         return "";
                     }
@@ -231,38 +230,38 @@ Connection: Close
                     {
                         if (params_dict.ContainsKey("config"))
                         {
-                            string content = "";
-                            string ret_code = "200 OK";
+                            var content = "";
+                            var ret_code = "200 OK";
                             if (!_controller.SaveServersConfig(params_dict["config"]))
                             {
                                 ret_code = "403 Forbid";
                             }
-                            string text = string.Format(@"HTTP/1.1 {0}
+                            var text = string.Format(@"HTTP/1.1 {0}
 Server: ShadowsocksR
 Content-Type: text/plain
 Content-Length: {1}
 Connection: Close
 
 ", ret_code, Encoding.UTF8.GetBytes(content).Length) + content;
-                            byte[] response = Encoding.UTF8.GetBytes(text);
+                            var response = Encoding.UTF8.GetBytes(text);
                             _local.BeginSend(response, 0, response.Length, 0, SendCallback, _local);
                             return "";
                         }
                         else
                         {
-                            Dictionary<string, string> token = _config.token;
+                            var token = _config.token;
                             _config.token = new Dictionary<string, string>();
-                            string content = JsonConvert.SerializeObject(_config, Formatting.Indented);
+                            var content = JsonConvert.SerializeObject(_config, Formatting.Indented);
                             _config.token = token;
 
-                            string text = string.Format(@"HTTP/1.1 200 OK
+                            var text = string.Format(@"HTTP/1.1 200 OK
 Server: ShadowsocksR
 Content-Type: text/plain
 Content-Length: {0}
 Connection: Close
 
 ", Encoding.UTF8.GetBytes(content).Length) + content;
-                            byte[] response = Encoding.UTF8.GetBytes(text);
+                            var response = Encoding.UTF8.GetBytes(text);
                             _local.BeginSend(response, 0, response.Length, 0, SendCallback, _local);
                             return "";
                         }
@@ -270,7 +269,7 @@ Connection: Close
                 }
             }
             {
-                byte[] response = Encoding.UTF8.GetBytes("");
+                var response = Encoding.UTF8.GetBytes("");
                 _local.BeginSend(response, 0, response.Length, 0, SendCallback, _local);
             }
             return "";
@@ -278,14 +277,16 @@ Connection: Close
 
         private void SendCallback(IAsyncResult ar)
         {
-            Socket conn = (Socket)ar.AsyncState;
+            var conn = (Socket)ar.AsyncState;
             try
             {
                 conn.Shutdown(SocketShutdown.Both);
                 conn.Close();
             }
             catch
-            { }
+            {
+                // ignored
+            }
         }
     }
 }

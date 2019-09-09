@@ -64,9 +64,9 @@ namespace Shadowsocks.Encryption.Stream
         {
             base.initCipher(iv, isCipher);
 
-            IntPtr cipherInfo = OpenSSL.GetCipherInfo(_innerLibName);
+            var cipherInfo = OpenSSL.GetCipherInfo(_innerLibName);
             if (cipherInfo == IntPtr.Zero) throw new Exception("openssl: cipher not found");
-            IntPtr ctx = OpenSSL.EVP_CIPHER_CTX_new();
+            var ctx = OpenSSL.EVP_CIPHER_CTX_new();
             if (ctx == IntPtr.Zero) throw new Exception("fail to create ctx");
 
             if (isCipher)
@@ -81,7 +81,7 @@ namespace Shadowsocks.Encryption.Stream
             byte[] realKey;
             if (_method.StartsWith(@"rc4-md5"))
             {
-                byte[] temp = new byte[keyLen + ivLen];
+                var temp = new byte[keyLen + ivLen];
                 Array.Copy(_key, 0, temp, 0, keyLen);
                 Array.Copy(iv, 0, temp, keyLen, ivLen);
                 realKey = MbedTLS.MD5(temp);

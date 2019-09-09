@@ -20,7 +20,7 @@ namespace Shadowsocks.Proxy
             {
                 if (local_sendback_protocol == "http")
                 {
-                    byte[] data = System.Text.Encoding.UTF8.GetBytes("HTTP/1.1 200 Connection Established\r\n\r\n");
+                    var data = System.Text.Encoding.UTF8.GetBytes("HTTP/1.1 200 Connection Established\r\n\r\n");
                     _socket.Send(data, data.Length, 0);
                 }
                 else if (local_sendback_protocol == "socks5")

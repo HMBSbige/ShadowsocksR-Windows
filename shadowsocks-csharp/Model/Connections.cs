@@ -48,7 +48,7 @@ namespace Shadowsocks.Model
                 s = new IHandler[sockets.Count];
                 sockets.Keys.CopyTo(s, 0);
             }
-            foreach (IHandler handler in s)
+            foreach (var handler in s)
             {
                 try
                 {

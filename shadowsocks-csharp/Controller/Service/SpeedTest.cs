@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Shadowsocks.Model;
+using System;
 using System.Collections.Generic;
-using Shadowsocks.Model;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -112,15 +112,15 @@ namespace Shadowsocks.Controller.Service
 
         public string TransferLog()
         {
-            string ret = "";
+            var ret = "";
 #if DEBUG
-            int lastdir = -1;
-            foreach (TransLog t in sizeTransfer)
+            var lastdir = -1;
+            foreach (var t in sizeTransfer)
             {
                 if (t.dir != lastdir)
                 {
                     lastdir = t.dir;
-                    ret += (t.dir == 0 ? " u" : " d");
+                    ret += t.dir == 0 ? " u" : " d";
                 }
                 ret += " " + t.size;
             }
@@ -162,16 +162,16 @@ namespace Shadowsocks.Controller.Service
 
             if (send_buffer.Length < 2) return;
 
-            int head_size = Obfs.ObfsBase.GetHeadSize(send_buffer, send_buffer.Length);
+            var head_size = Obfs.ObfsBase.GetHeadSize(send_buffer, send_buffer.Length);
             if (send_buffer.Length - head_size < 0) return;
-            byte[] data = new byte[send_buffer.Length - head_size];
+            var data = new byte[send_buffer.Length - head_size];
             Array.Copy(send_buffer, head_size, data, 0, data.Length);
 
             if (data.Length < 2) return;
 
             if (data.Length > 8)
             {
-                if (data[0] == 22 && data[1] == 3 && (data[2] >= 0 && data[2] <= 3))
+                if (data[0] == 22 && data[1] == 3 && data[2] <= 3)
                 {
                     protocol = Protocol.TLS;
                     return;

@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Shadowsocks.Model;
+using Shadowsocks.Proxy;
+using Shadowsocks.Util;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
-using Shadowsocks.Model;
-using Shadowsocks.Proxy;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -32,41 +32,41 @@ namespace Shadowsocks.Controller.Service
 
         public bool Handle(byte[] firstPacket, int length, Socket socket, string local_sendback_protocol)
         {
-            int handle = IsHandle(firstPacket, length, socket);
+            var handle = IsHandle(firstPacket, length);
             if (handle > 0)
             {
                 if (_config.proxyEnable)
                 {
-                    new Handler().Start(_config, _IPRange, firstPacket, length, socket, local_sendback_protocol, handle == 2);
+                    new Handler().Start(_config, firstPacket, socket, local_sendback_protocol, handle == 2);
                 }
                 else
                 {
-                    new Handler().Start(_config, _IPRange, firstPacket, length, socket, local_sendback_protocol, false);
+                    new Handler().Start(_config, firstPacket, socket, local_sendback_protocol, false);
                 }
                 return true;
             }
             return false;
         }
 
-        private int IsHandle(byte[] firstPacket, int length, Socket socket)
+        private int IsHandle(byte[] firstPacket, int length)
         {
             if (length >= 7 && _config.proxyRuleMode != ProxyRuleMode.Disable)
             {
                 IPAddress ipAddress = null;
                 if (firstPacket[0] == 1)
                 {
-                    byte[] addr = new byte[4];
+                    var addr = new byte[4];
                     Array.Copy(firstPacket, 1, addr, 0, addr.Length);
                     ipAddress = new IPAddress(addr);
                 }
                 else if (firstPacket[0] == 3)
                 {
                     int len = firstPacket[1];
-                    byte[] addr = new byte[len];
+                    var addr = new byte[len];
                     if (length >= len + 2)
                     {
                         Array.Copy(firstPacket, 2, addr, 0, addr.Length);
-                        string host = Encoding.UTF8.GetString(firstPacket, 2, len);
+                        var host = Encoding.UTF8.GetString(firstPacket, 2, len);
                         if (IPAddress.TryParse(host, out ipAddress))
                         {
                             //pass
@@ -79,12 +79,12 @@ namespace Shadowsocks.Controller.Service
                                 {
                                     if (_config.proxyRuleMode == ProxyRuleMode.UserCustom)
                                     {
-                                        HostMap hostMap = HostMap.Instance();
+                                        var hostMap = HostMap.Instance();
                                         if (hostMap.GetHost(host, out var host_addr))
                                         {
                                             if (!string.IsNullOrEmpty(host_addr))
                                             {
-                                                string lower_host_addr = host_addr.ToLower();
+                                                var lower_host_addr = host_addr.ToLower();
                                                 if (lower_host_addr.StartsWith("reject")
                                                     || lower_host_addr.StartsWith("direct")
                                                     )
@@ -142,7 +142,7 @@ namespace Shadowsocks.Controller.Service
                 }
                 else if (firstPacket[0] == 4)
                 {
-                    byte[] addr = new byte[16];
+                    var addr = new byte[16];
                     Array.Copy(firstPacket, 1, addr, 0, addr.Length);
                     ipAddress = new IPAddress(addr);
                 }
@@ -150,11 +150,10 @@ namespace Shadowsocks.Controller.Service
                 {
                     if (_config.proxyRuleMode == ProxyRuleMode.UserCustom)
                     {
-                        HostMap hostMap = HostMap.Instance();
-                        string host_addr;
-                        if (hostMap.GetIP(ipAddress, out host_addr))
+                        var hostMap = HostMap.Instance();
+                        if (hostMap.GetIP(ipAddress, out var host_addr))
                         {
-                            string lower_host_addr = host_addr.ToLower();
+                            var lower_host_addr = host_addr.ToLower();
                             if (lower_host_addr.StartsWith("reject")
                                 || lower_host_addr.StartsWith("direct")
                                 )
@@ -195,13 +194,11 @@ namespace Shadowsocks.Controller.Service
             return CONNECT_REMOTEPROXY;
         }
 
-        class Handler : IHandler
+        private class Handler : IHandler
         {
-            private IPRangeSet _IPRange;
             private Configuration _config;
 
             private byte[] _firstPacket;
-            private int _firstPacketLength;
             private ProxySocketTunLocal _local;
             private ProxySocketTun _remote;
 
@@ -222,13 +219,13 @@ namespace Shadowsocks.Controller.Service
             protected object timerLock = new object();
             protected DateTime lastTimerSetTime;
 
-            public void Start(Configuration config, IPRangeSet IPRange, byte[] firstPacket, int length, Socket socket, string local_sendback_protocol, bool proxy)
+            public void Start(Configuration config, byte[] firstPacket, Socket socket, string local_sendback_protocol, bool proxy)
             {
-                _IPRange = IPRange;
                 _firstPacket = firstPacket;
-                _firstPacketLength = length;
-                _local = new ProxySocketTunLocal(socket);
-                _local.local_sendback_protocol = local_sendback_protocol;
+                _local = new ProxySocketTunLocal(socket)
+                {
+                    local_sendback_protocol = local_sendback_protocol
+                };
                 _config = config;
                 _local_proxy = proxy;
                 Connect();
@@ -239,11 +236,11 @@ namespace Shadowsocks.Controller.Service
                 try
                 {
                     IPAddress ipAddress = null;
-                    int _targetPort = 0;
+                    var _targetPort = 0;
                     {
                         if (_firstPacket[0] == 1)
                         {
-                            byte[] addr = new byte[4];
+                            var addr = new byte[4];
                             Array.Copy(_firstPacket, 1, addr, 0, addr.Length);
                             ipAddress = new IPAddress(addr);
                             _targetPort = (_firstPacket[5] << 8) | _firstPacket[6];
@@ -252,7 +249,7 @@ namespace Shadowsocks.Controller.Service
                         }
                         else if (_firstPacket[0] == 4)
                         {
-                            byte[] addr = new byte[16];
+                            var addr = new byte[16];
                             Array.Copy(_firstPacket, 1, addr, 0, addr.Length);
                             ipAddress = new IPAddress(addr);
                             _targetPort = (_firstPacket[17] << 8) | _firstPacket[18];
@@ -262,7 +259,7 @@ namespace Shadowsocks.Controller.Service
                         else if (_firstPacket[0] == 3)
                         {
                             int len = _firstPacket[1];
-                            byte[] addr = new byte[len];
+                            var addr = new byte[len];
                             Array.Copy(_firstPacket, 2, addr, 0, addr.Length);
                             _remote_host = Encoding.UTF8.GetString(_firstPacket, 2, len);
                             _targetPort = (_firstPacket[len + 2] << 8) | _firstPacket[len + 3];
@@ -274,12 +271,12 @@ namespace Shadowsocks.Controller.Service
                                 {
                                     if (_config.proxyRuleMode == ProxyRuleMode.UserCustom)
                                     {
-                                        HostMap hostMap = HostMap.Instance();
+                                        var hostMap = HostMap.Instance();
                                         if (hostMap.GetHost(_remote_host, out var host_addr))
                                         {
                                             if (!string.IsNullOrEmpty(host_addr))
                                             {
-                                                string lower_host_addr = host_addr.ToLower();
+                                                var lower_host_addr = host_addr.ToLower();
                                                 if (lower_host_addr.StartsWith("reject"))
                                                 {
                                                     Close();
@@ -321,11 +318,10 @@ namespace Shadowsocks.Controller.Service
                     }
                     if (ipAddress != null && _config.proxyRuleMode == ProxyRuleMode.UserCustom)
                     {
-                        HostMap hostMap = HostMap.Instance();
-                        string host_addr;
-                        if (hostMap.GetIP(ipAddress, out host_addr))
+                        var hostMap = HostMap.Instance();
+                        if (hostMap.GetIP(ipAddress, out var host_addr))
                         {
-                            string lower_host_addr = host_addr.ToLower();
+                            var lower_host_addr = host_addr.ToLower();
                             if (lower_host_addr.StartsWith("reject")
                                 )
                             {
@@ -340,7 +336,7 @@ namespace Shadowsocks.Controller.Service
                         _targetPort = _config.proxyPort;
                     }
                     // ProxyAuth recv only socks5 head, so don't need to save anything else
-                    IPEndPoint remoteEP = new IPEndPoint(ipAddress, _targetPort);
+                    var remoteEP = new IPEndPoint(ipAddress ?? throw new InvalidOperationException(), _targetPort);
 
                     _remote = new ProxySocketTun(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                     _remote.GetSocket().NoDelay = true;
@@ -359,13 +355,13 @@ namespace Shadowsocks.Controller.Service
             {
                 if (_config.proxyType == 0)
                 {
-                    bool ret = _remote.ConnectSocks5ProxyServer(strRemoteHost, iRemotePort, false, _config.proxyAuthUser, _config.proxyAuthPass);
+                    var ret = _remote.ConnectSocks5ProxyServer(strRemoteHost, iRemotePort, false, _config.proxyAuthUser, _config.proxyAuthPass);
                     return ret;
                 }
 
                 if (_config.proxyType == 1)
                 {
-                    bool ret = _remote.ConnectHttpProxyServer(strRemoteHost, iRemotePort, _config.proxyAuthUser, _config.proxyAuthPass, _config.proxyUserAgent);
+                    var ret = _remote.ConnectHttpProxyServer(strRemoteHost, iRemotePort, _config.proxyAuthUser, _config.proxyAuthPass, _config.proxyUserAgent);
                     return ret;
                 }
 
@@ -420,7 +416,7 @@ namespace Shadowsocks.Controller.Service
                 }
                 else
                 {
-                    if (lastTimerSetTime != null && (DateTime.Now - lastTimerSetTime).TotalMilliseconds > 500)
+                    if ((DateTime.Now - lastTimerSetTime).TotalMilliseconds > 500)
                     {
                         lock (timerLock)
                         {
@@ -482,7 +478,7 @@ namespace Shadowsocks.Controller.Service
                 }
                 try
                 {
-                    int bytesRead = _remote.EndReceive(ar);
+                    var bytesRead = _remote.EndReceive(ar);
 
                     if (bytesRead > 0)
                     {
@@ -512,15 +508,15 @@ namespace Shadowsocks.Controller.Service
 
             private void PipeRemoteReceiveLoop()
             {
-                bool final_close = false;
-                byte[] recv_buffer = new byte[RecvSize];
-                DateTime beforeReceive = DateTime.Now;
+                var final_close = false;
+                var recv_buffer = new byte[RecvSize];
+                var beforeReceive = DateTime.Now;
                 while (!_closed)
                 {
                     try
                     {
-                        int bytesRead = _remote.Receive(recv_buffer, RecvSize, 0);
-                        DateTime now = DateTime.Now;
+                        var bytesRead = _remote.Receive(recv_buffer, RecvSize, 0);
+                        var now = DateTime.Now;
                         if (_remote != null && _remote.IsClose)
                         {
                             final_close = true;
@@ -570,7 +566,7 @@ namespace Shadowsocks.Controller.Service
                 }
                 try
                 {
-                    int bytesRead = _local.EndReceive(ar);
+                    var bytesRead = _local.EndReceive(ar);
 
                     if (bytesRead > 0)
                     {
@@ -598,17 +594,23 @@ namespace Shadowsocks.Controller.Service
                 {
                     if (sock != null)
                     {
-                        ProxySocketTun s = sock;
+                        var s = sock;
                         try
                         {
                             s.Shutdown(SocketShutdown.Both);
                         }
-                        catch { }
+                        catch
+                        {
+                            // ignored
+                        }
                         try
                         {
                             s.Close();
                         }
-                        catch { }
+                        catch
+                        {
+                            // ignored
+                        }
                     }
                 }
             }

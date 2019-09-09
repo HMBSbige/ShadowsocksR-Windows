@@ -1,15 +1,15 @@
-﻿using System;
+﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller.Service;
+using Shadowsocks.Model;
+using Shadowsocks.Obfs;
+using Shadowsocks.Util;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
-using Shadowsocks.Controller;
-using Shadowsocks.Controller.Service;
-using Shadowsocks.Model;
-using Shadowsocks.Obfs;
-using Shadowsocks.Util;
 using Timer = System.Timers.Timer;
 
 namespace Shadowsocks.Proxy
@@ -74,10 +74,7 @@ namespace Shadowsocks.Proxy
 
         private ConnectState State
         {
-            get
-            {
-                return state;
-            }
+            get => state;
             set
             {
                 lock (this)
@@ -113,7 +110,7 @@ namespace Shadowsocks.Proxy
             }
             else if (!closed)
             {
-                if (lastTimerSetTime != null && (DateTime.Now - lastTimerSetTime).TotalMilliseconds > 500)
+                if ((DateTime.Now - lastTimerSetTime).TotalMilliseconds > 500)
                 {
                     lock (timerLock)
                     {
@@ -348,9 +345,12 @@ namespace Shadowsocks.Proxy
                 handler.select_server = select_server;
                 handler.connection = connection;
                 handler.connectionUDP = connectionUDP;
-                handler.cfg = cfg.Clone() as HandlerConfig;
-                handler.cfg.ReconnectTimesRemain = cfg.ReconnectTimesRemain - 1;
-                handler.cfg.ReconnectTimes = cfg.ReconnectTimes + 1;
+                if (cfg.Clone() is HandlerConfig config)
+                {
+                    handler.cfg = config;
+                    handler.cfg.ReconnectTimesRemain = cfg.ReconnectTimesRemain - 1;
+                    handler.cfg.ReconnectTimes = cfg.ReconnectTimes + 1;
+                }
 
                 handler.speedTester.transfer = speedTester.transfer;
 
@@ -426,8 +426,9 @@ namespace Shadowsocks.Proxy
                 }
                 catch
                 {
-
+                    // ignored
                 }
+
                 remote.SetProtocol(ObfsFactory.GetObfs(server.Protocol));
                 remote.SetObfs(ObfsFactory.GetObfs(server.obfs));
             }
@@ -528,12 +529,19 @@ namespace Shadowsocks.Proxy
                     {
                         s.Shutdown(SocketShutdown.Both);
                     }
-                    catch { }
+                    catch
+                    {
+                        // ignored
+                    }
+
                     try
                     {
                         s.Close();
                     }
-                    catch { }
+                    catch
+                    {
+                        // ignored
+                    }
                 }
             }
         }
@@ -550,12 +558,19 @@ namespace Shadowsocks.Proxy
                     {
                         s.Shutdown(SocketShutdown.Both);
                     }
-                    catch { }
+                    catch
+                    {
+                        // ignored
+                    }
+
                     try
                     {
                         s.Close();
                     }
-                    catch { }
+                    catch
+                    {
+                        // ignored
+                    }
                 }
             }
         }
@@ -572,12 +587,19 @@ namespace Shadowsocks.Proxy
                     {
                         s.Shutdown(SocketShutdown.Both);
                     }
-                    catch { }
+                    catch
+                    {
+                        // ignored
+                    }
+
                     try
                     {
                         s.Close();
                     }
-                    catch { }
+                    catch
+                    {
+                        // ignored
+                    }
                 }
             }
         }
@@ -609,7 +631,7 @@ namespace Shadowsocks.Proxy
                 if (!local_error && speedTester.sizeProtocolRecv == 0 && speedTester.sizeUpload > 0)
                 {
                     if (is_protocol_sendback
-                        || (is_obfs_sendback && speedTester.sizeDownload == 0))
+                        || is_obfs_sendback && speedTester.sizeDownload == 0)
                     {
                         lastErrCode = 16;
                         server.SpeedLog.AddErrorDecodeTimes();
@@ -621,8 +643,8 @@ namespace Shadowsocks.Proxy
                     server.SpeedLog.AddNoErrorTimes();
             }
 
-            if (lastErrCode == 0 && server != null && cfg != null && keepCurrentServer != null)
-                keepCurrentServer(localPort, cfg.TargetHost, server.Id);
+            if (lastErrCode == 0 && server != null && cfg != null)
+                keepCurrentServer?.Invoke(localPort, cfg.TargetHost, server.Id);
 
             ResetTimeout(0);
             try
@@ -790,7 +812,7 @@ namespace Shadowsocks.Proxy
                     {
                         var dnsOk = false;
                         var buf = server.DnsBuffer();
-                        if (Monitor.TryEnter(buf, buf.ip != null ? 100 : 1000000))
+                        if (Monitor.TryEnter(buf, buf.Ip != null ? 100 : 1000000))
                         {
                             if (buf.isExpired(serverHost))
                             {
@@ -804,7 +826,7 @@ namespace Shadowsocks.Proxy
                             }
                             else
                             {
-                                ipAddress = buf.ip;
+                                ipAddress = buf.Ip;
                                 dnsOk = true;
                             }
 
@@ -812,18 +834,18 @@ namespace Shadowsocks.Proxy
                         }
                         else
                         {
-                            if (buf.ip != null)
+                            if (buf.Ip != null)
                             {
-                                ipAddress = buf.ip;
+                                ipAddress = buf.Ip;
                                 dnsOk = true;
                             }
                         }
 
                         if (!dnsOk)
                         {
-                            if (server.DnsBuffer().ip != null)
+                            if (server.DnsBuffer().Ip != null)
                             {
-                                ipAddress = server.DnsBuffer().ip;
+                                ipAddress = server.DnsBuffer().Ip;
                             }
                             else
                             {
@@ -836,7 +858,7 @@ namespace Shadowsocks.Proxy
                     }
                     else
                     {
-                        ipAddress = server.DnsBuffer().ip;
+                        ipAddress = server.DnsBuffer().Ip;
                     }
                 }
                 BeginConnect(ipAddress, serverPort);
@@ -909,11 +931,11 @@ namespace Shadowsocks.Proxy
             if (connectionUDP != null && connectionUDPIdle)
             {
                 connectionUDPIdle = false;
-                const int BufferSize = 65536;
+                const int bufferSize = 65536;
                 var sender = new IPEndPoint(connectionUDP.AddressFamily == AddressFamily.InterNetworkV6 ? IPAddress.IPv6Any : IPAddress.Any, 0);
                 EndPoint tempEP = sender;
-                var buffer = new byte[BufferSize];
-                connectionUDP.BeginReceiveFrom(buffer, 0, BufferSize, SocketFlags.None, ref tempEP,
+                var buffer = new byte[bufferSize];
+                connectionUDP.BeginReceiveFrom(buffer, 0, bufferSize, SocketFlags.None, ref tempEP,
                         PipeConnectionUDPReceiveCallback, buffer);
             }
         }
@@ -945,8 +967,7 @@ namespace Shadowsocks.Proxy
         {
             if (remote != null)
             {
-                bool sendback;
-                var bytesRead = remote.EndReceive(ar, out sendback);
+                var bytesRead = remote.EndReceive(ar, out var sendback);
 
                 var bytesRecv = remote.GetAsyncResultSize(ar);
                 server.SpeedLog.AddDownloadBytes(bytesRecv, DateTime.Now, speedTester.AddDownloadSize(bytesRecv));
@@ -967,10 +988,10 @@ namespace Shadowsocks.Proxy
             if (remoteUDP != null && remoteUDPIdle)
             {
                 remoteUDPIdle = false;
-                const int BufferSize = 65536;
+                const int bufferSize = 65536;
                 var sender = new IPEndPoint(remoteUDP.AddressFamily == AddressFamily.InterNetworkV6 ? IPAddress.IPv6Any : IPAddress.Any, 0);
-                EndPoint tempEP = sender;
-                remoteUDP.BeginReceiveFrom(new byte[BufferSize], BufferSize, SocketFlags.None, ref tempEP,
+                EndPoint tempEp = sender;
+                remoteUDP.BeginReceiveFrom(new byte[bufferSize], bufferSize, SocketFlags.None, ref tempEp,
                         PipeRemoteUDPReceiveCallback, null);
             }
         }
@@ -994,17 +1015,18 @@ namespace Shadowsocks.Proxy
 
         private void SetObfsPlugin()
         {
-            var head_len = 30;
+            int headLen;
             if (connectionSendBufferList != null && connectionSendBufferList.Count > 0)
             {
-                head_len = ObfsBase.GetHeadSize(connectionSendBufferList[0], 30);
+                headLen = ObfsBase.GetHeadSize(connectionSendBufferList[0], 30);
             }
             else
             {
-                head_len = ObfsBase.GetHeadSize(remoteHeaderSendBuffer, 30);
+                headLen = ObfsBase.GetHeadSize(remoteHeaderSendBuffer, 30);
             }
-            if (remote != null) remote.SetObfsPlugin(server, head_len);
-            if (remoteUDP != null) remoteUDP.SetObfsPlugin(server, head_len);
+
+            remote?.SetObfsPlugin(server, headLen);
+            remoteUDP?.SetObfsPlugin(server, headLen);
         }
 
         private string GetQueryString()
@@ -1215,12 +1237,10 @@ namespace Shadowsocks.Proxy
                 }
                 else
                 {
-                    var bytesRecv = remote.GetAsyncResultSize(ar);
+                    remote.GetAsyncResultSize(ar);
                     if (speedTester.BeginDownload())
                     {
-                        var pingTime = -1;
-                        if (speedTester.timeBeginDownload != null && speedTester.timeBeginUpload != null)
-                            pingTime = (int)(speedTester.timeBeginDownload - speedTester.timeBeginUpload).TotalMilliseconds;
+                        var pingTime = (int)(speedTester.timeBeginDownload - speedTester.timeBeginUpload).TotalMilliseconds;
                         if (pingTime >= 0)
                             server.SpeedLog.AddConnectTime(pingTime);
                     }
@@ -1290,10 +1310,7 @@ namespace Shadowsocks.Proxy
             {
                 try
                 {
-                    int protocolSize;
-                    bool sendback;
-                    int bytesRecv;
-                    var bytesRead = remote.Receive(recv_buffer, RecvSize, 0, out bytesRecv, out protocolSize, out sendback);
+                    var bytesRead = remote.Receive(recv_buffer, RecvSize, 0, out var bytesRecv, out var protocolSize, out var sendback);
                     var now = DateTime.Now;
                     if (remote != null && remote.IsClose)
                     {
@@ -1306,9 +1323,7 @@ namespace Shadowsocks.Proxy
                     }
                     if (speedTester.BeginDownload())
                     {
-                        var pingTime = -1;
-                        if (speedTester.timeBeginDownload != null && speedTester.timeBeginUpload != null)
-                            pingTime = (int)(speedTester.timeBeginDownload - speedTester.timeBeginUpload).TotalMilliseconds;
+                        var pingTime = (int)(speedTester.timeBeginDownload - speedTester.timeBeginUpload).TotalMilliseconds;
                         if (pingTime >= 0)
                             server.SpeedLog.AddConnectTime(pingTime);
                     }
@@ -1394,9 +1409,7 @@ namespace Shadowsocks.Proxy
                     var bytesRecv = remoteUDP.GetAsyncResultSize(ar);
                     if (speedTester.BeginDownload())
                     {
-                        var pingTime = -1;
-                        if (speedTester.timeBeginDownload != null && speedTester.timeBeginUpload != null)
-                            pingTime = (int)(speedTester.timeBeginDownload - speedTester.timeBeginUpload).TotalMilliseconds;
+                        var pingTime = (int)(speedTester.timeBeginDownload - speedTester.timeBeginUpload).TotalMilliseconds;
                         if (pingTime >= 0)
                             server.SpeedLog.AddConnectTime(pingTime);
                     }
@@ -1444,12 +1457,9 @@ namespace Shadowsocks.Proxy
                     ResetTimeout(cfg.ConnectTimeout <= 0 ? 30 : cfg.ConnectTimeout, false);
                 total_len += send_len;
 
-                if (lastKeepTime == null || (DateTime.Now - lastKeepTime).TotalSeconds > 5)
+                if ((DateTime.Now - lastKeepTime).TotalSeconds > 5)
                 {
-                    if (keepCurrentServer != null)
-                    {
-                        keepCurrentServer(localPort, cfg.TargetHost, server.Id);
-                    }
+                    keepCurrentServer?.Invoke(localPort, cfg.TargetHost, server.Id);
                     lastKeepTime = DateTime.Now;
                 }
 
@@ -1495,7 +1505,7 @@ namespace Shadowsocks.Proxy
                         return;
                     }
                     var connetionRecvBuffer = new byte[BufferSize];
-                    Array.Copy((ar.AsyncState as CallbackState).buffer, 0, connetionRecvBuffer, 0, bytesRead);
+                    Array.Copy(((CallbackState)ar.AsyncState).buffer, 0, connetionRecvBuffer, 0, bytesRead);
                     if (connectionSendBufferList != null)
                     {
                         detector.OnSend(connetionRecvBuffer, bytesRead);
@@ -1586,7 +1596,7 @@ namespace Shadowsocks.Proxy
                         if (connetionSendBuffer[0] == 0 && connetionSendBuffer[1] == 0)
                         {
                             connetionSendBuffer[0] = (byte)(bytesRead >> 8);
-                            connetionSendBuffer[1] = (byte)(bytesRead);
+                            connetionSendBuffer[1] = (byte)bytesRead;
                             RemoteSend(connetionSendBuffer, bytesRead);
                             doConnectionRecv();
                         }
@@ -1678,8 +1688,7 @@ namespace Shadowsocks.Proxy
         private void LogException(Exception e)
         {
             var err = LogSocketException(e);
-            string remarks;
-            var server_url = getServerUrl(out remarks);
+            var server_url = getServerUrl(out var remarks);
             if (err != 0 && !Logging.LogSocketException(remarks, server_url, e))
                 Logging.LogUsefulException(e);
         }

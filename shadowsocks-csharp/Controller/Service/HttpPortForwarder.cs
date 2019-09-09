@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Shadowsocks.Model;
+using Shadowsocks.Proxy;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using Shadowsocks.Model;
-using Shadowsocks.Proxy;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -64,8 +64,7 @@ namespace Shadowsocks.Controller.Service
                 }
                 httpProxyState.httpAuthUser = _config.authUser;
                 httpProxyState.httpAuthPass = _config.authPass;
-                byte[] remoteHeaderSendBuffer = null;
-                int err = httpProxyState.HandshakeReceive(_firstPacket, _firstPacketLength, ref remoteHeaderSendBuffer);
+                var err = httpProxyState.HandshakeReceive(_firstPacket, _firstPacketLength, out _);
                 if (err == 1)
                 {
                     _local.BeginReceive(connetionRecvBuffer, 0, _firstPacket.Length, 0,
@@ -73,8 +72,8 @@ namespace Shadowsocks.Controller.Service
                 }
                 else if (err == 2)
                 {
-                    string dataSend = httpProxyState.Http407();
-                    byte[] httpData = System.Text.Encoding.UTF8.GetBytes(dataSend);
+                    var dataSend = httpProxyState.Http407();
+                    var httpData = System.Text.Encoding.UTF8.GetBytes(dataSend);
                     _local.BeginSend(httpData, 0, httpData.Length, 0, HttpHandshakeAuthEndSend, null);
                 }
                 else if (err == 3)
@@ -87,14 +86,14 @@ namespace Shadowsocks.Controller.Service
                 }
                 else if (err == 0)
                 {
-                    string dataSend = httpProxyState.Http200();
-                    byte[] httpData = System.Text.Encoding.UTF8.GetBytes(dataSend);
+                    var dataSend = httpProxyState.Http200();
+                    var httpData = System.Text.Encoding.UTF8.GetBytes(dataSend);
                     _local.BeginSend(httpData, 0, httpData.Length, 0, StartConnect, null);
                 }
                 else if (err == 500)
                 {
-                    string dataSend = httpProxyState.Http500();
-                    byte[] httpData = System.Text.Encoding.UTF8.GetBytes(dataSend);
+                    var dataSend = httpProxyState.Http500();
+                    var httpData = System.Text.Encoding.UTF8.GetBytes(dataSend);
                     _local.BeginSend(httpData, 0, httpData.Length, 0, HttpHandshakeAuthEndSend, null);
                 }
             }
@@ -107,7 +106,7 @@ namespace Shadowsocks.Controller.Service
                 }
                 try
                 {
-                    int bytesRead = _local.EndReceive(ar);
+                    var bytesRead = _local.EndReceive(ar);
                     if (bytesRead > 0)
                     {
                         Array.Copy(connetionRecvBuffer, _firstPacket, bytesRead);
@@ -116,7 +115,7 @@ namespace Shadowsocks.Controller.Service
                     }
                     else
                     {
-                        Console.WriteLine("failed to recv data in HttpHandshakeRecv");
+                        Console.WriteLine(@"failed to recv data in HttpHandshakeRecv");
                         Close();
                     }
                 }
@@ -165,13 +164,13 @@ namespace Shadowsocks.Controller.Service
             {
                 try
                 {
-                    IPAddress ipAddress;
-                    bool parsed = IPAddress.TryParse("127.0.0.1", out ipAddress);
-                    IPEndPoint remoteEP = new IPEndPoint(ipAddress, _targetPort);
+                    var ipAddress = IPAddress.Loopback;
+                    var remoteEP = new IPEndPoint(ipAddress, _targetPort);
 
-                    _remote = new Socket(ipAddress.AddressFamily,
-                        SocketType.Stream, ProtocolType.Tcp);
-                    _remote.NoDelay = true;
+                    _remote = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp)
+                    {
+                        NoDelay = true
+                    };
 
                     // Connect to the remote endpoint.
                     _remote.BeginConnect(remoteEP,
@@ -249,7 +248,7 @@ namespace Shadowsocks.Controller.Service
                 }
                 try
                 {
-                    int bytesRead = _remote.EndReceive(ar);
+                    var bytesRead = _remote.EndReceive(ar);
 
                     if (bytesRead > 0)
                     {
@@ -275,7 +274,7 @@ namespace Shadowsocks.Controller.Service
                 }
                 try
                 {
-                    int bytesRead = _local.EndReceive(ar);
+                    var bytesRead = _local.EndReceive(ar);
 
                     if (bytesRead > 0)
                     {

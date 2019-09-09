@@ -31,8 +31,8 @@
         }
         public static ulong CalcCRC32(byte[] input, int index, int len, ulong value = 0xffffffff)
         {
-            byte[] buffer = input;
-            for (int i = index; i < len; i++)
+            var buffer = input;
+            for (var i = index; i < len; i++)
             {
                 value = (value >> 8) ^ Crc32Table[(value & 0xFF) ^ buffer[i]];
             }
@@ -50,16 +50,16 @@
         }
         public static void SetCRC32(byte[] buffer, int index, int length)
         {
-            ulong crc = ~CalcCRC32(buffer, index, length - 4);
+            var crc = ~CalcCRC32(buffer, index, length - 4);
             buffer[length - 1] = (byte)(crc >> 24);
             buffer[length - 2] = (byte)(crc >> 16);
             buffer[length - 3] = (byte)(crc >> 8);
-            buffer[length - 4] = (byte)(crc);
+            buffer[length - 4] = (byte)crc;
         }
 
         public static bool CheckCRC32(byte[] buffer, int length)
         {
-            ulong crc = CalcCRC32(buffer, length);
+            var crc = CalcCRC32(buffer, length);
             if (crc != 0xffffffffu)
                 return false;
             return true;
@@ -71,7 +71,7 @@
         {
             ulong a = 1;
             ulong b = 0;
-            for (int i = 0; i < len; i++)
+            for (var i = 0; i < len; i++)
             {
                 a += input[i];
                 b += a;
@@ -83,15 +83,15 @@
 
         public static bool CheckAdler32(byte[] input, int len)
         {
-            ulong adler32 = CalcAdler32(input, len - 4);
-            int checksum = (input[len - 1] << 24) | (input[len - 2] << 16) | (input[len - 3] << 8) | input[len - 4];
+            var adler32 = CalcAdler32(input, len - 4);
+            var checksum = (input[len - 1] << 24) | (input[len - 2] << 16) | (input[len - 3] << 8) | input[len - 4];
             return (int)adler32 == checksum;
         }
 
         public static bool CheckAdler32(byte[] input, int len, uint xor)
         {
-            ulong adler32 = CalcAdler32(input, len - 4) ^ xor;
-            int checksum = (input[len - 1] << 24) | (input[len - 2] << 16) | (input[len - 3] << 8) | input[len - 4];
+            var adler32 = CalcAdler32(input, len - 4) ^ xor;
+            var checksum = (input[len - 1] << 24) | (input[len - 2] << 16) | (input[len - 3] << 8) | input[len - 4];
             return (int)adler32 == checksum;
         }
     }

@@ -180,7 +180,7 @@ namespace Shadowsocks.Util
                     return false;
             }
 
-            if ((addr[index] >> (i - netmask)) != (net_addr[index] >> (i - netmask)))
+            if (addr[index] >> (i - netmask) != net_addr[index] >> (i - netmask))
                 return false;
             return true;
         }
@@ -318,9 +318,9 @@ namespace Shadowsocks.Util
                     var val = 0;
                     var c1 = s[0];
                     var c2 = s[1];
-                    val += (c1 < 'a') ? c1 - '0' : 10 + (c1 - 'a');
+                    val += c1 < 'a' ? c1 - '0' : 10 + (c1 - 'a');
                     val *= 16;
-                    val += (c2 < 'a') ? c2 - '0' : 10 + (c2 - 'a');
+                    val += c2 < 'a' ? c2 - '0' : 10 + (c2 - 'a');
 
                     ret += (char)val;
                     i += 2;

@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Shadowsocks.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Timers;
-using Shadowsocks.Model;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -19,7 +19,6 @@ namespace Shadowsocks.Controller.Service
         private Configuration _config;
         private bool _shareOverLAN;
         private string _authUser;
-        private string _authPass;
         private Socket _socket;
         private Socket _socket_v6;
         private bool _stop;
@@ -58,7 +57,6 @@ namespace Shadowsocks.Controller.Service
             _config = config;
             _shareOverLAN = config.shareOverLan;
             _authUser = config.authUser;
-            _authPass = config.authPass;
             _stop = false;
 
             var localPort = port == 0 ? _config.localPort : port;
