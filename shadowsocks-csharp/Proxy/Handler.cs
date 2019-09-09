@@ -14,7 +14,7 @@ using Timer = System.Timers.Timer;
 
 namespace Shadowsocks.Proxy
 {
-    class Handler : IHandler
+    internal class Handler : IHandler
     {
         public delegate Server GetCurrentServer(int localPort, ServerSelectStrategy.FilterFunc filter, string targetURI = null, bool cfgRandom = false, bool usingRandom = false, bool forceRandom = false);
         public delegate void KeepCurrentServer(int localPort, string targetURI, string id);

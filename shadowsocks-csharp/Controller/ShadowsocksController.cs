@@ -440,7 +440,7 @@ namespace Shadowsocks.Controller
                 privoxyRunner.Start(_config);
 
                 var local = new Local(_config, _transfer, _rangeSet);
-                var services = new List<Listener.Service>
+                var services = new List<Listener.IService>
                 {
                     local,
                     _pacServer,
@@ -478,7 +478,7 @@ namespace Shadowsocks.Controller
                 try
                 {
                     var local = new Local(_config, _transfer, _rangeSet);
-                    var services = new List<Listener.Service> { local };
+                    var services = new List<Listener.IService> { local };
                     var listener = new Listener(services);
                     listener.Start(_config, pair.Key);
                     _port_map_listener.Add(listener);
