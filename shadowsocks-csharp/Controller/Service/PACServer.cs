@@ -31,7 +31,7 @@ namespace Shadowsocks.Controller.Service
             PacUrl = $@"http://127.0.0.1:{config.localPort}/pac?auth={config.localAuthPassword}&t={Utils.GetTimestamp(DateTime.Now)}";
         }
 
-        public bool Handle(byte[] firstPacket, int length, Socket socket)
+        public override bool Handle(byte[] firstPacket, int length, Socket socket)
         {
             if (socket.ProtocolType != ProtocolType.Tcp)
             {

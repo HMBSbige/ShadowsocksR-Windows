@@ -168,7 +168,7 @@ namespace Shadowsocks.Util
             return -1;
         }
 
-        public static bool isMatchSubNet(IPAddress ip, IPAddress net, int netmask)
+        public static bool IsMatchSubNet(IPAddress ip, IPAddress net, int netmask)
         {
             var addr = ip.GetAddressBytes();
             var net_addr = net.GetAddressBytes();
@@ -184,7 +184,7 @@ namespace Shadowsocks.Util
             return true;
         }
 
-        public static bool isMatchSubNet(IPAddress ip, string netmask)
+        public static bool IsMatchSubNet(IPAddress ip, string netmask)
         {
             var mask = netmask.Split('/');
             var netmask_ip = IPAddress.Parse(mask[0]);
@@ -192,7 +192,7 @@ namespace Shadowsocks.Util
             {
                 try
                 {
-                    return isMatchSubNet(ip, netmask_ip, Convert.ToInt16(mask[1]));
+                    return IsMatchSubNet(ip, netmask_ip, Convert.ToInt16(mask[1]));
                 }
                 catch
                 {
@@ -215,7 +215,7 @@ namespace Shadowsocks.Util
                 };
                 foreach (var netmask in netmasks)
                 {
-                    if (isMatchSubNet(ip, netmask))
+                    if (IsMatchSubNet(ip, netmask))
                         return true;
                 }
 
@@ -230,7 +230,7 @@ namespace Shadowsocks.Util
                 };
                 foreach (var netmask in netmasks)
                 {
-                    if (isMatchSubNet(ip, netmask))
+                    if (IsMatchSubNet(ip, netmask))
                         return true;
                 }
 
@@ -269,7 +269,7 @@ namespace Shadowsocks.Util
                 };
                 foreach (var netmask in netmasks)
                 {
-                    if (isMatchSubNet(ip, netmask))
+                    if (IsMatchSubNet(ip, netmask))
                         return true;
                 }
 
@@ -286,7 +286,7 @@ namespace Shadowsocks.Util
                 };
                 foreach (var netmask in netmasks)
                 {
-                    if (isMatchSubNet(ip, netmask))
+                    if (IsMatchSubNet(ip, netmask))
                         return true;
                 }
 

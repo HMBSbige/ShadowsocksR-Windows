@@ -44,7 +44,7 @@ namespace Shadowsocks.Controller.Service
             return false;
         }
 
-        public bool Handle(byte[] firstPacket, int length, Socket socket)
+        public override bool Handle(byte[] firstPacket, int length, Socket socket)
         {
             if (!_config.GetPortMapCache().ContainsKey(((IPEndPoint)socket.LocalEndPoint).Port) && !Accept(firstPacket, length))
             {

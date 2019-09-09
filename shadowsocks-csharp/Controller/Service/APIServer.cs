@@ -24,7 +24,7 @@ namespace Shadowsocks.Controller.Service
             _config = config;
         }
 
-        public bool Handle(byte[] firstPacket, int length, Socket socket)
+        public override bool Handle(byte[] firstPacket, int length, Socket socket)
         {
             try
             {

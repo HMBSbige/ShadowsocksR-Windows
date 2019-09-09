@@ -25,7 +25,7 @@ namespace Shadowsocks.Controller.Service
             _IPRange = IPRange;
         }
 
-        public bool Handle(byte[] firstPacket, int length, Socket socket)
+        public override bool Handle(byte[] firstPacket, int length, Socket socket)
         {
             return Handle(firstPacket, length, socket, null);
         }

@@ -11,16 +11,25 @@ namespace Shadowsocks.Controller.Service
 {
     public class Listener
     {
-        public interface Service
+        public interface IService
         {
             bool Handle(byte[] firstPacket, int length, Socket socket);
+
+            void Stop();
+        }
+
+        public abstract class Service : IService
+        {
+            public abstract bool Handle(byte[] firstPacket, int length, Socket socket);
+
+            public virtual void Stop() { }
         }
 
         private Configuration _config;
         private bool _shareOverLAN;
         private string _authUser;
         private Socket _socket;
-        private Socket _socket_v6;
+        private Socket _socketV6;
         private bool _stop;
         private readonly IList<Service> _services;
         protected Timer timer;
@@ -70,12 +79,12 @@ namespace Shadowsocks.Controller.Service
                 _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                 try
                 {
-                    _socket_v6 = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
-                    _socket_v6.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                    _socketV6 = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
+                    _socketV6.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
                 }
                 catch
                 {
-                    _socket_v6 = null;
+                    _socketV6 = null;
                 }
 
                 var localEndPoint = new IPEndPoint(IPAddress.Any, localPort);
@@ -84,16 +93,16 @@ namespace Shadowsocks.Controller.Service
                 // Bind the socket to the local endpoint and listen for incoming connections.
                 _socket.Bind(localEndPoint);
                 _socket.Listen(1024);
-                if (_socket_v6 != null)
+                if (_socketV6 != null)
                 {
-                    _socket_v6.Bind(localEndPointV6);
-                    _socket_v6.Listen(1024);
+                    _socketV6.Bind(localEndPointV6);
+                    _socketV6.Listen(1024);
                 }
 
                 // Start an asynchronous socket to listen for connections.
                 Console.WriteLine($@"ShadowsocksR started on port {localPort}");
                 _socket.BeginAccept(AcceptCallback, _socket);
-                _socket_v6?.BeginAccept(AcceptCallback, _socket_v6);
+                _socketV6?.BeginAccept(AcceptCallback, _socketV6);
             }
             catch (SocketException e)
             {
@@ -103,10 +112,10 @@ namespace Shadowsocks.Controller.Service
                     _socket.Close();
                     _socket = null;
                 }
-                if (_socket_v6 != null)
+                if (_socketV6 != null)
                 {
-                    _socket_v6.Close();
-                    _socket_v6 = null;
+                    _socketV6.Close();
+                    _socketV6 = null;
                 }
                 throw;
             }
@@ -121,10 +130,10 @@ namespace Shadowsocks.Controller.Service
                 _socket.Close();
                 _socket = null;
             }
-            if (_socket_v6 != null)
+            if (_socketV6 != null)
             {
-                _socket_v6.Close();
-                _socket_v6 = null;
+                _socketV6.Close();
+                _socketV6 = null;
             }
         }
 
