@@ -1,6 +1,8 @@
 ﻿using Shadowsocks.Model;
 using System;
+#if DEBUG
 using System.Collections.Generic;
+#endif
 
 namespace Shadowsocks.Controller.Service
 {
@@ -22,7 +24,9 @@ namespace Shadowsocks.Controller.Service
         public long sizeDownload;
         public long sizeProtocolRecv;
         public long sizeRecv;
+#if DEBUG
         private List<TransLog> sizeTransfer = new List<TransLog>();
+#endif
         public string server;
         public ServerTransferTotal transfer;
         public int upload_cnt;
