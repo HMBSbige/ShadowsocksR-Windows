@@ -1,13 +1,13 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Shadowsocks.Model;
+using Shadowsocks.Properties;
+using Shadowsocks.Util;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using Newtonsoft.Json;
-using Shadowsocks.Model;
-using Shadowsocks.Properties;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -51,27 +51,27 @@ namespace Shadowsocks.Controller.Service
         public static bool MergeAndWritePACFile(string gfwListResult)
         {
             var abpContent = MergePACFile(gfwListResult);
-            if (File.Exists(PACServer.PAC_FILE))
+            if (File.Exists(PACDaemon.PAC_FILE))
             {
-                var original = FileManager.NonExclusiveReadAllText(PACServer.PAC_FILE, Encoding.UTF8);
+                var original = FileManager.NonExclusiveReadAllText(PACDaemon.PAC_FILE, Encoding.UTF8);
                 if (original == abpContent)
                 {
                     return false;
                 }
             }
 
-            File.WriteAllText(PACServer.PAC_FILE, abpContent, Encoding.UTF8);
+            File.WriteAllText(PACDaemon.PAC_FILE, abpContent, Encoding.UTF8);
             return true;
         }
 
         private static string MergePACFile(string gfwListResult)
         {
-            var abpContent = File.Exists(PACServer.USER_ABP_FILE) ? FileManager.NonExclusiveReadAllText(PACServer.USER_ABP_FILE, Encoding.UTF8) : Utils.UnGzip(Resources.abp_js);
+            var abpContent = File.Exists(PACDaemon.USER_ABP_FILE) ? FileManager.NonExclusiveReadAllText(PACDaemon.USER_ABP_FILE, Encoding.UTF8) : Resources.abp;
 
             var userRuleLines = new List<string>();
-            if (File.Exists(PACServer.USER_RULE_FILE))
+            if (File.Exists(PACDaemon.USER_RULE_FILE))
             {
-                var userRulesString = FileManager.NonExclusiveReadAllText(PACServer.USER_RULE_FILE, Encoding.UTF8);
+                var userRulesString = FileManager.NonExclusiveReadAllText(PACDaemon.USER_RULE_FILE, Encoding.UTF8);
                 userRuleLines = ParseToValidList(userRulesString);
             }
 
@@ -105,9 +105,9 @@ namespace Shadowsocks.Controller.Service
             try
             {
                 var content = e.Result;
-                if (File.Exists(PACServer.PAC_FILE))
+                if (File.Exists(PACDaemon.PAC_FILE))
                 {
-                    var original = File.ReadAllText(PACServer.PAC_FILE, Encoding.UTF8);
+                    var original = File.ReadAllText(PACDaemon.PAC_FILE, Encoding.UTF8);
                     if (original == content)
                     {
                         UpdateType = 1;
@@ -116,7 +116,7 @@ namespace Shadowsocks.Controller.Service
                     }
                 }
 
-                File.WriteAllText(PACServer.PAC_FILE, content, Encoding.UTF8);
+                File.WriteAllText(PACDaemon.PAC_FILE, content, Encoding.UTF8);
                 if (UpdateCompleted != null)
                 {
                     UpdateType = 1;

@@ -1,12 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using Shadowsocks.Model;
+using Shadowsocks.Util;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
-using Shadowsocks.Model;
-using Shadowsocks.Properties;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -14,32 +11,21 @@ namespace Shadowsocks.Controller.Service
     {
         public static string gfwlist_FILE = @"gfwlist.txt";
 
-        public static string PAC_FILE = @"pac.txt";
-
-        public static string USER_RULE_FILE = @"user-rule.txt";
-
-        public static string USER_ABP_FILE = @"abp.txt";
-
         public static string WHITELIST_FILE = @"whitelist.txt";
 
         public static string USER_WHITELIST_TEMPLATE_FILE = @"user_whitelist_temp.txt";
 
-        public string PacUrl { get; private set; } = "";
+        public string PacUrl { get; private set; } = string.Empty;
 
-        FileSystemWatcher PACFileWatcher;
-        FileSystemWatcher UserRuleFileWatcher;
         private Configuration _config;
+        private readonly PACDaemon _pacDaemon;
 
-        public event EventHandler PACFileChanged;
-        public event EventHandler UserRuleFileChanged;
-
-        public PACServer()
+        public PACServer(PACDaemon pacDaemon)
         {
-            WatchPacFile();
-            WatchUserRuleFile();
+            _pacDaemon = pacDaemon;
         }
 
-        public void UpdateConfiguration(Configuration config)
+        public void UpdatePacUrl(Configuration config)
         {
             _config = config;
             PacUrl = $@"http://127.0.0.1:{config.localPort}/pac?auth={config.localAuthPassword}&t={Utils.GetTimestamp(DateTime.Now)}";
@@ -130,43 +116,11 @@ namespace Shadowsocks.Controller.Service
             }
         }
 
-        public static string TouchPACFile()
-        {
-            if (File.Exists(PAC_FILE))
-            {
-                return PAC_FILE;
-            }
-
-            FileManager.DecompressFile(PAC_FILE, Resources.proxy_pac_txt);
-            return PAC_FILE;
-        }
-
-        public static string TouchUserRuleFile()
-        {
-            if (File.Exists(USER_RULE_FILE))
-            {
-                return USER_RULE_FILE;
-            }
-
-            File.WriteAllText(USER_RULE_FILE, Resources.user_rule);
-            return USER_RULE_FILE;
-        }
-
-        private string GetPACContent()
-        {
-            if (File.Exists(PAC_FILE))
-            {
-                return File.ReadAllText(PAC_FILE, Encoding.UTF8);
-            }
-
-            return Utils.UnGzip(Resources.proxy_pac_txt);
-        }
-
         public void SendResponse(Socket socket, int socksType, string setProxy)
         {
             try
             {
-                var pac = GetPACContent();
+                var pac = _pacDaemon.GetPACContent();
 
                 var localEndPoint = (IPEndPoint)socket.LocalEndPoint;
 
@@ -226,72 +180,6 @@ Connection: Close
                 // ignored
             }
         }
-
-        private void WatchPacFile()
-        {
-            PACFileWatcher?.Dispose();
-            PACFileWatcher = new FileSystemWatcher(Directory.GetCurrentDirectory())
-            {
-                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName,
-                Filter = PAC_FILE
-            };
-            PACFileWatcher.Changed += PACFileWatcher_Changed;
-            PACFileWatcher.Created += PACFileWatcher_Changed;
-            PACFileWatcher.Deleted += PACFileWatcher_Changed;
-            PACFileWatcher.Renamed += PACFileWatcher_Changed;
-            PACFileWatcher.EnableRaisingEvents = true;
-        }
-
-        private void WatchUserRuleFile()
-        {
-            UserRuleFileWatcher?.Dispose();
-            UserRuleFileWatcher = new FileSystemWatcher(Directory.GetCurrentDirectory())
-            {
-                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName,
-                Filter = USER_RULE_FILE
-            };
-            UserRuleFileWatcher.Changed += UserRuleFileWatcher_Changed;
-            UserRuleFileWatcher.Created += UserRuleFileWatcher_Changed;
-            UserRuleFileWatcher.Deleted += UserRuleFileWatcher_Changed;
-            UserRuleFileWatcher.Renamed += UserRuleFileWatcher_Changed;
-            UserRuleFileWatcher.EnableRaisingEvents = true;
-        }
-
-        #region FileSystemWatcher.OnChanged()
-        // FileSystemWatcher Changed event is raised twice
-        // http://stackoverflow.com/questions/1764809/filesystemwatcher-changed-event-is-raised-twice
-        // Add a short delay to avoid raise event twice in a short period
-        private void PACFileWatcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            if (PACFileChanged != null)
-            {
-                Logging.Info($@"Detected: PAC file '{e.Name}' was {e.ChangeType.ToString().ToLower()}.");
-                Task.Run(() =>
-                {
-                    ((FileSystemWatcher)sender).EnableRaisingEvents = false;
-                    Task.Delay(10).Wait();
-                    PACFileChanged(this, new EventArgs());
-                    ((FileSystemWatcher)sender).EnableRaisingEvents = true;
-                });
-            }
-        }
-
-        private void UserRuleFileWatcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            if (UserRuleFileChanged != null)
-            {
-                Logging.Info($@"Detected: User Rule file '{e.Name}' was {e.ChangeType.ToString().ToLower()}.");
-                Task.Run(() =>
-                {
-                    ((FileSystemWatcher)sender).EnableRaisingEvents = false;
-                    Task.Delay(10).Wait();
-                    UserRuleFileChanged(this, new EventArgs());
-                    ((FileSystemWatcher)sender).EnableRaisingEvents = true;
-                });
-            }
-        }
-
-        #endregion
 
         private string GetPACAddress(IPEndPoint localEndPoint, int socksType)
         {

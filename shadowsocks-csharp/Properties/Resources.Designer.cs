@@ -61,12 +61,26 @@ namespace Shadowsocks.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
+        ///   查找类似 var direct = &quot;__DIRECT__&quot;;
+        ///if (direct == &quot;__DIR&quot; + &quot;ECT__&quot;) direct = &quot;DIRECT;&quot;;
+        ///
+        ///var wall_proxy = function(){ return &quot;__PROXY__&quot;; };
+        ///var wall_v6_proxy = function(){ return &quot;__PROXY__&quot;; };
+        ///
+        ///var nowall_proxy = function(){ return direct; };
+        ///var ip_proxy = function(){ return nowall_proxy(); };
+        ///var ipv6_proxy = function(){ return nowall_proxy(); };
+        ///
+        ///var userrules = __USERRULES__;
+        ///var rules = __RULES__;
+        ///
+        ////*
+        ///* This file is part of Adblock Plus &lt;http://adblockplus.org/&gt;,
+        ///* Copyright (C) 2006-2014 Eye [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
-        internal static byte[] abp_js {
+        internal static string abp {
             get {
-                object obj = ResourceManager.GetObject("abp_js", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("abp", resourceCulture);
             }
         }
         
@@ -151,12 +165,28 @@ namespace Shadowsocks.Properties {
         }
         
         /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
+        ///   查找类似 var direct = &quot;__DIRECT__&quot;;
+        ///if (direct == &quot;__DIR&quot; + &quot;ECT__&quot;) direct = &quot;DIRECT;&quot;;
+        ///
+        ///var wall_proxy = function(){ return &quot;__PROXY__&quot;; };
+        ///var wall_v6_proxy = function(){ return &quot;__PROXY__&quot;; };
+        ///
+        ///var nowall_proxy = function(){ return direct; };
+        ///var ip_proxy = function(){ return nowall_proxy(); };
+        ///var ipv6_proxy = function(){ return nowall_proxy(); };
+        ///
+        ///var userrules = [];
+        ///var rules = [
+        ///  &quot;|http://85.17.73.31/&quot;,
+        ///  &quot;||agnesb.fr&quot;,
+        ///  &quot;||akiba-web.com&quot;,
+        ///  &quot;||altrec.com&quot;,
+        ///  &quot;||angela-merkel.de&quot;,
+        ///  &quot;||ang [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
-        internal static byte[] proxy_pac_txt {
+        internal static string proxy_pac {
             get {
-                object obj = ResourceManager.GetObject("proxy_pac_txt", resourceCulture);
-                return ((byte[])(obj));
+                return ResourceManager.GetString("proxy_pac", resourceCulture);
             }
         }
         

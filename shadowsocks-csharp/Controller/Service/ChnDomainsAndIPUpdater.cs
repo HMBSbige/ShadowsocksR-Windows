@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Shadowsocks.Model;
+using Shadowsocks.Util;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
-using Shadowsocks.Model;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -19,7 +19,7 @@ namespace Shadowsocks.Controller.Service
 
         private const string USER_AGENT = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36";
 
-        private static readonly string PAC_FILE = PACServer.PAC_FILE;
+        private static readonly string PAC_FILE = PACDaemon.PAC_FILE;
         private static readonly string USER_RULE_FILE = PACServer.WHITELIST_FILE;
         private static readonly string USER_TEMPLATE_FILE = PACServer.USER_WHITELIST_TEMPLATE_FILE;
 

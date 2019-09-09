@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Shadowsocks.Controller.Service;
+using Shadowsocks.Model;
+using Shadowsocks.Util;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,9 +9,6 @@ using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using Shadowsocks.Controller.Service;
-using Shadowsocks.Model;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller
 {
@@ -21,6 +21,7 @@ namespace Shadowsocks.Controller
 
         private Listener _listener;
         private List<Listener> _port_map_listener;
+        private PACDaemon _pacDaemon;
         private PACServer _pacServer;
         private Configuration _config;
         private ServerTransferTotal _transfer;
@@ -355,12 +356,12 @@ namespace Shadowsocks.Controller
 
         public void TouchPACFile()
         {
-            PACFileReadyToOpen?.Invoke(this, new PathEventArgs { Path = PACServer.TouchPACFile() });
+            PACFileReadyToOpen?.Invoke(this, new PathEventArgs { Path = _pacDaemon.TouchPACFile() });
         }
 
         public void TouchUserRuleFile()
         {
-            UserRuleFileReadyToOpen?.Invoke(this, new PathEventArgs { Path = PACServer.TouchUserRuleFile() });
+            UserRuleFileReadyToOpen?.Invoke(this, new PathEventArgs { Path = _pacDaemon.TouchUserRuleFile() });
         }
 
         public void UpdatePACFromGFWList()
@@ -403,13 +404,17 @@ namespace Shadowsocks.Controller
             {
                 privoxyRunner = new HttpProxyRunner();
             }
+            if (_pacDaemon == null)
+            {
+                _pacDaemon = new PACDaemon();
+                _pacDaemon.PACFileChanged += PacDaemon_PACFileChanged;
+                _pacDaemon.UserRuleFileChanged += PacDaemon_UserRuleFileChanged;
+            }
             if (_pacServer == null)
             {
-                _pacServer = new PACServer();
-                _pacServer.PACFileChanged += pacServer_PACFileChanged;
-                _pacServer.UserRuleFileChanged += pacServer_UserRuleFileChanged;
+                _pacServer = new PACServer(_pacDaemon);
             }
-            _pacServer.UpdateConfiguration(_config);
+            _pacServer.UpdatePacUrl(_config);
             if (gfwListUpdater == null)
             {
                 gfwListUpdater = new GFWListUpdater();
@@ -518,14 +523,14 @@ namespace Shadowsocks.Controller
             }
         }
 
-        private void pacServer_PACFileChanged(object sender, EventArgs e)
+        private void PacDaemon_PACFileChanged(object sender, EventArgs e)
         {
             UpdateSystemProxy();
         }
 
-        private void pacServer_UserRuleFileChanged(object sender, EventArgs e)
+        private void PacDaemon_UserRuleFileChanged(object sender, EventArgs e)
         {
-            if (!Utils.IsGFWListPAC(PACServer.PAC_FILE))
+            if (!Utils.IsGFWListPAC(PACDaemon.PAC_FILE))
             {
                 return;
             }

@@ -1,6 +1,6 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shadowsocks.Model;
+using System;
 
 namespace UnitTest
 {
@@ -24,7 +24,7 @@ namespace UnitTest
             Assert.AreEqual(server.Password, "aaabbb");
 
             server = new Server();
-            var normalCaseWithRemark = "ssr://MTI3LjAuMC4xOjEyMzQ6YXV0aF9hZXMxMjhfbWQ1OmFlcy0xMjgtY2ZiOnRsczEuMl90aWNrZXRfYXV0aDpZV0ZoWW1KaS8_b2Jmc3BhcmFtPVluSmxZV3QzWVRFeExtMXZaUSZyZW1hcmtzPTVyV0w2Sy1WNUxpdDVwYUg";
+            const string normalCaseWithRemark = "ssr://MTI3LjAuMC4xOjEyMzQ6YXV0aF9hZXMxMjhfbWQ1OmFlcy0xMjgtY2ZiOnRsczEuMl90aWNrZXRfYXV0aDpZV0ZoWW1KaS8_b2Jmc3BhcmFtPVluSmxZV3QzWVRFeExtMXZaUSZyZW1hcmtzPTVyV0w2Sy1WNUxpdDVwYUg";
 
             server.ServerFromSsr(normalCaseWithRemark, "firewallAirport");
 
@@ -37,7 +37,8 @@ namespace UnitTest
             Assert.AreEqual(server.Password, "aaabbb");
 
             Assert.AreEqual(server.Remarks, "测试中文");
-            Assert.AreEqual(server.Group, "firewallAirport");
+            Assert.AreEqual(server.Group, string.Empty);
+            Assert.AreEqual(server.SubTag, "firewallAirport");
         }
 
         [TestMethod]
