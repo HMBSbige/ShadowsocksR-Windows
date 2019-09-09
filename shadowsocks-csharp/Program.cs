@@ -86,16 +86,20 @@ namespace Shadowsocks
             SystemEvents.SessionEnding += _viewController.Quit_Click;
 
             _controller.Start();
+#if !DEBUG
             Reg.SetUrlProtocol(@"ssr");
             Reg.SetUrlProtocol(@"sub");
+#endif
             singleInstance.ListenForArgumentsFromSuccessiveInstances();
             app.Run();
         }
 
         private static void App_Exit(object sender, ExitEventArgs e)
         {
+#if !DEBUG
             Reg.RemoveUrlProtocol(@"ssr");
             Reg.RemoveUrlProtocol(@"sub");
+#endif
             _controller?.Stop();
             _controller = null;
         }
