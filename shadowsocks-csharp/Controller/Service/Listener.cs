@@ -67,7 +67,7 @@ namespace Shadowsocks.Controller.Service
                 _socket.Listen(1024);
 
                 // IPv6
-                if (Socket.OSSupportsIPv6)
+                if (GlobalConfiguration.OSSupportsLocalIPv6)
                 {
                     try
                     {

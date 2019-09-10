@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Shadowsocks.GitHubRelease;
 using Shadowsocks.Model;
+using System;
+using System.Collections.Generic;
+using System.Net;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -50,7 +50,7 @@ namespace Shadowsocks.Controller.Service
 #endif
         public static IWebProxy CreateProxy(Configuration config)
         {
-            var proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
+            var proxy = new WebProxy(Configuration.LocalHost, config.localPort);
             if (!string.IsNullOrEmpty(config.authPass))
             {
                 proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);

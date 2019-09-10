@@ -29,7 +29,7 @@ namespace Shadowsocks.Controller.Service
         public void UpdatePacUrl(Configuration config)
         {
             _config = config;
-            PacUrl = $@"http://127.0.0.1:{config.localPort}/pac?auth={config.localAuthPassword}&t={Utils.GetTimestamp(DateTime.Now)}";
+            PacUrl = $@"http://{Configuration.LocalHost}:{config.localPort}/pac?auth={config.localAuthPassword}&t={Utils.GetTimestamp(DateTime.Now)}";
         }
 
         public override bool Handle(byte[] firstPacket, int length, Socket socket)

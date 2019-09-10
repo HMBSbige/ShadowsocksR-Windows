@@ -430,13 +430,15 @@ namespace Shadowsocks.Controller
 
             _listener?.Stop();
 
+            privoxyRunner.Stop();
             // don't put PrivoxyRunner.Start() before pacServer.Stop()
             // or bind will fail when switching bind address from 0.0.0.0 to 127.0.0.1
             // though UseShellExecute is set to true now
             // http://stackoverflow.com/questions/10235093/socket-doesnt-close-after-application-exits-if-a-launched-process-is-open
             try
             {
-                privoxyRunner.Stop();
+                GlobalConfiguration.OSSupportsLocalIPv6 = Socket.OSSupportsIPv6;
+
                 privoxyRunner.Start(_config);
 
                 var local = new Local(_config, _transfer, _rangeSet);
@@ -449,7 +451,6 @@ namespace Shadowsocks.Controller
                 };
                 _listener = new Listener(services);
                 _listener.Start(_config, 0);
-
             }
             catch (Exception e)
             {
@@ -457,14 +458,18 @@ namespace Shadowsocks.Controller
                 // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
                 if (e is SocketException se)
                 {
-                    if (se.SocketErrorCode == SocketError.AddressAlreadyInUse)
+                    switch (se.SocketErrorCode)
                     {
-                        e = new Exception(string.Format(I18N.GetString("Port {0} already in use"), _config.localPort),
-                                se);
-                    }
-                    else if (se.SocketErrorCode == SocketError.AccessDenied)
-                    {
-                        e = new Exception(string.Format(I18N.GetString("Port {0} is reserved by system"), _config.localPort), se);
+                        case SocketError.AddressAlreadyInUse:
+                        {
+                            e = new Exception(string.Format(I18N.GetString("Port {0} already in use"), _config.localPort), se);
+                            break;
+                        }
+                        case SocketError.AccessDenied:
+                        {
+                            e = new Exception(string.Format(I18N.GetString("Port {0} is reserved by system"), _config.localPort), se);
+                            break;
+                        }
                     }
                 }
 

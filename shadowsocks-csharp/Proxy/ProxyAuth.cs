@@ -100,7 +100,7 @@ namespace Shadowsocks.Proxy
             {
                 return true;
             }
-            return ((IPEndPoint)_connection.RemoteEndPoint).Address.IsInSubnet(@"127.0.0.0/8");
+            return IPSubnet.IsLoopBack(((IPEndPoint)_connection.RemoteEndPoint).Address);
         }
 
         private void HandshakeReceive()
@@ -111,7 +111,7 @@ namespace Shadowsocks.Proxy
 
                 if (bytesRead > 1)
                 {
-                    if ((!string.IsNullOrEmpty(_config.authUser) || ((IPEndPoint)_connection.RemoteEndPoint).Address.IsInSubnet(@"127.0.0.0/8"))
+                    if ((!string.IsNullOrEmpty(_config.authUser) || IPSubnet.IsLoopBack(((IPEndPoint)_connection.RemoteEndPoint).Address))
                         && _firstPacket[0] == 4 && _firstPacketLength >= 9)
                     {
                         RspSocks4aHandshakeReceive();
@@ -220,7 +220,7 @@ namespace Shadowsocks.Proxy
                 HandshakeAuthReceiveCallback();
             }
             else if (string.IsNullOrEmpty(_config.authUser)
-                     || ((IPEndPoint)_connection.RemoteEndPoint).Address.IsInSubnet(@"127.0.0.0/8"))
+                     || IPSubnet.IsLoopBack(((IPEndPoint)_connection.RemoteEndPoint).Address))
             {
                 _connection.Send(response);
                 HandshakeReceive2Callback();
@@ -412,7 +412,7 @@ namespace Shadowsocks.Proxy
             {
                 httpProxyState = new HttpParser();
             }
-            if (((IPEndPoint)_connection.RemoteEndPoint).Address.IsInSubnet(@"127.0.0.0/8"))
+            if (IPSubnet.IsLoopBack(((IPEndPoint)_connection.RemoteEndPoint).Address))
             {
                 httpProxyState.httpAuthUser = string.Empty;
                 httpProxyState.httpAuthPass = string.Empty;

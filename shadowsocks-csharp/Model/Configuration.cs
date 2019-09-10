@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Shadowsocks.Controller;
+using Shadowsocks.Encryption;
+using Shadowsocks.Util;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
-using Newtonsoft.Json;
-using Shadowsocks.Controller;
-using Shadowsocks.Encryption;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Model
 {
@@ -68,6 +68,14 @@ namespace Shadowsocks.Model
 
         private const string CONFIG_FILE = @"gui-config.json";
         private const string CONFIG_FILE_BACKUP = @"gui-config.json.backup";
+
+        [JsonIgnore]
+        public static string LocalHost => GlobalConfiguration.OSSupportsLocalIPv6
+                ? $@"[{IPAddress.IPv6Loopback}]"
+                : $@"{IPAddress.Loopback}";
+
+        [JsonIgnore]
+        public static string AnyHost => GlobalConfiguration.OSSupportsLocalIPv6 ? $@"[{IPAddress.IPv6Any}]" : $@"{IPAddress.Any}";
 
         public static void SetPassword(string password)
         {

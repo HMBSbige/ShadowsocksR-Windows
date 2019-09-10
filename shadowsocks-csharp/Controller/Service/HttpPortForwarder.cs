@@ -174,8 +174,7 @@ namespace Shadowsocks.Controller.Service
             {
                 try
                 {
-                    //TODO:IPv6 support
-                    var ipAddress = IPAddress.Loopback;
+                    var ipAddress = GlobalConfiguration.OSSupportsLocalIPv6 ? IPAddress.IPv6Loopback : IPAddress.Loopback;
                     var remoteEp = new IPEndPoint(ipAddress, _targetPort);
 
                     _remote = new WrappedSocket();

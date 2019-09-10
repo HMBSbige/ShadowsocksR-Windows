@@ -191,7 +191,7 @@ namespace Shadowsocks.Controller.Service
                 lastTemplate = template;
                 var http = new WebClient();
                 http.Headers.Add(@"User-Agent", string.IsNullOrEmpty(config.proxyUserAgent) ? USER_AGENT : config.proxyUserAgent);
-                var proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
+                var proxy = new WebProxy(Configuration.LocalHost, config.localPort);
                 if (!string.IsNullOrEmpty(config.authPass))
                 {
                     proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);
@@ -218,7 +218,7 @@ namespace Shadowsocks.Controller.Service
             {
                 var http = new WebClient();
                 http.Headers.Add(@"User-Agent", string.IsNullOrEmpty(config.proxyUserAgent) ? USER_AGENT : config.proxyUserAgent);
-                var proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
+                var proxy = new WebProxy(Configuration.LocalHost, config.localPort);
                 if (!string.IsNullOrEmpty(config.authPass))
                 {
                     proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);
@@ -231,7 +231,7 @@ namespace Shadowsocks.Controller.Service
             {
                 var http = new WebClient();
                 http.Headers.Add(@"User-Agent", string.IsNullOrEmpty(config.proxyUserAgent) ? USER_AGENT : config.proxyUserAgent);
-                var proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
+                var proxy = new WebProxy(Configuration.LocalHost, config.localPort);
                 if (!string.IsNullOrEmpty(config.authPass))
                 {
                     proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);

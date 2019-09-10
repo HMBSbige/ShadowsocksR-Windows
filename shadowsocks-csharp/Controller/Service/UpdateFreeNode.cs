@@ -27,7 +27,7 @@ namespace Shadowsocks.Controller.Service
                 http.QueryString[@"rnd"] = Utils.RandUInt32().ToString();
                 if (useProxy)
                 {
-                    var proxy = new WebProxy(IPAddress.Loopback.ToString(), config.localPort);
+                    var proxy = new WebProxy(Configuration.LocalHost, config.localPort);
                     if (!string.IsNullOrEmpty(config.authPass))
                     {
                         proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);
