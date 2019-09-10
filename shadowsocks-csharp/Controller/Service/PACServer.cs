@@ -184,15 +184,18 @@ Connection: Close
 
         private string GetPACAddress(IPEndPoint localEndPoint, int socksType)
         {
+            var localhost = localEndPoint.AddressFamily == AddressFamily.InterNetworkV6
+                    ? $@"[{localEndPoint.Address}]"
+                    : $@"{localEndPoint.Address}";
             if (socksType == 5)
             {
-                return $@"SOCKS5 {localEndPoint.Address}:{_config.localPort};";
+                return $@"SOCKS5 {localhost}:{_config.localPort};";
             }
             if (socksType == 4)
             {
-                return $@"SOCKS {localEndPoint.Address}:{_config.localPort};";
+                return $@"SOCKS {localhost}:{_config.localPort};";
             }
-            return $@"PROXY {localEndPoint.Address}:{_config.localPort};";
+            return $@"PROXY {localhost}:{_config.localPort};";
         }
     }
 }
