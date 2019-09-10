@@ -400,6 +400,8 @@ namespace Shadowsocks.Controller
             hostMap.LoadHostFile();
             HostMap.Instance().Clear(hostMap);
 
+            GlobalConfiguration.OSSupportsLocalIPv6 = Socket.OSSupportsIPv6;
+
             if (privoxyRunner == null)
             {
                 privoxyRunner = new HttpProxyRunner();
@@ -437,8 +439,6 @@ namespace Shadowsocks.Controller
             // http://stackoverflow.com/questions/10235093/socket-doesnt-close-after-application-exits-if-a-launched-process-is-open
             try
             {
-                GlobalConfiguration.OSSupportsLocalIPv6 = Socket.OSSupportsIPv6;
-
                 privoxyRunner.Start(_config);
 
                 var local = new Local(_config, _transfer, _rangeSet);

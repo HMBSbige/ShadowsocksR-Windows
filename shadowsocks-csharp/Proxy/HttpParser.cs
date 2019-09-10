@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Shadowsocks.Proxy
 {
-    class HttpParser
+    internal class HttpParser
     {
         public bool httpProxy;
         public byte[] httpRequestBuffer;
@@ -17,11 +17,11 @@ namespace Shadowsocks.Proxy
         public string httpAuthPass;
         protected string httpHost;
         protected int httpPort;
-        bool redir;
+        private readonly bool _redir;
 
         public HttpParser(bool redir = false)
         {
-            this.redir = redir;
+            this._redir = redir;
         }
 
         private static string ParseHostAndPort(string str, ref int port)
@@ -101,7 +101,7 @@ namespace Shadowsocks.Proxy
 
         public void HostToHandshakeBuffer(string host, int port, ref byte[] remoteHeaderSendBuffer)
         {
-            if (redir)
+            if (_redir)
             {
                 remoteHeaderSendBuffer = new byte[0];
             }
@@ -234,7 +234,7 @@ namespace Shadowsocks.Proxy
                 httpContentLength = Convert.ToInt32(header_dict["Content-Length"]) + 2;
             }
             HostToHandshakeBuffer(httpHost, httpPort, ref remoteHeaderSendBuffer);
-            if (redir)
+            if (_redir)
             {
                 if (header_dict.ContainsKey("Proxy-Connection"))
                 {
@@ -248,11 +248,7 @@ namespace Shadowsocks.Proxy
                 httpData.CopyTo(remoteHeaderSendBuffer, len);
                 httpProxy = true;
             }
-            var auth_ok = false;
-            if (httpAuthUser == null || httpAuthUser.Length == 0)
-            {
-                auth_ok = true;
-            }
+            var authOk = string.IsNullOrEmpty(httpAuthUser);
             if (header_dict.ContainsKey("Proxy-Authorization"))
             {
                 var authString = header_dict["Proxy-Authorization"].Substring("Basic ".Length);
@@ -260,11 +256,11 @@ namespace Shadowsocks.Proxy
                 var httpAuthString = Convert.ToBase64String(Encoding.UTF8.GetBytes(authStr));
                 if (httpAuthString == authString)
                 {
-                    auth_ok = true;
+                    authOk = true;
                 }
                 header_dict.Remove("Proxy-Authorization");
             }
-            if (auth_ok && httpRequestBuffer.Length > 0)
+            if (authOk && httpRequestBuffer.Length > 0)
             {
                 var len = httpRequestBuffer.Length;
                 var httpData = httpRequestBuffer;
@@ -272,7 +268,7 @@ namespace Shadowsocks.Proxy
                 httpData.CopyTo(remoteHeaderSendBuffer, remoteHeaderSendBuffer.Length - len);
                 httpRequestBuffer = new byte[0];
             }
-            if (auth_ok && httpContentLength > 0)
+            if (authOk && httpContentLength > 0)
             {
                 var len = Math.Min(httpRequestBuffer.Length, httpContentLength);
                 Array.Resize(ref remoteHeaderSendBuffer, len + remoteHeaderSendBuffer.Length);
@@ -286,7 +282,7 @@ namespace Shadowsocks.Proxy
                 httpContentLength = 0;
                 httpRequestBuffer = new byte[0];
             }
-            if (remoteHeaderSendBuffer == null || !auth_ok)
+            if (remoteHeaderSendBuffer == null || !authOk)
             {
                 return 2;
             }
@@ -297,12 +293,12 @@ namespace Shadowsocks.Proxy
             return 0;
         }
 
-        public string Http200()
+        public static string Http200()
         {
             return "HTTP/1.1 200 Connection Established\r\n\r\n";
         }
 
-        public string Http407()
+        public static string Http407()
         {
             var header = "HTTP/1.1 407 Proxy Authentication Required\r\nProxy-Authenticate: Basic realm=\"RRR\"\r\n";
             var content = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN" +
@@ -317,7 +313,7 @@ namespace Shadowsocks.Proxy
             return header + "\r\n" + content + "\r\n";
         }
 
-        public string Http500()
+        public static string Http500()
         {
             var header = "HTTP/1.1 500 Internal Server Error\r\n";
             var content = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN" +

@@ -432,7 +432,7 @@ namespace Shadowsocks.Proxy
                 }
                 else if (err == 2)
                 {
-                    var dataSend = httpProxyState.Http407();
+                    var dataSend = HttpParser.Http407();
                     var httpData = Encoding.UTF8.GetBytes(dataSend);
                     _connection.Send(httpData);
                     if (HttpHandshakeRecv())
@@ -451,7 +451,7 @@ namespace Shadowsocks.Proxy
                 }
                 else if (err == 500)
                 {
-                    var dataSend = httpProxyState.Http500();
+                    var dataSend = HttpParser.Http500();
                     var httpData = Encoding.UTF8.GetBytes(dataSend);
                     _connection.Send(httpData);
                     if (HttpHandshakeRecv())

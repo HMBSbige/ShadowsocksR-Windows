@@ -82,7 +82,7 @@ namespace Shadowsocks.Controller.Service
                 }
                 else if (err == 2)
                 {
-                    var dataSend = _httpProxyState.Http407();
+                    var dataSend = HttpParser.Http407();
                     var httpData = System.Text.Encoding.UTF8.GetBytes(dataSend);
                     _local.BeginSend(httpData, 0, httpData.Length, 0, HttpHandshakeAuthEndSend, null);
                 }
@@ -96,13 +96,13 @@ namespace Shadowsocks.Controller.Service
                 }
                 else if (err == 0)
                 {
-                    var dataSend = _httpProxyState.Http200();
+                    var dataSend = HttpParser.Http200();
                     var httpData = System.Text.Encoding.UTF8.GetBytes(dataSend);
                     _local.BeginSend(httpData, 0, httpData.Length, 0, StartConnect, null);
                 }
                 else if (err == 500)
                 {
-                    var dataSend = _httpProxyState.Http500();
+                    var dataSend = HttpParser.Http500();
                     var httpData = System.Text.Encoding.UTF8.GetBytes(dataSend);
                     _local.BeginSend(httpData, 0, httpData.Length, 0, HttpHandshakeAuthEndSend, null);
                 }

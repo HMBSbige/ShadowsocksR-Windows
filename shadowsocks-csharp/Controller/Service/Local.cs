@@ -1,8 +1,9 @@
-﻿using System.Net;
+﻿using Shadowsocks.Model;
+using Shadowsocks.Proxy;
+using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Shadowsocks.Model;
-using Shadowsocks.Proxy;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -29,6 +30,7 @@ namespace Shadowsocks.Controller.Service
             {
                 return true;
             }
+            Debug.WriteLine(System.Text.Encoding.UTF8.GetString(firstPacket));
             if (length > 8
                 && firstPacket[0] == 'C'
                 && firstPacket[1] == 'O'
