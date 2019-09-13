@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Shadowsocks.Util;
+using System;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
-using Shadowsocks.Controller;
 
 namespace Shadowsocks.Controls
 {
@@ -14,7 +14,7 @@ namespace Shadowsocks.Controls
             {
                 if (targetType == typeof(string))
                 {
-                    return I18N.GetString(enable ? @"Enabled" : @"Disabled");
+                    return I18NUtil.GetAppStringValue(enable ? @"Enabled" : @"Disabled");
                 }
 
                 if (targetType == typeof(Brush))

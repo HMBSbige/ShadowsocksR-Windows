@@ -1,4 +1,5 @@
 ﻿using Shadowsocks.Model;
+using Shadowsocks.Util;
 using Shadowsocks.Util.NetUtils;
 using System;
 using System.Collections.Generic;
@@ -26,15 +27,17 @@ namespace Shadowsocks.Controller.Service
         }
 
         private Configuration _config;
-        private bool _shareOverLAN;
+        private bool _shareOverLan;
         private string _authUser;
         private Socket _socket;
         private Socket _socketV6;
+        private bool _stop;
         private readonly List<IService> _services;
 
         public Listener(List<IService> services)
         {
             _services = services;
+            _stop = false;
         }
 
         private static bool CheckIfPortInUse(int port)
@@ -46,13 +49,13 @@ namespace Shadowsocks.Controller.Service
         public void Start(Configuration config, int port)
         {
             _config = config;
-            _shareOverLAN = config.shareOverLan;
+            _shareOverLan = config.shareOverLan;
             _authUser = config.authUser;
 
             var localPort = port == 0 ? _config.localPort : port;
             if (CheckIfPortInUse(localPort))
             {
-                throw new Exception(string.Format(I18N.GetString("Port {0} already in use"), localPort));
+                throw new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortInUse"), localPort));
             }
 
             try
@@ -61,7 +64,7 @@ namespace Shadowsocks.Controller.Service
                 // Create a TCP/IP socket.
                 _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                var localEndPoint = new IPEndPoint(_shareOverLAN ? IPAddress.Any : IPAddress.Loopback, localPort);
+                var localEndPoint = new IPEndPoint(_shareOverLan ? IPAddress.Any : IPAddress.Loopback, localPort);
                 // Bind the socket to the local endpoint and listen for incoming connections.
                 _socket.Bind(localEndPoint);
                 _socket.Listen(1024);
@@ -78,7 +81,7 @@ namespace Shadowsocks.Controller.Service
                     {
                         _socketV6 = null;
                     }
-                    var localEndPointV6 = new IPEndPoint(_shareOverLAN ? IPAddress.IPv6Any : IPAddress.IPv6Loopback, localPort);
+                    var localEndPointV6 = new IPEndPoint(_shareOverLan ? IPAddress.IPv6Any : IPAddress.IPv6Loopback, localPort);
                     if (_socketV6 != null)
                     {
                         _socketV6.Bind(localEndPointV6);
@@ -114,6 +117,8 @@ namespace Shadowsocks.Controller.Service
 
         public void Stop()
         {
+            _stop = true;
+
             if (_socket != null)
             {
                 _socket.Close();
@@ -130,6 +135,10 @@ namespace Shadowsocks.Controller.Service
 
         private void AcceptCallback(IAsyncResult ar)
         {
+            if (_stop)
+            {
+                return;
+            }
             var listener = (Socket)ar.AsyncState;
             try
             {

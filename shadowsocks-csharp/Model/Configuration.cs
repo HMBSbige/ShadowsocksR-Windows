@@ -1,13 +1,12 @@
 ﻿using Newtonsoft.Json;
-using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.Util;
+using Shadowsocks.Util.NetUtils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
-using Shadowsocks.Util.NetUtils;
 
 namespace Shadowsocks.Model
 {
@@ -526,7 +525,7 @@ namespace Shadowsocks.Model
         {
             if (port <= IPEndPoint.MinPort || port > IPEndPoint.MaxPort)
             {
-                throw new ConfigurationException(I18N.GetString("Port out of range"));
+                throw new ConfigurationException(I18NUtil.GetAppStringValue(@"PortOutOfRange"));
             }
         }
 

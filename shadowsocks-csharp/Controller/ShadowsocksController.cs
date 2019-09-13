@@ -462,12 +462,12 @@ namespace Shadowsocks.Controller
                     {
                         case SocketError.AddressAlreadyInUse:
                         {
-                            e = new Exception(string.Format(I18N.GetString("Port {0} already in use"), _config.localPort), se);
+                            e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortInUse"), _config.localPort), se);
                             break;
                         }
                         case SocketError.AccessDenied:
                         {
-                            e = new Exception(string.Format(I18N.GetString("Port {0} is reserved by system"), _config.localPort), se);
+                            e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortReserved"), _config.localPort), se);
                             break;
                         }
                     }
@@ -496,11 +496,11 @@ namespace Shadowsocks.Controller
                     {
                         if (se.SocketErrorCode == SocketError.AddressAlreadyInUse)
                         {
-                            e = new Exception(string.Format(I18N.GetString("Port {0} already in use"), pair.Key), e);
+                            e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortInUse"), pair.Key), e);
                         }
                         else if (se.SocketErrorCode == SocketError.AccessDenied)
                         {
-                            e = new Exception(string.Format(I18N.GetString("Port {0} is reserved by system"), pair.Key), se);
+                            e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortReserved"), pair.Key), se);
                         }
                     }
                     Logging.LogUsefulException(e);

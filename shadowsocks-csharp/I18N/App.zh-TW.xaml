@@ -73,4 +73,11 @@
 
     <sys:String x:Key="NewServer">未配置的伺服器</sys:String>
 
+    <sys:String x:Key="PortInUse">連接埠號碼 {0} 已被使用</sys:String>
+    <sys:String x:Key="PortReserved">連接埠號碼 {0} 由系統保留</sys:String>
+    <sys:String x:Key="PortOutOfRange">連接埠超出範圍</sys:String>
+
+    <sys:String x:Key="Enabled">已啟用</sys:String>
+    <sys:String x:Key="Disabled">已停用</sys:String>
+
 </ResourceDictionary>
