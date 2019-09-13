@@ -73,7 +73,7 @@ namespace Shadowsocks.Proxy
 
         public int Receive(byte[] buffer, int size, SocketFlags flags)
         {
-            return _socket.Receive(buffer, size, SocketFlags.None);
+            return _socket.Receive(buffer, size, flags);
         }
 
         public IAsyncResult BeginReceive(byte[] buffer, int size, SocketFlags flags, AsyncCallback callback, object state)
@@ -101,10 +101,10 @@ namespace Shadowsocks.Proxy
 
         public int SendAll(byte[] buffer, int size, SocketFlags flags)
         {
-            var sendSize = _socket.Send(buffer, size, 0);
+            var sendSize = _socket.Send(buffer, size, flags);
             while (sendSize < size)
             {
-                var new_size = _socket.Send(buffer, sendSize, size - sendSize, 0);
+                var new_size = _socket.Send(buffer, sendSize, size - sendSize, flags);
                 sendSize += new_size;
             }
             return size;
@@ -112,7 +112,7 @@ namespace Shadowsocks.Proxy
 
         public virtual int Send(byte[] buffer, int size, SocketFlags flags)
         {
-            return SendAll(buffer, size, 0);
+            return SendAll(buffer, size, flags);
         }
 
         public int BeginSend(byte[] buffer, int size, SocketFlags flags, AsyncCallback callback, object state)
@@ -121,7 +121,7 @@ namespace Shadowsocks.Proxy
             st.size = size;
             st.state = state;
 
-            _socket.BeginSend(buffer, 0, size, 0, callback, st);
+            _socket.BeginSend(buffer, 0, size, flags, callback, st);
             return size;
         }
 

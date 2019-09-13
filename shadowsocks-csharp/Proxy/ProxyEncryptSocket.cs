@@ -232,10 +232,10 @@ namespace Shadowsocks.Proxy
 
         public int SendAll(byte[] buffer, int size, SocketFlags flags)
         {
-            var sendSize = _socket.Send(buffer, size, 0);
+            var sendSize = _socket.Send(buffer, size, flags);
             while (sendSize < size)
             {
-                var new_size = _socket.Send(buffer, sendSize, size - sendSize, 0);
+                var new_size = _socket.Send(buffer, sendSize, size - sendSize, flags);
                 sendSize += new_size;
             }
             return size;
@@ -248,18 +248,6 @@ namespace Shadowsocks.Proxy
 
             lock (_encryptionLock)
             {
-                //if (!header_sent)
-                //{
-                //    header_sent = true;
-                //    if (buffer[0] == 3 && _method == "none")
-                //    {
-                //        for (int i = 0; i < buffer[1]; ++i)
-                //        {
-                //            buffer[i + 2] |= 0x80;
-                //        }
-                //        buffer[0] = 2;
-                //    }
-                //}
                 var bytesToEncrypt = _protocol.ClientPreEncrypt(buffer, size, out var outlength);
                 if (bytesToEncrypt == null)
                     return 0;
@@ -267,7 +255,7 @@ namespace Shadowsocks.Proxy
                 _encryptor.Encrypt(bytesToEncrypt, outlength, SendEncryptBuffer, out var bytesToSend);
                 obfsBuffer = _obfs.ClientEncode(SendEncryptBuffer, bytesToSend, out obfsSendSize);
             }
-            return SendAll(obfsBuffer, obfsSendSize, 0);
+            return SendAll(obfsBuffer, obfsSendSize, flags);
         }
 
         public IAsyncResult BeginReceiveFrom(byte[] buffer, int size, SocketFlags flags, ref EndPoint ep, AsyncCallback callback, object state)

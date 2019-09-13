@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using static Shadowsocks.Encryption.EncryptorBase;
 
 namespace Shadowsocks.Proxy
 {
@@ -30,6 +31,9 @@ namespace Shadowsocks.Proxy
         protected byte[] _remoteHeaderSendBuffer;
 
         protected HttpParser httpProxyState;
+
+        private const int CMD_CONNECT = 0x01;
+        private const int CMD_UDP_ASSOC = 0x03;
 
         public ProxyAuthHandler(Configuration config, ServerTransferTotal transfer, IPRangeSet IPRange, byte[] firstPacket, int length, Socket socket)
         {
@@ -90,7 +94,7 @@ namespace Shadowsocks.Proxy
             _config = null;
         }
 
-        bool AuthConnection(string authUser, string authPass)
+        private bool AuthConnection(string authUser, string authPass)
         {
             if ((_config.authUser ?? string.Empty).Length == 0)
             {
@@ -216,14 +220,12 @@ namespace Shadowsocks.Proxy
             if (auth)
             {
                 response[1] = 2;
-                _connection.Send(response);
-                HandshakeAuthReceiveCallback();
+                _connection.BeginSend(response, 0, response.Length, SocketFlags.None, HandshakeAuthSendCallback, null);
             }
             else if (string.IsNullOrEmpty(_config.authUser)
                      || IPSubnet.IsLoopBack(((IPEndPoint)_connection.RemoteEndPoint).Address))
             {
-                _connection.Send(response);
-                HandshakeReceive2Callback();
+                _connection.BeginSend(response, 0, response.Length, SocketFlags.None, HandshakeSendCallback, null);
             }
             else
             {
@@ -232,10 +234,11 @@ namespace Shadowsocks.Proxy
             }
         }
 
-        private void HandshakeAuthReceiveCallback()
+        private void HandshakeAuthSendCallback(IAsyncResult ar)
         {
             try
             {
+                _connection.EndSend(ar);
                 var bytesRead = _connection.Receive(_connetionRecvBuffer, 1024, 0); //_connection.EndReceive(ar);
 
                 if (bytesRead >= 3)
@@ -247,13 +250,12 @@ namespace Shadowsocks.Proxy
                     var pass = Encoding.UTF8.GetString(_connetionRecvBuffer, user_len + 3, pass_len);
                     if (AuthConnection(user, pass))
                     {
-                        _connection.Send(response);
-                        HandshakeReceive2Callback();
+                        _connection.BeginSend(response, 0, response.Length, SocketFlags.None, HandshakeSendCallback, null);
                     }
                 }
                 else
                 {
-                    Console.WriteLine(@"failed to recv data in HandshakeAuthReceiveCallback");
+                    Console.WriteLine(@"failed to recv data in HandshakeAuthSendCallback");
                     Close();
                 }
             }
@@ -264,33 +266,56 @@ namespace Shadowsocks.Proxy
             }
         }
 
-        private void HandshakeReceive2Callback()
+        private void HandshakeSendCallback(IAsyncResult ar)
         {
             try
             {
-                // +----+-----+-------+------+----------+----------+
-                // |VER | CMD |  RSV  | ATYP | DST.ADDR | DST.PORT |
-                // +----+-----+-------+------+----------+----------+
-                // | 1  |  1  | X'00' |  1   | Variable |    2     |
-                // +----+-----+-------+------+----------+----------+
-                var bytesRead = _connection.Receive(_connetionRecvBuffer, 5, 0);
+                _connection.EndSend(ar);
 
+                // +-----+-----+-------+------+----------+----------+
+                // | VER | CMD |  RSV  | ATYP | DST.ADDR | DST.PORT |
+                // +-----+-----+-------+------+----------+----------+
+                // |  1  |  1  | X'00' |  1   | Variable |    2     |
+                // +-----+-----+-------+------+----------+----------+
+                // Skip first 3 bytes, and read 2 more bytes to analysis the address.
+                // 2 more bytes is designed if address is domain then we don't need to read once more to get the addr length.
+                // TODO validate
+                _connection.BeginReceive(_connetionRecvBuffer, 0, 3 + ADDR_ATYP_LEN + 1, SocketFlags.None, HandshakeReceive2Callback, null);
+            }
+            catch (Exception e)
+            {
+                Logging.LogUsefulException(e);
+                Close();
+            }
+        }
+
+        private void HandshakeReceive2Callback(IAsyncResult ar)
+        {
+            try
+            {
+                var bytesRead = _connection.EndReceive(ar);
                 if (bytesRead >= 5)
                 {
                     command = _connetionRecvBuffer[1];
                     _remoteHeaderSendBuffer = new byte[bytesRead - 3];
                     Array.Copy(_connetionRecvBuffer, 3, _remoteHeaderSendBuffer, 0, _remoteHeaderSendBuffer.Length);
 
-                    var recv_size = 0;
-                    if (_remoteHeaderSendBuffer[0] == 1)
-                        recv_size = 4 - 1;
-                    else if (_remoteHeaderSendBuffer[0] == 4)
-                        recv_size = 16 - 1;
-                    else if (_remoteHeaderSendBuffer[0] == 3)
-                        recv_size = _remoteHeaderSendBuffer[1];
-                    if (recv_size == 0)
+                    var size = 0;
+                    switch (_remoteHeaderSendBuffer[0])
+                    {
+                        case ATYP_IPv4:
+                            size = 4 - 1;
+                            break;
+                        case ATYP_IPv6:
+                            size = 16 - 1;
+                            break;
+                        case ATYP_DOMAIN:
+                            size = _remoteHeaderSendBuffer[1];
+                            break;
+                    }
+                    if (size == 0)
                         throw new Exception("Wrong socks5 addr type");
-                    HandshakeReceive3Callback(recv_size + 2); // recv port
+                    HandshakeReceive3Callback(size + ADDR_PORT_LEN); // recv port
                 }
                 else
                 {
@@ -298,33 +323,34 @@ namespace Shadowsocks.Proxy
                     Close();
                 }
             }
-            catch (Exception e)
+            catch
             {
-                Logging.LogUsefulException(e);
-                Close();
+                // ignored
             }
         }
 
-        private void HandshakeReceive3Callback(int recv_size)
+        private void HandshakeReceive3Callback(int bytesRemain)
         {
             try
             {
-                var bytesRead = _connection.Receive(_connetionRecvBuffer, recv_size, 0);
-
+                var bytesRead = _connection.Receive(_connetionRecvBuffer, bytesRemain, 0);
                 if (bytesRead > 0)
                 {
                     Array.Resize(ref _remoteHeaderSendBuffer, _remoteHeaderSendBuffer.Length + bytesRead);
                     Array.Copy(_connetionRecvBuffer, 0, _remoteHeaderSendBuffer, _remoteHeaderSendBuffer.Length - bytesRead, bytesRead);
-
-                    if (command == 3)
+                    switch (command)
                     {
-                        RspSocks5UDPHeader(bytesRead);
-                    }
-                    else
-                    {
-                        //RspSocks5TCPHeader();
-                        local_sendback_protocol = "socks5";
-                        Connect();
+                        case CMD_UDP_ASSOC:
+                            RspSocks5UDPHeader(bytesRead);
+                            break;
+                        case CMD_CONNECT:
+                            local_sendback_protocol = @"socks5";
+                            Connect();
+                            break;
+                        default:
+                            Logging.Debug($@"Unsupported CMD={command}");
+                            Close();
+                            break;
                     }
                 }
                 else
@@ -541,11 +567,11 @@ namespace Shadowsocks.Proxy
                 {
                     if (cfg.server != null)
                     {
-                        handler.select_server = delegate (Server server, Server selServer) { return server.Id == cfg.server.Id; };
+                        handler.select_server = (server, selServer) => server.Id == cfg.server.Id;
                     }
                     else if (!string.IsNullOrEmpty(cfg.id))
                     {
-                        handler.select_server = delegate (Server server, Server selServer) { return server.Group == cfg.id; };
+                        handler.select_server = (server, selServer) => server.Group == cfg.id;
                     }
                     if (cfg.type == PortMapType.Forward) // tunnel
                     {
@@ -566,7 +592,7 @@ namespace Shadowsocks.Proxy
                     }
                     else
                     {
-                        handler.Start(_remoteHeaderSendBuffer, _remoteHeaderSendBuffer.Length, "socks5");
+                        handler.Start(_remoteHeaderSendBuffer, _remoteHeaderSendBuffer.Length, @"socks5");
                     }
                     Dispose();
                     return;

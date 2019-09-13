@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Shadowsocks.Util;
+using Shadowsocks.Util.NetUtils;
+using Shadowsocks.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using Newtonsoft.Json;
-using Shadowsocks.Util;
-using Shadowsocks.ViewModel;
 
 namespace Shadowsocks.Model
 {
@@ -476,7 +477,7 @@ namespace Shadowsocks.Model
             UdpOverTcp = false;
             Enable = true;
             var randId = new byte[16];
-            Utils.RandBytes(randId, randId.Length);
+            RNG.RandBytes(randId, randId.Length);
             Id = BitConverter.ToString(randId).Replace(@"-", @"");
 
             SpeedLog = new ServerSpeedLog();

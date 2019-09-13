@@ -20,7 +20,7 @@ namespace Shadowsocks.Controller.Service
             _ipRange = IPRange;
         }
 
-        protected bool Accept(byte[] firstPacket, int length)
+        private static bool Accept(byte[] firstPacket, int length)
         {
             if (length < 2)
             {

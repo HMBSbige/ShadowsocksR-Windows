@@ -3,13 +3,16 @@ using Shadowsocks.Controller.Service;
 using Shadowsocks.Model;
 using Shadowsocks.Obfs;
 using Shadowsocks.Util;
+using Shadowsocks.Util.NetUtils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using static Shadowsocks.Encryption.EncryptorBase;
 using Timer = System.Timers.Timer;
 
 namespace Shadowsocks.Proxy
@@ -763,12 +766,12 @@ namespace Shadowsocks.Proxy
 
                 if (!IPAddress.TryParse(host, out var ipAddress))
                 {
-                    ipAddress = Utils.DnsBuffer.Get(host) ?? Utils.QueryDns(host, host.IndexOf('.') >= 0 ? cfg.DnsServers : null);
+                    ipAddress = DnsUtil.DnsBuffer.Get(host) ?? DnsUtil.QueryDns(host, host.IndexOf('.') >= 0 ? cfg.DnsServers : null);
                     if (ipAddress != null)
                     {
                         Logging.Info($@"DNS nolock query {host} answer {ipAddress}");
-                        Utils.DnsBuffer.Set(host, new IPAddress(ipAddress.GetAddressBytes()));
-                        Utils.DnsBuffer.Sweep();
+                        DnsUtil.DnsBuffer.Set(host, new IPAddress(ipAddress.GetAddressBytes()));
+                        DnsUtil.DnsBuffer.Sweep();
                     }
                     else
                     {
@@ -816,7 +819,7 @@ namespace Shadowsocks.Proxy
                         {
                             if (buf.isExpired(serverHost))
                             {
-                                ipAddress = Utils.QueryDns(serverHost, serverHost.IndexOf('.') >= 0 ? cfg.LocalDnsServers : null);
+                                ipAddress = DnsUtil.QueryDns(serverHost, serverHost.IndexOf('.') >= 0 ? cfg.LocalDnsServers : null);
 
                                 if (ipAddress != null)
                                 {
@@ -910,8 +913,7 @@ namespace Shadowsocks.Proxy
                 connectionTCPIdle = false;
                 var recv_size = remote == null ? RecvSize : remote.TcpMSS - remote.OverHead;
                 var buffer = new byte[recv_size];
-                connection.BeginReceive(buffer, recv_size, 0,
-                        PipeConnectionReceiveCallback, null);
+                connection.BeginReceive(buffer, recv_size, SocketFlags.None, PipeConnectionReceiveCallback, null);
             }
         }
 
@@ -958,8 +960,7 @@ namespace Shadowsocks.Proxy
             if (remote != null && remoteTCPIdle)
             {
                 remoteTCPIdle = false;
-                remote.BeginReceive(new byte[BufferSize], RecvSize, 0,
-                        PipeRemoteReceiveCallback, null);
+                remote.BeginReceive(new byte[BufferSize], RecvSize, SocketFlags.None, PipeRemoteReceiveCallback, null);
             }
         }
 
@@ -1034,34 +1035,33 @@ namespace Shadowsocks.Proxy
             if (remoteHeaderSendBuffer == null)
                 return null;
 
-            if (remoteHeaderSendBuffer[0] == 1)
+            switch (remoteHeaderSendBuffer[0])
             {
-                if (remoteHeaderSendBuffer.Length > 4)
+                case ATYP_IPv4:
                 {
-                    var addr = new byte[4];
-                    Array.Copy(remoteHeaderSendBuffer, 1, addr, 0, 4);
-                    var ipAddress = new IPAddress(addr);
-                    return ipAddress.ToString();
+                    if (remoteHeaderSendBuffer.Length > 4)
+                    {
+                        return new IPAddress(remoteHeaderSendBuffer.Skip(1).Take(4).ToArray()).ToString();
+                    }
+                    return null;
                 }
-                return null;
-            }
-            if (remoteHeaderSendBuffer[0] == 4)
-            {
-                if (remoteHeaderSendBuffer.Length > 16)
+
+                case ATYP_IPv6:
                 {
-                    var addr = new byte[16];
-                    Array.Copy(remoteHeaderSendBuffer, 1, addr, 0, 16);
-                    var ipAddress = new IPAddress(addr);
-                    return ipAddress.ToString();
+                    if (remoteHeaderSendBuffer.Length > 16)
+                    {
+                        return new IPAddress(remoteHeaderSendBuffer.Skip(1).Take(16).ToArray()).ToString();
+                    }
+                    return null;
                 }
-                return null;
-            }
-            if (remoteHeaderSendBuffer[0] == 3 && remoteHeaderSendBuffer.Length > 1)
-            {
-                if (remoteHeaderSendBuffer.Length > remoteHeaderSendBuffer[1] + 1)
+
+                case ATYP_DOMAIN when remoteHeaderSendBuffer.Length > 1:
                 {
-                    var url = System.Text.Encoding.UTF8.GetString(remoteHeaderSendBuffer, 2, remoteHeaderSendBuffer[1]);
-                    return url;
+                    if (remoteHeaderSendBuffer.Length > remoteHeaderSendBuffer[1] + 1)
+                    {
+                        return System.Text.Encoding.UTF8.GetString(remoteHeaderSendBuffer, 2, remoteHeaderSendBuffer[1]);
+                    }
+                    break;
                 }
             }
             return null;
@@ -1072,30 +1072,35 @@ namespace Shadowsocks.Proxy
             if (remoteHeaderSendBuffer == null)
                 return 0;
 
-            if (remoteHeaderSendBuffer[0] == 1)
+            switch (remoteHeaderSendBuffer[0])
             {
-                if (remoteHeaderSendBuffer.Length > 6)
+                case ATYP_IPv4:
                 {
-                    var port = (remoteHeaderSendBuffer[5] << 8) | remoteHeaderSendBuffer[6];
-                    return port;
+                    if (remoteHeaderSendBuffer.Length > 6)
+                    {
+                        return (remoteHeaderSendBuffer[5] << 8) | remoteHeaderSendBuffer[6];
+                    }
+                    return 0;
                 }
-                return 0;
-            }
-            if (remoteHeaderSendBuffer[0] == 4)
-            {
-                if (remoteHeaderSendBuffer.Length > 18)
+
+                case ATYP_IPv6:
                 {
-                    var port = (remoteHeaderSendBuffer[17] << 8) | remoteHeaderSendBuffer[18];
-                    return port;
+                    if (remoteHeaderSendBuffer.Length > 18)
+                    {
+                        return (remoteHeaderSendBuffer[17] << 8) | remoteHeaderSendBuffer[18];
+                    }
+                    return 0;
                 }
-                return 0;
-            }
-            if (remoteHeaderSendBuffer[0] == 3 && remoteHeaderSendBuffer.Length > 1)
-            {
-                if (remoteHeaderSendBuffer.Length > remoteHeaderSendBuffer[1] + 2)
+
+                case ATYP_DOMAIN when remoteHeaderSendBuffer.Length > 1:
                 {
-                    var port = (remoteHeaderSendBuffer[remoteHeaderSendBuffer[1] + 2] << 8) | remoteHeaderSendBuffer[remoteHeaderSendBuffer[1] + 3];
-                    return port;
+                    if (remoteHeaderSendBuffer.Length > remoteHeaderSendBuffer[1] + 2)
+                    {
+                        var len = remoteHeaderSendBuffer[1];
+                        return (remoteHeaderSendBuffer[len + 2] << 8) | remoteHeaderSendBuffer[len + 3];
+                    }
+
+                    break;
                 }
             }
             return 0;
@@ -1151,7 +1156,7 @@ namespace Shadowsocks.Proxy
 
                 if (connection.local_sendback_protocol != null)
                 {
-                    connection.Send(remoteUDPRecvBuffer, 0, 0);
+                    connection.Send(remoteUDPRecvBuffer, 0, SocketFlags.None);
                 }
 
                 // remote recv first
@@ -1266,7 +1271,7 @@ namespace Shadowsocks.Proxy
                             {
                                 server.SpeedLog.ResetEmptyTimes();
                             }
-                            connection.Send(remoteSendBuffer, bytesRead, 0);
+                            connection.Send(remoteSendBuffer, bytesRead, SocketFlags.None);
                         }
                         else
                         {
@@ -1310,7 +1315,7 @@ namespace Shadowsocks.Proxy
             {
                 try
                 {
-                    var bytesRead = remote.Receive(recv_buffer, RecvSize, 0, out var bytesRecv, out var protocolSize, out var sendback);
+                    var bytesRead = remote.Receive(recv_buffer, RecvSize, SocketFlags.None, out var bytesRecv, out var protocolSize, out var sendback);
                     var now = DateTime.Now;
                     if (remote != null && remote.IsClose)
                     {
@@ -1354,7 +1359,7 @@ namespace Shadowsocks.Proxy
                             {
                                 server.SpeedLog.ResetEmptyTimes();
                             }
-                            connection.Send(remoteSendBuffer, bytesRead, 0);
+                            connection.Send(remoteSendBuffer, bytesRead, SocketFlags.None);
                         }
                         else
                         {

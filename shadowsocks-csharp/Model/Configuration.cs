@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using Shadowsocks.Util.NetUtils;
 
 namespace Shadowsocks.Model
 {
@@ -384,7 +385,7 @@ namespace Shadowsocks.Model
                 if (id.ContainsKey(server.Id))
                 {
                     var newId = new byte[16];
-                    Utils.RandBytes(newId, newId.Length);
+                    RNG.RandBytes(newId, newId.Length);
                     server.Id = BitConverter.ToString(newId).Replace("-", string.Empty);
                 }
                 else

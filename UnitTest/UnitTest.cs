@@ -1,10 +1,11 @@
-﻿using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shadowsocks.Encryption;
 using Shadowsocks.GitHubRelease;
 using Shadowsocks.Util;
+using Shadowsocks.Util.NetUtils;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace UnitTest
 {
@@ -39,7 +40,7 @@ namespace UnitTest
         public void EncryptStringTest()
         {
             var largeBytes = new byte[ushort.MaxValue * 100];
-            Utils.RandBytes(largeBytes);
+            RNG.RandBytes(largeBytes);
             var largeStr = Encoding.UTF8.GetString(largeBytes);
             using var encryptor = EncryptorFactory.GetEncryptor(@"aes-256-cfb", @"密码");
 

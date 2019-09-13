@@ -193,7 +193,7 @@ namespace Shadowsocks.Controller.Service
                         string key, val;
                         key = p.Substring(0, index);
                         val = p.Substring(index + 1);
-                        params_dict[key] = Util.Utils.urlDecode(val);
+                        params_dict[key] = Util.Utils.UrlDecode(val);
                     }
                 }
             }

@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Shadowsocks.Model;
+using Shadowsocks.Util.NetUtils;
+using System;
 using System.Net;
-using Shadowsocks.Model;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -24,7 +24,7 @@ namespace Shadowsocks.Controller.Service
             {
                 var http = new WebClient();
                 http.Headers.Add(@"User-Agent", string.IsNullOrEmpty(config.proxyUserAgent) ? UserAgent : config.proxyUserAgent);
-                http.QueryString[@"rnd"] = Utils.RandUInt32().ToString();
+                http.QueryString[@"rnd"] = RNG.RandUInt32().ToString();
                 if (useProxy)
                 {
                     var proxy = new WebProxy(Configuration.LocalHost, config.localPort);

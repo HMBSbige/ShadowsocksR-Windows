@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Shadowsocks.Model;
+using Shadowsocks.Util.NetUtils;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-using Shadowsocks.Model;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Encryption.Stream
 {
@@ -68,7 +68,7 @@ namespace Shadowsocks.Encryption.Stream
         {
             method = method.ToLower();
             _method = method;
-            var k = method + ":" + password;
+            var k = $@"{method}:{password}";
             ciphers = getCiphers();
             _cipherInfo = ciphers[_method];
             _innerLibName = string.IsNullOrWhiteSpace(_cipherInfo.name) ? method : _cipherInfo.name;
@@ -96,12 +96,12 @@ namespace Shadowsocks.Encryption.Stream
             if (_key == null)
                 _key = CachedKeys.Get(k);
             Array.Resize(ref _iv, ivLen);
-            Utils.RandBytes(_iv, ivLen);
+            RNG.RandBytes(_iv, ivLen);
         }
 
         public static void bytesToKey(byte[] password, byte[] key)
         {
-            var result = new byte[password.Length + 16];
+            var result = new byte[password.Length + MD5_LEN];
             var i = 0;
             byte[] md5Sum = null;
             while (i < key.Length)
@@ -210,7 +210,7 @@ namespace Shadowsocks.Encryption.Stream
         public override void ResetEncrypt()
         {
             _encryptIVSent = false;
-            Utils.RandBytes(_iv, ivLen);
+            RNG.RandBytes(_iv, ivLen);
         }
 
         public override void ResetDecrypt()

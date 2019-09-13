@@ -17,26 +17,19 @@
             this.name = name;
         }
     }
+
     public abstract class EncryptorBase : IEncryptor
     {
         public const int MAX_INPUT_SIZE = 32768;
 
         public const int MD5_LEN = 16;
 
-        public const int CHUNK_LEN_BYTES = 2;
+        public const int ADDR_PORT_LEN = 2;
+        public const int ADDR_ATYP_LEN = 1;
 
-        public const uint CHUNK_LEN_MASK = 0x3FFFu;
-
-        public const int RecvSize = 2048;
-
-        // overhead of one chunk, reserved for AEAD ciphers
-        public const int ChunkOverheadSize = 16 * 2 /* two tags */ + CHUNK_LEN_BYTES;
-
-        // max chunk size
-        public const uint MaxChunkSize = CHUNK_LEN_MASK + CHUNK_LEN_BYTES + 16 * 2;
-
-        // In general, the ciphertext length, we should take overhead into account
-        public const int BufferSize = RecvSize + (int)MaxChunkSize + 32 /* max salt len */;
+        public const int ATYP_IPv4 = 0x01;
+        public const int ATYP_DOMAIN = 0x03;
+        public const int ATYP_IPv6 = 0x04;
 
         protected EncryptorBase(string method, string password)
         {

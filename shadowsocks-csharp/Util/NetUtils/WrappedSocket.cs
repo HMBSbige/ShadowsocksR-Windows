@@ -80,7 +80,7 @@ namespace Shadowsocks.Util.NetUtils
                 {
                     var ex = args.ConnectByNameError ?? new SocketException((int)args.SocketError);
 
-                    var r = new FakeAsyncResult()
+                    var r = new FakeAsyncResult
                     {
                         AsyncState = token.AsyncState,
                         InternalException = ex
@@ -109,7 +109,7 @@ namespace Shadowsocks.Util.NetUtils
                                 _activeSocket.FullClose();
                             }
 
-                            var r = new FakeAsyncResult()
+                            var r = new FakeAsyncResult
                             {
                                 AsyncState = token.AsyncState
                             };
@@ -172,9 +172,7 @@ namespace Shadowsocks.Util.NetUtils
 
         }
 
-        public IAsyncResult BeginSend(byte[] buffer, int offset, int size, SocketFlags socketFlags,
-            AsyncCallback callback,
-            object state)
+        public IAsyncResult BeginSend(byte[] buffer, int offset, int size, SocketFlags socketFlags, AsyncCallback callback, object state)
         {
             if (_disposed)
             {
@@ -202,9 +200,7 @@ namespace Shadowsocks.Util.NetUtils
             return _activeSocket.EndSend(asyncResult);
         }
 
-        public IAsyncResult BeginReceive(byte[] buffer, int offset, int size, SocketFlags socketFlags,
-            AsyncCallback callback,
-            object state)
+        public IAsyncResult BeginReceive(byte[] buffer, int offset, int size, SocketFlags socketFlags, AsyncCallback callback, object state)
         {
             if (_disposed)
             {

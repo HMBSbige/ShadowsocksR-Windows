@@ -50,7 +50,7 @@ namespace Shadowsocks.Proxy
                 local_sendback_protocol = null;
             }
 
-            return SendAll(buffer, size, 0);
+            return SendAll(buffer, size, flags);
         }
 
     }

@@ -2,6 +2,7 @@
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
 using Shadowsocks.Util;
+using Shadowsocks.Util.NetUtils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -95,7 +96,7 @@ namespace Shadowsocks.Controller.Service
             http.Proxy = proxy;
             http.BaseAddress = GFWLIST_URL;
             http.DownloadStringCompleted += http_DownloadStringCompleted;
-            http.DownloadStringAsync(new Uri($@"{GFWLIST_URL}?rnd={Utils.RandUInt32()}"));
+            http.DownloadStringAsync(new Uri($@"{GFWLIST_URL}?rnd={RNG.RandUInt32()}"));
         }
 
         #region OnlinePAC
@@ -140,7 +141,7 @@ namespace Shadowsocks.Controller.Service
             }
             http.Proxy = proxy;
             http.DownloadStringCompleted += http_DownloadOnlinePACCompleted;
-            http.DownloadStringAsync(new Uri($@"{url}?rnd={Utils.RandUInt32()}"));
+            http.DownloadStringAsync(new Uri($@"{url}?rnd={RNG.RandUInt32()}"));
         }
 
         #endregion
