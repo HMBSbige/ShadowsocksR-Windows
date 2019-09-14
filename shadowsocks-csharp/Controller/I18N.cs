@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Shadowsocks.Properties;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Shadowsocks.Properties;
 
 namespace Shadowsocks.Controller
 {

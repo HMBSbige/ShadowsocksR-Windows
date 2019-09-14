@@ -1,6 +1,5 @@
 ﻿using Shadowsocks.Model;
 using Shadowsocks.Util;
-using Shadowsocks.Util.NetUtils;
 using System;
 using System.Collections.Generic;
 using System.IO;

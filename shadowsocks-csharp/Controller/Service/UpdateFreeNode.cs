@@ -1,5 +1,5 @@
 ﻿using Shadowsocks.Model;
-using Shadowsocks.Util.NetUtils;
+using Shadowsocks.Util;
 using System;
 using System.Net;
 

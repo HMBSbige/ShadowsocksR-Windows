@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Shadowsocks.Encryption;
 using Shadowsocks.Util;
-using Shadowsocks.Util.NetUtils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -295,7 +294,7 @@ namespace Shadowsocks.Model
             dnsServer = string.Empty;
             localDnsServer = string.Empty;
 
-            balanceAlgorithm = @"LowException";
+            balanceAlgorithm = LoadBalance.LowException.ToString();
             random = false;
             sysProxyMode = ProxyMode.NoModify;
             proxyRuleMode = ProxyRuleMode.Disable;

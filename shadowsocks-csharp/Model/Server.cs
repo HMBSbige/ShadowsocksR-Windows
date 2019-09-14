@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Shadowsocks.Util;
-using Shadowsocks.Util.NetUtils;
 using Shadowsocks.ViewModel;
 using System;
 using System.Collections.Generic;

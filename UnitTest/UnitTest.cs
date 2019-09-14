@@ -2,7 +2,6 @@
 using Shadowsocks.Encryption;
 using Shadowsocks.GitHubRelease;
 using Shadowsocks.Util;
-using Shadowsocks.Util.NetUtils;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -50,5 +49,6 @@ namespace UnitTest
 
             Assert.AreEqual(largeStr, decodeStr);
         }
+
     }
 }

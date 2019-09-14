@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 
-namespace Shadowsocks.Util.NetUtils
+namespace Shadowsocks.Util
 {
     public static class RNG
     {

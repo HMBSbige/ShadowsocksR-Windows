@@ -80,4 +80,34 @@
     <sys:String x:Key="Enabled">已启用</sys:String>
     <sys:String x:Key="Disabled">已禁用</sys:String>
 
+    <sys:String x:Key="ControllerError">ShadowsocksR Error: {0}</sys:String>
+
+    <sys:String x:Key="Colon" xml:space="preserve">：</sys:String>
+
+    <sys:String x:Key="OneByOne">按次序</sys:String>
+    <sys:String x:Key="Random">随机</sys:String>
+    <sys:String x:Key="FastDownloadSpeed">下载速度优先</sys:String>
+    <sys:String x:Key="LowLatency">低延迟优先</sys:String>
+    <sys:String x:Key="LowException">低错误优先</sys:String>
+    <sys:String x:Key="SelectedFirst">选中优先</sys:String>
+    <sys:String x:Key="Timer">定时切换</sys:String>
+
+    <sys:String x:Key="BalanceInGroup">所选组切换</sys:String>
+    <sys:String x:Key="AutoBan">自动禁用出错服务器</sys:String>
+
+    <sys:String x:Key="RunningPort">正在运行：端口 {0}</sys:String>
+
+    <sys:String x:Key="UpdatePacFailed">更新 PAC 文件失败</sys:String>
+    <sys:String x:Key="GfwListPacUpdated">更新 GFWList PAC 成功</sys:String>
+    <sys:String x:Key="PacUpdated">更新 PAC 成功</sys:String>
+    <sys:String x:Key="GfwListPacNotFound">未发现更新。如有问题请提交给 GFWList</sys:String>
+    <sys:String x:Key="PacNotFound">未发现更新</sys:String>
+
+    <sys:String x:Key="Success">成功</sys:String>
+    <sys:String x:Key="Error">错误</sys:String>
+
+    <sys:String x:Key="UpdateSubscribeSuccess">服务器订阅 {0} 更新成功</sys:String>
+    <sys:String x:Key="UpdateSubscribeFailure">服务器订阅 {0} 更新失败</sys:String>
+
+    <sys:String x:Key="QrCodeNotFound">未发现二维码，尝试把它放大或移动到靠近屏幕中间的位置</sys:String>
 </ResourceDictionary>

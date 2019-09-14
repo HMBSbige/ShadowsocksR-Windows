@@ -80,4 +80,34 @@
     <sys:String x:Key="Enabled">Enabled</sys:String>
     <sys:String x:Key="Disabled">Disabled</sys:String>
 
+    <sys:String x:Key="ControllerError">ShadowsocksR Error: {0}</sys:String>
+
+    <sys:String x:Key="Colon" xml:space="preserve">: </sys:String>
+
+    <sys:String x:Key="OneByOne">OneByOne</sys:String>
+    <sys:String x:Key="Random">Random</sys:String>
+    <sys:String x:Key="FastDownloadSpeed">FastDownloadSpeed</sys:String>
+    <sys:String x:Key="LowLatency">LowLatency</sys:String>
+    <sys:String x:Key="LowException">LowException</sys:String>
+    <sys:String x:Key="SelectedFirst">SelectedFirst</sys:String>
+    <sys:String x:Key="Timer">Timer</sys:String>
+
+    <sys:String x:Key="BalanceInGroup">Balance in group</sys:String>
+    <sys:String x:Key="AutoBan">AutoBan</sys:String>
+
+    <sys:String x:Key="RunningPort">Running: Port {0}</sys:String>
+
+    <sys:String x:Key="UpdatePacFailed">Failed to update PAC file</sys:String>
+    <sys:String x:Key="GfwListPacUpdated">GFWList PAC updated</sys:String>
+    <sys:String x:Key="PacUpdated">PAC updated</sys:String>
+    <sys:String x:Key="GfwListPacNotFound">No updates found. Please report to GFWList if you have problems with it.</sys:String>
+    <sys:String x:Key="PacNotFound">No updates found.</sys:String>
+
+    <sys:String x:Key="Success">Success</sys:String>
+    <sys:String x:Key="Error">Error</sys:String>
+
+    <sys:String x:Key="UpdateSubscribeSuccess">Update subscribe {0} success</sys:String>
+    <sys:String x:Key="UpdateSubscribeFailure">Update subscribe {0} failure</sys:String>
+
+    <sys:String x:Key="QrCodeNotFound">No QRCode found. Try to zoom in or move it to the center of the screen.</sys:String>
 </ResourceDictionary>

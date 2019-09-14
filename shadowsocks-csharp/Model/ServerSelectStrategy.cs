@@ -146,7 +146,7 @@ namespace Shadowsocks.Model
             }
             if (lastUserSelectIndex != curIndex)
             {
-                if (configs.Count > curIndex && curIndex >= 0 && algorithm != "Timer")
+                if (configs.Count > curIndex && curIndex >= 0 && algorithm != LoadBalance.Timer.ToString())
                 {
                     lastSelectIndex = curIndex;
                 }
@@ -183,7 +183,7 @@ namespace Shadowsocks.Model
                         serverList.Add(new ServerIndex(i, configs[i]));
                     }
                 }
-                if (forceChange && serverList.Count > 1 && algorithm != "OneByOne")
+                if (forceChange && serverList.Count > 1 && algorithm != LoadBalance.OneByOne.ToString())
                 {
                     for (var i = 0; i < serverList.Count; ++i)
                     {
@@ -203,7 +203,7 @@ namespace Shadowsocks.Model
                 var serverListIndex = -1;
                 if (serverList.Count > 0)
                 {
-                    if (algorithm == "OneByOne")
+                    if (algorithm == LoadBalance.OneByOne.ToString())
                     {
                         var selIndex = -1;
                         for (var i = 0; i < serverList.Count; ++i)
@@ -216,16 +216,16 @@ namespace Shadowsocks.Model
                         }
                         serverListIndex = serverList[(selIndex + 1) % serverList.Count].index;
                     }
-                    else if (algorithm == "Random")
+                    else if (algorithm == LoadBalance.Random.ToString())
                     {
                         serverListIndex = randomGennarator.Next(serverList.Count);
                         serverListIndex = serverList[serverListIndex].index;
                     }
-                    else if (algorithm == "LowException"
-                        || algorithm == "Timer"
-                        || algorithm == "FastDownloadSpeed")
+                    else if (algorithm == LoadBalance.LowException.ToString()
+                        || algorithm == LoadBalance.Timer.ToString()
+                        || algorithm == LoadBalance.FastDownloadSpeed.ToString())
                     {
-                        if (algorithm == "Timer")
+                        if (algorithm == LoadBalance.Timer.ToString())
                         {
                             if ((DateTime.Now - lastSelectTime).TotalSeconds > 60 * 5)
                             {
@@ -241,7 +241,7 @@ namespace Shadowsocks.Model
                         }
                         var chances = new List<double>();
                         double lastBeginVal = 0;
-                        if (algorithm == "FastDownloadSpeed")
+                        if (algorithm == LoadBalance.FastDownloadSpeed.ToString())
                         {
                             long avg_speed = 1024 * 64;
                             long sum_speed = 0;
@@ -307,7 +307,7 @@ namespace Shadowsocks.Model
                                 lastBeginVal += chance;
                             }
                         }
-                        if (algorithm == "SelectedFirst"
+                        if (algorithm == LoadBalance.SelectedFirst.ToString()
                             && randomGennarator.Next(3) == 0
                             && configs[curIndex].Enable)
                         {
