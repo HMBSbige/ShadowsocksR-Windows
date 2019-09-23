@@ -79,20 +79,15 @@ namespace Shadowsocks.Util.NetUtils
 
         public static IPAddress QueryDns(string host, string dns_servers, bool IPv6_first = false)
         {
-            var ret_ipAddress = Query(host, dns_servers, IPv6_first);
-            if (ret_ipAddress == null)
-            {
-                Logging.Info($@"DNS query {host} failed.");
-            }
-            else
-            {
-                Logging.Info($@"DNS query {host} answer {ret_ipAddress}");
-            }
+            var retIpAddress = Query(host, dns_servers, IPv6_first);
+            Logging.Info(retIpAddress == null
+                    ? $@"DNS query {host} failed."
+                    : $@"DNS query {host} answer {retIpAddress}");
 
-            return ret_ipAddress;
+            return retIpAddress;
         }
 
-        private static IPAddress Query(string host, string dnsServers, bool IPv6_first = false)
+        private static IPAddress Query(string host, string dnsServers, bool ipv6_first = false)
         {
             try
             {
@@ -103,7 +98,7 @@ namespace Shadowsocks.Util.NetUtils
                         UseCache = false
                     };
                     IPAddress r;
-                    if (IPv6_first)
+                    if (ipv6_first)
                     {
                         try
                         {
@@ -152,29 +147,23 @@ namespace Shadowsocks.Util.NetUtils
                         }
                     }
                 }
-            }
-            catch
-            {
-                // ignored
-            }
-
-            try
-            {
-
-                var ips = Dns.GetHostAddresses(host);
-                var type = IPv6_first ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
-
-                foreach (var ad in ips)
+                else
                 {
-                    if (ad.AddressFamily == type)
+                    var ips = Dns.GetHostAddresses(host);
+                    var type = ipv6_first ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
+
+                    foreach (var ad in ips)
+                    {
+                        if (ad.AddressFamily == type)
+                        {
+                            return ad;
+                        }
+                    }
+
+                    foreach (var ad in ips)
                     {
                         return ad;
                     }
-                }
-
-                foreach (var ad in ips)
-                {
-                    return ad;
                 }
             }
             catch
