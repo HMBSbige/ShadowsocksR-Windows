@@ -8,7 +8,7 @@ jobs:
     runs-on: windows-latest
     strategy:
         matrix:
-            dotnet: ['3.0.100-preview9-014004']
+            dotnet: ['3.0.100-rc1-014190']
     name: dotnet ${{ matrix.dotnet }}
     steps:
     - uses: actions/checkout@master
