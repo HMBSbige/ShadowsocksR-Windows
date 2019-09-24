@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 
-namespace Shadowsocks.Controller.Service
+namespace Shadowsocks.Controller.HttpRequest
 {
     public class UpdateChecker
     {

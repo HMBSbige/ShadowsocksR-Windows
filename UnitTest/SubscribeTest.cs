@@ -1,8 +1,8 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Shadowsocks.Controller.Service;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Util;
+using System;
+using System.Text.RegularExpressions;
 
 namespace UnitTest
 {
@@ -18,7 +18,7 @@ namespace UnitTest
                 throw new FormatException();
 
             var res = Base64.DecodeUrlSafeBase64(sub.Groups[1].Value);
-            Assert.AreEqual(res, UpdateFreeNode.DefaultUpdateUrl);
+            Assert.AreEqual(res, UpdateNode.DefaultUpdateUrl);
         }
     }
 }

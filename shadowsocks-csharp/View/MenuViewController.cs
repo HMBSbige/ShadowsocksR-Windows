@@ -1,6 +1,7 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Win32;
 using Shadowsocks.Controller;
+using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Controller.Service;
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
@@ -39,7 +40,7 @@ namespace Shadowsocks.View
 
         private readonly ShadowsocksController controller;
         private readonly UpdateChecker updateChecker;
-        private readonly UpdateFreeNode updateFreeNodeChecker;
+        private readonly UpdateNode _updateNodeChecker;
         private readonly UpdateSubscribeManager updateSubscribeManager;
 
         private readonly TaskbarIcon _notifyIcon;
@@ -113,8 +114,8 @@ namespace Shadowsocks.View
             updateChecker.NewVersionNotFound += updateChecker_NewVersionNotFound;
             updateChecker.NewVersionFoundFailed += UpdateChecker_NewVersionFoundFailed;
 
-            updateFreeNodeChecker = new UpdateFreeNode();
-            updateFreeNodeChecker.NewFreeNodeFound += updateFreeNodeChecker_NewFreeNodeFound;
+            _updateNodeChecker = new UpdateNode();
+            _updateNodeChecker.NewFreeNodeFound += UpdateNodeCheckerNewNodeFound;
 
             updateSubscribeManager = new UpdateSubscribeManager();
 
@@ -135,7 +136,7 @@ namespace Shadowsocks.View
                 updateChecker.Check(cfg, false);
             }
 
-            updateSubscribeManager.CreateTask(cfg, updateFreeNodeChecker, !cfg.IsDefaultConfig(), false);
+            updateSubscribeManager.CreateTask(cfg, _updateNodeChecker, false);
         }
 
         private static void ControllerError(object sender, ErrorEventArgs e)
@@ -321,7 +322,6 @@ namespace Shadowsocks.View
                         {
                             ((MenuItem)menuItem.Items[0]).Click += SubscribeSetting_Click;
                             ((MenuItem)menuItem.Items[1]).Click += CheckNodeUpdate_Click;
-                            ((MenuItem)menuItem.Items[2]).Click += CheckNodeUpdateBypassProxy_Click;
                             break;
                         }
                         case @"GlobalSettings":
@@ -426,7 +426,7 @@ namespace Shadowsocks.View
             _notifyIcon.ShowBalloonTip(UpdateChecker.Name, result, BalloonIcon.Info);
         }
 
-        private void updateFreeNodeChecker_NewFreeNodeFound(object sender, EventArgs e)
+        private void UpdateNodeCheckerNewNodeFound(object sender, EventArgs e)
         {
             if (configFrom_open)
             {
@@ -435,10 +435,10 @@ namespace Shadowsocks.View
             }
             string lastGroup = null;
             var count = 0;
-            if (!string.IsNullOrWhiteSpace(updateFreeNodeChecker.FreeNodeResult))
+            if (!string.IsNullOrWhiteSpace(_updateNodeChecker.FreeNodeResult))
             {
                 var urls = new List<string>();
-                updateFreeNodeChecker.FreeNodeResult = updateFreeNodeChecker.FreeNodeResult.TrimEnd('\r', '\n', ' ');
+                _updateNodeChecker.FreeNodeResult = _updateNodeChecker.FreeNodeResult.TrimEnd('\r', '\n', ' ');
                 var config = controller.GetCurrentConfiguration();
                 Server selectedServer = null;
                 if (config.index >= 0 && config.index < config.configs.Count)
@@ -447,13 +447,13 @@ namespace Shadowsocks.View
                 }
                 try
                 {
-                    updateFreeNodeChecker.FreeNodeResult = Base64.DecodeBase64(updateFreeNodeChecker.FreeNodeResult);
+                    _updateNodeChecker.FreeNodeResult = Base64.DecodeBase64(_updateNodeChecker.FreeNodeResult);
                 }
                 catch
                 {
-                    updateFreeNodeChecker.FreeNodeResult = string.Empty;
+                    _updateNodeChecker.FreeNodeResult = string.Empty;
                 }
-                Utils.URL_Split(updateFreeNodeChecker.FreeNodeResult, ref urls);
+                Utils.URL_Split(_updateNodeChecker.FreeNodeResult, ref urls);
                 for (var i = urls.Count - 1; i >= 0; --i)
                 {
                     if (!urls[i].StartsWith(@"ssr://"))
@@ -592,7 +592,7 @@ namespace Shadowsocks.View
                     //If Update Success
                     if (count > 0)
                     {
-                        foreach (var serverSubscribe in config.serverSubscribes.Where(serverSubscribe => serverSubscribe.Url == updateFreeNodeChecker.SubscribeTask.Url))
+                        foreach (var serverSubscribe in config.serverSubscribes.Where(serverSubscribe => serverSubscribe.Url == _updateNodeChecker.SubscribeTask.Url))
                         {
                             serverSubscribe.LastUpdateTime = (ulong)Math.Floor(DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
                         }
@@ -604,7 +604,7 @@ namespace Shadowsocks.View
 
             if (count > 0)
             {
-                if (updateFreeNodeChecker.Notify)
+                if (_updateNodeChecker.Notify)
                 {
                     _notifyIcon.ShowBalloonTip(I18NUtil.GetAppStringValue(@"Success"), string.Format(I18NUtil.GetAppStringValue(@"UpdateSubscribeSuccess"), lastGroup), BalloonIcon.Info);
                 }
@@ -613,10 +613,10 @@ namespace Shadowsocks.View
             {
                 if (lastGroup == null)
                 {
-                    lastGroup = updateFreeNodeChecker.SubscribeTask.Group;
+                    lastGroup = _updateNodeChecker.SubscribeTask.Group;
                 }
 
-                if (updateFreeNodeChecker.Notify)
+                if (_updateNodeChecker.Notify)
                 {
                     _notifyIcon.ShowBalloonTip(I18NUtil.GetAppStringValue(@"Error"), string.Format(I18NUtil.GetAppStringValue(@"UpdateSubscribeFailure"), lastGroup), BalloonIcon.Info);
                 }
@@ -800,7 +800,7 @@ namespace Shadowsocks.View
             {
                 foreach (var p in eventList)
                 {
-                    updateFreeNodeChecker_NewFreeNodeFound(p.sender, p.e);
+                    UpdateNodeCheckerNewNodeFound(p.sender, p.e);
                 }
 
                 eventList.Clear();
@@ -939,7 +939,7 @@ namespace Shadowsocks.View
             }
             else
             {
-                _subScribeWindow = new SubscribeWindow(controller, updateSubscribeManager, updateFreeNodeChecker);
+                _subScribeWindow = new SubscribeWindow(controller, updateSubscribeManager, _updateNodeChecker);
                 _subScribeWindow.Show();
                 _subScribeWindow.Activate();
                 _subScribeWindow.BringToFront();
@@ -1220,12 +1220,7 @@ namespace Shadowsocks.View
 
         private void CheckNodeUpdate_Click(object sender, RoutedEventArgs e)
         {
-            updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, true, true);
-        }
-
-        private void CheckNodeUpdateBypassProxy_Click(object sender, RoutedEventArgs e)
-        {
-            updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, false, true);
+            updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), _updateNodeChecker, true);
         }
 
         private void ShowLogItem_Click(object sender, RoutedEventArgs e)

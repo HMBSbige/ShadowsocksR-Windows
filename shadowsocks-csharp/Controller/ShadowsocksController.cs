@@ -1,4 +1,5 @@
-﻿using Shadowsocks.Controller.Service;
+﻿using Shadowsocks.Controller.HttpRequest;
+using Shadowsocks.Controller.Service;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
 using System;

@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Model;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -8,17 +9,15 @@ namespace Shadowsocks.Controller.Service
     {
         private Configuration _config;
         private List<ServerSubscribe> _serverSubscribes;
-        private UpdateFreeNode _updater;
-        private bool _useProxy;
+        private UpdateNode _updater;
         private bool _notify;
 
-        public void CreateTask(Configuration config, UpdateFreeNode updater, bool useProxy, bool updateManually, ServerSubscribe serverSubscribe = null)
+        public void CreateTask(Configuration config, UpdateNode updater, bool updateManually, ServerSubscribe serverSubscribe = null)
         {
             if (_config == null)
             {
                 _config = config;
                 _updater = updater;
-                _useProxy = useProxy;
                 _notify = updateManually;
                 _serverSubscribes = new List<ServerSubscribe>();
                 if (serverSubscribe != null)
@@ -52,7 +51,7 @@ namespace Shadowsocks.Controller.Service
             }
 
             CurrentServerSubscribe = _serverSubscribes[0];
-            _updater.CheckUpdate(_config, _serverSubscribes[0], _useProxy, _notify);
+            _updater.CheckUpdate(_config, CurrentServerSubscribe, _notify);
             _serverSubscribes.RemoveAt(0);
             return true;
         }

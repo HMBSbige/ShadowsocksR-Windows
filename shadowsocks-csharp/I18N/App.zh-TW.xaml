@@ -35,16 +35,15 @@
     <sys:String x:Key="DisconnectCurrent">斷開當前所有連接</sys:String>
 
     <sys:String x:Key="ServersSubscribe">伺服器訂閱</sys:String>
-    <sys:String x:Key="SubscribeSetting">SSR伺服器訂閱設置...</sys:String>
-    <sys:String x:Key="UpdateSubscribeSsrNode">更新SSR伺服器訂閱</sys:String>
-    <sys:String x:Key="UpdateSubscribeSsrNodeBypassProxy">更新SSR伺服器訂閱（不通過代理）</sys:String>
+    <sys:String x:Key="SubscribeSetting">伺服器訂閱設置...</sys:String>
+    <sys:String x:Key="UpdateSubscribeSsrNode">更新伺服器訂閱</sys:String>
 
     <sys:String x:Key="GlobalSettings">選項設置...</sys:String>
     <sys:String x:Key="PortSettings">連接埠設置...</sys:String>
     <sys:String x:Key="ShowLogs">顯示日誌...</sys:String>
     <sys:String x:Key="UpdateAvailable">可用更新</sys:String>
     <sys:String x:Key="ScanQrCode">QR 碼掃描...</sys:String>
-    <sys:String x:Key="ImportSsrLinksFromClipboard">剪貼板批量導入ssr://連結...</sys:String>
+    <sys:String x:Key="ImportSsrLinksFromClipboard">剪貼板批量導入連結...</sys:String>
 
     <sys:String x:Key="Help">幫助</sys:String>
     <sys:String x:Key="Update">更新...</sys:String>
