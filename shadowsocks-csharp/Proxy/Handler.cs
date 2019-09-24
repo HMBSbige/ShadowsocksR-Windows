@@ -222,6 +222,7 @@ namespace Shadowsocks.Proxy
                         s.SpeedLog.AddErrorDecodeTimes();
                     }
                 }
+
                 return 16; // ObfsException(decrypt error)
             }
 
@@ -235,106 +236,97 @@ namespace Shadowsocks.Proxy
                         s.SpeedLog.AddErrorDecodeTimes();
                     }
                 }
+
                 return 16; // ObfsException(decrypt error)
             }
 
             if (e is SocketException se)
             {
-                if (se.SocketErrorCode == SocketError.ConnectionAborted
-                    || se.SocketErrorCode == SocketError.ConnectionReset
-                    || se.SocketErrorCode == SocketError.NotConnected
-                    || se.SocketErrorCode == SocketError.Interrupted
-                    || se.SocketErrorCode == SocketError.Shutdown
-                )
+                switch (se.SocketErrorCode)
                 {
-                    // closed by browser when sending
-                    // normally happens when download is canceled or a tab is closed before page is loaded
-                }
-                else if (se.SocketErrorCode == SocketError.NoData)
-                {
-                    if (lastErrCode == 0)
+                    case SocketError.ConnectionAborted:
+                    case SocketError.ConnectionReset:
+                    case SocketError.NotConnected:
+                    case SocketError.Interrupted:
+                    case SocketError.Shutdown:
+                        // closed by browser when sending
+                        // normally happens when download is canceled or a tab is closed before page is loaded
+                        break;
+                    case SocketError.NoData:
                     {
-                        if (s != null)
+                        if (lastErrCode == 0)
                         {
-                            lastErrCode = 1;
-                            s.SpeedLog.AddErrorTimes();
-                            if (s.SpeedLog.ErrorConnectTimes >= 3 && cfg.AutoSwitchOff)
+                            if (s != null)
                             {
-                                s.Enable = false;
-                            }
-                        }
-                    }
-                    return 1; // proxy DNS error
-                }
-                else if (se.SocketErrorCode == SocketError.HostNotFound)
-                {
-                    if (lastErrCode == 0)
-                    {
-                        if (s != null)
-                        {
-                            lastErrCode = 2;
-                            s.SpeedLog.AddErrorTimes();
-                            if (s.SpeedLog.ErrorConnectTimes >= 3 && cfg.AutoSwitchOff)
-                            {
-                                s.Enable = false;
-                            }
-                        }
-                    }
-                    return 2; // ip not exist
-                }
-                else if (se.SocketErrorCode == SocketError.ConnectionRefused)
-                {
-                    if (lastErrCode == 0)
-                    {
-                        if (s != null)
-                        {
-                            lastErrCode = 1;
-                            if (cfg != null && cfg.Socks5RemotePort == 0)
-                            {
+                                lastErrCode = 1;
                                 s.SpeedLog.AddErrorTimes();
-                                if (s.SpeedLog.ErrorConnectTimes >= 3 && cfg.AutoSwitchOff)
+                            }
+                        }
+
+                        return 1; // proxy DNS error
+                    }
+                    case SocketError.HostNotFound:
+                    {
+                        if (lastErrCode == 0)
+                        {
+                            if (s != null)
+                            {
+                                lastErrCode = 2;
+                                s.SpeedLog.AddErrorTimes();
+                            }
+                        }
+
+                        return 2; // ip not exist
+                    }
+                    case SocketError.ConnectionRefused:
+                    {
+                        if (lastErrCode == 0)
+                        {
+                            if (s != null)
+                            {
+                                lastErrCode = 1;
+                                if (cfg != null && cfg.Socks5RemotePort == 0)
                                 {
-                                    s.Enable = false;
+                                    s.SpeedLog.AddErrorTimes();
                                 }
                             }
                         }
+
+                        return 2; // proxy ip/port error
                     }
-                    return 2; // proxy ip/port error
-                }
-                else if (se.SocketErrorCode == SocketError.NetworkUnreachable)
-                {
-                    if (lastErrCode == 0)
+                    case SocketError.NetworkUnreachable:
                     {
-                        if (s != null)
+                        if (lastErrCode == 0 && s != null)
                         {
                             lastErrCode = 3;
-                            //s.SpeedLog.AddErrorTimes();
+                            s.SpeedLog.AddErrorTimes();
                         }
+
+                        return 3; // proxy ip/port error
                     }
-                    return 3; // proxy ip/port error
-                }
-                else if (se.SocketErrorCode == SocketError.TimedOut)
-                {
-                    if (lastErrCode == 0)
+                    case SocketError.TimedOut:
                     {
-                        if (s != null)
+                        if (lastErrCode == 0 && s != null)
                         {
                             lastErrCode = 8;
                             s.SpeedLog.AddTimeoutTimes();
                         }
+
+                        return 8; // proxy server no response too slow
                     }
-                    return 8; // proxy server no response too slow
-                }
-                else
-                {
-                    if (lastErrCode == 0)
+                    default:
                     {
-                        lastErrCode = -1;
-                        s?.SpeedLog.AddNoErrorTimes(); //?
+                        if (lastErrCode == 0)
+                        {
+                            lastErrCode = -1;
+                            s?.SpeedLog.AddNoErrorTimes(); //?
+                        }
+
+                        return -1;
                     }
-                    return -1;
                 }
             }
+
             return 0;
         }
 
@@ -679,6 +671,17 @@ namespace Shadowsocks.Proxy
                 {
                     connection = null;
                     connectionUDP = null;
+                }
+
+
+                if (cfg != null && cfg.AutoSwitchOff && server != null)
+                {
+                    if (server.SpeedLog.ErrorPercent.HasValue && server.SpeedLog.ErrorPercent >= 1
+                    && (server.SpeedLog.ConnectError >= 3 || server.SpeedLog.ErrorContinuousTimes >= 3 ||
+                       server.SpeedLog.ErrorTimeoutTimes >= 3 || server.SpeedLog.ErrorEmptyTimes >= 3))
+                    {
+                        server.Enable = false;
+                    }
                 }
             }
             catch (Exception e)
