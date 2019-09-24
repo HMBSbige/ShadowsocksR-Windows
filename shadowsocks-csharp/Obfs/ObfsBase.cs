@@ -72,7 +72,7 @@ namespace Shadowsocks.Obfs
         {
             if (plaindata == null || plaindata.Length < 2)
                 return defaultValue;
-            int head_type = plaindata[0] & 0x7;
+            var head_type = plaindata[0] & 0x7;
             if (head_type == 1)
                 return 7;
             if (head_type == 4)

@@ -1,6 +1,5 @@
-﻿using Shadowsocks.Model;
-using Shadowsocks.Proxy;
-using Shadowsocks.Proxy.SystemProxy;
+﻿using Shadowsocks.Controller.Service;
+using Shadowsocks.Model;
 using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
@@ -22,6 +21,7 @@ namespace Shadowsocks.Controller
 
         private Listener _listener;
         private List<Listener> _port_map_listener;
+        private PACDaemon _pacDaemon;
         private PACServer _pacServer;
         private Configuration _config;
         private ServerTransferTotal _transfer;
@@ -334,7 +334,7 @@ namespace Shadowsocks.Controller
             privoxyRunner?.Stop();
             if (_config.sysProxyMode != ProxyMode.NoModify && _config.sysProxyMode != ProxyMode.Direct)
             {
-                SystemProxy.Update(_config, true, null);
+                SystemProxy.SystemProxy.Update(_config, true, null);
             }
             ServerTransferTotal.Save(_transfer);
         }
@@ -356,12 +356,12 @@ namespace Shadowsocks.Controller
 
         public void TouchPACFile()
         {
-            PACFileReadyToOpen?.Invoke(this, new PathEventArgs { Path = PACServer.TouchPACFile() });
+            PACFileReadyToOpen?.Invoke(this, new PathEventArgs { Path = _pacDaemon.TouchPACFile() });
         }
 
         public void TouchUserRuleFile()
         {
-            UserRuleFileReadyToOpen?.Invoke(this, new PathEventArgs { Path = PACServer.TouchUserRuleFile() });
+            UserRuleFileReadyToOpen?.Invoke(this, new PathEventArgs { Path = _pacDaemon.TouchUserRuleFile() });
         }
 
         public void UpdatePACFromGFWList()
@@ -400,17 +400,23 @@ namespace Shadowsocks.Controller
             hostMap.LoadHostFile();
             HostMap.Instance().Clear(hostMap);
 
+            GlobalConfiguration.OSSupportsLocalIPv6 = Socket.OSSupportsIPv6;
+
             if (privoxyRunner == null)
             {
                 privoxyRunner = new HttpProxyRunner();
             }
+            if (_pacDaemon == null)
+            {
+                _pacDaemon = new PACDaemon();
+                _pacDaemon.PACFileChanged += PacDaemon_PACFileChanged;
+                _pacDaemon.UserRuleFileChanged += PacDaemon_UserRuleFileChanged;
+            }
             if (_pacServer == null)
             {
-                _pacServer = new PACServer();
-                _pacServer.PACFileChanged += pacServer_PACFileChanged;
-                _pacServer.UserRuleFileChanged += pacServer_UserRuleFileChanged;
+                _pacServer = new PACServer(_pacDaemon);
             }
-            _pacServer.UpdateConfiguration(_config);
+            _pacServer.UpdatePacUrl(_config);
             if (gfwListUpdater == null)
             {
                 gfwListUpdater = new GFWListUpdater();
@@ -426,17 +432,17 @@ namespace Shadowsocks.Controller
 
             _listener?.Stop();
 
+            privoxyRunner.Stop();
             // don't put PrivoxyRunner.Start() before pacServer.Stop()
             // or bind will fail when switching bind address from 0.0.0.0 to 127.0.0.1
             // though UseShellExecute is set to true now
             // http://stackoverflow.com/questions/10235093/socket-doesnt-close-after-application-exits-if-a-launched-process-is-open
             try
             {
-                privoxyRunner.Stop();
                 privoxyRunner.Start(_config);
 
                 var local = new Local(_config, _transfer, _rangeSet);
-                var services = new List<Listener.Service>
+                var services = new List<Listener.IService>
                 {
                     local,
                     _pacServer,
@@ -445,7 +451,6 @@ namespace Shadowsocks.Controller
                 };
                 _listener = new Listener(services);
                 _listener.Start(_config, 0);
-
             }
             catch (Exception e)
             {
@@ -453,14 +458,18 @@ namespace Shadowsocks.Controller
                 // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
                 if (e is SocketException se)
                 {
-                    if (se.SocketErrorCode == SocketError.AddressAlreadyInUse)
+                    switch (se.SocketErrorCode)
                     {
-                        e = new Exception(string.Format(I18N.GetString("Port {0} already in use"), _config.localPort),
-                                se);
-                    }
-                    else if (se.SocketErrorCode == SocketError.AccessDenied)
-                    {
-                        e = new Exception(string.Format(I18N.GetString("Port {0} is reserved by system"), _config.localPort), se);
+                        case SocketError.AddressAlreadyInUse:
+                        {
+                            e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortInUse"), _config.localPort), se);
+                            break;
+                        }
+                        case SocketError.AccessDenied:
+                        {
+                            e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortReserved"), _config.localPort), se);
+                            break;
+                        }
                     }
                 }
 
@@ -474,7 +483,7 @@ namespace Shadowsocks.Controller
                 try
                 {
                     var local = new Local(_config, _transfer, _rangeSet);
-                    var services = new List<Listener.Service> { local };
+                    var services = new List<Listener.IService> { local };
                     var listener = new Listener(services);
                     listener.Start(_config, pair.Key);
                     _port_map_listener.Add(listener);
@@ -487,11 +496,11 @@ namespace Shadowsocks.Controller
                     {
                         if (se.SocketErrorCode == SocketError.AddressAlreadyInUse)
                         {
-                            e = new Exception(string.Format(I18N.GetString("Port {0} already in use"), pair.Key), e);
+                            e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortInUse"), pair.Key), e);
                         }
                         else if (se.SocketErrorCode == SocketError.AccessDenied)
                         {
-                            e = new Exception(string.Format(I18N.GetString("Port {0} is reserved by system"), pair.Key), se);
+                            e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortReserved"), pair.Key), se);
                         }
                     }
                     Logging.LogUsefulException(e);
@@ -515,18 +524,18 @@ namespace Shadowsocks.Controller
         {
             if (_config.sysProxyMode != ProxyMode.NoModify)
             {
-                SystemProxy.Update(_config, false, _pacServer);
+                SystemProxy.SystemProxy.Update(_config, false, _pacServer);
             }
         }
 
-        private void pacServer_PACFileChanged(object sender, EventArgs e)
+        private void PacDaemon_PACFileChanged(object sender, EventArgs e)
         {
             UpdateSystemProxy();
         }
 
-        private void pacServer_UserRuleFileChanged(object sender, EventArgs e)
+        private void PacDaemon_UserRuleFileChanged(object sender, EventArgs e)
         {
-            if (!Utils.IsGFWListPAC(PACServer.PAC_FILE))
+            if (!Utils.IsGFWListPAC(PACDaemon.PAC_FILE))
             {
                 return;
             }

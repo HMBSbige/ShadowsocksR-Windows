@@ -170,6 +170,23 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        <Style x:Key="GroupHeaderStyle" TargetType="{x:Type GroupItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type GroupItem}">
+                        <Expander
+                        IsExpanded="True"
+                        Background="LightSkyBlue"
+                        BorderThickness="0">
+                            <Expander.Header>
+                                <TextBlock Text="{Binding Path=Name}" Foreground="DarkBlue"/>
+                            </Expander.Header>
+                            <ItemsPresenter />
+                        </Expander>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <Grid>
         <DockPanel>
@@ -202,6 +219,8 @@
                       VerticalGridLinesBrush="LightGray"
                       
                       Background="Transparent"
+                      BorderThickness="0,1,0,0"
+                      BorderBrush="LightGray"
 
                       HeadersVisibility="Column"
                       AutoGenerateColumns="False"
@@ -212,6 +231,15 @@
                       MouseLeftButtonUp="ServerDataGrid_MouseLeftButtonUp"
                       MouseDoubleClick="ServerDataGrid_OnMouseDoubleClick"
                       >
+                <DataGrid.GroupStyle>
+                    <GroupStyle ContainerStyle="{StaticResource GroupHeaderStyle}">
+                        <GroupStyle.Panel>
+                            <ItemsPanelTemplate>
+                                <DataGridRowsPresenter />
+                            </ItemsPanelTemplate>
+                        </GroupStyle.Panel>
+                    </GroupStyle>
+                </DataGrid.GroupStyle>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding Index}"
                     IsReadOnly="True" CellStyle="{StaticResource DefaultCellStyle}"/>

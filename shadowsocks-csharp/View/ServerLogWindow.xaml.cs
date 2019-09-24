@@ -1,4 +1,5 @@
 ﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller.Service;
 using Shadowsocks.Model;
 using Shadowsocks.ViewModel;
 using System;
@@ -22,7 +23,7 @@ namespace Shadowsocks.View
             if (status == null)
             {
                 SizeToContent = SizeToContent.Width;
-                Height = 400;
+                Height = 600;
                 WindowStartupLocation = WindowStartupLocation.CenterScreen;
             }
             else

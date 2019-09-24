@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Shadowsocks.Obfs;
+using Shadowsocks.Util;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
-using Shadowsocks.Obfs;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller
 {
@@ -147,9 +147,8 @@ namespace Shadowsocks.Controller
         {
             UpdateLogFile();
             // just log useful exceptions, not all of them
-            if (e is SocketException)
+            if (e is SocketException se)
             {
-                SocketException se = (SocketException)e;
                 if (se.SocketErrorCode == SocketError.ConnectionAborted)
                 {
                     // closed by browser when sending
@@ -194,9 +193,8 @@ namespace Shadowsocks.Controller
         {
             UpdateLogFile();
             // just log useful exceptions, not all of them
-            if (e is ObfsException)
+            if (e is ObfsException oe)
             {
-                ObfsException oe = (ObfsException)e;
                 Error("Proxy server [" + remarks + "(" + server + ")] "
                     + oe.Message);
                 return true;
@@ -213,9 +211,8 @@ namespace Shadowsocks.Controller
                 return true;
             }
 
-            if (e is SocketException)
+            if (e is SocketException se)
             {
-                SocketException se = (SocketException)e;
                 if ((uint)se.SocketErrorCode == 0x80004005)
                 {
                     // already closed

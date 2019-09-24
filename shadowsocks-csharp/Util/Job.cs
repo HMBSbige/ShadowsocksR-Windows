@@ -29,7 +29,7 @@ namespace Shadowsocks.Util
 
             try
             {
-                int length = Marshal.SizeOf(typeof(JOBOBJECT_EXTENDED_LIMIT_INFORMATION));
+                var length = Marshal.SizeOf(typeof(JOBOBJECT_EXTENDED_LIMIT_INFORMATION));
                 extendedInfoPtr = Marshal.AllocHGlobal(length);
                 Marshal.StructureToPtr(extendedInfo, extendedInfoPtr, false);
 

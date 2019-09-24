@@ -85,7 +85,7 @@ namespace Shadowsocks.Encryption.Stream
                 sodiumBuf = _decryptBuf;
                 iv = _decryptIV;
             }
-            int padding = bytesRemaining;
+            var padding = bytesRemaining;
             Buffer.BlockCopy(buf, 0, sodiumBuf, padding, length);
             _encryptorDelegate(sodiumBuf, sodiumBuf, (ulong)(padding + length), iv, ic, _key);
             Buffer.BlockCopy(sodiumBuf, padding, outbuf, 0, length);

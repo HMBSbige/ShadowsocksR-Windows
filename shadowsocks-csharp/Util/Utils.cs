@@ -1,6 +1,4 @@
-﻿using DnsClient;
-using DnsClient.Protocol;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.Model;
@@ -8,23 +6,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace Shadowsocks.Util
 {
     public static class Utils
     {
-        public static LRUCache<string, IPAddress> DnsBuffer { get; } = new LRUCache<string, IPAddress>();
-
-        public static LRUCache<string, IPAddress> LocalDnsBuffer => DnsBuffer;
-
         #region ReleaseMemory
 
         private static Process CurrentProcess => Process.GetCurrentProcess();
@@ -78,59 +68,6 @@ namespace Shadowsocks.Util
 
         #endregion
 
-        public static string UnGzip(byte[] buf)
-        {
-            var buffer = new byte[1024];
-            using var sb = new MemoryStream();
-            using (var input = new GZipStream(new MemoryStream(buf), CompressionMode.Decompress, false))
-            {
-                int n;
-                while ((n = input.Read(buffer, 0, buffer.Length)) > 0)
-                {
-                    sb.Write(buffer, 0, n);
-                }
-            }
-
-            return Encoding.UTF8.GetString(sb.ToArray());
-        }
-
-        public static void RandBytes(byte[] buf, int length = -1)
-        {
-            if (length == -1)
-            {
-                length = buf.Length;
-            }
-            var temp = new byte[length];
-            using (var rngServiceProvider = new RNGCryptoServiceProvider())
-            {
-                rngServiceProvider.GetBytes(temp);
-            }
-            temp.CopyTo(buf, 0);
-        }
-
-        public static uint RandUInt32()
-        {
-            var temp = new byte[4];
-            using (var rngServiceProvider = new RNGCryptoServiceProvider())
-            {
-                rngServiceProvider.GetBytes(temp);
-            }
-            return BitConverter.ToUInt32(temp, 0);
-        }
-
-        public static void Shuffle<T>(IList<T> list, Random rng)
-        {
-            var n = list.Count;
-            while (n > 1)
-            {
-                var k = rng.Next(n);
-                n--;
-                var value = list[k];
-                list[k] = list[n];
-                list[n] = value;
-            }
-        }
-
         public static bool BitCompare(byte[] target, int target_offset, byte[] m, int m_offset, int targetLength)
         {
             for (var i = 0; i < targetLength; ++i)
@@ -168,145 +105,12 @@ namespace Shadowsocks.Util
             return -1;
         }
 
-        public static bool isMatchSubNet(IPAddress ip, IPAddress net, int netmask)
-        {
-            var addr = ip.GetAddressBytes();
-            var net_addr = net.GetAddressBytes();
-            int i = 8, index = 0;
-            for (; i < netmask; i += 8, index += 1)
-            {
-                if (addr[index] != net_addr[index])
-                    return false;
-            }
-
-            if ((addr[index] >> (i - netmask)) != (net_addr[index] >> (i - netmask)))
-                return false;
-            return true;
-        }
-
-        public static bool isMatchSubNet(IPAddress ip, string netmask)
-        {
-            var mask = netmask.Split('/');
-            var netmask_ip = IPAddress.Parse(mask[0]);
-            if (ip.AddressFamily == netmask_ip.AddressFamily)
-            {
-                try
-                {
-                    return isMatchSubNet(ip, netmask_ip, Convert.ToInt16(mask[1]));
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-
-            return false;
-        }
-
-        public static bool isLocal(IPAddress ip)
-        {
-            var addr = ip.GetAddressBytes();
-            if (addr.Length == 4)
-            {
-                var netmasks = new[]
-                {
-                        "127.0.0.0/8",
-                        "169.254.0.0/16"
-                };
-                foreach (var netmask in netmasks)
-                {
-                    if (isMatchSubNet(ip, netmask))
-                        return true;
-                }
-
-                return false;
-            }
-
-            if (addr.Length == 16)
-            {
-                var netmasks = new[]
-                {
-                        "::1/128"
-                };
-                foreach (var netmask in netmasks)
-                {
-                    if (isMatchSubNet(ip, netmask))
-                        return true;
-                }
-
-                return false;
-            }
-
-            return true;
-        }
-
-        public static bool isLocal(Socket socket)
-        {
-            return isLocal(((IPEndPoint)socket.RemoteEndPoint).Address);
-        }
-
-        public static bool isLAN(IPAddress ip)
-        {
-            var addr = ip.GetAddressBytes();
-            if (addr.Length == 4)
-            {
-                if (ip.Equals(new IPAddress(0)))
-                    return false;
-                var netmasks = new[]
-                {
-                        "0.0.0.0/8",
-                        "10.0.0.0/8",
-                        //"100.64.0.0/10", //部分地区运营商貌似在使用这个，这个可能不安全
-                        "127.0.0.0/8",
-                        "169.254.0.0/16",
-                        "172.16.0.0/12",
-                        //"192.0.0.0/24",
-                        //"192.0.2.0/24",
-                        "192.168.0.0/16"
-                        //"198.18.0.0/15",
-                        //"198.51.100.0/24",
-                        //"203.0.113.0/24",
-                };
-                foreach (var netmask in netmasks)
-                {
-                    if (isMatchSubNet(ip, netmask))
-                        return true;
-                }
-
-                return false;
-            }
-
-            if (addr.Length == 16)
-            {
-                var netmasks = new[]
-                {
-                        "::1/128",
-                        "fc00::/7",
-                        "fe80::/10"
-                };
-                foreach (var netmask in netmasks)
-                {
-                    if (isMatchSubNet(ip, netmask))
-                        return true;
-                }
-
-                return false;
-            }
-
-            return true;
-        }
-
-        public static bool isLAN(Socket socket)
-        {
-            return isLAN(((IPEndPoint)socket.RemoteEndPoint).Address);
-        }
-
         public static string GetTimestamp(DateTime value)
         {
             return value.ToString("yyyyMMddHHmmssffff");
         }
 
-        public static string urlDecode(string str)
+        public static string UrlDecode(string str)
         {
             var ret = "";
             for (var i = 0; i < str.Length; ++i)
@@ -317,9 +121,9 @@ namespace Shadowsocks.Util
                     var val = 0;
                     var c1 = s[0];
                     var c2 = s[1];
-                    val += (c1 < 'a') ? c1 - '0' : 10 + (c1 - 'a');
+                    val += c1 < 'a' ? c1 - '0' : 10 + (c1 - 'a');
                     val *= 16;
-                    val += (c2 < 'a') ? c2 - '0' : 10 + (c2 - 'a');
+                    val += c2 < 'a' ? c2 - '0' : 10 + (c2 - 'a');
 
                     ret += (char)val;
                     i += 2;
@@ -353,175 +157,6 @@ namespace Shadowsocks.Util
             }
         }
 
-        public static IPAddress QueryDns(string host, string dns_servers, bool IPv6_first = false)
-        {
-            var ret_ipAddress = Query(host, dns_servers, IPv6_first);
-            if (ret_ipAddress == null)
-            {
-                Logging.Info($@"DNS query {host} failed.");
-            }
-            else
-            {
-                Logging.Info($@"DNS query {host} answer {ret_ipAddress}");
-            }
-
-            return ret_ipAddress;
-        }
-
-        private static IPAddress Query(string host, string dnsServers, bool IPv6_first = false)
-        {
-            try
-            {
-                if (!string.IsNullOrWhiteSpace(dnsServers))
-                {
-                    var client = new LookupClient(ToIpEndPoints(dnsServers))
-                    {
-                        UseCache = false
-                    };
-                    IPAddress r;
-                    if (IPv6_first)
-                    {
-                        try
-                        {
-                            r = client.Query(host, QueryType.AAAA).Answers.OfType<AaaaRecord>().FirstOrDefault()
-                                    ?.Address;
-                        }
-                        catch (DnsResponseException)
-                        {
-                            client.UseTcpOnly = true;
-                            r = client.Query(host, QueryType.AAAA).Answers.OfType<AaaaRecord>().FirstOrDefault()
-                                    ?.Address;
-                        }
-
-                        if (r != null)
-                        {
-                            return r;
-                        }
-
-                        r = client.Query(host, QueryType.A).Answers.OfType<ARecord>().FirstOrDefault()?.Address;
-                        if (r != null)
-                        {
-                            return r;
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
-                            r = client.Query(host, QueryType.A).Answers.OfType<ARecord>().FirstOrDefault()?.Address;
-                        }
-                        catch (DnsResponseException)
-                        {
-                            client.UseTcpOnly = true;
-                            r = client.Query(host, QueryType.A).Answers.OfType<ARecord>().FirstOrDefault()?.Address;
-                        }
-
-                        if (r != null)
-                        {
-                            return r;
-                        }
-
-                        r = client.Query(host, QueryType.AAAA).Answers.OfType<AaaaRecord>().FirstOrDefault()?.Address;
-                        if (r != null)
-                        {
-                            return r;
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                // ignored
-            }
-
-            try
-            {
-
-                var ips = Dns.GetHostAddresses(host);
-                var type = IPv6_first ? AddressFamily.InterNetworkV6 : AddressFamily.InterNetwork;
-
-                foreach (var ad in ips)
-                {
-                    if (ad.AddressFamily == type)
-                    {
-                        return ad;
-                    }
-                }
-
-                foreach (var ad in ips)
-                {
-                    return ad;
-                }
-            }
-            catch
-            {
-                // ignored
-            }
-
-            return null;
-        }
-
-        private static IPEndPoint[] ToIpEndPoints(string dnsServers, ushort defaultPort = 53)
-        {
-            var dnsServerStr = dnsServers.Split(new[] { ',', '，' }, StringSplitOptions.RemoveEmptyEntries);
-            var dnsServer = new List<IPEndPoint>();
-            foreach (var serverStr in dnsServerStr)
-            {
-                var server = serverStr.Trim();
-                var index = server.IndexOf(':');
-                string ip = null;
-                string port = null;
-                if (index >= 0)
-                {
-                    if (server.StartsWith("["))
-                    {
-                        var ipv6_end = server.IndexOf(']', 1);
-                        if (ipv6_end >= 0)
-                        {
-                            ip = server.Substring(1, ipv6_end - 1);
-
-                            index = server.IndexOf(':', ipv6_end);
-                            if (index == ipv6_end + 1)
-                            {
-                                port = server.Substring(index + 1);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        ip = server.Substring(0, index);
-                        port = server.Substring(index + 1);
-                    }
-                }
-                else
-                {
-                    index = server.IndexOf(' ');
-                    if (index >= 0)
-                    {
-                        ip = server.Substring(0, index);
-                        port = server.Substring(index + 1);
-                    }
-                    else
-                    {
-                        ip = server;
-                    }
-                }
-
-                if (ip != null && IPAddress.TryParse(ip, out var ipAddress))
-                {
-                    var iPort = defaultPort;
-                    if (port != null)
-                    {
-                        ushort.TryParse(port, out iPort);
-                    }
-
-                    dnsServer.Add(new IPEndPoint(ipAddress, iPort));
-                }
-            }
-
-            return dnsServer.ToArray();
-        }
-
         public static string GetExecutablePath()
         {
             var p = Process.GetCurrentProcess();
@@ -548,14 +183,14 @@ namespace Shadowsocks.Util
             return userKey;
         }
 
-        public static int RunAsAdmin(string Arguments)
+        public static int RunAsAdmin(string arguments)
         {
             Process process;
             var processInfo = new ProcessStartInfo
             {
                 Verb = "runas",
                 FileName = GetExecutablePath(),
-                Arguments = Arguments
+                Arguments = arguments
             };
             try
             {
@@ -608,7 +243,7 @@ namespace Shadowsocks.Util
         {
             if (File.Exists(filename))
             {
-                var original = FileManager.NonExclusiveReadAllText(PACServer.PAC_FILE, Encoding.UTF8);
+                var original = FileManager.NonExclusiveReadAllText(filename, Encoding.UTF8);
                 if (original.Contains(@"adblockplus") && !original.Contains(@"cnIpRange"))
                 {
                     return true;

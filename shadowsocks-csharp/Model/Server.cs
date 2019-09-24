@@ -476,7 +476,7 @@ namespace Shadowsocks.Model
             UdpOverTcp = false;
             Enable = true;
             var randId = new byte[16];
-            Utils.RandBytes(randId, randId.Length);
+            RNG.RandBytes(randId, randId.Length);
             Id = BitConverter.ToString(randId).Replace(@"-", @"");
 
             SpeedLog = new ServerSpeedLog();

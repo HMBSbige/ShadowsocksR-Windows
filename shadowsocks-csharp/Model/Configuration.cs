@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.Util;
 using System;
@@ -68,6 +67,14 @@ namespace Shadowsocks.Model
 
         private const string CONFIG_FILE = @"gui-config.json";
         private const string CONFIG_FILE_BACKUP = @"gui-config.json.backup";
+
+        [JsonIgnore]
+        public static string LocalHost => GlobalConfiguration.OSSupportsLocalIPv6
+                ? $@"[{IPAddress.IPv6Loopback}]"
+                : $@"{IPAddress.Loopback}";
+
+        [JsonIgnore]
+        public static string AnyHost => GlobalConfiguration.OSSupportsLocalIPv6 ? $@"[{IPAddress.IPv6Any}]" : $@"{IPAddress.Any}";
 
         public static void SetPassword(string password)
         {
@@ -287,7 +294,7 @@ namespace Shadowsocks.Model
             dnsServer = string.Empty;
             localDnsServer = string.Empty;
 
-            balanceAlgorithm = @"LowException";
+            balanceAlgorithm = LoadBalance.LowException.ToString();
             random = false;
             sysProxyMode = ProxyMode.NoModify;
             proxyRuleMode = ProxyRuleMode.Disable;
@@ -376,7 +383,7 @@ namespace Shadowsocks.Model
                 if (id.ContainsKey(server.Id))
                 {
                     var newId = new byte[16];
-                    Utils.RandBytes(newId, newId.Length);
+                    RNG.RandBytes(newId, newId.Length);
                     server.Id = BitConverter.ToString(newId).Replace("-", string.Empty);
                 }
                 else
@@ -517,7 +524,7 @@ namespace Shadowsocks.Model
         {
             if (port <= IPEndPoint.MinPort || port > IPEndPoint.MaxPort)
             {
-                throw new ConfigurationException(I18N.GetString("Port out of range"));
+                throw new ConfigurationException(I18NUtil.GetAppStringValue(@"PortOutOfRange"));
             }
         }
 

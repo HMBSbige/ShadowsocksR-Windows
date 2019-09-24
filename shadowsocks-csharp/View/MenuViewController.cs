@@ -1,6 +1,7 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Win32;
 using Shadowsocks.Controller;
+using Shadowsocks.Controller.Service;
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
 using Shadowsocks.Util;
@@ -139,7 +140,7 @@ namespace Shadowsocks.View
 
         private static void ControllerError(object sender, ErrorEventArgs e)
         {
-            MessageBox.Show(e.GetException().ToString(), string.Format(I18N.GetString("Shadowsocks Error: {0}"), e.GetException().Message));
+            MessageBox.Show(e.GetException().ToString(), string.Format(I18NUtil.GetAppStringValue(@"ControllerError"), e.GetException().Message));
         }
 
         private void UpdateTrayIcon()
@@ -166,15 +167,15 @@ namespace Shadowsocks.View
             var line4 = string.Empty;
             if (random)
             {
-                strServer = $@"{I18N.GetString(@"Load balance")}{I18N.GetString(@": ")}{I18N.GetString(config.balanceAlgorithm)}";
+                strServer = $@"{I18NUtil.GetAppStringValue(@"LoadBalance")}{I18NUtil.GetAppStringValue(@"Colon")}{I18NUtil.GetAppStringValue(config.balanceAlgorithm)}";
                 if (config.randomInGroup)
                 {
-                    line3 = $@"{I18N.GetString(@"Balance in group")}{Environment.NewLine}";
+                    line3 = $@"{I18NUtil.GetAppStringValue(@"BalanceInGroup")}{Environment.NewLine}";
                 }
 
                 if (config.autoBan)
                 {
-                    line4 = $@"{I18N.GetString(@"AutoBan")}{Environment.NewLine}";
+                    line4 = $@"{I18NUtil.GetAppStringValue(@"AutoBan")}{Environment.NewLine}";
                 }
             }
             else
@@ -193,16 +194,42 @@ namespace Shadowsocks.View
                     }
                     else
                     {
-                        strServer = $@"{groupName}{I18N.GetString(@": ")}{serverName}";
+                        strServer = $@"{groupName}{I18NUtil.GetAppStringValue(@"Colon")}{serverName}";
                     }
                 }
             }
-            var line1 = (enabled
-                                ? global ? I18N.GetString(@"Global") : I18N.GetString(@"PAC")
-                                : I18N.GetString(@"Disable system proxy"))
-                                + Environment.NewLine;
+
+            string line1;
+            switch (config.sysProxyMode)
+            {
+                case ProxyMode.NoModify:
+                {
+                    line1 = $@"{I18NUtil.GetAppStringValue(@"NoProxy")}{Environment.NewLine}";
+                    break;
+                }
+                case ProxyMode.Direct:
+                {
+                    line1 = $@"{I18NUtil.GetAppStringValue(@"DisableProxy")}{Environment.NewLine}";
+                    break;
+                }
+                case ProxyMode.Pac:
+                {
+                    line1 = $@"{I18NUtil.GetAppStringValue(@"PacProxy")}{Environment.NewLine}";
+                    break;
+                }
+                case ProxyMode.Global:
+                {
+                    line1 = $@"{I18NUtil.GetAppStringValue(@"GlobalProxy")}{Environment.NewLine}";
+                    break;
+                }
+                default:
+                {
+                    line1 = null;
+                    break;
+                }
+            }
             var line2 = string.IsNullOrWhiteSpace(strServer) ? null : $@"{strServer}{Environment.NewLine}";
-            var line5 = string.Format(I18N.GetString(@"Running: Port {0}"), config.localPort); // this feedback is very important because they need to know Shadowsocks is running
+            var line5 = string.Format(I18NUtil.GetAppStringValue(@"RunningPort"), config.localPort); // this feedback is very important because they need to know Shadowsocks is running
 
             var text = $@"{line1}{line2}{line3}{line4}{line5}";
             _notifyIcon.ToolTipText = text;
@@ -330,7 +357,6 @@ namespace Shadowsocks.View
                         }
                         case @"Help":
                         {
-
                             ((MenuItem)menuItem.Items[0]).Click += OpenWiki_Click;
                             ((MenuItem)menuItem.Items[1]).Click += FeedbackItem_Click;
                             ((MenuItem)menuItem.Items[2]).Click += DonateMenuItem_Click;
@@ -381,7 +407,7 @@ namespace Shadowsocks.View
 
         private void controller_UpdatePACFromGFWListError(object sender, ErrorEventArgs e)
         {
-            _notifyIcon.ShowBalloonTip(I18N.GetString(@"Failed to update PAC file"), e.GetException().Message, BalloonIcon.Error);
+            _notifyIcon.ShowBalloonTip(I18NUtil.GetAppStringValue(@"UpdatePacFailed"), e.GetException().Message, BalloonIcon.Error);
             Logging.LogUsefulException(e.GetException());
         }
 
@@ -389,15 +415,15 @@ namespace Shadowsocks.View
         {
             var updater = (GFWListUpdater)sender;
             var result = e.Success ?
-                updater.UpdateType < 1 ? I18N.GetString(@"GFWList PAC updated") : I18N.GetString(@"PAC updated")
-                : I18N.GetString(@"No updates found. Please report to GFWList if you have problems with it.");
-            _notifyIcon.ShowBalloonTip(I18N.GetString(@"ShadowsocksR"), result, BalloonIcon.Info);
+                updater.UpdateType < 1 ? I18NUtil.GetAppStringValue(@"GfwListPacUpdated") : I18NUtil.GetAppStringValue(@"PacUpdated")
+                : I18NUtil.GetAppStringValue(@"GfwListPacNotFound");
+            _notifyIcon.ShowBalloonTip(UpdateChecker.Name, result, BalloonIcon.Info);
         }
 
         private void controller_UpdatePACFromChnDomainsAndIPCompleted(object sender, ChnDomainsAndIPUpdater.ResultEventArgs e)
         {
-            var result = e.Success ? I18N.GetString(@"PAC updated") : I18N.GetString(@"No updates found.");
-            _notifyIcon.ShowBalloonTip(I18N.GetString(@"ShadowsocksR"), result, BalloonIcon.Info);
+            var result = e.Success ? I18NUtil.GetAppStringValue(@"PacUpdated") : I18NUtil.GetAppStringValue(@"PacNotFound");
+            _notifyIcon.ShowBalloonTip(UpdateChecker.Name, result, BalloonIcon.Info);
         }
 
         private void updateFreeNodeChecker_NewFreeNodeFound(object sender, EventArgs e)
@@ -570,6 +596,7 @@ namespace Shadowsocks.View
                         {
                             serverSubscribe.LastUpdateTime = (ulong)Math.Floor(DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
                         }
+                        config.configs.RemoveAll(server => server.IsMatchServer(Server.GetDefaultServer()));
                     }
                     controller.SaveServersConfig(config);
                 }
@@ -579,7 +606,7 @@ namespace Shadowsocks.View
             {
                 if (updateFreeNodeChecker.Notify)
                 {
-                    _notifyIcon.ShowBalloonTip(I18N.GetString("Success"), string.Format(I18N.GetString("Update subscribe {0} success"), lastGroup), BalloonIcon.Info);
+                    _notifyIcon.ShowBalloonTip(I18NUtil.GetAppStringValue(@"Success"), string.Format(I18NUtil.GetAppStringValue(@"UpdateSubscribeSuccess"), lastGroup), BalloonIcon.Info);
                 }
             }
             else
@@ -591,7 +618,7 @@ namespace Shadowsocks.View
 
                 if (updateFreeNodeChecker.Notify)
                 {
-                    _notifyIcon.ShowBalloonTip(I18N.GetString("Error"), string.Format(I18N.GetString("Update subscribe {0} failure"), lastGroup), BalloonIcon.Info);
+                    _notifyIcon.ShowBalloonTip(I18NUtil.GetAppStringValue(@"Error"), string.Format(I18NUtil.GetAppStringValue(@"UpdateSubscribeFailure"), lastGroup), BalloonIcon.Info);
                 }
             }
             if (updateSubscribeManager.Next())
@@ -609,8 +636,8 @@ namespace Shadowsocks.View
                     if (UpdateItem.Visibility != Visibility.Visible)
                     {
                         _notifyIcon.ShowBalloonTip(
-                                string.Format(I18NUtil.GetAppStringValue(@"NewVersionFound"), UpdateChecker.Name,
-                                        updateChecker.LatestVersionNumber),
+                                string.Format(I18NUtil.GetAppStringValue(@"NewVersionFound"),
+                                UpdateChecker.Name, updateChecker.LatestVersionNumber),
                                 I18NUtil.GetAppStringValue(@"ClickMenuToDownload"), BalloonIcon.Info);
                     }
                     UpdateItem.Visibility = Visibility.Visible;
@@ -622,13 +649,12 @@ namespace Shadowsocks.View
 
         private void updateChecker_NewVersionNotFound(object sender, EventArgs e)
         {
-            _notifyIcon.ShowBalloonTip($@"ShadowsocksR {UpdateChecker.FullVersion}", I18NUtil.GetAppStringValue(@"NewVersionNotFound"), BalloonIcon.Info);
+            _notifyIcon.ShowBalloonTip($@"{UpdateChecker.Name} {UpdateChecker.FullVersion}", I18NUtil.GetAppStringValue(@"NewVersionNotFound"), BalloonIcon.Info);
         }
 
         private void UpdateChecker_NewVersionFoundFailed(object sender, EventArgs e)
         {
-            _notifyIcon.ShowBalloonTip($@"ShadowsocksR {UpdateChecker.FullVersion}",
-                    I18NUtil.GetAppStringValue(@"NewVersionFoundFailed"), BalloonIcon.Info);
+            _notifyIcon.ShowBalloonTip($@"{UpdateChecker.Name} {UpdateChecker.FullVersion}", I18NUtil.GetAppStringValue(@"NewVersionFoundFailed"), BalloonIcon.Info);
         }
 
         private void UpdateItem_Clicked(object sender, RoutedEventArgs e)
@@ -1096,7 +1122,14 @@ namespace Shadowsocks.View
         private void SelectRandomItem_Click(object sender, RoutedEventArgs e)
         {
             SelectRandomItem.IsChecked = !SelectRandomItem.IsChecked;
-            controller.ToggleSelectRandom(SelectRandomItem.IsChecked);
+            if (SelectRandomItem.IsChecked)
+            {
+                Task.Run(() => { controller.ToggleSelectRandom(true); });
+            }
+            else
+            {
+                Task.Run(() => { controller.ToggleSelectRandom(false); });
+            }
         }
 
         private void AutoCheckUpdateItem_Click(object sender, RoutedEventArgs e)
@@ -1114,7 +1147,14 @@ namespace Shadowsocks.View
         private void SelectSameHostForSameTargetItem_Click(object sender, RoutedEventArgs e)
         {
             sameHostForSameTargetItem.IsChecked = !sameHostForSameTargetItem.IsChecked;
-            controller.ToggleSameHostForSameTargetRandom(sameHostForSameTargetItem.IsChecked);
+            if (sameHostForSameTargetItem.IsChecked)
+            {
+                Task.Run(() => { controller.ToggleSameHostForSameTargetRandom(true); });
+            }
+            else
+            {
+                Task.Run(() => { controller.ToggleSameHostForSameTargetRandom(false); });
+            }
         }
 
         private void CopyPacUrlItem_Click(object sender, RoutedEventArgs e)
@@ -1159,14 +1199,18 @@ namespace Shadowsocks.View
 
         private void AServerItem_Click(object sender, EventArgs e)
         {
-            var config = controller.GetCurrentConfiguration();
-            Console.WriteLine(@"config.checkSwitchAutoCloseAll:" + config.checkSwitchAutoCloseAll);
-            if (config.checkSwitchAutoCloseAll)
-            {
-                controller.DisconnectAllConnections();
-            }
             var item = (MenuItem)sender;
-            controller.SelectServerIndex((int)item.Tag);
+            var index = (int)item.Tag;
+            Task.Run(() =>
+            {
+                var config = controller.GetCurrentConfiguration();
+                Console.WriteLine($@"config.checkSwitchAutoCloseAll:{config.checkSwitchAutoCloseAll}");
+                if (config.checkSwitchAutoCloseAll)
+                {
+                    controller.DisconnectAllConnections();
+                }
+                controller.SelectServerIndex(index);
+            });
         }
 
         private void CheckUpdate_Click(object sender, RoutedEventArgs e)
@@ -1206,7 +1250,7 @@ namespace Shadowsocks.View
 
         private void DisconnectCurrent_Click(object sender, RoutedEventArgs e)
         {
-            controller.DisconnectAllConnections();
+            Task.Run(() => { controller.DisconnectAllConnections(); });
         }
 
         public void ImportAddress(string text)
@@ -1329,7 +1373,7 @@ namespace Shadowsocks.View
                     }
                 }
 
-                MessageBox.Show(I18N.GetString(@"No QRCode found. Try to zoom in or move it to the center of the screen."));
+                MessageBox.Show(I18NUtil.GetAppStringValue(@"QrCodeNotFound"));
             });
         }
 

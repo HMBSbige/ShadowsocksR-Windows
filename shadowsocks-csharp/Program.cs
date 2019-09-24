@@ -1,16 +1,17 @@
-﻿using Microsoft.Win32;
-using Shadowsocks.Controller;
-using Shadowsocks.Model;
-using Shadowsocks.Util;
-using Shadowsocks.Util.SingleInstance;
-using Shadowsocks.View;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.Win32;
+using Shadowsocks.Controller;
+using Shadowsocks.Controller.Service;
+using Shadowsocks.Model;
+using Shadowsocks.Util;
+using Shadowsocks.Util.SingleInstance;
+using Shadowsocks.View;
 
 namespace Shadowsocks
 {
@@ -86,16 +87,20 @@ namespace Shadowsocks
             SystemEvents.SessionEnding += _viewController.Quit_Click;
 
             _controller.Start();
+#if !DEBUG
             Reg.SetUrlProtocol(@"ssr");
             Reg.SetUrlProtocol(@"sub");
+#endif
             singleInstance.ListenForArgumentsFromSuccessiveInstances();
             app.Run();
         }
 
         private static void App_Exit(object sender, ExitEventArgs e)
         {
+#if !DEBUG
             Reg.RemoveUrlProtocol(@"ssr");
             Reg.RemoveUrlProtocol(@"sub");
+#endif
             _controller?.Stop();
             _controller = null;
         }

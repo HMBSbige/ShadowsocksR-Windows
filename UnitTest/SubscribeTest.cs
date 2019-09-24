@@ -1,8 +1,8 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Shadowsocks.Controller;
-using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Text.RegularExpressions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Shadowsocks.Controller.Service;
+using Shadowsocks.Util;
 
 namespace UnitTest
 {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -18,9 +19,6 @@ namespace Shadowsocks.Proxy
 
         protected const int RecvSize = 1460 * 2;
 
-        private byte[] SendEncryptBuffer = new byte[RecvSize];
-        private byte[] ReceiveDecryptBuffer = new byte[RecvSize * 2];
-
         protected bool _close;
 
         public ProxySocketTun(Socket socket)
@@ -38,41 +36,17 @@ namespace Shadowsocks.Proxy
             return _socket;
         }
 
-        public bool IsClose
-        {
-            get
-            {
-                return _close;
-            }
-        }
+        public bool IsClose => _close;
 
         public bool GoS5Proxy
         {
-            get
-            {
-                return _proxy;
-            }
-            set
-            {
-                _proxy = value;
-            }
+            get => _proxy;
+            set => _proxy = value;
         }
 
-        public AddressFamily AddressFamily
-        {
-            get
-            {
-                return _socket.AddressFamily;
-            }
-        }
+        public AddressFamily AddressFamily => _socket.AddressFamily;
 
-        public int Available
-        {
-            get
-            {
-                return _socket.Available;
-            }
-        }
+        public int Available => _socket.Available;
 
         public void Shutdown(SocketShutdown how)
         {
@@ -83,9 +57,6 @@ namespace Shadowsocks.Proxy
         {
             _socket.Close();
             _socket = null;
-
-            SendEncryptBuffer = null;
-            ReceiveDecryptBuffer = null;
         }
 
         public IAsyncResult BeginConnect(EndPoint ep, AsyncCallback callback, object state)
@@ -102,12 +73,12 @@ namespace Shadowsocks.Proxy
 
         public int Receive(byte[] buffer, int size, SocketFlags flags)
         {
-            return _socket.Receive(buffer, size, SocketFlags.None);
+            return _socket.Receive(buffer, size, flags);
         }
 
         public IAsyncResult BeginReceive(byte[] buffer, int size, SocketFlags flags, AsyncCallback callback, object state)
         {
-            CallbackState st = new CallbackState();
+            var st = new CallbackState();
             st.buffer = buffer;
             st.size = size;
             st.state = state;
@@ -116,10 +87,10 @@ namespace Shadowsocks.Proxy
 
         public int EndReceive(IAsyncResult ar)
         {
-            int bytesRead = _socket.EndReceive(ar);
+            var bytesRead = _socket.EndReceive(ar);
             if (bytesRead > 0)
             {
-                CallbackState st = (CallbackState)ar.AsyncState;
+                var st = (CallbackState)ar.AsyncState;
                 st.size = bytesRead;
                 return bytesRead;
             }
@@ -130,10 +101,10 @@ namespace Shadowsocks.Proxy
 
         public int SendAll(byte[] buffer, int size, SocketFlags flags)
         {
-            int sendSize = _socket.Send(buffer, size, 0);
+            var sendSize = _socket.Send(buffer, size, flags);
             while (sendSize < size)
             {
-                int new_size = _socket.Send(buffer, sendSize, size - sendSize, 0);
+                var new_size = _socket.Send(buffer, sendSize, size - sendSize, flags);
                 sendSize += new_size;
             }
             return size;
@@ -141,16 +112,16 @@ namespace Shadowsocks.Proxy
 
         public virtual int Send(byte[] buffer, int size, SocketFlags flags)
         {
-            return SendAll(buffer, size, 0);
+            return SendAll(buffer, size, flags);
         }
 
         public int BeginSend(byte[] buffer, int size, SocketFlags flags, AsyncCallback callback, object state)
         {
-            CallbackState st = new CallbackState();
+            var st = new CallbackState();
             st.size = size;
             st.state = state;
 
-            _socket.BeginSend(buffer, 0, size, 0, callback, st);
+            _socket.BeginSend(buffer, 0, size, flags, callback, st);
             return size;
         }
 
@@ -161,7 +132,7 @@ namespace Shadowsocks.Proxy
 
         public IAsyncResult BeginReceiveFrom(byte[] buffer, int size, SocketFlags flags, ref EndPoint ep, AsyncCallback callback, object state)
         {
-            CallbackState st = new CallbackState();
+            var st = new CallbackState();
             st.buffer = buffer;
             st.size = size;
             st.state = state;
@@ -170,40 +141,40 @@ namespace Shadowsocks.Proxy
 
         public int GetAsyncResultSize(IAsyncResult ar)
         {
-            CallbackState st = (CallbackState)ar.AsyncState;
+            var st = (CallbackState)ar.AsyncState;
             return st.size;
         }
 
         public byte[] GetAsyncResultBuffer(IAsyncResult ar)
         {
-            CallbackState st = (CallbackState)ar.AsyncState;
+            var st = (CallbackState)ar.AsyncState;
             return st.buffer;
         }
 
         public bool ConnectSocks5ProxyServer(string strRemoteHost, int iRemotePort, bool udp, string socks5RemoteUsername, string socks5RemotePassword)
         {
-            int socketErrorCode = (int)SocketError.ConnectionReset;
+            var socketErrorCode = (int)SocketError.ConnectionReset;
             _proxy = true;
 
             //构造Socks5代理服务器第一连接头(无用户名密码)
-            byte[] bySock5Send = new byte[10];
+            var bySock5Send = new byte[10];
             bySock5Send[0] = 5;
-            bySock5Send[1] = (socks5RemoteUsername.Length == 0 ? (byte)1 : (byte)2);
+            bySock5Send[1] = socks5RemoteUsername.Length == 0 ? (byte)1 : (byte)2;
             bySock5Send[2] = 0;
             bySock5Send[3] = 2;
 
             //发送Socks5代理第一次连接信息
             _socket.Send(bySock5Send, bySock5Send[1] + 2, SocketFlags.None);
 
-            byte[] bySock5Receive = new byte[32];
-            int iRecCount = _socket.Receive(bySock5Receive, bySock5Receive.Length, SocketFlags.None);
+            var bySock5Receive = new byte[32];
+            var iRecCount = _socket.Receive(bySock5Receive, bySock5Receive.Length, SocketFlags.None);
 
             if (iRecCount < 2)
             {
                 throw new SocketException(socketErrorCode);
             }
 
-            if (bySock5Receive[0] != 5 || (bySock5Receive[1] != 0 && bySock5Receive[1] != 2))
+            if (bySock5Receive[0] != 5 || bySock5Receive[1] != 0 && bySock5Receive[1] != 2)
             {
                 throw new SocketException(socketErrorCode);
             }
@@ -220,17 +191,17 @@ namespace Shadowsocks.Proxy
                     bySock5Send = new byte[socks5RemoteUsername.Length + socks5RemotePassword.Length + 3];
                     bySock5Send[0] = 1;
                     bySock5Send[1] = (byte)socks5RemoteUsername.Length;
-                    for (int i = 0; i < socks5RemoteUsername.Length; ++i)
+                    for (var i = 0; i < socks5RemoteUsername.Length; ++i)
                     {
                         bySock5Send[2 + i] = (byte)socks5RemoteUsername[i];
                     }
                     bySock5Send[socks5RemoteUsername.Length + 2] = (byte)socks5RemotePassword.Length;
-                    for (int i = 0; i < socks5RemotePassword.Length; ++i)
+                    for (var i = 0; i < socks5RemotePassword.Length; ++i)
                     {
                         bySock5Send[socks5RemoteUsername.Length + 3 + i] = (byte)socks5RemotePassword[i];
                     }
                     _socket.Send(bySock5Send, bySock5Send.Length, SocketFlags.None);
-                    iRecCount = _socket.Receive(bySock5Receive, bySock5Receive.Length, SocketFlags.None);
+                    _socket.Receive(bySock5Receive, bySock5Receive.Length, SocketFlags.None);
 
                     if (bySock5Receive[0] != 1 || bySock5Receive[1] != 0)
                     {
@@ -245,29 +216,21 @@ namespace Shadowsocks.Proxy
             // connect
             if (!udp) // TCP
             {
-                List<byte> dataSock5Send = new List<byte>();
-                dataSock5Send.Add(5);
-                dataSock5Send.Add(1);
-                dataSock5Send.Add(0);
+                var dataSock5Send = new List<byte> { 5, 1, 0 };
 
-                IPAddress ipAdd;
-                bool parsed = IPAddress.TryParse(strRemoteHost, out ipAdd);
-                if (ipAdd == null)
+                if (!IPAddress.TryParse(strRemoteHost, out var ipAdd))
                 {
                     dataSock5Send.Add(3); // remote DNS resolve
                     dataSock5Send.Add((byte)strRemoteHost.Length);
-                    for (int i = 0; i < strRemoteHost.Length; ++i)
-                    {
-                        dataSock5Send.Add((byte)strRemoteHost[i]);
-                    }
+                    dataSock5Send.AddRange(strRemoteHost.Select(t => (byte)t));
                 }
                 else
                 {
-                    byte[] addBytes = ipAdd.GetAddressBytes();
+                    var addBytes = ipAdd.GetAddressBytes();
                     if (addBytes.GetLength(0) > 4)
                     {
                         dataSock5Send.Add(4); // IPv6
-                        for (int i = 0; i < 16; ++i)
+                        for (var i = 0; i < 16; ++i)
                         {
                             dataSock5Send.Add(addBytes[i]);
                         }
@@ -275,7 +238,7 @@ namespace Shadowsocks.Proxy
                     else
                     {
                         dataSock5Send.Add(1); // IPv4
-                        for (int i = 0; i < 4; ++i)
+                        for (var i = 0; i < 4; ++i)
                         {
                             dataSock5Send.Add(addBytes[i]);
                         }
@@ -297,18 +260,18 @@ namespace Shadowsocks.Proxy
             }
             else // UDP
             {
-                List<byte> dataSock5Send = new List<byte>();
+                var dataSock5Send = new List<byte>();
                 dataSock5Send.Add(5);
                 dataSock5Send.Add(3);
                 dataSock5Send.Add(0);
 
-                IPAddress ipAdd = ((IPEndPoint)_socketEndPoint).Address;
+                var ipAdd = ((IPEndPoint)_socketEndPoint).Address;
                 {
-                    byte[] addBytes = ipAdd.GetAddressBytes();
+                    var addBytes = ipAdd.GetAddressBytes();
                     if (addBytes.GetLength(0) > 4)
                     {
                         dataSock5Send.Add(4); // IPv6
-                        for (int i = 0; i < 16; ++i)
+                        for (var i = 0; i < 16; ++i)
                         {
                             dataSock5Send.Add(addBytes[i]);
                         }
@@ -316,7 +279,7 @@ namespace Shadowsocks.Proxy
                     else
                     {
                         dataSock5Send.Add(1); // IPv4
-                        for (int i = 0; i < 4; ++i)
+                        for (var i = 0; i < 4; ++i)
                         {
                             dataSock5Send.Add(addBytes[i]);
                         }
@@ -327,7 +290,7 @@ namespace Shadowsocks.Proxy
                 dataSock5Send.Add(0);
 
                 _socket.Send(dataSock5Send.ToArray(), dataSock5Send.Count, SocketFlags.None);
-                iRecCount = _socket.Receive(bySock5Receive, bySock5Receive.Length, SocketFlags.None);
+                _socket.Receive(bySock5Receive, bySock5Receive.Length, SocketFlags.None);
 
                 if (bySock5Receive[0] != 5 || bySock5Receive[1] != 0)
                 {
@@ -335,7 +298,7 @@ namespace Shadowsocks.Proxy
                     //throw new Exception("第二次连接Socks5代理返回数据出错。");
                 }
 
-                bool ipv6 = bySock5Receive[0] == 4;
+                var ipv6 = bySock5Receive[0] == 4;
                 byte[] addr;
                 int port;
                 if (!ipv6)
@@ -377,15 +340,13 @@ namespace Shadowsocks.Proxy
         {
             _proxy = true;
 
-            IPAddress ipAdd;
-            bool parsed = IPAddress.TryParse(strRemoteHost, out ipAdd);
-            if (ipAdd != null)
+            if (IPAddress.TryParse(strRemoteHost, out var ipAdd))
             {
                 strRemoteHost = ipAdd.ToString();
             }
-            string host = (strRemoteHost.IndexOf(':') >= 0 ? "[" + strRemoteHost + "]" : strRemoteHost) + ":" + iRemotePort;
-            string authstr = Convert.ToBase64String(Encoding.UTF8.GetBytes(socks5RemoteUsername + ":" + socks5RemotePassword));
-            string cmd = "CONNECT " + host + " HTTP/1.0\r\n"
+            var host = (strRemoteHost.IndexOf(':') >= 0 ? "[" + strRemoteHost + "]" : strRemoteHost) + ":" + iRemotePort;
+            var authstr = Convert.ToBase64String(Encoding.UTF8.GetBytes(socks5RemoteUsername + ":" + socks5RemotePassword));
+            var cmd = "CONNECT " + host + " HTTP/1.0\r\n"
                 + "Host: " + host + "\r\n";
             if (!string.IsNullOrEmpty(proxyUserAgent))
                 cmd += "User-Agent: " + proxyUserAgent + "\r\n";
@@ -393,14 +354,14 @@ namespace Shadowsocks.Proxy
             if (socks5RemoteUsername.Length > 0)
                 cmd += "Proxy-Authorization: Basic " + authstr + "\r\n";
             cmd += "\r\n";
-            byte[] httpData = Encoding.UTF8.GetBytes(cmd);
+            var httpData = Encoding.UTF8.GetBytes(cmd);
             _socket.Send(httpData, httpData.Length, SocketFlags.None);
-            byte[] byReceive = new byte[1024];
-            int iRecCount = _socket.Receive(byReceive, byReceive.Length, SocketFlags.None);
+            var byReceive = new byte[1024];
+            var iRecCount = _socket.Receive(byReceive, byReceive.Length, SocketFlags.None);
             if (iRecCount > 13)
             {
-                string data = Encoding.UTF8.GetString(byReceive, 0, iRecCount);
-                string[] data_part = data.Split(' ');
+                var data = Encoding.UTF8.GetString(byReceive, 0, iRecCount);
+                var data_part = data.Split(' ');
                 if (data_part.Length > 1 && data_part[1] == "200")
                 {
                     return true;

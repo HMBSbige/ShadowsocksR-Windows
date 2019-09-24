@@ -16,7 +16,7 @@ namespace UnitTest
             var plain = new byte[16384];
             var cipher = new byte[plain.Length + 16];
             var plain2 = new byte[plain.Length + 16];
-            Utils.RandBytes(plain);
+            RNG.RandBytes(plain);
             encryptor.Encrypt(plain, plain.Length, cipher, out var outLen);
             decryptor.Decrypt(cipher, outLen, plain2, out var outLen2);
             Assert.AreEqual(plain.Length, outLen2);

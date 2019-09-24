@@ -66,6 +66,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Controller\SystemProxy\" />
     <Folder Include="Util\SingleInstance\" />
   </ItemGroup>
 
