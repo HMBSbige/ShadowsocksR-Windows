@@ -230,6 +230,7 @@
                       ItemsSource="{Binding ServersCollection}"
                       MouseLeftButtonUp="ServerDataGrid_MouseLeftButtonUp"
                       MouseDoubleClick="ServerDataGrid_OnMouseDoubleClick"
+                      VirtualizingPanel.IsVirtualizingWhenGrouping="True"
                       >
                 <DataGrid.GroupStyle>
                     <GroupStyle ContainerStyle="{StaticResource GroupHeaderStyle}">
