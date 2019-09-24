@@ -760,7 +760,6 @@ namespace Shadowsocks.Proxy
             Logging.Info($@"Connect {cfg.TargetHost}:{cfg.TargetPort.ToString()} via {server.server}:{server.Server_Port}");
 
             ResetTimeout(cfg.Ttl);
-            //TODO:
             if (cfg.TargetHost != null)
             {
                 var host = cfg.TargetHost;
