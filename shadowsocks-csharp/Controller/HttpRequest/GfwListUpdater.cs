@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Shadowsocks.Controller.Service;
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
 using Shadowsocks.Util;
@@ -9,7 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 
-namespace Shadowsocks.Controller.Service
+namespace Shadowsocks.Controller.HttpRequest
 {
     public class GFWListUpdater
     {

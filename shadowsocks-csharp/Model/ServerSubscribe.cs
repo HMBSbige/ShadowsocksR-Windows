@@ -1,9 +1,9 @@
-﻿using System;
-using System.Text;
-using Newtonsoft.Json;
-using Shadowsocks.Controller.Service;
+﻿using Newtonsoft.Json;
+using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Encryption;
 using Shadowsocks.ViewModel;
+using System;
+using System.Text;
 
 namespace Shadowsocks.Model
 {
@@ -17,7 +17,7 @@ namespace Shadowsocks.Model
 
         public ServerSubscribe()
         {
-            url = UpdateFreeNode.DefaultUpdateUrl;
+            url = UpdateNode.DefaultUpdateUrl;
             autoCheckUpdate = true;
         }
 

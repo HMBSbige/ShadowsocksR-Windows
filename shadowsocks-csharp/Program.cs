@@ -1,17 +1,17 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using Shadowsocks.Controller;
+using Shadowsocks.Controller.HttpRequest;
+using Shadowsocks.Model;
+using Shadowsocks.Util;
+using Shadowsocks.Util.SingleInstance;
+using Shadowsocks.View;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using Microsoft.Win32;
-using Shadowsocks.Controller;
-using Shadowsocks.Controller.Service;
-using Shadowsocks.Model;
-using Shadowsocks.Util;
-using Shadowsocks.Util.SingleInstance;
-using Shadowsocks.View;
 
 namespace Shadowsocks
 {

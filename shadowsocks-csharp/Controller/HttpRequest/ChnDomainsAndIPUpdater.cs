@@ -1,4 +1,5 @@
-﻿using Shadowsocks.Model;
+﻿using Shadowsocks.Controller.Service;
+using Shadowsocks.Model;
 using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 
-namespace Shadowsocks.Controller.Service
+namespace Shadowsocks.Controller.HttpRequest
 {
     public class ChnDomainsAndIPUpdater
     {

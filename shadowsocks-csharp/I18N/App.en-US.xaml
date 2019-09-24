@@ -36,15 +36,14 @@
 
     <sys:String x:Key="ServersSubscribe">Servers Subscribe</sys:String>
     <sys:String x:Key="SubscribeSetting">Subscribe setting...</sys:String>
-    <sys:String x:Key="UpdateSubscribeSsrNode">Update subscribe SSR node</sys:String>
-    <sys:String x:Key="UpdateSubscribeSsrNodeBypassProxy">Update subscribe SSR node(bypass proxy)</sys:String>
+    <sys:String x:Key="UpdateSubscribeSsrNode">Update subscribe node</sys:String>
 
     <sys:String x:Key="GlobalSettings">Global settings...</sys:String>
     <sys:String x:Key="PortSettings">Port settings...</sys:String>
     <sys:String x:Key="ShowLogs">Show logs...</sys:String>
     <sys:String x:Key="UpdateAvailable">Update available</sys:String>
     <sys:String x:Key="ScanQrCode">Scan QRCode from screen...</sys:String>
-    <sys:String x:Key="ImportSsrLinksFromClipboard">Import SSR links from clipboard...</sys:String>
+    <sys:String x:Key="ImportSsrLinksFromClipboard">Import links from clipboard...</sys:String>
 
     <sys:String x:Key="Help">Help</sys:String>
     <sys:String x:Key="Update">Update...</sys:String>
