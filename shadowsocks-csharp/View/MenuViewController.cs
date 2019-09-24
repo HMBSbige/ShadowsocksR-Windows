@@ -357,7 +357,6 @@ namespace Shadowsocks.View
                         }
                         case @"Help":
                         {
-
                             ((MenuItem)menuItem.Items[0]).Click += OpenWiki_Click;
                             ((MenuItem)menuItem.Items[1]).Click += FeedbackItem_Click;
                             ((MenuItem)menuItem.Items[2]).Click += DonateMenuItem_Click;
@@ -1123,7 +1122,14 @@ namespace Shadowsocks.View
         private void SelectRandomItem_Click(object sender, RoutedEventArgs e)
         {
             SelectRandomItem.IsChecked = !SelectRandomItem.IsChecked;
-            controller.ToggleSelectRandom(SelectRandomItem.IsChecked);
+            if (SelectRandomItem.IsChecked)
+            {
+                Task.Run(() => { controller.ToggleSelectRandom(true); });
+            }
+            else
+            {
+                Task.Run(() => { controller.ToggleSelectRandom(false); });
+            }
         }
 
         private void AutoCheckUpdateItem_Click(object sender, RoutedEventArgs e)
@@ -1141,7 +1147,14 @@ namespace Shadowsocks.View
         private void SelectSameHostForSameTargetItem_Click(object sender, RoutedEventArgs e)
         {
             sameHostForSameTargetItem.IsChecked = !sameHostForSameTargetItem.IsChecked;
-            controller.ToggleSameHostForSameTargetRandom(sameHostForSameTargetItem.IsChecked);
+            if (sameHostForSameTargetItem.IsChecked)
+            {
+                Task.Run(() => { controller.ToggleSameHostForSameTargetRandom(true); });
+            }
+            else
+            {
+                Task.Run(() => { controller.ToggleSameHostForSameTargetRandom(false); });
+            }
         }
 
         private void CopyPacUrlItem_Click(object sender, RoutedEventArgs e)
@@ -1186,14 +1199,18 @@ namespace Shadowsocks.View
 
         private void AServerItem_Click(object sender, EventArgs e)
         {
-            var config = controller.GetCurrentConfiguration();
-            Console.WriteLine(@"config.checkSwitchAutoCloseAll:" + config.checkSwitchAutoCloseAll);
-            if (config.checkSwitchAutoCloseAll)
-            {
-                controller.DisconnectAllConnections();
-            }
             var item = (MenuItem)sender;
-            controller.SelectServerIndex((int)item.Tag);
+            var index = (int)item.Tag;
+            Task.Run(() =>
+            {
+                var config = controller.GetCurrentConfiguration();
+                Console.WriteLine($@"config.checkSwitchAutoCloseAll:{config.checkSwitchAutoCloseAll}");
+                if (config.checkSwitchAutoCloseAll)
+                {
+                    controller.DisconnectAllConnections();
+                }
+                controller.SelectServerIndex(index);
+            });
         }
 
         private void CheckUpdate_Click(object sender, RoutedEventArgs e)
@@ -1233,7 +1250,7 @@ namespace Shadowsocks.View
 
         private void DisconnectCurrent_Click(object sender, RoutedEventArgs e)
         {
-            controller.DisconnectAllConnections();
+            Task.Run(() => { controller.DisconnectAllConnections(); });
         }
 
         public void ImportAddress(string text)
