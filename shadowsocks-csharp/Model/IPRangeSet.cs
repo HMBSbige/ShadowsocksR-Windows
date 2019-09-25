@@ -20,11 +20,11 @@ namespace Shadowsocks.Model
         {
             begin /= 256;
             end /= 256;
-            for (uint i = begin; i <= end; ++i)
+            for (var i = begin; i <= end; ++i)
             {
-                uint pos = i / 32;
-                int mv = (int)(i & 31);
-                _set[pos] |= (1u << mv);
+                var pos = i / 32;
+                var mv = (int)(i & 31);
+                _set[pos] |= 1u << mv;
             }
         }
 
@@ -35,16 +35,16 @@ namespace Shadowsocks.Model
 
         public void Insert(IPAddress addr, uint size)
         {
-            byte[] bytes_addr = addr.GetAddressBytes();
+            var bytes_addr = addr.GetAddressBytes();
             Array.Reverse(bytes_addr);
             Insert(BitConverter.ToUInt32(bytes_addr, 0), size);
         }
 
         public void Insert(IPAddress addr_beg, IPAddress addr_end)
         {
-            byte[] bytes_addr_beg = addr_beg.GetAddressBytes();
+            var bytes_addr_beg = addr_beg.GetAddressBytes();
             Array.Reverse(bytes_addr_beg);
-            byte[] bytes_addr_end = addr_end.GetAddressBytes();
+            var bytes_addr_end = addr_end.GetAddressBytes();
             Array.Reverse(bytes_addr_end);
             InsertRange(BitConverter.ToUInt32(bytes_addr_beg, 0), BitConverter.ToUInt32(bytes_addr_end, 0));
         }
@@ -52,22 +52,22 @@ namespace Shadowsocks.Model
         public bool isIn(uint ip)
         {
             ip /= 256;
-            uint pos = ip / 32;
-            int mv = (int)(ip & 31);
+            var pos = ip / 32;
+            var mv = (int)(ip & 31);
             return (_set[pos] & (1u << mv)) != 0;
         }
 
         public bool IsInIPRange(IPAddress addr)
         {
-            byte[] bytes_addr = addr.GetAddressBytes();
+            var bytes_addr = addr.GetAddressBytes();
             Array.Reverse(bytes_addr);
             return isIn(BitConverter.ToUInt32(bytes_addr, 0));
         }
 
         public bool LoadApnic(string zone)
         {
-            string filename = APNIC_EXT_FILENAME;
-            string absFilePath = Path.Combine(Directory.GetCurrentDirectory(), filename);
+            var filename = APNIC_EXT_FILENAME;
+            var absFilePath = Path.Combine(Directory.GetCurrentDirectory(), filename);
             if (!File.Exists(absFilePath))
             {
                 filename = APNIC_FILENAME;
@@ -77,31 +77,30 @@ namespace Shadowsocks.Model
             {
                 try
                 {
-                    using (StreamReader stream = File.OpenText(absFilePath))
+                    using (var stream = File.OpenText(absFilePath))
                     {
-                        using StreamWriter out_stream = new StreamWriter(File.OpenWrite(CHN_FILENAME));
+                        using var out_stream = new StreamWriter(File.OpenWrite(CHN_FILENAME));
                         while (true)
                         {
-                            string line = stream.ReadLine();
+                            var line = stream.ReadLine();
                             if (line == null)
                                 break;
-                            string[] parts = line.Split('|');
+                            var parts = line.Split('|');
                             if (parts.Length < 7)
                                 continue;
                             if (parts[0] != "apnic" || parts[1] != zone || parts[2] != "ipv4")
                                 continue;
-                            IPAddress addr;
-                            IPAddress.TryParse(parts[3], out addr);
-                            uint size = uint.Parse(parts[4]);
+                            IPAddress.TryParse(parts[3], out var addr);
+                            var size = uint.Parse(parts[4]);
                             Insert(addr, size);
 
-                            byte[] addr_bytes = addr.GetAddressBytes();
+                            var addr_bytes = addr.GetAddressBytes();
                             Array.Reverse(addr_bytes);
-                            uint ip_addr = BitConverter.ToUInt32(addr_bytes, 0);
+                            var ip_addr = BitConverter.ToUInt32(addr_bytes, 0);
                             ip_addr += size - 1;
                             addr_bytes = BitConverter.GetBytes(ip_addr);
                             Array.Reverse(addr_bytes);
-                            out_stream.Write(parts[3] + " " + (new IPAddress(addr_bytes)) + "\r\n");
+                            out_stream.Write(parts[3] + " " + new IPAddress(addr_bytes) + "\r\n");
                         }
                     }
                     return true;
@@ -116,24 +115,23 @@ namespace Shadowsocks.Model
 
         public bool LoadChn()
         {
-            string absFilePath = Path.Combine(Directory.GetCurrentDirectory(), CHN_FILENAME);
+            var absFilePath = Path.Combine(Directory.GetCurrentDirectory(), CHN_FILENAME);
             if (File.Exists(absFilePath))
             {
                 try
                 {
-                    using StreamReader stream = File.OpenText(absFilePath);
+                    using var stream = File.OpenText(absFilePath);
                     while (true)
                     {
-                        string line = stream.ReadLine();
+                        var line = stream.ReadLine();
                         if (line == null)
                             break;
-                        string[] parts = line.Split(' ');
+                        var parts = line.Split(' ');
                         if (parts.Length < 2)
                             continue;
 
-                        IPAddress addr_beg, addr_end;
-                        IPAddress.TryParse(parts[0], out addr_beg);
-                        IPAddress.TryParse(parts[1], out addr_end);
+                        IPAddress.TryParse(parts[0], out var addr_beg);
+                        IPAddress.TryParse(parts[1], out var addr_end);
                         Insert(addr_beg, addr_end);
                     }
                 }
@@ -151,9 +149,8 @@ namespace Shadowsocks.Model
 
         public void Reverse()
         {
-            IPAddress addr_beg, addr_end;
-            IPAddress.TryParse("240.0.0.0", out addr_beg);
-            IPAddress.TryParse("255.255.255.255", out addr_end);
+            IPAddress.TryParse("240.0.0.0", out var addr_beg);
+            IPAddress.TryParse("255.255.255.255", out var addr_end);
             Insert(addr_beg, addr_end);
             for (uint i = 0; i < _set.Length; ++i)
             {

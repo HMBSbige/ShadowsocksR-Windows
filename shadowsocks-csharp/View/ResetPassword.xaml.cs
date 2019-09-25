@@ -1,7 +1,8 @@
-﻿using System.Windows;
-using System.Windows.Input;
-using Shadowsocks.Controller;
+﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Model;
+using System.Windows;
+using System.Windows.Input;
 
 namespace Shadowsocks.View
 {

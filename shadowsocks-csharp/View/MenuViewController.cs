@@ -1,18 +1,18 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Win32;
 using Shadowsocks.Controller;
+using Shadowsocks.Controller.HttpRequest;
+using Shadowsocks.Controller.Service;
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
 using Shadowsocks.Util;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -40,7 +40,7 @@ namespace Shadowsocks.View
 
         private readonly ShadowsocksController controller;
         private readonly UpdateChecker updateChecker;
-        private readonly UpdateFreeNode updateFreeNodeChecker;
+        private readonly UpdateNode _updateNodeChecker;
         private readonly UpdateSubscribeManager updateSubscribeManager;
 
         private readonly TaskbarIcon _notifyIcon;
@@ -94,7 +94,7 @@ namespace Shadowsocks.View
             controller.ConfigChanged += controller_ConfigChanged;
             controller.PACFileReadyToOpen += controller_FileReadyToOpen;
             controller.UserRuleFileReadyToOpen += controller_FileReadyToOpen;
-            controller.Errored += controller_Errored;
+            controller.Errored += ControllerError;
             controller.UpdatePACFromGFWListCompleted += controller_UpdatePACFromGFWListCompleted;
             controller.UpdatePACFromChnDomainsAndIPCompleted += controller_UpdatePACFromChnDomainsAndIPCompleted;
             controller.UpdatePACFromGFWListError += controller_UpdatePACFromGFWListError;
@@ -114,8 +114,8 @@ namespace Shadowsocks.View
             updateChecker.NewVersionNotFound += updateChecker_NewVersionNotFound;
             updateChecker.NewVersionFoundFailed += UpdateChecker_NewVersionFoundFailed;
 
-            updateFreeNodeChecker = new UpdateFreeNode();
-            updateFreeNodeChecker.NewFreeNodeFound += updateFreeNodeChecker_NewFreeNodeFound;
+            _updateNodeChecker = new UpdateNode();
+            _updateNodeChecker.NewFreeNodeFound += UpdateNodeCheckerNewNodeFound;
 
             updateSubscribeManager = new UpdateSubscribeManager();
 
@@ -136,22 +136,19 @@ namespace Shadowsocks.View
                 updateChecker.Check(cfg, false);
             }
 
-            if (cfg.IsDefaultConfig() || cfg.nodeFeedAutoUpdate)
-            {
-                updateSubscribeManager.CreateTask(cfg, updateFreeNodeChecker, -1, !cfg.IsDefaultConfig(), false);
-            }
+            updateSubscribeManager.CreateTask(cfg, _updateNodeChecker, false);
         }
 
-        private void controller_Errored(object sender, ErrorEventArgs e)
+        private static void ControllerError(object sender, ErrorEventArgs e)
         {
-            MessageBox.Show(e.GetException().ToString(), string.Format(I18N.GetString("Shadowsocks Error: {0}"), e.GetException().Message));
+            MessageBox.Show(e.GetException().ToString(), string.Format(I18NUtil.GetAppStringValue(@"ControllerError"), e.GetException().Message));
         }
 
         private void UpdateTrayIcon()
         {
             var config = controller.GetCurrentConfiguration();
-            var enabled = config.sysProxyMode != (int)ProxyMode.NoModify && config.sysProxyMode != (int)ProxyMode.Direct;
-            var global = config.sysProxyMode == (int)ProxyMode.Global;
+            var enabled = config.sysProxyMode != ProxyMode.NoModify && config.sysProxyMode != ProxyMode.Direct;
+            var global = config.sysProxyMode == ProxyMode.Global;
             var random = config.random;
 
             var colorMask = ViewUtils.SelectColorMask(enabled, global);
@@ -171,15 +168,15 @@ namespace Shadowsocks.View
             var line4 = string.Empty;
             if (random)
             {
-                strServer = $@"{I18N.GetString(@"Load balance")}{I18N.GetString(@": ")}{I18N.GetString(config.balanceAlgorithm)}";
+                strServer = $@"{I18NUtil.GetAppStringValue(@"LoadBalance")}{I18NUtil.GetAppStringValue(@"Colon")}{I18NUtil.GetAppStringValue(config.balanceAlgorithm)}";
                 if (config.randomInGroup)
                 {
-                    line3 = $@"{I18N.GetString(@"Balance in group")}{Environment.NewLine}";
+                    line3 = $@"{I18NUtil.GetAppStringValue(@"BalanceInGroup")}{Environment.NewLine}";
                 }
 
                 if (config.autoBan)
                 {
-                    line4 = $@"{I18N.GetString(@"AutoBan")}{Environment.NewLine}";
+                    line4 = $@"{I18NUtil.GetAppStringValue(@"AutoBan")}{Environment.NewLine}";
                 }
             }
             else
@@ -198,16 +195,42 @@ namespace Shadowsocks.View
                     }
                     else
                     {
-                        strServer = $@"{groupName}{I18N.GetString(@": ")}{serverName}";
+                        strServer = $@"{groupName}{I18NUtil.GetAppStringValue(@"Colon")}{serverName}";
                     }
                 }
             }
-            var line1 = (enabled
-                                ? global ? I18N.GetString(@"Global") : I18N.GetString(@"PAC")
-                                : I18N.GetString(@"Disable system proxy"))
-                                + Environment.NewLine;
+
+            string line1;
+            switch (config.sysProxyMode)
+            {
+                case ProxyMode.NoModify:
+                {
+                    line1 = $@"{I18NUtil.GetAppStringValue(@"NoProxy")}{Environment.NewLine}";
+                    break;
+                }
+                case ProxyMode.Direct:
+                {
+                    line1 = $@"{I18NUtil.GetAppStringValue(@"DisableProxy")}{Environment.NewLine}";
+                    break;
+                }
+                case ProxyMode.Pac:
+                {
+                    line1 = $@"{I18NUtil.GetAppStringValue(@"PacProxy")}{Environment.NewLine}";
+                    break;
+                }
+                case ProxyMode.Global:
+                {
+                    line1 = $@"{I18NUtil.GetAppStringValue(@"GlobalProxy")}{Environment.NewLine}";
+                    break;
+                }
+                default:
+                {
+                    line1 = null;
+                    break;
+                }
+            }
             var line2 = string.IsNullOrWhiteSpace(strServer) ? null : $@"{strServer}{Environment.NewLine}";
-            var line5 = string.Format(I18N.GetString(@"Running: Port {0}"), config.localPort); // this feedback is very important because they need to know Shadowsocks is running
+            var line5 = string.Format(I18NUtil.GetAppStringValue(@"RunningPort"), config.localPort); // this feedback is very important because they need to know Shadowsocks is running
 
             var text = $@"{line1}{line2}{line3}{line4}{line5}";
             _notifyIcon.ToolTipText = text;
@@ -299,7 +322,6 @@ namespace Shadowsocks.View
                         {
                             ((MenuItem)menuItem.Items[0]).Click += SubscribeSetting_Click;
                             ((MenuItem)menuItem.Items[1]).Click += CheckNodeUpdate_Click;
-                            ((MenuItem)menuItem.Items[2]).Click += CheckNodeUpdateBypassProxy_Click;
                             break;
                         }
                         case @"GlobalSettings":
@@ -335,7 +357,6 @@ namespace Shadowsocks.View
                         }
                         case @"Help":
                         {
-
                             ((MenuItem)menuItem.Items[0]).Click += OpenWiki_Click;
                             ((MenuItem)menuItem.Items[1]).Click += FeedbackItem_Click;
                             ((MenuItem)menuItem.Items[2]).Click += DonateMenuItem_Click;
@@ -386,7 +407,7 @@ namespace Shadowsocks.View
 
         private void controller_UpdatePACFromGFWListError(object sender, ErrorEventArgs e)
         {
-            _notifyIcon.ShowBalloonTip(I18N.GetString(@"Failed to update PAC file"), e.GetException().Message, BalloonIcon.Error);
+            _notifyIcon.ShowBalloonTip(I18NUtil.GetAppStringValue(@"UpdatePacFailed"), e.GetException().Message, BalloonIcon.Error);
             Logging.LogUsefulException(e.GetException());
         }
 
@@ -394,21 +415,19 @@ namespace Shadowsocks.View
         {
             var updater = (GFWListUpdater)sender;
             var result = e.Success ?
-                updater.UpdateType < 1 ? I18N.GetString(@"GFWList PAC updated") : I18N.GetString(@"PAC updated")
-                : I18N.GetString(@"No updates found. Please report to GFWList if you have problems with it.");
-            _notifyIcon.ShowBalloonTip(I18N.GetString(@"ShadowsocksR"), result, BalloonIcon.Info);
+                updater.UpdateType < 1 ? I18NUtil.GetAppStringValue(@"GfwListPacUpdated") : I18NUtil.GetAppStringValue(@"PacUpdated")
+                : I18NUtil.GetAppStringValue(@"GfwListPacNotFound");
+            _notifyIcon.ShowBalloonTip(UpdateChecker.Name, result, BalloonIcon.Info);
         }
 
         private void controller_UpdatePACFromChnDomainsAndIPCompleted(object sender, ChnDomainsAndIPUpdater.ResultEventArgs e)
         {
-            var result = e.Success ? I18N.GetString(@"PAC updated") : I18N.GetString(@"No updates found.");
-            _notifyIcon.ShowBalloonTip(I18N.GetString(@"ShadowsocksR"), result, BalloonIcon.Info);
+            var result = e.Success ? I18NUtil.GetAppStringValue(@"PacUpdated") : I18NUtil.GetAppStringValue(@"PacNotFound");
+            _notifyIcon.ShowBalloonTip(UpdateChecker.Name, result, BalloonIcon.Info);
         }
 
-        [SuppressMessage("ReSharper", "LoopVariableIsNeverChangedInsideLoop")]
-        private void updateFreeNodeChecker_NewFreeNodeFound(object sender, EventArgs e)
+        private void UpdateNodeCheckerNewNodeFound(object sender, EventArgs e)
         {
-            //TODO
             if (configFrom_open)
             {
                 eventList.Add(new EventParams(sender, e));
@@ -416,217 +435,144 @@ namespace Shadowsocks.View
             }
             string lastGroup = null;
             var count = 0;
-            if (!string.IsNullOrEmpty(updateFreeNodeChecker.FreeNodeResult))
+            if (!string.IsNullOrWhiteSpace(_updateNodeChecker.FreeNodeResult))
             {
                 var urls = new List<string>();
-                updateFreeNodeChecker.FreeNodeResult = updateFreeNodeChecker.FreeNodeResult.TrimEnd('\r', '\n', ' ');
+                _updateNodeChecker.FreeNodeResult = _updateNodeChecker.FreeNodeResult.TrimEnd('\r', '\n', ' ');
                 var config = controller.GetCurrentConfiguration();
-                Server selected_server = null;
+                Server selectedServer = null;
                 if (config.index >= 0 && config.index < config.configs.Count)
                 {
-                    selected_server = config.configs[config.index];
+                    selectedServer = config.configs[config.index];
                 }
                 try
                 {
-                    updateFreeNodeChecker.FreeNodeResult = Base64.DecodeBase64(updateFreeNodeChecker.FreeNodeResult);
+                    _updateNodeChecker.FreeNodeResult = Base64.DecodeBase64(_updateNodeChecker.FreeNodeResult);
                 }
                 catch
                 {
-                    updateFreeNodeChecker.FreeNodeResult = string.Empty;
+                    _updateNodeChecker.FreeNodeResult = string.Empty;
                 }
-                var max_node_num = 0;
-
-                var match_maxnum = Regex.Match(updateFreeNodeChecker.FreeNodeResult, "^MAX=([0-9]+)");
-                if (match_maxnum.Success)
-                {
-                    try
-                    {
-                        max_node_num = Convert.ToInt32(match_maxnum.Groups[1].Value, 10);
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
-                }
-                Utils.URL_Split(updateFreeNodeChecker.FreeNodeResult, ref urls);
+                Utils.URL_Split(_updateNodeChecker.FreeNodeResult, ref urls);
                 for (var i = urls.Count - 1; i >= 0; --i)
                 {
-                    if (!urls[i].StartsWith("ssr"))
+                    if (!urls[i].StartsWith(@"ssr://"))
+                    {
                         urls.RemoveAt(i);
+                    }
                 }
                 if (urls.Count > 0)
                 {
-                    var keep_selected_server = false; // set 'false' if import all nodes
-                    if (max_node_num <= 0 || max_node_num >= urls.Count)
+                    urls.Reverse();
+
+                    var curGroup = updateSubscribeManager.CurrentServerSubscribe.OriginGroup;
+                    if (string.IsNullOrWhiteSpace(curGroup))
                     {
-                        urls.Reverse();
+                        foreach (var url in urls)
+                        {
+                            try // try get group name
+                            {
+                                var server = new Server(url, null);
+                                if (!string.IsNullOrEmpty(server.Group))
+                                {
+                                    var hasSameGroup = config.serverSubscribes.Any(subscribe => subscribe.Group == server.Group);
+                                    if (hasSameGroup)
+                                    {
+                                        continue;
+                                    }
+
+                                    foreach (var serverSubscribe in config.serverSubscribes.Where(serverSubscribe => serverSubscribe.Url == updateSubscribeManager.CurrentServerSubscribe.Url))
+                                    {
+                                        curGroup = serverSubscribe.Group = server.Group;
+                                    }
+
+                                    break;
+                                }
+                            }
+                            catch
+                            {
+                                // ignored
+                            }
+                        }
                     }
-                    else
+                    if (string.IsNullOrWhiteSpace(curGroup))
                     {
-                        var r = new Random();
-                        Utils.Shuffle(urls, r);
-                        urls.RemoveRange(max_node_num, urls.Count - max_node_num);
-                        if (!config.IsDefaultConfig())
-                            keep_selected_server = true;
+                        curGroup = updateSubscribeManager.CurrentServerSubscribe.UrlMd5;
                     }
-                    string curGroup = null;
+
+                    lastGroup = curGroup;
+
+                    // import all, find difference
+                    var oldServers = new List<Server>();
+                    var firstInsertIndex = config.configs.Count;
+                    //Find old servers
+                    for (var i = config.configs.Count - 1; i >= 0; --i)
+                    {
+                        if (lastGroup == config.configs[i].SubTag)
+                        {
+                            oldServers.Add(config.configs[i]);
+                            firstInsertIndex = i;
+                        }
+                    }
+
+                    //Find new servers
+                    var newServers = new List<Server>();
                     foreach (var url in urls)
                     {
-                        try // try get group name
+                        try
                         {
-                            var server = new Server(url, null);
-                            if (!string.IsNullOrEmpty(server.Group))
-                            {
-                                curGroup = server.Group;
-                                break;
-                            }
+                            var server = new Server(url, curGroup) { Index = firstInsertIndex++ };
+                            newServers.Add(server);
                         }
                         catch
                         {
                             // ignored
                         }
                     }
-                    var subscribeURL = updateSubscribeManager.Url;
-                    if (string.IsNullOrEmpty(curGroup))
-                    {
-                        curGroup = subscribeURL;
-                    }
-                    foreach (var serverSubscribe in config.serverSubscribes)
-                    {
-                        if (subscribeURL == serverSubscribe.URL)
-                        {
-                            lastGroup = serverSubscribe.Group;
-                            serverSubscribe.Group = curGroup;
-                            break;
-                        }
-                    }
-                    if (string.IsNullOrEmpty(lastGroup))
-                    {
-                        lastGroup = curGroup;
-                    }
 
-                    Debug.Assert(selected_server != null, nameof(selected_server) + " != null");
-                    if (keep_selected_server && selected_server.Group == curGroup)
+                    count = newServers.Count;
+
+                    var removeServers = oldServers.Except(newServers);
+                    var addServers = newServers.Except(oldServers);
+
+                    //Remove servers
+                    foreach (var server in removeServers)
                     {
-                        var match = false;
-                        foreach (var url in urls)
+                        for (var i = config.configs.Count - 1; i >= 0; --i)
                         {
-                            try
+                            if (config.configs[i].Id == server.Id)
                             {
-                                var server = new Server(url, null);
-                                if (selected_server.IsMatchServer(server))
-                                {
-                                    match = true;
-                                    break;
-                                }
+                                config.configs[i].GetConnections().CloseAll();
+                                config.configs.RemoveAt(i);
+                                break;
                             }
-                            catch
-                            {
-                                // ignored
-                            }
-                        }
-                        if (!match)
-                        {
-                            urls.RemoveAt(0);
-                            urls.Add(selected_server.SsrLink);
                         }
                     }
 
-                    // import all, find difference
+                    //Add servers
+                    foreach (var server in addServers)
                     {
-                        var old_servers = new Dictionary<string, Server>();
-                        var old_insert_servers = new Dictionary<string, Server>();
-                        if (!string.IsNullOrEmpty(lastGroup))
-                        {
-                            for (var i = config.configs.Count - 1; i >= 0; --i)
-                            {
-                                if (lastGroup == config.configs[i].Group)
-                                {
-                                    old_servers[config.configs[i].Id] = config.configs[i];
-                                }
-                            }
-                        }
-                        foreach (var url in urls)
-                        {
-                            try
-                            {
-                                var server = new Server(url, curGroup);
-                                var match = false;
-                                if (!match)
-                                {
-                                    foreach (var pair in old_insert_servers)
-                                    {
-                                        if (server.IsMatchServer(pair.Value))
-                                        {
-                                            match = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                                old_insert_servers[server.Id] = server;
-                                if (!match)
-                                {
-                                    foreach (var pair in old_servers)
-                                    {
-                                        if (server.IsMatchServer(pair.Value))
-                                        {
-                                            match = true;
-                                            old_servers.Remove(pair.Key);
-                                            pair.Value.CopyServerInfo(server);
-                                            ++count;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (!match)
-                                {
-                                    var insert_index = config.configs.Count;
-                                    for (var index = config.configs.Count - 1; index >= 0; --index)
-                                    {
-                                        if (config.configs[index].Group == curGroup)
-                                        {
-                                            insert_index = index + 1;
-                                            break;
-                                        }
-                                    }
-                                    config.configs.Insert(insert_index, server);
-                                    ++count;
-                                }
-                            }
-                            catch
-                            {
-                                // ignored
-                            }
-                        }
-                        foreach (var pair in old_servers)
-                        {
-                            for (var i = config.configs.Count - 1; i >= 0; --i)
-                            {
-                                if (config.configs[i].Id == pair.Key)
-                                {
-                                    config.configs.RemoveAt(i);
-                                    break;
-                                }
-                            }
-                        }
-                        controller.SaveServersConfig(config);
+                        config.configs.Insert(server.Index, server);
                     }
+
+                    controller.SaveServersConfig(config);
+                    //Set SelectedServer
                     config = controller.GetCurrentConfiguration();
-                    if (selected_server != null)
+                    if (selectedServer != null)
                     {
                         var match = false;
                         for (var i = config.configs.Count - 1; i >= 0; --i)
                         {
-                            if (config.configs[i].Id == selected_server.Id)
+                            if (config.configs[i].Id == selectedServer.Id)
                             {
                                 config.index = i;
                                 match = true;
                                 break;
                             }
 
-                            if (config.configs[i].Group == selected_server.Group)
+                            if (config.configs[i].SubTag == selectedServer.SubTag)
                             {
-                                if (config.configs[i].IsMatchServer(selected_server))
+                                if (config.configs[i].IsMatchServer(selectedServer))
                                 {
                                     config.index = i;
                                     match = true;
@@ -643,12 +589,14 @@ namespace Shadowsocks.View
                     {
                         config.index = config.configs.Count - 1;
                     }
+                    //If Update Success
                     if (count > 0)
                     {
-                        foreach (var serverSubscribe in config.serverSubscribes.Where(serverSubscribe => serverSubscribe.URL == updateFreeNodeChecker.SubscribeTask.URL))
+                        foreach (var serverSubscribe in config.serverSubscribes.Where(serverSubscribe => serverSubscribe.Url == _updateNodeChecker.SubscribeTask.Url))
                         {
                             serverSubscribe.LastUpdateTime = (ulong)Math.Floor(DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
                         }
+                        config.configs.RemoveAll(server => server.IsMatchServer(Server.GetDefaultServer()));
                     }
                     controller.SaveServersConfig(config);
                 }
@@ -656,23 +604,21 @@ namespace Shadowsocks.View
 
             if (count > 0)
             {
-                if (updateFreeNodeChecker.Notify)
+                if (_updateNodeChecker.Notify)
                 {
-                    _notifyIcon.ShowBalloonTip(I18N.GetString("Success"),
-                    string.Format(I18N.GetString("Update subscribe {0} success"), lastGroup), BalloonIcon.Info);
+                    _notifyIcon.ShowBalloonTip(I18NUtil.GetAppStringValue(@"Success"), string.Format(I18NUtil.GetAppStringValue(@"UpdateSubscribeSuccess"), lastGroup), BalloonIcon.Info);
                 }
             }
             else
             {
                 if (lastGroup == null)
                 {
-                    lastGroup = updateFreeNodeChecker.SubscribeTask.Group;
+                    lastGroup = _updateNodeChecker.SubscribeTask.Group;
                 }
 
-                if (updateFreeNodeChecker.Notify)
+                if (_updateNodeChecker.Notify)
                 {
-                    _notifyIcon.ShowBalloonTip(I18N.GetString("Error"),
-                            string.Format(I18N.GetString("Update subscribe {0} failure"), lastGroup), BalloonIcon.Info);
+                    _notifyIcon.ShowBalloonTip(I18NUtil.GetAppStringValue(@"Error"), string.Format(I18NUtil.GetAppStringValue(@"UpdateSubscribeFailure"), lastGroup), BalloonIcon.Info);
                 }
             }
             if (updateSubscribeManager.Next())
@@ -690,8 +636,8 @@ namespace Shadowsocks.View
                     if (UpdateItem.Visibility != Visibility.Visible)
                     {
                         _notifyIcon.ShowBalloonTip(
-                                string.Format(I18NUtil.GetAppStringValue(@"NewVersionFound"), UpdateChecker.Name,
-                                        updateChecker.LatestVersionNumber),
+                                string.Format(I18NUtil.GetAppStringValue(@"NewVersionFound"),
+                                UpdateChecker.Name, updateChecker.LatestVersionNumber),
                                 I18NUtil.GetAppStringValue(@"ClickMenuToDownload"), BalloonIcon.Info);
                     }
                     UpdateItem.Visibility = Visibility.Visible;
@@ -703,13 +649,12 @@ namespace Shadowsocks.View
 
         private void updateChecker_NewVersionNotFound(object sender, EventArgs e)
         {
-            _notifyIcon.ShowBalloonTip($@"ShadowsocksR {UpdateChecker.FullVersion}", I18NUtil.GetAppStringValue(@"NewVersionNotFound"), BalloonIcon.Info);
+            _notifyIcon.ShowBalloonTip($@"{UpdateChecker.Name} {UpdateChecker.FullVersion}", I18NUtil.GetAppStringValue(@"NewVersionNotFound"), BalloonIcon.Info);
         }
 
         private void UpdateChecker_NewVersionFoundFailed(object sender, EventArgs e)
         {
-            _notifyIcon.ShowBalloonTip($@"ShadowsocksR {UpdateChecker.FullVersion}",
-                    I18NUtil.GetAppStringValue(@"NewVersionFoundFailed"), BalloonIcon.Info);
+            _notifyIcon.ShowBalloonTip($@"{UpdateChecker.Name} {UpdateChecker.FullVersion}", I18NUtil.GetAppStringValue(@"NewVersionFoundFailed"), BalloonIcon.Info);
         }
 
         private void UpdateItem_Clicked(object sender, RoutedEventArgs e)
@@ -730,19 +675,19 @@ namespace Shadowsocks.View
 
         private void UpdateSysProxyMode(Configuration config)
         {
-            noModifyItem.IsChecked = config.sysProxyMode == (int)ProxyMode.NoModify;
-            enableItem.IsChecked = config.sysProxyMode == (int)ProxyMode.Direct;
-            PACModeItem.IsChecked = config.sysProxyMode == (int)ProxyMode.Pac;
-            globalModeItem.IsChecked = config.sysProxyMode == (int)ProxyMode.Global;
+            noModifyItem.IsChecked = config.sysProxyMode == ProxyMode.NoModify;
+            enableItem.IsChecked = config.sysProxyMode == ProxyMode.Direct;
+            PACModeItem.IsChecked = config.sysProxyMode == ProxyMode.Pac;
+            globalModeItem.IsChecked = config.sysProxyMode == ProxyMode.Global;
         }
 
         private void UpdateProxyRule(Configuration config)
         {
-            ruleDisableBypass.IsChecked = config.proxyRuleMode == (int)ProxyRuleMode.Disable;
-            ruleBypassLan.IsChecked = config.proxyRuleMode == (int)ProxyRuleMode.BypassLan;
-            ruleBypassChina.IsChecked = config.proxyRuleMode == (int)ProxyRuleMode.BypassLanAndChina;
-            ruleBypassNotChina.IsChecked = config.proxyRuleMode == (int)ProxyRuleMode.BypassLanAndNotChina;
-            ruleUser.IsChecked = config.proxyRuleMode == (int)ProxyRuleMode.UserCustom;
+            ruleDisableBypass.IsChecked = config.proxyRuleMode == ProxyRuleMode.Disable;
+            ruleBypassLan.IsChecked = config.proxyRuleMode == ProxyRuleMode.BypassLan;
+            ruleBypassChina.IsChecked = config.proxyRuleMode == ProxyRuleMode.BypassLanAndChina;
+            ruleBypassNotChina.IsChecked = config.proxyRuleMode == ProxyRuleMode.BypassLanAndNotChina;
+            ruleUser.IsChecked = config.proxyRuleMode == ProxyRuleMode.UserCustom;
         }
 
         private void LoadCurrentConfiguration()
@@ -855,7 +800,7 @@ namespace Shadowsocks.View
             {
                 foreach (var p in eventList)
                 {
-                    updateFreeNodeChecker_NewFreeNodeFound(p.sender, p.e);
+                    UpdateNodeCheckerNewNodeFound(p.sender, p.e);
                 }
 
                 eventList.Clear();
@@ -994,7 +939,7 @@ namespace Shadowsocks.View
             }
             else
             {
-                _subScribeWindow = new SubscribeWindow(controller);
+                _subScribeWindow = new SubscribeWindow(controller, updateSubscribeManager, _updateNodeChecker);
                 _subScribeWindow.Show();
                 _subScribeWindow.Activate();
                 _subScribeWindow.BringToFront();
@@ -1076,7 +1021,7 @@ namespace Shadowsocks.View
 
         private void OpenWiki_Click(object sender, RoutedEventArgs e)
         {
-            Utils.OpenURL(@"https://github.com/HMBSbige/shadowsocks-rss/wiki");
+            Utils.OpenURL(@"https://github.com/HMBSbige/ShadowsocksR-Windows/wiki");
         }
 
         private void FeedbackItem_Click(object sender, RoutedEventArgs e)
@@ -1151,33 +1096,40 @@ namespace Shadowsocks.View
 
         private void RuleBypassLanItem_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(() => { controller.ToggleRuleMode((int)ProxyRuleMode.BypassLan); });
+            Task.Run(() => { controller.ToggleRuleMode(ProxyRuleMode.BypassLan); });
         }
 
         private void RuleBypassChinaItem_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(() => { controller.ToggleRuleMode((int)ProxyRuleMode.BypassLanAndChina); });
+            Task.Run(() => { controller.ToggleRuleMode(ProxyRuleMode.BypassLanAndChina); });
         }
 
         private void RuleBypassNotChinaItem_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(() => { controller.ToggleRuleMode((int)ProxyRuleMode.BypassLanAndNotChina); });
+            Task.Run(() => { controller.ToggleRuleMode(ProxyRuleMode.BypassLanAndNotChina); });
         }
 
         private void RuleUserItem_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(() => { controller.ToggleRuleMode((int)ProxyRuleMode.UserCustom); });
+            Task.Run(() => { controller.ToggleRuleMode(ProxyRuleMode.UserCustom); });
         }
 
         private void RuleBypassDisableItem_Click(object sender, RoutedEventArgs e)
         {
-            Task.Run(() => { controller.ToggleRuleMode((int)ProxyRuleMode.Disable); });
+            Task.Run(() => { controller.ToggleRuleMode(ProxyRuleMode.Disable); });
         }
 
         private void SelectRandomItem_Click(object sender, RoutedEventArgs e)
         {
             SelectRandomItem.IsChecked = !SelectRandomItem.IsChecked;
-            controller.ToggleSelectRandom(SelectRandomItem.IsChecked);
+            if (SelectRandomItem.IsChecked)
+            {
+                Task.Run(() => { controller.ToggleSelectRandom(true); });
+            }
+            else
+            {
+                Task.Run(() => { controller.ToggleSelectRandom(false); });
+            }
         }
 
         private void AutoCheckUpdateItem_Click(object sender, RoutedEventArgs e)
@@ -1195,7 +1147,14 @@ namespace Shadowsocks.View
         private void SelectSameHostForSameTargetItem_Click(object sender, RoutedEventArgs e)
         {
             sameHostForSameTargetItem.IsChecked = !sameHostForSameTargetItem.IsChecked;
-            controller.ToggleSameHostForSameTargetRandom(sameHostForSameTargetItem.IsChecked);
+            if (sameHostForSameTargetItem.IsChecked)
+            {
+                Task.Run(() => { controller.ToggleSameHostForSameTargetRandom(true); });
+            }
+            else
+            {
+                Task.Run(() => { controller.ToggleSameHostForSameTargetRandom(false); });
+            }
         }
 
         private void CopyPacUrlItem_Click(object sender, RoutedEventArgs e)
@@ -1240,14 +1199,18 @@ namespace Shadowsocks.View
 
         private void AServerItem_Click(object sender, EventArgs e)
         {
-            var config = controller.GetCurrentConfiguration();
-            Console.WriteLine(@"config.checkSwitchAutoCloseAll:" + config.checkSwitchAutoCloseAll);
-            if (config.checkSwitchAutoCloseAll)
-            {
-                controller.DisconnectAllConnections();
-            }
             var item = (MenuItem)sender;
-            controller.SelectServerIndex((int)item.Tag);
+            var index = (int)item.Tag;
+            Task.Run(() =>
+            {
+                var config = controller.GetCurrentConfiguration();
+                Console.WriteLine($@"config.checkSwitchAutoCloseAll:{config.checkSwitchAutoCloseAll}");
+                if (config.checkSwitchAutoCloseAll)
+                {
+                    controller.DisconnectAllConnections();
+                }
+                controller.SelectServerIndex(index);
+            });
         }
 
         private void CheckUpdate_Click(object sender, RoutedEventArgs e)
@@ -1257,12 +1220,7 @@ namespace Shadowsocks.View
 
         private void CheckNodeUpdate_Click(object sender, RoutedEventArgs e)
         {
-            updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, true, true);
-        }
-
-        private void CheckNodeUpdateBypassProxy_Click(object sender, RoutedEventArgs e)
-        {
-            updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), updateFreeNodeChecker, -1, false, true);
+            updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), _updateNodeChecker, true);
         }
 
         private void ShowLogItem_Click(object sender, RoutedEventArgs e)
@@ -1287,17 +1245,19 @@ namespace Shadowsocks.View
 
         private void DisconnectCurrent_Click(object sender, RoutedEventArgs e)
         {
-            controller.DisconnectAllConnections();
+            Task.Run(() => { controller.DisconnectAllConnections(); });
         }
 
         public void ImportAddress(string text)
         {
-            var urls = new List<string>();
-            Utils.URL_Split(text, ref urls);
-            var count = urls.Count(url => controller.AddServerBySSURL(url));
-            if (count > 0)
+            if (controller.AddServerBySsUrl(text))
             {
                 ShowConfigForm(true);
+            }
+
+            if (controller.AddSubscribeUrl(text))
+            {
+                ShowSubscribeSettingForm();
             }
         }
 
@@ -1358,15 +1318,20 @@ namespace Shadowsocks.View
                     var result = QrCodeUtils.ScanBitmap(target);
                     if (result != null)
                     {
-                        var success = controller.AddServerBySSURL(result.Text);
+                        var success = controller.AddServerBySsUrl(result.Text);
+                        var successSub = controller.AddSubscribeUrl(result.Text);
                         Application.Current.Dispatcher?.Invoke(() =>
                         {
                             var splash = new QRCodeSplashWindow();
+                            if (successSub)
+                            {
+                                splash.Closed += Splash_Closed0;
+                            }
                             if (success)
                             {
                                 splash.Closed += Splash_Closed;
                             }
-                            else
+                            if (!(successSub || success))
                             {
                                 _urlToOpen = result.Text;
                                 splash.Closed += Splash_Closed2;
@@ -1403,13 +1368,18 @@ namespace Shadowsocks.View
                     }
                 }
 
-                MessageBox.Show(I18N.GetString(@"No QRCode found. Try to zoom in or move it to the center of the screen."));
+                MessageBox.Show(I18NUtil.GetAppStringValue(@"QrCodeNotFound"));
             });
         }
 
         private void Splash_Closed(object sender, EventArgs e)
         {
             ShowConfigForm(true);
+        }
+
+        private void Splash_Closed0(object sender, EventArgs e)
+        {
+            ShowSubscribeSettingForm();
         }
 
         private void showURLFromQRCode()

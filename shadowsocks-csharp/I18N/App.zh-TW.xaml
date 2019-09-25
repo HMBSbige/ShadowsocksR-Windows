@@ -35,16 +35,15 @@
     <sys:String x:Key="DisconnectCurrent">斷開當前所有連接</sys:String>
 
     <sys:String x:Key="ServersSubscribe">伺服器訂閱</sys:String>
-    <sys:String x:Key="SubscribeSetting">SSR伺服器訂閱設置...</sys:String>
-    <sys:String x:Key="UpdateSubscribeSsrNode">更新SSR伺服器訂閱</sys:String>
-    <sys:String x:Key="UpdateSubscribeSsrNodeBypassProxy">更新SSR伺服器訂閱（不通過代理）</sys:String>
+    <sys:String x:Key="SubscribeSetting">伺服器訂閱設置...</sys:String>
+    <sys:String x:Key="UpdateSubscribeSsrNode">更新伺服器訂閱</sys:String>
 
     <sys:String x:Key="GlobalSettings">選項設置...</sys:String>
     <sys:String x:Key="PortSettings">連接埠設置...</sys:String>
     <sys:String x:Key="ShowLogs">顯示日誌...</sys:String>
     <sys:String x:Key="UpdateAvailable">可用更新</sys:String>
     <sys:String x:Key="ScanQrCode">QR 碼掃描...</sys:String>
-    <sys:String x:Key="ImportSsrLinksFromClipboard">剪貼板批量導入ssr://連結...</sys:String>
+    <sys:String x:Key="ImportSsrLinksFromClipboard">剪貼板批量導入連結...</sys:String>
 
     <sys:String x:Key="Help">幫助</sys:String>
     <sys:String x:Key="Update">更新...</sys:String>
@@ -66,4 +65,48 @@
     <sys:String x:Key="NewVersionAvailable">【點擊下載新版本 {0} {1}】</sys:String>
     <sys:String x:Key="NewVersionFoundFailed">檢查更新失敗</sys:String>
 
+    <sys:String x:Key="UnexpectedError">Unexpected error, ShadowsocksR will exit.</sys:String>
+    <sys:String x:Key="SuccessiveInstancesMessage1">請在工作列裡尋找 ShadowsocksR 圖標。</sys:String>
+    <sys:String x:Key="SuccessiveInstancesMessage2">如果想啟動多份，可以另外複製一份到別的目錄。</sys:String>
+    <sys:String x:Key="SuccessiveInstancesCaption">ShadowsocksR 已經在運行</sys:String>
+
+    <sys:String x:Key="NewServer">未配置的伺服器</sys:String>
+
+    <sys:String x:Key="PortInUse">連接埠號碼 {0} 已被使用</sys:String>
+    <sys:String x:Key="PortReserved">連接埠號碼 {0} 由系統保留</sys:String>
+    <sys:String x:Key="PortOutOfRange">連接埠超出範圍</sys:String>
+
+    <sys:String x:Key="Enabled">已啟用</sys:String>
+    <sys:String x:Key="Disabled">已停用</sys:String>
+
+    <sys:String x:Key="ControllerError">ShadowsocksR Error: {0}</sys:String>
+
+    <sys:String x:Key="Colon" xml:space="preserve">：</sys:String>
+
+    <sys:String x:Key="OneByOne">按次序</sys:String>
+    <sys:String x:Key="Random">隨機</sys:String>
+    <sys:String x:Key="FastDownloadSpeed">下載速度優先</sys:String>
+    <sys:String x:Key="LowLatency">低延遲優先</sys:String>
+    <sys:String x:Key="LowException">低錯誤優先</sys:String>
+    <sys:String x:Key="SelectedFirst">選中優先</sys:String>
+    <sys:String x:Key="Timer">定時切換</sys:String>
+
+    <sys:String x:Key="BalanceInGroup">所選組切換</sys:String>
+    <sys:String x:Key="AutoBan">自動禁用出錯伺服器</sys:String>
+
+    <sys:String x:Key="RunningPort">正在運行：連接埠 {0}</sys:String>
+
+    <sys:String x:Key="UpdatePacFailed">更新 PAC 文件失敗</sys:String>
+    <sys:String x:Key="GfwListPacUpdated">更新 GFWList PAC 成功</sys:String>
+    <sys:String x:Key="PacUpdated">更新 PAC 成功</sys:String>
+    <sys:String x:Key="GfwListPacNotFound">未發現更新。如有問題請提交給 GFWList</sys:String>
+    <sys:String x:Key="PacNotFound">未發現更新</sys:String>
+
+    <sys:String x:Key="Success">成功</sys:String>
+    <sys:String x:Key="Error">錯誤</sys:String>
+
+    <sys:String x:Key="UpdateSubscribeSuccess">伺服器訂閱 {0} 更新成功</sys:String>
+    <sys:String x:Key="UpdateSubscribeFailure">伺服器訂閱 {0} 更新失敗</sys:String>
+
+    <sys:String x:Key="QrCodeNotFound">未發現 QR 碼，嘗試把它放大或移動到靠近屏幕中間的位置</sys:String>
 </ResourceDictionary>

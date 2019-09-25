@@ -1,0 +1,21 @@
+on: [push]
+
+name: .NET Build
+
+jobs:
+
+  build:
+    runs-on: windows-latest
+    strategy:
+        matrix:
+            dotnet: ['3.0.100']
+    name: dotnet ${{ matrix.dotnet }}
+    steps:
+    - uses: actions/checkout@master
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@master
+      with:
+        dotnet-version: ${{ matrix.dotnet }}
+
+    - name: Build with dotnet
+      run: dotnet build -c Release shadowsocks-csharp

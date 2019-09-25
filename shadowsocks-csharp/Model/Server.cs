@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Shadowsocks.Controller;
+using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -25,6 +25,7 @@ namespace Shadowsocks.Model
         private string obfsparam;
         private string remarks_base64;
         private string group;
+        private string subTag;
         private bool enable;
         private bool udp_over_tcp;
 
@@ -89,7 +90,7 @@ namespace Shadowsocks.Model
 
                 try
                 {
-                    return Util.Base64.DecodeUrlSafeBase64(Remarks_Base64);
+                    return Base64.DecodeUrlSafeBase64(Remarks_Base64);
                 }
                 catch (FormatException)
                 {
@@ -100,7 +101,7 @@ namespace Shadowsocks.Model
             }
             set
             {
-                var @new = Util.Base64.EncodeUrlSafeBase64(value);
+                var @new = Base64.EncodeUrlSafeBase64(value);
                 if (@new != Remarks_Base64)
                 {
                     Remarks_Base64 = @new;
@@ -115,7 +116,7 @@ namespace Shadowsocks.Model
             {
                 if (string.IsNullOrEmpty(server))
                 {
-                    return I18N.GetString(@"New server");
+                    return I18NUtil.GetAppStringValue(@"NewServer");
                 }
 
                 if (string.IsNullOrEmpty(Remarks))
@@ -330,6 +331,19 @@ namespace Shadowsocks.Model
             }
         }
 
+        public string SubTag
+        {
+            get => subTag;
+            set
+            {
+                if (subTag != value)
+                {
+                    subTag = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public string Remarks_Base64
         {
             get => remarks_base64;
@@ -380,20 +394,14 @@ namespace Shadowsocks.Model
             return new Server();
         }
 
-        public void CopyServer(Server Server)
+        public void CopyServer(Server oldServer)
         {
-            Protocoldata = Server.Protocoldata;
-            Obfsdata = Server.Obfsdata;
-            SpeedLog = Server.SpeedLog;
-            dnsBuffer = Server.dnsBuffer;
-            Connections = Server.Connections;
-            Enable = Server.Enable;
-        }
-
-        public void CopyServerInfo(Server Server)
-        {
-            Remarks = Server.Remarks;
-            Group = Server.Group;
+            Protocoldata = oldServer.Protocoldata;
+            Obfsdata = oldServer.Obfsdata;
+            SpeedLog = oldServer.SpeedLog;
+            dnsBuffer = oldServer.dnsBuffer;
+            Connections = oldServer.Connections;
+            Enable = oldServer.Enable;
         }
 
         public static Server GetForwardServerRef()
@@ -464,10 +472,11 @@ namespace Shadowsocks.Model
             Password = @"0";
             Remarks_Base64 = @"";
             Group = @"FreeSSR-public";
+            SubTag = @"";
             UdpOverTcp = false;
             Enable = true;
             var randId = new byte[16];
-            Util.Utils.RandBytes(randId, randId.Length);
+            RNG.RandBytes(randId, randId.Length);
             Id = BitConverter.ToString(randId).Replace(@"-", @"");
 
             SpeedLog = new ServerSpeedLog();
@@ -516,7 +525,7 @@ namespace Shadowsocks.Model
             if (!ssr.Success)
                 throw new FormatException();
 
-            var data = Util.Base64.DecodeUrlSafeBase64(ssr.Groups[1].Value);
+            var data = Base64.DecodeUrlSafeBase64(ssr.Groups[1].Value);
             var params_dict = new Dictionary<string, string>();
 
             var param_start_pos = data.IndexOf("?", StringComparison.Ordinal);
@@ -543,26 +552,22 @@ namespace Shadowsocks.Model
             Method = match.Groups[4].Value;
             obfs = match.Groups[5].Value.Length == 0 ? "plain" : match.Groups[5].Value;
             obfs = obfs.Replace("_compatible", "");
-            Password = Util.Base64.DecodeStandardSSRUrlSafeBase64(match.Groups[6].Value);
+            Password = Base64.DecodeStandardSSRUrlSafeBase64(match.Groups[6].Value);
 
             if (params_dict.ContainsKey("protoparam"))
             {
-                ProtocolParam = Util.Base64.DecodeStandardSSRUrlSafeBase64(params_dict["protoparam"]);
+                ProtocolParam = Base64.DecodeStandardSSRUrlSafeBase64(params_dict["protoparam"]);
             }
             if (params_dict.ContainsKey("obfsparam"))
             {
-                ObfsParam = Util.Base64.DecodeStandardSSRUrlSafeBase64(params_dict["obfsparam"]);
+                ObfsParam = Base64.DecodeStandardSSRUrlSafeBase64(params_dict["obfsparam"]);
             }
             if (params_dict.ContainsKey("remarks"))
             {
-                Remarks = Util.Base64.DecodeStandardSSRUrlSafeBase64(params_dict["remarks"]);
+                Remarks = Base64.DecodeStandardSSRUrlSafeBase64(params_dict["remarks"]);
             }
-            if (params_dict.ContainsKey("group"))
-            {
-                Group = Util.Base64.DecodeStandardSSRUrlSafeBase64(params_dict["group"]);
-            }
-            else
-                Group = "";
+            Group = params_dict.ContainsKey("group") ? Base64.DecodeStandardSSRUrlSafeBase64(params_dict["group"]) : string.Empty;
+
             if (params_dict.ContainsKey("uot"))
             {
                 UdpOverTcp = int.Parse(params_dict["uot"]) != 0;
@@ -572,7 +577,9 @@ namespace Shadowsocks.Model
                 Server_Udp_Port = ushort.Parse(params_dict["udpport"]);
             }
             if (!string.IsNullOrEmpty(forceGroup))
-                Group = forceGroup;
+            {
+                SubTag = forceGroup;
+            }
         }
 
         private void ServerFromSs(string ssUrl, string forceGroup)
@@ -593,7 +600,7 @@ namespace Shadowsocks.Model
             Password = match.Groups["password"].Value;
             server = match.Groups["hostname"].Value;
             Server_Port = ushort.Parse(match.Groups["port"].Value);
-            Group = !string.IsNullOrEmpty(forceGroup) ? forceGroup : string.Empty;
+            SubTag = !string.IsNullOrEmpty(forceGroup) ? forceGroup : string.Empty;
         }
 
         public bool IsMatchServer(Server serverObject)
@@ -608,7 +615,8 @@ namespace Shadowsocks.Model
                    && ObfsParam == serverObject.ObfsParam
                    && Password == serverObject.Password
                    && UdpOverTcp == serverObject.UdpOverTcp
-                   && Remarks == serverObject.Remarks;
+                   && Remarks == serverObject.Remarks
+                   && Group == serverObject.Group;
         }
 
         private string GetSsLink()
@@ -621,21 +629,21 @@ namespace Shadowsocks.Model
         private string GetSsrLink()
         {
             var mainPart =
-                    $@"{server}:{Server_Port}:{Protocol}:{Method}:{obfs}:{Util.Base64.EncodeUrlSafeBase64(Password)}";
-            var paramStr = $@"obfsparam={Util.Base64.EncodeUrlSafeBase64(ObfsParam ?? string.Empty)}";
+                    $@"{server}:{Server_Port}:{Protocol}:{Method}:{obfs}:{Base64.EncodeUrlSafeBase64(Password)}";
+            var paramStr = $@"obfsparam={Base64.EncodeUrlSafeBase64(ObfsParam ?? string.Empty)}";
             if (!string.IsNullOrEmpty(ProtocolParam))
             {
-                paramStr += $@"&protoparam={Util.Base64.EncodeUrlSafeBase64(ProtocolParam)}";
+                paramStr += $@"&protoparam={Base64.EncodeUrlSafeBase64(ProtocolParam)}";
             }
 
             if (!string.IsNullOrEmpty(Remarks))
             {
-                paramStr += $@"&remarks={Util.Base64.EncodeUrlSafeBase64(Remarks)}";
+                paramStr += $@"&remarks={Base64.EncodeUrlSafeBase64(Remarks)}";
             }
 
             if (!string.IsNullOrEmpty(Group))
             {
-                paramStr += $@"&group={Util.Base64.EncodeUrlSafeBase64(Group)}";
+                paramStr += $@"&group={Base64.EncodeUrlSafeBase64(Group)}";
             }
 
             if (UdpOverTcp)
@@ -648,7 +656,7 @@ namespace Shadowsocks.Model
                 paramStr += $@"&udpport={Server_Udp_Port}";
             }
 
-            var base64 = Util.Base64.EncodeUrlSafeBase64($@"{mainPart}/?{paramStr}");
+            var base64 = Base64.EncodeUrlSafeBase64($@"{mainPart}/?{paramStr}");
             return $@"ssr://{base64}";
         }
 

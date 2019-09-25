@@ -1,6 +1,7 @@
 ﻿using Shadowsocks.Controller;
 using Shadowsocks.Model;
 using System.Collections.ObjectModel;
+using System.Windows.Data;
 
 namespace Shadowsocks.ViewModel
 {
@@ -42,11 +43,9 @@ namespace Shadowsocks.ViewModel
         public void ReadConfig(ShadowsocksController controller)
         {
             var config = controller.GetCurrentConfiguration();
-            ServersCollection = config.configs;
-            SelectedServer = null;
+            ServersCollection.Clear();
             var index = 1;
-
-            foreach (var server in ServersCollection)
+            foreach (var server in config.configs)
             {
                 server.Index = index++;
                 if (config.index == server.Index - 1)
@@ -58,7 +57,12 @@ namespace Shadowsocks.ViewModel
                 {
                     server.IsSelected = false;
                 }
+                ServersCollection.Add(server);
             }
+
+            var vw = CollectionViewSource.GetDefaultView(ServersCollection);
+            vw.GroupDescriptions.Clear();
+            vw.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Server.SubTag)));
         }
     }
 }

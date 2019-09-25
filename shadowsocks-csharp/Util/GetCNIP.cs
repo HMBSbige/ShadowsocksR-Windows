@@ -41,24 +41,9 @@ namespace Shadowsocks.Util
             return new IPAddress(bytesAddress);
         }
 
-        private static string IPv4ToIPv4BinStr(IPAddress ipv4)
-        {
-            var bytesAddress = ipv4.GetAddressBytes();
-
-            return $@"{Convert.ToString(bytesAddress[0], 2).PadLeft(8, '0')}{
-                       Convert.ToString(bytesAddress[1], 2).PadLeft(8, '0')}{
-                       Convert.ToString(bytesAddress[2], 2).PadLeft(8, '0')}{
-                       Convert.ToString(bytesAddress[3], 2).PadLeft(8, '0')}";
-        }
-
         public static int Hosts2CIDR(int hosts)
         {
             return 32 - Convert.ToInt32(Math.Log(hosts, 2));
-        }
-
-        public static int CIDR2Hosts(int CIDR)
-        {
-            return Convert.ToInt32(Math.Pow(2, 32 - Convert.ToInt32(CIDR)));
         }
 
         public IPv4Subnet(IPAddress ipv4, int hosts)

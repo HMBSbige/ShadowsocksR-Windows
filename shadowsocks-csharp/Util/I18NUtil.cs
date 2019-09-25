@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -14,20 +13,25 @@ namespace Shadowsocks.Util
 
         public static readonly Dictionary<string, string> SupportLanguage = new Dictionary<string, string>
         {
-                {@"简体中文", @"zh-CN"},
-                {@"繁体中文", @"zh-TW"},
-                {@"English (United States)", @"en-US"},
+                {@"zh-CN", @"zh-CN"},
+                {@"zh", @"zh-CN"},
+                {@"zh-Hans", @"zh-CN"},
+                {@"zh-SG", @"zh-CN"},
+                {@"zh-Hant", @"zh-TW"},
+                {@"zh-HK", @"zh-TW"},
+                {@"zh-TW", @"zh-TW"},
+                {@"zh-MO", @"zh-TW"},
+                {@"en-US", @"en-US"}
         };
-
-        public static string GetLanguage(string name)
-        {
-            return SupportLanguage.All(s => name != s.Value) ? GetLanguage() : name;
-        }
 
         public static string GetLanguage()
         {
             var name = System.Globalization.CultureInfo.CurrentCulture.Name;
-            return SupportLanguage.Any(s => name == s.Value) ? name : DefaultLanguage;
+            if (SupportLanguage.TryGetValue(name, out var res))
+            {
+                return res;
+            }
+            return DefaultLanguage;
         }
 
         public static void SetLanguage(string langName)
@@ -45,7 +49,7 @@ namespace Shadowsocks.Util
             return key;
         }
 
-        public static string GetWindowStringValue(Window window, string key)
+        public static string GetWindowStringValue(this Window window, string key)
         {
             if (window.Resources.MergedDictionaries[0][key] is string str)
             {

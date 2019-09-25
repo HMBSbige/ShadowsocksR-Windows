@@ -19,7 +19,7 @@ namespace Shadowsocks.Obfs
         public int tcp_mss;
         public int overhead;
         public int buffer_size;
-        public byte[] iv;
+        public byte[] Iv;
         public byte[] key;
         public string key_str;
         public int head_len;
@@ -30,7 +30,7 @@ namespace Shadowsocks.Obfs
             this.port = port;
             this.param = param;
             this.data = data;
-            this.iv = iv;
+            this.Iv = iv;
             this.key = key;
             this.key_str = key_str;
             this.head_len = head_len;
@@ -41,7 +41,7 @@ namespace Shadowsocks.Obfs
 
         public void SetIV(byte[] iv)
         {
-            this.iv = iv;
+            this.Iv = iv;
         }
     }
     public interface IObfs : IDisposable

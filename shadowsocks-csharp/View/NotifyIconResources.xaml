@@ -47,7 +47,6 @@
         <MenuItem x:Name="ServersSubscribe" Style="{StaticResource TrayMenuItem}">
             <MenuItem x:Name="SubscribeSetting" Style="{StaticResource TrayMenuItem}" />
             <MenuItem x:Name="UpdateSubscribeSsrNode" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="UpdateSubscribeSsrNodeBypassProxy" Style="{StaticResource TrayMenuItem}" />
         </MenuItem>
         <MenuItem x:Name="GlobalSettings" Style="{StaticResource TrayMenuItem}" />
         <MenuItem x:Name="PortSettings" Style="{StaticResource TrayMenuItem}" />

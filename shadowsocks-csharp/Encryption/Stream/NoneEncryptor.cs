@@ -61,6 +61,13 @@ namespace Shadowsocks.Encryption.Stream
                 }
 
                 _disposed = true;
+
+                if (disposing)
+                {
+                    // free managed objects
+                }
+
+                // free unmanaged objects
             }
         }
 

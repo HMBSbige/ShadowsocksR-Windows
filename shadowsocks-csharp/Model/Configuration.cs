@@ -1,115 +1,23 @@
 ﻿using Newtonsoft.Json;
-using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
 using System.Text;
 
 namespace Shadowsocks.Model
 {
-    public class UriVisitTime : IComparable
-    {
-        public DateTime visitTime;
-        public string uri;
-        public int index;
-
-        public int CompareTo(object other)
-        {
-            if (!(other is UriVisitTime))
-                throw new InvalidOperationException("CompareTo: Not a UriVisitTime");
-            return Equals(other) ? 0 : visitTime.CompareTo(((UriVisitTime)other).visitTime);
-        }
-
-    }
-
-    public enum PortMapType
-    {
-        Forward = 0,
-        ForceProxy,
-        RuleProxy
-    }
-
-    public enum ProxyRuleMode
-    {
-        Disable = 0,
-        BypassLan,
-        BypassLanAndChina,
-        BypassLanAndNotChina,
-        UserCustom = 16
-    }
-
-    [Serializable]
-    public class PortMapConfig
-    {
-        public bool enable;
-        public PortMapType type;
-        public string id;
-        public string server_addr;
-        public int server_port;
-        public string remarks;
-    }
-
-    public class PortMapConfigCache
-    {
-        public PortMapType type;
-        public string id;
-        public Server server;
-        public string server_addr;
-        public int server_port;
-    }
-
-    [Serializable]
-    public class ServerSubscribe
-    {
-        private static string DEFAULT_FEED_URL = @"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/freenodeplain.txt";
-
-        public string URL = DEFAULT_FEED_URL;
-        public string Group;
-        public ulong LastUpdateTime;
-    }
-
-    public static class GlobalConfiguration
-    {
-        public static string config_password = string.Empty;
-    }
-
-    [Serializable]
-    class ConfigurationException : Exception
-    {
-        public ConfigurationException()
-        { }
-        public ConfigurationException(string message) : base(message) { }
-        public ConfigurationException(string message, Exception inner) : base(message, inner) { }
-        protected ConfigurationException(System.Runtime.Serialization.SerializationInfo info,
-            System.Runtime.Serialization.StreamingContext context)
-        { }
-    }
-
-    [Serializable]
-    class ConfigurationWarning : Exception
-    {
-        public ConfigurationWarning()
-        { }
-        public ConfigurationWarning(string message) : base(message) { }
-        public ConfigurationWarning(string message, Exception inner) : base(message, inner) { }
-        protected ConfigurationWarning(System.Runtime.Serialization.SerializationInfo info,
-            System.Runtime.Serialization.StreamingContext context)
-        { }
-    }
-
     [Serializable]
     public class Configuration
     {
         #region Data
 
-        public ObservableCollection<Server> configs;
+        public List<Server> configs;
         public int index;
         public bool random;
-        public int sysProxyMode;
+        public ProxyMode sysProxyMode;
         public bool shareOverLan;
         public int localPort;
         public string localAuthPassword;
@@ -122,7 +30,7 @@ namespace Shadowsocks.Model
         public int TTL;
         public int connectTimeout;
 
-        public int proxyRuleMode;
+        public ProxyRuleMode proxyRuleMode;
 
         public bool proxyEnable;
         public bool pacDirectGoProxy;
@@ -146,7 +54,6 @@ namespace Shadowsocks.Model
         public bool isPreRelease;
         public bool AutoCheckUpdate;
 
-        public bool nodeFeedAutoUpdate;
         public List<ServerSubscribe> serverSubscribes;
 
         public Dictionary<string, string> token = new Dictionary<string, string>();
@@ -160,6 +67,14 @@ namespace Shadowsocks.Model
 
         private const string CONFIG_FILE = @"gui-config.json";
         private const string CONFIG_FILE_BACKUP = @"gui-config.json.backup";
+
+        [JsonIgnore]
+        public static string LocalHost => GlobalConfiguration.OSSupportsLocalIPv6
+                ? $@"[{IPAddress.IPv6Loopback}]"
+                : $@"{IPAddress.Loopback}";
+
+        [JsonIgnore]
+        public static string AnyHost => GlobalConfiguration.OSSupportsLocalIPv6 ? $@"[{IPAddress.IPv6Any}]" : $@"{IPAddress.Any}";
 
         public static void SetPassword(string password)
         {
@@ -379,18 +294,17 @@ namespace Shadowsocks.Model
             dnsServer = string.Empty;
             localDnsServer = string.Empty;
 
-            balanceAlgorithm = @"LowException";
+            balanceAlgorithm = LoadBalance.LowException.ToString();
             random = false;
-            sysProxyMode = (int)ProxyMode.NoModify;
-            proxyRuleMode = (int)ProxyRuleMode.Disable;
+            sysProxyMode = ProxyMode.NoModify;
+            proxyRuleMode = ProxyRuleMode.Disable;
 
             AutoCheckUpdate = true;
             isPreRelease = false;
-            nodeFeedAutoUpdate = true;
 
             serverSubscribes = new List<ServerSubscribe>();
 
-            configs = new ObservableCollection<Server>();
+            configs = new List<Server>();
         }
 
         public void CopyFrom(Configuration config)
@@ -425,7 +339,6 @@ namespace Shadowsocks.Model
             keepVisitTime = config.keepVisitTime;
             AutoCheckUpdate = config.AutoCheckUpdate;
             isPreRelease = config.isPreRelease;
-            nodeFeedAutoUpdate = config.nodeFeedAutoUpdate;
             serverSubscribes = config.serverSubscribes;
         }
 
@@ -470,7 +383,7 @@ namespace Shadowsocks.Model
                 if (id.ContainsKey(server.Id))
                 {
                     var newId = new byte[16];
-                    Utils.RandBytes(newId, newId.Length);
+                    RNG.RandBytes(newId, newId.Length);
                     server.Id = BitConverter.ToString(newId).Replace("-", string.Empty);
                 }
                 else
@@ -611,146 +524,9 @@ namespace Shadowsocks.Model
         {
             if (port <= IPEndPoint.MinPort || port > IPEndPoint.MaxPort)
             {
-                throw new ConfigurationException(I18N.GetString("Port out of range"));
+                throw new ConfigurationException(I18NUtil.GetAppStringValue(@"PortOutOfRange"));
             }
         }
 
-    }
-
-    [Serializable]
-    public class ServerTrans
-    {
-        public long totalUploadBytes;
-        public long totalDownloadBytes;
-    }
-
-    [Serializable]
-    public class ServerTransferTotal
-    {
-        private const string LOG_FILE = @"transfer_log.json";
-
-        public Dictionary<string, ServerTrans> servers = new Dictionary<string, ServerTrans>();
-        private int saveCounter;
-        private DateTime saveTime;
-
-        public static ServerTransferTotal Load()
-        {
-            try
-            {
-                var config_str = File.ReadAllText(LOG_FILE);
-                var config = new ServerTransferTotal();
-                try
-                {
-                    if (GlobalConfiguration.config_password.Length > 0)
-                    {
-                        using var encryptor = EncryptorFactory.GetEncryptor(@"aes-256-cfb", GlobalConfiguration.config_password);
-                        config_str = Encoding.UTF8.GetString(Utils.DecryptLargeBase64StringToBytes(encryptor, config_str));
-                    }
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                config.servers = JsonConvert.DeserializeObject<Dictionary<string, ServerTrans>>(config_str);
-                config.Init();
-                return config;
-            }
-            catch (Exception e)
-            {
-                if (!(e is FileNotFoundException))
-                {
-                    Console.WriteLine(e);
-                }
-                return new ServerTransferTotal();
-            }
-        }
-
-        private void Init()
-        {
-            saveCounter = 256;
-            saveTime = DateTime.Now;
-            if (servers == null)
-            {
-                servers = new Dictionary<string, ServerTrans>();
-            }
-        }
-
-        public static void Save(ServerTransferTotal config)
-        {
-            try
-            {
-                using var sw = new StreamWriter(File.Open(LOG_FILE, FileMode.Create));
-                var jsonString = JsonConvert.SerializeObject(config.servers, Formatting.Indented);
-                if (GlobalConfiguration.config_password.Length > 0)
-                {
-                    using var encryptor = EncryptorFactory.GetEncryptor(@"aes-256-cfb", GlobalConfiguration.config_password);
-                    var cfgData = Encoding.UTF8.GetBytes(jsonString);
-                    jsonString = Utils.EncryptLargeBytesToBase64String(encryptor, cfgData);
-                }
-                sw.Write(jsonString);
-                sw.Flush();
-            }
-            catch (IOException e)
-            {
-                Console.Error.WriteLine(e);
-            }
-        }
-
-        public void Clear(string server)
-        {
-            lock (servers)
-            {
-                if (servers.ContainsKey(server))
-                {
-                    servers[server].totalUploadBytes = 0;
-                    servers[server].totalDownloadBytes = 0;
-                }
-            }
-        }
-
-        public void AddUpload(string server, long size)
-        {
-            lock (servers)
-            {
-                if (!servers.ContainsKey(server))
-                    servers.Add(server, new ServerTrans());
-                servers[server].totalUploadBytes += size;
-            }
-            if (--saveCounter <= 0)
-            {
-                saveCounter = 256;
-                if ((DateTime.Now - saveTime).TotalMinutes > 10)
-                {
-                    lock (servers)
-                    {
-                        Save(this);
-                        saveTime = DateTime.Now;
-                    }
-                }
-            }
-        }
-
-        public void AddDownload(string server, long size)
-        {
-            lock (servers)
-            {
-                if (!servers.ContainsKey(server))
-                    servers.Add(server, new ServerTrans());
-                servers[server].totalDownloadBytes += size;
-            }
-            if (--saveCounter <= 0)
-            {
-                saveCounter = 256;
-                if ((DateTime.Now - saveTime).TotalMinutes > 10)
-                {
-                    lock (servers)
-                    {
-                        Save(this);
-                        saveTime = DateTime.Now;
-                    }
-                }
-            }
-        }
     }
 }

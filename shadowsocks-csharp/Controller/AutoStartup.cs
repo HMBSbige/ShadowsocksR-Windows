@@ -1,8 +1,8 @@
-﻿using Microsoft.Win32;
-using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
+using Microsoft.Win32;
+using Shadowsocks.Util;
 
 namespace Shadowsocks.Controller
 {

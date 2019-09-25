@@ -58,7 +58,7 @@ namespace Shadowsocks.Model
             {
                 if (_store.ContainsKey(key))
                 {
-                    DateTime t = _key_2_time[key];
+                    var t = _key_2_time[key];
                     _key_2_time.Remove(key);
                     _time_2_key.Remove(t);
                     t = DateTime.Now;
@@ -116,12 +116,12 @@ namespace Shadowsocks.Model
         {
             lock (_lock)
             {
-                DateTime now = DateTime.Now;
-                int sweep = 0;
-                for (int i = 0; i < 100; ++i)
+                var now = DateTime.Now;
+                var sweep = 0;
+                for (var i = 0; i < 100; ++i)
                 {
-                    bool finish = false;
-                    foreach (KeyValuePair<DateTime, K> p in _time_2_key)
+                    var finish = false;
+                    foreach (var p in _time_2_key)
                     {
                         if ((now - p.Key).TotalSeconds < _sweep_time)
                         {
