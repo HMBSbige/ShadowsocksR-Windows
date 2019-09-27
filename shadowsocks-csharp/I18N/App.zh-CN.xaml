@@ -28,7 +28,7 @@
 
     <sys:String x:Key="Servers">服务器</sys:String>
     <sys:String x:Key="EditServers">编辑服务器</sys:String>
-    <sys:String x:Key="ImportServers">从文件导入服务器...</sys:String>
+    <sys:String x:Key="ImportServers">从文件导入服务器</sys:String>
     <sys:String x:Key="LoadBalance">服务器负载均衡</sys:String>
     <sys:String x:Key="SameHostForSameAddress">优先相同节点连接同一地址</sys:String>
     <sys:String x:Key="ServerStatistic">服务器连接统计</sys:String>
@@ -46,7 +46,7 @@
     <sys:String x:Key="ImportSsrLinksFromClipboard">剪贴板批量导入链接</sys:String>
 
     <sys:String x:Key="Help">帮助</sys:String>
-    <sys:String x:Key="Update">更新...</sys:String>
+    <sys:String x:Key="Update">更新</sys:String>
     <sys:String x:Key="CheckUpdate">检查更新</sys:String>
     <sys:String x:Key="AutoCheckUpdate">自动检查更新</sys:String>
     <sys:String x:Key="AllowPreRelease">包括测试版更新</sys:String>
@@ -66,8 +66,8 @@
     <sys:String x:Key="NewVersionFoundFailed">检查更新失败</sys:String>
 
     <sys:String x:Key="UnexpectedError">Unexpected error, ShadowsocksR will exit.</sys:String>
-    <sys:String x:Key="SuccessiveInstancesMessage1">请在任务栏里寻找 ShadowsocksR 图标。</sys:String>
-    <sys:String x:Key="SuccessiveInstancesMessage2">如果想启动多份，可以另外复制一份到别的目录。</sys:String>
+    <sys:String x:Key="SuccessiveInstancesMessage1">请在任务栏里寻找 ShadowsocksR 图标</sys:String>
+    <sys:String x:Key="SuccessiveInstancesMessage2">如果想启动多份，可以另外复制一份到别的目录</sys:String>
     <sys:String x:Key="SuccessiveInstancesCaption">ShadowsocksR 已经在运行</sys:String>
 
     <sys:String x:Key="NewServer">未配置的服务器</sys:String>
