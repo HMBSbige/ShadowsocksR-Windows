@@ -34,18 +34,20 @@ namespace Shadowsocks.Controller.HttpRequest
         {
             try
             {
-                FreeNodeResult = await Get(url, proxy, userAgent);
+                if (await HeadAsync(url, proxy))
+                {
+                    Logging.Info($@"Update Nodes from {url} by proxy.");
+                    FreeNodeResult = await GetAsync(url, proxy, userAgent);
+                }
+                else
+                {
+                    Logging.Info($@"Update Nodes from {url} directly.");
+                    FreeNodeResult = await GetAsync(url, null, userAgent);
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                try
-                {
-                    FreeNodeResult = await Get(url, null, userAgent);
-                }
-                catch (Exception ex)
-                {
-                    Logging.Debug(ex.ToString());
-                }
+                Logging.Debug(ex.ToString());
             }
 
             NewFreeNodeFound?.Invoke(this, new EventArgs());
