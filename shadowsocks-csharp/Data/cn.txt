@@ -133,21 +133,21 @@ Apply=应用
 # ServerLog Form
 
 ServerLog=服务器记录
-_Control=操作（_C）
-_Disconnect direct connections=断开直连连接（_D）
-Disconnect _All=断开当前所有连接（_A）
-Clear _MaxSpeed=重置历史最高（_M）
-_Clear=清空（_C）
-Clear _Selected Total=清空选中节点历史流量（_S）
-Clear _Total=清空所有历史流量（_T）
-Port _out=导出（_O）
+_Control=操作 (_C)
+_Disconnect direct connections=断开直连连接 (_D)
+Disconnect _All=断开当前所有连接 (_A)
+Clear _MaxSpeed=重置历史最高 (_M)
+_Clear=清空 (_C)
+Clear _Selected Total=清空选中节点历史流量 (_S)
+Clear _Total=清空所有历史流量 (_T)
+Port _out=导出 (_O)
 Copy current link=复制选中链接
 Copy current group links=复制选中组链接
 Copy all enable links=复制所有开启节点链接
 Copy all links=复制所有节点链接
-_Window=窗口（_W）
-Auto _size=自动调整大小（_S）
-Always On _Top=窗口置顶（_T）
+_Window=窗口 (_W)
+Auto _size=自动调整大小 (_S)
+Always On _Top=窗口置顶 (_T)
 Total Connect=总连接
 Enable=开关
 Enabled=已启用
@@ -170,14 +170,14 @@ Version=版本
 
 # Global Log Form
 
-_File=文件（_F）
-Clear _log=清空日志（_L）
-Show in _Explorer=在资源管理器中显示（_E）
-_Close=关闭（_C）
-_View=视图（_V）
-_Font...=字体设置（_F）
-_Wrap Text=自动换行（_W）
-_Always on top=置于顶层（_A）
+_File=文件 (_F)
+Clear _log=清空日志 (_L)
+Show in _Explorer=在资源管理器中显示 (_E)
+_Close=关闭 (_C)
+_View=视图 (_V)
+_Font...=字体设置 (_F)
+_Wrap Text=自动换行 (_W)
+_Always on top=置于顶层 (_A)
 Log Viewer=日志查看器
 
 # QRCode Form
