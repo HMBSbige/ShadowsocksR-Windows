@@ -10,14 +10,14 @@
     <sys:String x:Key="NoProxy">保持当前状态不修改</sys:String>
 
     <sys:String x:Key="Pac">PAC</sys:String>
-    <sys:String x:Key="UpdateLanPac">更新PAC为绕过局域网IP</sys:String>
-    <sys:String x:Key="UpdateChnDomainPac">更新PAC为绕过大陆域名</sys:String>
-    <sys:String x:Key="UpdateChnDomainIpPac">更新PAC为绕过大陆域名和IP</sys:String>
-    <sys:String x:Key="UpdateGfwList">更新PAC为GFWList</sys:String>
-    <sys:String x:Key="UpdateChnOnlyPac">更新PAC为仅通过大陆常见域名（国外访问大陆）</sys:String>
+    <sys:String x:Key="UpdateLanPac">更新 PAC 为绕过局域网 IP</sys:String>
+    <sys:String x:Key="UpdateChnDomainPac">更新 PAC 为绕过大陆域名</sys:String>
+    <sys:String x:Key="UpdateChnDomainIpPac">更新 PAC 为绕过大陆域名和 IP</sys:String>
+    <sys:String x:Key="UpdateGfwList">更新 PAC 为 GFWList</sys:String>
+    <sys:String x:Key="UpdateChnOnlyPac">更新 PAC 为仅通过大陆常见域名（国外访问大陆）</sys:String>
     <sys:String x:Key="CopyPacUrl">复制 PAC URL</sys:String>
-    <sys:String x:Key="EditPacFile">编辑本地 PAC 文件...</sys:String>
-    <sys:String x:Key="EditGfwListUserRule">编辑 GFWList 的用户规则...</sys:String>
+    <sys:String x:Key="EditPacFile">编辑本地 PAC 文件</sys:String>
+    <sys:String x:Key="EditGfwListUserRule">编辑 GFWList 的用户规则</sys:String>
 
     <sys:String x:Key="ProxyRule">代理规则</sys:String>
     <sys:String x:Key="BypassLan">绕过局域网</sys:String>
@@ -27,35 +27,35 @@
     <sys:String x:Key="DisableBypass">全局</sys:String>
 
     <sys:String x:Key="Servers">服务器</sys:String>
-    <sys:String x:Key="EditServers">编辑服务器...</sys:String>
+    <sys:String x:Key="EditServers">编辑服务器</sys:String>
     <sys:String x:Key="ImportServers">从文件导入服务器...</sys:String>
     <sys:String x:Key="LoadBalance">服务器负载均衡</sys:String>
     <sys:String x:Key="SameHostForSameAddress">优先相同节点连接同一地址</sys:String>
-    <sys:String x:Key="ServerStatistic">服务器连接统计...</sys:String>
+    <sys:String x:Key="ServerStatistic">服务器连接统计</sys:String>
     <sys:String x:Key="DisconnectCurrent">断开当前所有连接</sys:String>
 
     <sys:String x:Key="ServersSubscribe">服务器订阅</sys:String>
-    <sys:String x:Key="SubscribeSetting">服务器订阅设置...</sys:String>
+    <sys:String x:Key="SubscribeSetting">服务器订阅设置</sys:String>
     <sys:String x:Key="UpdateSubscribeSsrNode">更新服务器订阅</sys:String>
 
-    <sys:String x:Key="GlobalSettings">选项设置...</sys:String>
-    <sys:String x:Key="PortSettings">端口设置...</sys:String>
-    <sys:String x:Key="ShowLogs">显示日志...</sys:String>
+    <sys:String x:Key="GlobalSettings">选项设置</sys:String>
+    <sys:String x:Key="PortSettings">端口设置</sys:String>
+    <sys:String x:Key="ShowLogs">显示日志</sys:String>
     <sys:String x:Key="UpdateAvailable">更新可用</sys:String>
-    <sys:String x:Key="ScanQrCode">二维码扫描...</sys:String>
-    <sys:String x:Key="ImportSsrLinksFromClipboard">剪贴板批量导入链接...</sys:String>
+    <sys:String x:Key="ScanQrCode">二维码扫描</sys:String>
+    <sys:String x:Key="ImportSsrLinksFromClipboard">剪贴板批量导入链接</sys:String>
 
     <sys:String x:Key="Help">帮助</sys:String>
     <sys:String x:Key="Update">更新...</sys:String>
     <sys:String x:Key="CheckUpdate">检查更新</sys:String>
     <sys:String x:Key="AutoCheckUpdate">自动检查更新</sys:String>
     <sys:String x:Key="AllowPreRelease">包括测试版更新</sys:String>
-    <sys:String x:Key="OpenWiki">打开Wiki文档...</sys:String>
-    <sys:String x:Key="Feedback">问题反馈...</sys:String>
+    <sys:String x:Key="OpenWiki">打开 Wiki 文档</sys:String>
+    <sys:String x:Key="Feedback">问题反馈</sys:String>
     <sys:String x:Key="GenQrCode">自定义生成二维码</sys:String>
-    <sys:String x:Key="ResetPassword">设置客户端密码...</sys:String>
-    <sys:String x:Key="About">关于...</sys:String>
-    <sys:String x:Key="Donate">捐助...</sys:String>
+    <sys:String x:Key="ResetPassword">设置客户端密码</sys:String>
+    <sys:String x:Key="About">关于</sys:String>
+    <sys:String x:Key="Donate">捐助</sys:String>
 
     <sys:String x:Key="Quit">退出</sys:String>
 
