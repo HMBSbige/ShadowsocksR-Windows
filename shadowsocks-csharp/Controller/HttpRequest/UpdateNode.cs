@@ -22,7 +22,7 @@ namespace Shadowsocks.Controller.HttpRequest
                 var proxy = UpdateChecker.CreateProxy(config);
                 SubscribeTask = subscribeTask;
                 var url = subscribeTask.Url ?? DefaultUpdateUrl;
-                Update(proxy, url, config.proxyUserAgent);
+                Update(proxy, config.connectTimeout * 1000, url, config.proxyUserAgent);
             }
             catch (Exception e)
             {
@@ -30,11 +30,11 @@ namespace Shadowsocks.Controller.HttpRequest
             }
         }
 
-        private async void Update(IWebProxy proxy, string url, string userAgent)
+        private async void Update(IWebProxy proxy, int timeout, string url, string userAgent)
         {
             try
             {
-                if (await HeadAsync(url, proxy))
+                if (await HeadAsync(url, proxy, timeout))
                 {
                     Logging.Info($@"Update Nodes from {url} by proxy.");
                     FreeNodeResult = await GetAsync(url, proxy, userAgent);
