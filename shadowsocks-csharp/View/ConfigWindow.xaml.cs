@@ -5,11 +5,11 @@ using Shadowsocks.Model;
 using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace Shadowsocks.View
 {
@@ -18,6 +18,7 @@ namespace Shadowsocks.View
         public ConfigWindow(ShadowsocksController controller, int focusIndex)
         {
             InitializeComponent();
+            ServerViewModel.TreeView = ServersTreeView;
             I18NUtil.SetLanguage(Resources, @"ConfigWindow");
             SizeChanged += (o, args) => { GenQr(LinkTextBox.Text); };
             Splitter2.DragDelta += (o, args) => { GenQr(LinkTextBox.Text); };
@@ -42,23 +43,8 @@ namespace Shadowsocks.View
             }
 
             _controller.ConfigChanged += controller_ConfigChanged;
-
-            LoadCurrentConfiguration();
             ServerViewModel.ServersChanged += ServerViewModel_ServersChanged;
-
-            if (focusIndex == -1)
-            {
-                var index = _modifiedConfiguration.index + 1;
-                if (index < 0 || index > _modifiedConfiguration.configs.Count)
-                    index = _modifiedConfiguration.configs.Count;
-
-                focusIndex = index;
-            }
-
-            if (focusIndex >= 0 && focusIndex < _modifiedConfiguration.configs.Count)
-            {
-                SetServerListSelectedIndex(focusIndex);
-            }
+            _focusIndex = focusIndex;
         }
 
         private void ServerViewModel_ServersChanged(object sender, EventArgs e)
@@ -94,12 +80,41 @@ namespace Shadowsocks.View
         private readonly ShadowsocksController _controller;
 
         private Configuration _modifiedConfiguration;
+        private int _focusIndex;
 
         public ServerViewModel ServerViewModel { get; set; } = new ServerViewModel();
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateTitle();
+            LoadCurrentConfiguration(false);
+            switch (_focusIndex)
+            {
+                case -1:
+                {
+                    var index = _modifiedConfiguration.index + 1;
+                    if (index < 0 || index > _modifiedConfiguration.configs.Count)
+                        index = _modifiedConfiguration.configs.Count;
+                    _focusIndex = index;
+                    break;
+                }
+                case -2:
+                {
+                    var index = _modifiedConfiguration.index;
+                    if (index < 0 || index > _modifiedConfiguration.configs.Count)
+                        index = _modifiedConfiguration.configs.Count;
+                    _focusIndex = index;
+                    break;
+                }
+            }
+
+            if (_focusIndex >= 0 && _focusIndex < _modifiedConfiguration.configs.Count)
+            {
+                Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Loaded,
+                        new Action(() => { MoveToSelectedItem(_focusIndex); }));
+            }
+
+            ServerGroupBox.Visibility = ServersTreeView.SelectedValue is Server ? Visibility.Visible : Visibility.Hidden;
         }
 
         private void UpdateTitle()
@@ -109,88 +124,139 @@ namespace Shadowsocks.View
 
         private void controller_ConfigChanged(object sender, EventArgs e)
         {
-            LoadCurrentConfiguration();
+            LoadCurrentConfiguration(true);
             UpdateTitle();
         }
 
-        private void LoadCurrentConfiguration()
+        private void LoadCurrentConfiguration(bool scrollToSelectedItem)
         {
             _modifiedConfiguration = _controller.GetConfiguration();
             ServerViewModel.ReadConfig(_modifiedConfiguration);
-            SetServerListSelectedIndex(_modifiedConfiguration.index);
+
+            // Load all items
+            ExpandTree(true);
+            ExpandTree(false);
+
+            if (scrollToSelectedItem)
+            {
+                Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Loaded,
+                        new Action(() => { MoveToSelectedItem(_modifiedConfiguration.index); }));
+            }
+
             ApplyButton.IsEnabled = false;
         }
 
-        public void SetServerListSelectedIndex(int index)
+        #region TreeView
+
+        public void MoveToSelectedItem(int index)
         {
-            if (index < 0)
+            if (index >= 0 && index < _modifiedConfiguration.configs.Count)
             {
-                return;
-            }
-            if (index < ServersListBox.Items.Count)
-            {
-                ServersListBox.SelectedIndex = index;
-                ServersListBox.ScrollIntoView(ServersListBox.Items[index]);
-            }
-            else
-            {
-                ServersListBox.SelectedIndex = ServersListBox.Items.Count - 1;
-                if (ServersListBox.SelectedIndex > 0)
+                var server = _modifiedConfiguration.configs[index];
+                var serverTreeViewModel = ServerTreeViewModel.FindNode(ServerViewModel.ServersTreeViewCollection, server.Id);
+                if (serverTreeViewModel != null)
                 {
-                    ServersListBox.ScrollIntoView(ServersListBox.Items[ServersListBox.Items.Count - 1]);
+                    MoveToSelectedItem(serverTreeViewModel);
                 }
             }
         }
 
-        private void GenQr(string text)
+        private void ExpandTree(bool expand)
         {
-            if (PictureQrCode.Visibility != Visibility.Visible)
+            if (expand)
             {
-                return;
-            }
-            try
-            {
-                var h = Convert.ToInt32(MainGrid.ActualHeight);
-                var w = Convert.ToInt32(MainGrid.ColumnDefinitions[2].ActualWidth - PictureQrCode.Margin.Left - PictureQrCode.Margin.Right);
-                if (h <= 0 || w <= 0)
+                foreach (var item in ServersTreeView.Items)
                 {
-                    PictureQrCode.Source = null;
-                }
-                else
-                {
-                    PictureQrCode.Source = text != string.Empty
-                            ? QrCodeUtils.GenQrCode(text, w, h)
-                            : QrCodeUtils.GenQrCode2(text, Math.Min(w, h));
+                    var dependencyObject = ServersTreeView.ItemContainerGenerator.ContainerFromItem(item);
+                    ((TreeViewItem)dependencyObject)?.ExpandSubtree();
                 }
             }
-            catch
+            else
             {
-                PictureQrCode.Source = null;
+                foreach (var treeViewItem in ViewUtils.FindVisualChildren<TreeViewItem>(ServersTreeView))
+                {
+                    treeViewItem.IsExpanded = false;
+                }
             }
         }
+
+        private void MoveToSelectedItem(ServerTreeViewModel serverTreeViewModel)
+        {
+            var ti = ViewUtils.GetTreeViewItem(ServersTreeView.ItemContainerGenerator, serverTreeViewModel);
+            if (ti != null)
+            {
+                ti.IsSelected = true;
+                ti.BringIntoView();
+                ti.Focus();
+            }
+        }
+
+        private void AddButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ServersTreeView.SelectedItem is ServerTreeViewModel st)
+            {
+                switch (st.Type)
+                {
+                    case ServerTreeViewType.Subtag:
+                        break;
+                    case ServerTreeViewType.Group:
+                    {
+                        var item = new ServerTreeViewModel
+                        { Type = ServerTreeViewType.Server, Server = new Server { Group = st.Name } };
+                        st.Nodes.Add(item);
+                        MoveToSelectedItem(item);
+                        return;
+                    }
+                    case ServerTreeViewType.Server:
+                    {
+                        var parent = ViewUtils.GetTreeViewItemParent(ViewUtils.GetTreeViewItem(ServersTreeView.ItemContainerGenerator, st));
+                        if (parent != null && parent.Header is ServerTreeViewModel parentSt)
+                        {
+                            var item = new ServerTreeViewModel { Type = ServerTreeViewType.Server, Server = Server.Clone(st.Server) };
+                            var index = parentSt.Nodes.IndexOf(st) + 1;
+                            parentSt.Nodes.Insert(index, item);
+                            MoveToSelectedItem(item);
+                        }
+                        return;
+                    }
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            MessageBox.Show(this.GetWindowStringValue(@"AddServerError"), UpdateChecker.Name, MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ServersTreeView.SelectedItem is ServerTreeViewModel st)
+            {
+                ServerTreeViewModel.Remove(ServerViewModel.ServersTreeViewCollection, st);
+            }
+        }
+
+        private void Expand_OnClick(object sender, RoutedEventArgs e)
+        {
+            ExpandTree(true);
+        }
+
+        private void Collapse_Click(object sender, RoutedEventArgs e)
+        {
+            ExpandTree(false);
+        }
+
+        private void ServersTreeView_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            ServerViewModel.SelectedServer_ServerChanged();
+            ServerGroupBox.Visibility = ServersTreeView.SelectedValue is Server ? Visibility.Visible : Visibility.Hidden;
+        }
+
+        #endregion
+
+        #region LinkTextBox
 
         private void LinkTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             GenQr(LinkTextBox.Text);
-        }
-
-        private void ServersListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ServerGroupBox.Visibility = ServersListBox.SelectedIndex == -1 ? Visibility.Hidden : Visibility.Visible;
-        }
-
-        private void ObfsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            try
-            {
-                var obfs = (Obfs.ObfsBase)Obfs.ObfsFactory.GetObfs(ObfsComboBox.SelectedItem.ToString());
-                var properties = obfs.GetObfs()[ObfsComboBox.SelectedItem.ToString()];
-                ObfsParamTextBox.IsEnabled = properties[2] > 0;
-            }
-            catch
-            {
-                ObfsParamTextBox.IsEnabled = true;
-            }
         }
 
         private void LinkTextBox_PreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -207,10 +273,26 @@ namespace Shadowsocks.View
             ((TextBox)sender).SelectAll();
         }
 
+        #endregion
+
+        private void ObfsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                var obfs = (Obfs.ObfsBase)Obfs.ObfsFactory.GetObfs(ObfsComboBox.SelectedItem.ToString());
+                var properties = obfs.GetObfs()[ObfsComboBox.SelectedItem.ToString()];
+                ObfsParamTextBox.IsEnabled = properties[2] > 0;
+            }
+            catch
+            {
+                ObfsParamTextBox.IsEnabled = true;
+            }
+        }
+
         private bool SaveConfig()
         {
             _modifiedConfiguration.configs.Clear();
-            _modifiedConfiguration.configs.AddRange(ServerViewModel.ServerCollection);
+            _modifiedConfiguration.configs.AddRange(ServerViewModel.ServerTreeViewModelToList(ServerViewModel.ServersTreeViewCollection));
             if (_modifiedConfiguration.configs.Count == 0)
             {
                 MessageBox.Show(this.GetWindowStringValue(@"NoServer"));
@@ -249,129 +331,36 @@ namespace Shadowsocks.View
             }
         }
 
-        private void AddButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (ServersListBox.SelectedIndex == -1)
-            {
-                ServerViewModel.ServerCollection.Add(Server.GetDefaultServer());
-                SetServerListSelectedIndex(ServerViewModel.ServerCollection.Count - 1);
-            }
-            else
-            {
-                var position = ServersListBox.SelectedIndex + 1;
-                ServerViewModel.ServerCollection.Insert(position, Server.Clone((Server)ServersListBox.SelectedItem));
-                if (position <= _modifiedConfiguration.index)
-                {
-                    ++_modifiedConfiguration.index;
-                }
-                SetServerListSelectedIndex(position);
-            }
-        }
+        #region QrCode
 
-        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        private void GenQr(string text)
         {
-            var index = ServersListBox.SelectedIndex;
-            foreach (var selectedItem in ServersListBox.SelectedItems.Cast<Server>().ToArray())
+            if (PictureQrCode.Visibility != Visibility.Visible)
             {
-                var position = ServerViewModel.ServerCollection.IndexOf(selectedItem);
-                ServerViewModel.ServerCollection.Remove(selectedItem);
-                if (position < _modifiedConfiguration.index)
-                {
-                    --_modifiedConfiguration.index;
-                }
+                return;
             }
-            SetServerListSelectedIndex(index);
-        }
 
-        private void UpButton_Click(object sender, RoutedEventArgs e)
-        {
-            var sortedCopy = new SortedDictionary<int, object>();
-            foreach (Server selectedItem in ServersListBox.SelectedItems.Cast<object>().ToArray())
+            try
             {
-                sortedCopy.Add(ServerViewModel.ServerCollection.IndexOf(selectedItem), selectedItem);
-            }
-            foreach (var selectedItem in sortedCopy)
-            {
-                var position = selectedItem.Key;
-                if (position > 0)
+                var h = Convert.ToInt32(MainGrid.ActualHeight);
+                var w = Convert.ToInt32(MainGrid.ColumnDefinitions[2].ActualWidth - PictureQrCode.Margin.Left -
+                                        PictureQrCode.Margin.Right);
+                if (h <= 0 || w <= 0)
                 {
-                    ServerViewModel.ServerCollection.Move(position, position - 1);
-                    if (position == _modifiedConfiguration.index + 1)
-                    {
-                        ++_modifiedConfiguration.index;
-                    }
-                    else if (position == _modifiedConfiguration.index)
-                    {
-                        --_modifiedConfiguration.index;
-                    }
+                    PictureQrCode.Source = null;
                 }
                 else
                 {
-                    break;
+                    PictureQrCode.Source = text != string.Empty
+                            ? QrCodeUtils.GenQrCode(text, w, h)
+                            : QrCodeUtils.GenQrCode2(text, Math.Min(w, h));
                 }
             }
-
-            foreach (var selectedItem in sortedCopy)
+            catch
             {
-                ServersListBox.SelectedItems.Add(selectedItem.Value);
-            }
-
-            if (ServersListBox.SelectedItem != null)
-            {
-                ServersListBox.ScrollIntoView(ServersListBox.SelectedItem);
+                PictureQrCode.Source = null;
             }
         }
-
-        private void DownButton_Click(object sender, RoutedEventArgs e)
-        {
-            var sortedCopy = new SortedDictionary<int, object>();
-            foreach (Server selectedItem in ServersListBox.SelectedItems.Cast<object>().ToArray())
-            {
-                sortedCopy.Add(ServerViewModel.ServerCollection.IndexOf(selectedItem), selectedItem);
-            }
-
-            var reverseSortedCopy = sortedCopy.Reverse().ToArray();
-
-            foreach (var selectedItem in reverseSortedCopy)
-            {
-                var position = selectedItem.Key;
-                if (position + 1 < ServerViewModel.ServerCollection.Count)
-                {
-                    ServerViewModel.ServerCollection.Move(position, position + 1);
-                    if (position == _modifiedConfiguration.index - 1)
-                    {
-                        --_modifiedConfiguration.index;
-                    }
-                    else if (position == _modifiedConfiguration.index)
-                    {
-                        ++_modifiedConfiguration.index;
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            foreach (var selectedItem in reverseSortedCopy)
-            {
-                ServersListBox.SelectedItems.Add(selectedItem.Value);
-            }
-
-            if (ServersListBox.SelectedItem != null)
-            {
-                ServersListBox.ScrollIntoView(ServersListBox.SelectedItem);
-            }
-        }
-
-        private void ServerIpCheckBox_IsCheckedChanged(object sender, RoutedEventArgs e)
-        {
-            if (ServersListBox.SelectedItem != null)
-            {
-                ServersListBox.ScrollIntoView(ServersListBox.SelectedItem);
-            }
-        }
-
         private double _oldWidth = 400.0;
         private void ShowQrCodeButton_OnClick(object sender, RoutedEventArgs e)
         {
@@ -391,5 +380,7 @@ namespace Shadowsocks.View
                 ShowQrCodeButton.Content = @">>";
             }
         }
+
+        #endregion
     }
 }

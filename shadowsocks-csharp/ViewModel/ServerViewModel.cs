@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Shadowsocks.Model;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Shadowsocks.Model;
+using System.Linq;
+using System.Windows.Controls;
 
 namespace Shadowsocks.ViewModel
 {
@@ -8,24 +11,95 @@ namespace Shadowsocks.ViewModel
     {
         public ServerViewModel()
         {
-            ServerCollection = new ObservableCollection<Server>();
+            ServersTreeViewCollection = new ObservableCollection<ServerTreeViewModel>();
             IsSsr = true;
+        }
+
+        public TreeView TreeView;
+
+        private ObservableCollection<ServerTreeViewModel> _serverTreeViewCollection;
+        public ObservableCollection<ServerTreeViewModel> ServersTreeViewCollection
+        {
+            get => _serverTreeViewCollection;
+            set
+            {
+                if (_serverTreeViewCollection != value)
+                {
+                    _serverTreeViewCollection = value;
+                    OnPropertyChanged();
+                    ServersChanged?.Invoke(this, new EventArgs());
+                }
+            }
         }
 
         public void ReadConfig(Configuration config)
         {
-            ServerCollection.Clear();
-            foreach (var server in config.configs)
+            ServersTreeViewCollection.Clear();
+            var subTags = new HashSet<string>(config.configs.Select(server => server.SubTag));
+            foreach (var subTag in subTags)
             {
-                ServerCollection.Add(server);
-            }
-            if (config.index >= 0 && config.index < ServerCollection.Count)
-            {
-                SelectedServer = ServerCollection[config.index];
+                var sub1 = new ServerTreeViewModel
+                {
+                    Name = subTag,
+                    Type = ServerTreeViewType.Subtag
+                };
+                var servers = config.configs.Where(server => server.SubTag == subTag).ToArray();
+                var groups = new HashSet<string>(servers.Select(server => server.Group));
+
+                foreach (var group in groups)
+                {
+                    var sub2 = new ServerTreeViewModel
+                    {
+                        Name = group,
+                        Type = ServerTreeViewType.Group
+                    };
+                    var subServers = servers.Where(server => server.Group == group);
+                    foreach (var server in subServers)
+                    {
+                        server.ServerChanged += ServerChanged;
+                        sub2.Nodes.CollectionChanged -= ServerCollection_CollectionChanged;
+                        sub2.Nodes.CollectionChanged += ServerCollection_CollectionChanged;
+                        sub2.Nodes.Add(new ServerTreeViewModel
+                        {
+                            Server = server,
+                            Type = ServerTreeViewType.Server
+                        });
+                    }
+                    sub1.Nodes.CollectionChanged -= ServerCollection_CollectionChanged;
+                    sub1.Nodes.CollectionChanged += ServerCollection_CollectionChanged;
+                    sub1.Nodes.Add(sub2);
+                }
+
+                if (groups.Count == 1)
+                {
+                    sub1.Nodes.First().Name = subTag;
+                    ServersTreeViewCollection.Add(sub1.Nodes.First());
+                }
+                else
+                {
+                    ServersTreeViewCollection.Add(sub1);
+                }
             }
 
-            ServerCollection.CollectionChanged -= ServerCollection_CollectionChanged;
-            ServerCollection.CollectionChanged += ServerCollection_CollectionChanged;
+            ServersTreeViewCollection.CollectionChanged -= ServerCollection_CollectionChanged;
+            ServersTreeViewCollection.CollectionChanged += ServerCollection_CollectionChanged;
+        }
+
+        public static IEnumerable<Server> ServerTreeViewModelToList(IEnumerable<ServerTreeViewModel> nodes)
+        {
+            var res = new List<Server>();
+            foreach (var serverTreeViewModel in nodes)
+            {
+                if (serverTreeViewModel.Type == ServerTreeViewType.Server)
+                {
+                    res.Add(serverTreeViewModel.Server);
+                }
+                else
+                {
+                    res.AddRange(ServerTreeViewModelToList(serverTreeViewModel.Nodes));
+                }
+            }
+            return res;
         }
 
         private void ServerCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -35,45 +109,15 @@ namespace Shadowsocks.ViewModel
 
         public event EventHandler ServersChanged;
 
-        private Server _selectedServer;
-        public Server SelectedServer
-        {
-            get => _selectedServer;
-            set
-            {
-                if (_selectedServer != value)
-                {
-                    _selectedServer = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(SsLink));
-                    if (_selectedServer != null)
-                    {
-                        _selectedServer.ServerChanged -= _selectedServer_ServerChanged;
-                        _selectedServer.ServerChanged += _selectedServer_ServerChanged;
-                    }
-                }
-            }
-        }
-
-        private void _selectedServer_ServerChanged(object sender, EventArgs e)
+        private void ServerChanged(object sender, EventArgs e)
         {
             OnPropertyChanged(nameof(SsLink));
             ServersChanged?.Invoke(this, new EventArgs());
         }
 
-        private ObservableCollection<Server> _serverCollection;
-        public ObservableCollection<Server> ServerCollection
+        public void SelectedServer_ServerChanged()
         {
-            get => _serverCollection;
-            set
-            {
-                if (_serverCollection != value)
-                {
-                    _serverCollection = value;
-                    OnPropertyChanged();
-                    ServersChanged?.Invoke(this, new EventArgs());
-                }
-            }
+            OnPropertyChanged(nameof(SsLink));
         }
 
         private bool _isSsr;
@@ -95,9 +139,9 @@ namespace Shadowsocks.ViewModel
         {
             get
             {
-                if (SelectedServer != null)
+                if (TreeView?.SelectedValue is Server server)
                 {
-                    return IsSsr ? SelectedServer.SsrLink : SelectedServer.SsLink;
+                    return IsSsr ? server.SsrLink : server.SsLink;
                 }
                 return string.Empty;
             }

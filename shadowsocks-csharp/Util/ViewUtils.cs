@@ -164,5 +164,43 @@ namespace Shadowsocks.Util
                 resources.MergedDictionaries.Add(langRd);
             }
         }
+
+        public static TreeViewItem GetTreeViewItem(ItemContainerGenerator containerGenerator, object item)
+        {
+            var container = (TreeViewItem)containerGenerator.ContainerFromItem(item);
+            if (container != null)
+                return container;
+
+            foreach (var childItem in containerGenerator.Items)
+            {
+                var parent = containerGenerator.ContainerFromItem(childItem) as TreeViewItem;
+                if (parent == null)
+                    continue;
+
+                container = parent.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
+                if (container != null)
+                    return container;
+
+                container = GetTreeViewItem(parent.ItemContainerGenerator, item);
+                if (container != null)
+                    return container;
+            }
+
+            return null;
+        }
+
+        public static TreeViewItem GetTreeViewItemParent(TreeViewItem item)
+        {
+            var parent = VisualTreeHelper.GetParent(item);
+            while (!(parent is TreeViewItem))
+            {
+                if (parent == null)
+                {
+                    return null;
+                }
+                parent = VisualTreeHelper.GetParent(parent);
+            }
+            return (TreeViewItem)parent;
+        }
     }
 }

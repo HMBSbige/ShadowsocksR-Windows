@@ -109,4 +109,7 @@
     <sys:String x:Key="UpdateSubscribeFailure">Update subscribe {0} failure</sys:String>
 
     <sys:String x:Key="QrCodeNotFound">No QRCode found. Try to zoom in or move it to the center of the screen.</sys:String>
+
+    <sys:String x:Key="EmptySubtag">[Empty subscription remarks]</sys:String>
+    <sys:String x:Key="EmptyGroup">[Empty group name]</sys:String>
 </ResourceDictionary>
