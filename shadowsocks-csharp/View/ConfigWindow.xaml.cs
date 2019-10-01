@@ -228,9 +228,13 @@ namespace Shadowsocks.View
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ServersTreeView.SelectedItem is ServerTreeViewModel st)
+            var deleteItems = ServersTreeView.SelectedItems.ToArray();
+            foreach (var selectedItem in deleteItems)
             {
-                ServerTreeViewModel.Remove(ServerViewModel.ServersTreeViewCollection, st);
+                if (selectedItem.Header is ServerTreeViewModel st)
+                {
+                    ServerTreeViewModel.Remove(ServerViewModel.ServersTreeViewCollection, st);
+                }
             }
         }
 

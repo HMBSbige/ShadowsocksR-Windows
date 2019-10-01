@@ -1,4 +1,4 @@
-﻿<Window x:Class="Shadowsocks.View.ServerLogWindow"
+<Window x:Class="Shadowsocks.View.ServerLogWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -208,7 +208,7 @@
                       HeadersVisibility="Column"
                       AutoGenerateColumns="False"
                       SelectionUnit="Cell" SelectionMode="Single"
-                      CanUserAddRows="false" CanUserResizeRows="False"
+                      CanUserAddRows="False" CanUserResizeRows="False"
                       DataContext="{Binding ServerLogViewModel, ElementName=Slw}"
                       ItemsSource="{Binding ServersCollection}"
                       MouseLeftButtonUp="ServerDataGrid_MouseLeftButtonUp"
@@ -219,48 +219,48 @@
                       ScrollViewer.CanContentScroll="True"
                       >
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="ID" Binding="{Binding Index}"
+                    <DataGridTextColumn Header="ID" Binding="{Binding Index,Mode=OneTime}"
                     IsReadOnly="True" CellStyle="{StaticResource DefaultCellStyle}"/>
-                    <DataGridTextColumn Header="Group" Binding="{Binding GroupName}" 
+                    <DataGridTextColumn Header="Group" Binding="{Binding GroupName,Mode=OneTime}" 
                     IsReadOnly="True" CellStyle="{StaticResource DefaultCellStyle}" />
-                    <DataGridTextColumn x:Name="ServerColumn" Header="Server" Binding="{Binding FriendlyName}"
+                    <DataGridTextColumn x:Name="ServerColumn" Header="Server" Binding="{Binding FriendlyName,Mode=OneTime}"
                     IsReadOnly="True" CellStyle="{StaticResource ServerCellStyle}"/>
-                    <DataGridTextColumn Header="Enable" Binding="{Binding Enable,Converter={StaticResource BooleanToEnabledConverter}}" 
+                    <DataGridTextColumn Header="Enable" Binding="{Binding Enable,Converter={StaticResource BooleanToEnabledConverter},Mode=OneTime}" 
                     IsReadOnly="False" CellStyle="{StaticResource EnableCellStyle}" />
-                    <DataGridTextColumn Header="Connecting" Binding="{Binding SpeedLog.Connecting}"
+                    <DataGridTextColumn Header="Connecting" Binding="{Binding SpeedLog.Connecting,Mode=OneWay}"
                     IsReadOnly="True" CellStyle="{StaticResource ConnectionCellStyle}"/>
-                    <DataGridTextColumn Header="Latency" Binding="{Binding SpeedLog.AvgConnectTimeText}"
+                    <DataGridTextColumn Header="Latency" Binding="{Binding SpeedLog.AvgConnectTimeText,Mode=OneWay}"
                     IsReadOnly="True" CellStyle="{StaticResource DefaultCellStyle}" />
-                    <DataGridTextColumn Header="Avg DSpeed" Binding="{Binding SpeedLog.AvgDownloadBytesText}"
+                    <DataGridTextColumn Header="Avg DSpeed" Binding="{Binding SpeedLog.AvgDownloadBytesText,Mode=OneWay}"
                     IsReadOnly="True" CellStyle="{StaticResource AvgDownloadCellStyle}" 
                     SortMemberPath="SpeedLog.AvgDownloadBytes" />
-                    <DataGridTextColumn Header="Max DSpeed" Binding="{Binding SpeedLog.MaxDownSpeedText}"
+                    <DataGridTextColumn Header="Max DSpeed" Binding="{Binding SpeedLog.MaxDownSpeedText,Mode=OneWay}"
                     IsReadOnly="True" CellStyle="{StaticResource MaxDownSpeedCellStyle}"
                     SortMemberPath="SpeedLog.MaxDownSpeed" />
-                    <DataGridTextColumn Header="Avg UpSpeed" Binding="{Binding SpeedLog.AvgUploadBytesText}"
+                    <DataGridTextColumn Header="Avg UpSpeed" Binding="{Binding SpeedLog.AvgUploadBytesText,Mode=OneWay}"
                     IsReadOnly="True" CellStyle="{StaticResource AvgUploadCellStyle}"
                     SortMemberPath="SpeedLog.AvgUploadBytes" />
-                    <DataGridTextColumn Header="Max UpSpeed" Binding="{Binding SpeedLog.MaxUpSpeedText}"
+                    <DataGridTextColumn Header="Max UpSpeed" Binding="{Binding SpeedLog.MaxUpSpeedText,Mode=OneWay}"
                     IsReadOnly="True" CellStyle="{StaticResource MaxUpSpeedCellStyle}"
                     SortMemberPath="SpeedLog.MaxUpSpeed" />
-                    <DataGridTextColumn Header="Dload" Binding="{Binding SpeedLog.TotalDownloadBytesText}"
+                    <DataGridTextColumn Header="Dload" Binding="{Binding SpeedLog.TotalDownloadBytesText,Mode=OneWay}"
                                         IsReadOnly="True" SortMemberPath="SpeedLog.TotalDownloadBytes"
                                         CellStyle="{StaticResource DownloadCellStyle}" />
-                    <DataGridTextColumn Header="Upload" Binding="{Binding SpeedLog.TotalUploadBytesText}"
+                    <DataGridTextColumn Header="Upload" Binding="{Binding SpeedLog.TotalUploadBytesText,Mode=OneWay}"
                                         IsReadOnly="True" SortMemberPath="SpeedLog.TotalUploadBytes"
                                         CellStyle="{StaticResource UploadCellStyle}" />
-                    <DataGridTextColumn Header="DloadRaw" Binding="{Binding SpeedLog.TotalDownloadRawBytesText}"
+                    <DataGridTextColumn Header="DloadRaw" Binding="{Binding SpeedLog.TotalDownloadRawBytesText,Mode=OneWay}"
                                         IsReadOnly="True" SortMemberPath="SpeedLog.TotalDownloadRawBytes"
                                         CellStyle="{StaticResource DownloadRawCellStyle}" />
-                    <DataGridTextColumn Header="Error" Binding="{Binding SpeedLog.ConnectError}"
+                    <DataGridTextColumn Header="Error" Binding="{Binding SpeedLog.ConnectError,Mode=OneWay}"
                     IsReadOnly="True" CellStyle="{StaticResource ConnectErrorCellStyle}"/>
-                    <DataGridTextColumn Header="Timeout" Binding="{Binding SpeedLog.ErrorTimeoutTimes}"
+                    <DataGridTextColumn Header="Timeout" Binding="{Binding SpeedLog.ErrorTimeoutTimes,Mode=OneWay}"
                     IsReadOnly="True" CellStyle="{StaticResource ConnectTimeoutCellStyle}"/>
-                    <DataGridTextColumn Header="Empty Response" Binding="{Binding SpeedLog.ErrorEmptyTimes}"
+                    <DataGridTextColumn Header="Empty Response" Binding="{Binding SpeedLog.ErrorEmptyTimes,Mode=OneWay}"
                     IsReadOnly="True"  CellStyle="{StaticResource ConnectEmptyCellStyle}"/>
-                    <DataGridTextColumn Header="Continuous" Binding="{Binding SpeedLog.ErrorContinuousTimes}"
+                    <DataGridTextColumn Header="Continuous" Binding="{Binding SpeedLog.ErrorContinuousTimes,Mode=OneWay}"
                     IsReadOnly="True" CellStyle="{StaticResource ContinuousCellStyle}"/>
-                    <DataGridTextColumn Header="Error Percent" Binding="{Binding SpeedLog.ErrorPercentText}"
+                    <DataGridTextColumn Header="Error Percent" Binding="{Binding SpeedLog.ErrorPercentText,Mode=OneWay}"
                     IsReadOnly="True" SortMemberPath="SpeedLog.ErrorPercent" CellStyle="{StaticResource ErrorPercentCellStyle}"/>
                 </DataGrid.Columns>
             </DataGrid>
