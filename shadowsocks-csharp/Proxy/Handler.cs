@@ -676,7 +676,7 @@ namespace Shadowsocks.Proxy
 
                 if (cfg != null && cfg.AutoSwitchOff && server != null)
                 {
-                    if (server.SpeedLog.ErrorPercent.HasValue && server.SpeedLog.ErrorPercent >= 1
+                    if (server.SpeedLog.ErrorPercent.HasValue && server.SpeedLog.ErrorPercent >= 100
                     && (server.SpeedLog.ConnectError >= 3 || server.SpeedLog.ErrorContinuousTimes >= 3 ||
                        server.SpeedLog.ErrorTimeoutTimes >= 3 || server.SpeedLog.ErrorEmptyTimes >= 3))
                     {
