@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
         xmlns:controls="clr-namespace:Shadowsocks.Controls"
-        xmlns:model="clr-namespace:Shadowsocks.Model"
         mc:Ignorable="d"
         x:Name="Cw" 
         Title="ConfigWindow" Height="560" Width="800" WindowStartupLocation="CenterScreen"
@@ -50,12 +50,26 @@
                       HorizontalAlignment="Right"
                       VerticalAlignment="Stretch"
                       Width="3" Visibility="Collapsed"/>
-        <controls:TreeViewEx x:Name="ServersTreeView" Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Margin="10,0,10,10"
-                  DataContext="{Binding Path=ServerViewModel, ElementName=Cw}"
-                  ItemsSource="{Binding ServersTreeViewCollection,Mode=TwoWay}"
-                  SelectedValuePath="Server"
-                  SelectedItemChanged="ServersTreeView_OnSelectedItemChanged">
-            <TreeView.ContextMenu>
+        <syncfusion:TreeViewAdv x:Name="ServersTreeView"
+        Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Margin="10,0,10,10"
+        AnimationType="None"
+        DataContext="{Binding Path=ServerViewModel, ElementName=Cw}"
+        ItemsSource="{Binding ServersTreeViewCollection}"
+        SelectedValuePath="Server"
+        AllowMultiSelect="True"
+        AllowDragDrop="True"
+        ShowRootLines="False"
+        VirtualizationMode="Extended"
+        SelectedItemChanged="ServersTreeView_OnSelectedItemChanged"
+        DragEnd="ServersTreeView_OnDragEnd">
+            <syncfusion:TreeViewAdv.ItemContainerStyle>
+                <Style TargetType="{x:Type syncfusion:TreeViewItemAdv}">
+                    <Setter Property="IsEditable" Value="False" />
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
+                    <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                </Style>
+            </syncfusion:TreeViewAdv.ItemContainerStyle>
+            <syncfusion:TreeViewAdv.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="{DynamicResource Add}" Click="AddButton_Click" />
                     <MenuItem Header="{DynamicResource Delete}" Click="DeleteButton_Click" />
@@ -63,21 +77,13 @@
                     <MenuItem Header="{DynamicResource Expand}" Click="Expand_OnClick" />
                     <MenuItem Header="{DynamicResource Collapse}" Click="Collapse_Click" />
                 </ContextMenu>
-            </TreeView.ContextMenu>
-            <TreeView.Resources>
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
-                                 Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}" />
-                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
-                                 Color="{DynamicResource {x:Static SystemColors.HighlightTextColorKey}}" />
-                <HierarchicalDataTemplate DataType="{x:Type model:ServerTreeViewModel}"
-                                          ItemsSource="{Binding Nodes,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}">
-                    <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
-                        <TextBlock Text="{Binding Name,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"
-                                   ToolTip="{Binding Name,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
-                    </StackPanel>
+            </syncfusion:TreeViewAdv.ContextMenu>
+            <syncfusion:TreeViewAdv.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Nodes}" >
+                    <TextBlock Text="{Binding Name}" />
                 </HierarchicalDataTemplate>
-            </TreeView.Resources>
-        </controls:TreeViewEx>
+            </syncfusion:TreeViewAdv.ItemTemplate>
+        </syncfusion:TreeViewAdv>
         <Button x:Name="ShowQrCodeButton" Grid.Row="1" Grid.Column="1" Margin="10,10,10,0" Content=">>" HorizontalAlignment="Right" Width="40" Click="ShowQrCodeButton_OnClick"/>
         <Grid Grid.Row="2" Grid.Column="1" Margin="5,10,10,10" >
             <Grid.ColumnDefinitions>
@@ -172,16 +178,25 @@
                     <TextBox Grid.Row="9" Grid.Column="1" Height="23.24" Margin="0,5,0,0"
                              Text="{Binding SelectedValue.Group,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
 
-                    <CheckBox Grid.Row="10" Grid.Column="0"
+                    <CheckBox x:Name="SsrLinkCheckBox" Grid.Row="10" Grid.Column="0"
                               Content="{DynamicResource SsrLink}" VerticalAlignment="Center"
                               Margin="0,5,5,0"
                               HorizontalAlignment="Right"
-                              DataContext="{Binding Path=ServerViewModel, ElementName=Cw}"
-                              IsChecked="{Binding IsSsr,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                              IsChecked="True"/>
                     <TextBox x:Name="LinkTextBox" Grid.Row="10" Grid.Column="1" Height="23.24" Margin="0,5,0,0" IsReadOnly="True"
                     GotFocus="LinkTextBox_GotFocus" PreviewMouseUp="LinkTextBox_PreviewMouseUp"
-                    DataContext="{Binding Path=ServerViewModel, ElementName=Cw}"
-                    Text="{Binding SsLink,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" TextChanged="LinkTextBox_TextChanged" />
+                    TextChanged="LinkTextBox_TextChanged">
+                         <TextBox.Style>
+                            <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+                                <Setter Property="Text" Value="{Binding SelectedValue.SsrLink,ElementName=ServersTreeView,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsChecked,ElementName=SsrLinkCheckBox}" Value="False">
+                                        <Setter Property="Text" Value="{Binding SelectedValue.SsLink,ElementName=ServersTreeView,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
 
                     <CheckBox x:Name="AdvSettingCheckBox" Grid.Row="11" Grid.Column="0"
                               Content="{DynamicResource AdvSetting}" VerticalAlignment="Center"

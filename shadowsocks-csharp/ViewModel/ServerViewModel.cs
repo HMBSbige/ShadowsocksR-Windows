@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Controls;
 
 namespace Shadowsocks.ViewModel
 {
@@ -12,10 +11,7 @@ namespace Shadowsocks.ViewModel
         public ServerViewModel()
         {
             ServersTreeViewCollection = new ObservableCollection<ServerTreeViewModel>();
-            IsSsr = true;
         }
-
-        public TreeView TreeView;
 
         private ObservableCollection<ServerTreeViewModel> _serverTreeViewCollection;
         public ObservableCollection<ServerTreeViewModel> ServersTreeViewCollection
@@ -32,10 +28,10 @@ namespace Shadowsocks.ViewModel
             }
         }
 
-        public void ReadConfig(Configuration config)
+        public void ReadServers(List<Server> configs)
         {
             ServersTreeViewCollection.Clear();
-            var subTags = new HashSet<string>(config.configs.Select(server => server.SubTag));
+            var subTags = new HashSet<string>(configs.Select(server => server.SubTag));
             foreach (var subTag in subTags)
             {
                 var sub1 = new ServerTreeViewModel
@@ -43,7 +39,7 @@ namespace Shadowsocks.ViewModel
                     Name = subTag,
                     Type = ServerTreeViewType.Subtag
                 };
-                var servers = config.configs.Where(server => server.SubTag == subTag).ToArray();
+                var servers = configs.Where(server => server.SubTag == subTag).ToArray();
                 var groups = new HashSet<string>(servers.Select(server => server.Group));
 
                 foreach (var group in groups)
@@ -51,7 +47,8 @@ namespace Shadowsocks.ViewModel
                     var sub2 = new ServerTreeViewModel
                     {
                         Name = group,
-                        Type = ServerTreeViewType.Group
+                        Type = ServerTreeViewType.Group,
+                        Parent = sub1
                     };
                     var subServers = servers.Where(server => server.Group == group);
                     foreach (var server in subServers)
@@ -62,7 +59,8 @@ namespace Shadowsocks.ViewModel
                         sub2.Nodes.Add(new ServerTreeViewModel
                         {
                             Server = server,
-                            Type = ServerTreeViewType.Server
+                            Type = ServerTreeViewType.Server,
+                            Parent = sub2
                         });
                     }
                     sub1.Nodes.CollectionChanged -= ServerCollection_CollectionChanged;
@@ -72,7 +70,9 @@ namespace Shadowsocks.ViewModel
 
                 if (groups.Count == 1)
                 {
-                    sub1.Nodes.First().Name = subTag;
+                    sub1.Nodes[0].Name = subTag;
+                    sub1.Nodes[0].Type = ServerTreeViewType.Subtag;
+                    sub1.Nodes[0].Parent = null;
                     ServersTreeViewCollection.Add(sub1.Nodes.First());
                 }
                 else
@@ -111,40 +111,7 @@ namespace Shadowsocks.ViewModel
 
         private void ServerChanged(object sender, EventArgs e)
         {
-            OnPropertyChanged(nameof(SsLink));
             ServersChanged?.Invoke(this, new EventArgs());
-        }
-
-        public void SelectedServer_ServerChanged()
-        {
-            OnPropertyChanged(nameof(SsLink));
-        }
-
-        private bool _isSsr;
-        public bool IsSsr
-        {
-            get => _isSsr;
-            set
-            {
-                if (_isSsr != value)
-                {
-                    _isSsr = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(SsLink));
-                }
-            }
-        }
-
-        public string SsLink
-        {
-            get
-            {
-                if (TreeView?.SelectedValue is Server server)
-                {
-                    return IsSsr ? server.SsrLink : server.SsLink;
-                }
-                return string.Empty;
-            }
         }
     }
 }

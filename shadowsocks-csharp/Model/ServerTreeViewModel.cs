@@ -1,12 +1,14 @@
 ﻿using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
+using Syncfusion.Windows.Tools.Controls;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Shadowsocks.Model
 {
-    public class ServerTreeViewModel : ViewModelBase
+    public class ServerTreeViewModel : ViewModelBase, IVirtualTree
     {
         public ServerTreeViewModel()
         {
@@ -14,6 +16,7 @@ namespace Shadowsocks.Model
             _name = string.Empty;
             _server = null;
             _type = ServerTreeViewType.Subtag;
+            Parent = null;
         }
 
         private string _name;
@@ -120,6 +123,18 @@ namespace Shadowsocks.Model
             }
         }
 
+        public static IEnumerable<ServerTreeViewModel> GetNodes(IEnumerable<ServerTreeViewModel> root)
+        {
+            foreach (var serverTreeViewModel in root)
+            {
+                yield return serverTreeViewModel;
+                foreach (var subServerTreeViewModel in GetNodes(serverTreeViewModel.Nodes))
+                {
+                    yield return subServerTreeViewModel;
+                }
+            }
+        }
+
         public static ServerTreeViewModel FindNode(Collection<ServerTreeViewModel> root, string serverId)
         {
             var res = root.FirstOrDefault(serverTreeViewModel => serverTreeViewModel.Server?.Id == serverId);
@@ -138,6 +153,44 @@ namespace Shadowsocks.Model
             }
             return null;
         }
+
+        #endregion
+
+        #region IVirtualTree
+
+        private bool _isExpanded;
+        public bool IsExpanded
+        {
+            get => _isExpanded;
+            set
+            {
+                if (_isExpanded != value)
+                {
+                    _isExpanded = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set
+            {
+                if (_isSelected != value)
+                {
+                    _isSelected = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public IVirtualTree Parent { get; set; }
+
+        //TODO:
+        public int ItemsCount { get; set; }
+        public double ExtentHeight { get; set; }
 
         #endregion
     }

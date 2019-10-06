@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using Shadowsocks.Controller;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Model;
@@ -56,6 +56,8 @@ namespace Shadowsocks
 
             SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
             app.Exit += App_Exit;
+
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("##SyncfusionLicense##");
 
             var tryTimes = 0;
             while (Configuration.Load() == null)
