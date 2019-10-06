@@ -27,6 +27,7 @@
                 </Style.Triggers>
             </Style>
             <BooleanToVisibilityConverter x:Key="Bool2Visibility" />
+            <controls:ServerTreeTypeToFontConverter x:Key="ServerTreeTypeToFontConverter" />
         </ResourceDictionary>
     </Window.Resources>
 
@@ -80,7 +81,9 @@
             </syncfusion:TreeViewAdv.ContextMenu>
             <syncfusion:TreeViewAdv.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Nodes}" >
-                    <TextBlock Text="{Binding Name}" />
+                    <TextBlock Text="{Binding Name}" 
+                    Foreground="{Binding Type,Converter={StaticResource ServerTreeTypeToFontConverter}}"
+                    FontWeight="{Binding Type,Converter={StaticResource ServerTreeTypeToFontConverter}}" />
                 </HierarchicalDataTemplate>
             </syncfusion:TreeViewAdv.ItemTemplate>
         </syncfusion:TreeViewAdv>
