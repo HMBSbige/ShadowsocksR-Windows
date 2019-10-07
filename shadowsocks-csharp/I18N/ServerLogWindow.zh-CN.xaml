@@ -1,0 +1,47 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="ResourceDictionaryName">zh-CN</sys:String>
+
+    <sys:String x:Key="Title">服务器记录</sys:String>
+    <sys:String x:Key="Any">任意地址</sys:String>
+    <sys:String x:Key="Local">本机地址</sys:String>
+    <sys:String x:Key="Version">版本</sys:String>
+
+    <sys:String x:Key="Control">操作(_C)</sys:String>
+    <sys:String x:Key="DisconnectDirect">断开直连连接(_D)</sys:String>
+    <sys:String x:Key="DisconnectAll">断开当前所有连接(_A)</sys:String>
+    <sys:String x:Key="ClearMaxSpeed">重置历史最高(_M)</sys:String>
+    <sys:String x:Key="Clear">清空(_C)</sys:String>
+    <sys:String x:Key="ClearSelectedTotal">清空选中节点历史流量(_S)</sys:String>
+    <sys:String x:Key="ClearTotal">清空所有历史流量(_T)</sys:String>
+
+    <sys:String x:Key="PortOut">导出(_O)</sys:String>
+    <sys:String x:Key="CopyCurrentLink">复制选中链接</sys:String>
+    <sys:String x:Key="CopyCurrentGroupLinks">复制选中组链接</sys:String>
+    <sys:String x:Key="CopyAllEnableLinks">复制所有开启节点链接</sys:String>
+    <sys:String x:Key="CopyAllLinks">复制所有节点链接</sys:String>
+
+    <sys:String x:Key="Window">窗口(_W)</sys:String>
+    <sys:String x:Key="AutoSize">自动调整大小(_S)</sys:String>
+    <sys:String x:Key="AlwaysOnTop">窗口置顶(_T)</sys:String>
+
+    <sys:String x:Key="Index">序号</sys:String>
+    <sys:String x:Key="Group">群组名</sys:String>
+    <sys:String x:Key="Server">服务器</sys:String>
+    <sys:String x:Key="Connecting">连接</sys:String>
+    <sys:String x:Key="Latency">延迟</sys:String>
+    <sys:String x:Key="AvgDSpeed">平均下载速度</sys:String>
+    <sys:String x:Key="MaxDSpeed">最高下载速度</sys:String>
+    <sys:String x:Key="AvgUpSpeed">平均上传速度</sys:String>
+    <sys:String x:Key="MaxUpSpeed">最高上传速度</sys:String>
+    <sys:String x:Key="Dload">总下载</sys:String>
+    <sys:String x:Key="Upload">总上传</sys:String>
+    <sys:String x:Key="DloadRaw">实下载</sys:String>
+    <sys:String x:Key="Error">错误</sys:String>
+    <sys:String x:Key="Timeout">超时</sys:String>
+    <sys:String x:Key="EmptyResponse">空连</sys:String>
+    <sys:String x:Key="Continuous">连错</sys:String>
+    <sys:String x:Key="ErrorPercent">出错比例</sys:String>
+
+</ResourceDictionary>

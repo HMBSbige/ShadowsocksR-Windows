@@ -1,0 +1,47 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="ResourceDictionaryName">en-US</sys:String>
+
+    <sys:String x:Key="Title">ServerLog</sys:String>
+    <sys:String x:Key="Any">Any</sys:String>
+    <sys:String x:Key="Local">Local</sys:String>
+    <sys:String x:Key="Version">Version</sys:String>
+
+    <sys:String x:Key="Control">_Control</sys:String>
+    <sys:String x:Key="DisconnectDirect">_Disconnect direct connections</sys:String>
+    <sys:String x:Key="DisconnectAll">Disconnect _All</sys:String>
+    <sys:String x:Key="ClearMaxSpeed">Clear _MaxSpeed</sys:String>
+    <sys:String x:Key="Clear">_Clear</sys:String>
+    <sys:String x:Key="ClearSelectedTotal">Clear _Selected Total</sys:String>
+    <sys:String x:Key="ClearTotal">Clear _Total</sys:String>
+
+    <sys:String x:Key="PortOut">Port _out</sys:String>
+    <sys:String x:Key="CopyCurrentLink">Copy current link</sys:String>
+    <sys:String x:Key="CopyCurrentGroupLinks">Copy current group links</sys:String>
+    <sys:String x:Key="CopyAllEnableLinks">Copy all enable links</sys:String>
+    <sys:String x:Key="CopyAllLinks">Copy all links</sys:String>
+
+    <sys:String x:Key="Window">_Window</sys:String>
+    <sys:String x:Key="AutoSize">Auto _size</sys:String>
+    <sys:String x:Key="AlwaysOnTop">Always On _Top</sys:String>
+
+    <sys:String x:Key="Index">Id</sys:String>
+    <sys:String x:Key="Group">Group</sys:String>
+    <sys:String x:Key="Server">Server</sys:String>
+    <sys:String x:Key="Connecting">Connecting</sys:String>
+    <sys:String x:Key="Latency">Latency</sys:String>
+    <sys:String x:Key="AvgDSpeed">Avg DSpeed</sys:String>
+    <sys:String x:Key="MaxDSpeed">Max DSpeed</sys:String>
+    <sys:String x:Key="AvgUpSpeed">Avg UpSpeed</sys:String>
+    <sys:String x:Key="MaxUpSpeed">Max UpSpeed</sys:String>
+    <sys:String x:Key="Dload">Dload</sys:String>
+    <sys:String x:Key="Upload">Upload</sys:String>
+    <sys:String x:Key="DloadRaw">DloadRaw</sys:String>
+    <sys:String x:Key="Error">Error</sys:String>
+    <sys:String x:Key="Timeout">Timeout</sys:String>
+    <sys:String x:Key="EmptyResponse">Empty Response</sys:String>
+    <sys:String x:Key="Continuous">Continuous</sys:String>
+    <sys:String x:Key="ErrorPercent">Error Percent</sys:String>
+
+</ResourceDictionary>

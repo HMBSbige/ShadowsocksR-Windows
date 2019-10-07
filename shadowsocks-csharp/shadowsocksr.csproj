@@ -55,6 +55,7 @@
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.0.8" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Syncfusion.Licensing" Version="17.3.0.14" />
+    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="17.3.0.14" />
     <PackageReference Include="Syncfusion.Shared.WPF" Version="17.3.0.14" />
     <PackageReference Include="Syncfusion.Tools.WPF" Version="17.3.0.14" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
@@ -89,6 +90,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="I18N\ServerLogWindow.en-US.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\ServerLogWindow.zh-CN.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\ServerLogWindow.zh-TW.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="I18N\SubscribeWindow.en-US.xaml">
       <SubType>Designer</SubType>
     </Page>

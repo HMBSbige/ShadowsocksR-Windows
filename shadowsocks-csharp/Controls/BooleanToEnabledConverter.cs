@@ -1,5 +1,4 @@
-﻿using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
@@ -12,14 +11,9 @@ namespace Shadowsocks.Controls
         {
             if (value is bool enable)
             {
-                if (targetType == typeof(string))
-                {
-                    return I18NUtil.GetAppStringValue(enable ? @"Enabled" : @"Disabled");
-                }
-
                 if (targetType == typeof(Brush))
                 {
-                    return enable ? Brushes.Green : Brushes.Red;
+                    return enable ? Brushes.LightGreen : Brushes.Red;
                 }
             }
             return DependencyProperty.UnsetValue;

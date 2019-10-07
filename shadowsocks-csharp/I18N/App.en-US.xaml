@@ -76,9 +76,6 @@
     <sys:String x:Key="PortReserved">Port {0} is reserved by system</sys:String>
     <sys:String x:Key="PortOutOfRange">Port out of range</sys:String>
 
-    <sys:String x:Key="Enabled">Enabled</sys:String>
-    <sys:String x:Key="Disabled">Disabled</sys:String>
-
     <sys:String x:Key="ControllerError">ShadowsocksR Error: {0}</sys:String>
 
     <sys:String x:Key="Colon" xml:space="preserve">: </sys:String>

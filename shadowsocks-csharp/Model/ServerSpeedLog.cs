@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Shadowsocks.Util;
+using Shadowsocks.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Shadowsocks.Util;
-using Shadowsocks.ViewModel;
 
 namespace Shadowsocks.Model
 {
@@ -264,8 +264,6 @@ namespace Shadowsocks.Model
             }
         }
 
-        public string ErrorPercentText => ErrorPercent != null ? $@"{ErrorPercent:F0}%" : @"-";
-
         #endregion
 
         public void ClearTrans()
@@ -311,7 +309,6 @@ namespace Shadowsocks.Model
             OnPropertyChanged(nameof(ErrorEmptyTimes));
             OnPropertyChanged(nameof(ErrorContinuousTimes));
             OnPropertyChanged(nameof(ErrorPercent));
-            OnPropertyChanged(nameof(ErrorPercentText));
         }
 
         public void ClearMaxSpeed()
@@ -341,7 +338,6 @@ namespace Shadowsocks.Model
             OnPropertyChanged(nameof(TotalConnectTimes));
             OnPropertyChanged(nameof(Connecting));
             OnPropertyChanged(nameof(ErrorPercent));
-            OnPropertyChanged(nameof(ErrorPercentText));
         }
 
         public void AddDisconnectTimes()
@@ -350,7 +346,6 @@ namespace Shadowsocks.Model
             OnPropertyChanged(nameof(TotalDisconnectTimes));
             OnPropertyChanged(nameof(Connecting));
             OnPropertyChanged(nameof(ErrorPercent));
-            OnPropertyChanged(nameof(ErrorPercentText));
         }
 
         protected void Sweep()
@@ -399,7 +394,6 @@ namespace Shadowsocks.Model
                     }
                 }
                 OnPropertyChanged(nameof(ErrorPercent));
-                OnPropertyChanged(nameof(ErrorPercentText));
             }
         }
 
@@ -617,7 +611,6 @@ namespace Shadowsocks.Model
             OnPropertyChanged(nameof(ErrorContinuousTimes));
             OnPropertyChanged(nameof(ConnectError));
             OnPropertyChanged(nameof(ErrorPercent));
-            OnPropertyChanged(nameof(ErrorPercentText));
         }
 
         public void ResetContinuousTimes()

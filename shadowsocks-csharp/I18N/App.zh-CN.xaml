@@ -76,9 +76,6 @@
     <sys:String x:Key="PortReserved">端口 {0} 是系统保留端口</sys:String>
     <sys:String x:Key="PortOutOfRange">端口超出范围</sys:String>
 
-    <sys:String x:Key="Enabled">已启用</sys:String>
-    <sys:String x:Key="Disabled">已禁用</sys:String>
-
     <sys:String x:Key="ControllerError">ShadowsocksR Error: {0}</sys:String>
 
     <sys:String x:Key="Colon" xml:space="preserve">：</sys:String>
