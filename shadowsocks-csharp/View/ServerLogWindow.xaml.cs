@@ -7,6 +7,7 @@ using Syncfusion.UI.Xaml.Grid;
 using Syncfusion.UI.Xaml.Grid.Helpers;
 using Syncfusion.UI.Xaml.ScrollAxis;
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -303,12 +304,38 @@ namespace Shadowsocks.View
                 return;
 
             var recordIndex = ServerDataGrid.ResolveToRecordIndex(rowColumnIndex.RowIndex);
-            if (recordIndex < 0)
-                return;
-
-            var server = ServerLogViewModel.ServersCollection[recordIndex];
-            server.Enable = !server.Enable;
-            _controller.Save();
+            if (recordIndex == -1)
+            {
+                const string columnName = @"Enable";
+                var sortColumnDescription = ServerDataGrid.SortColumnDescriptions.FirstOrDefault(col => col.ColumnName == columnName);
+                if (sortColumnDescription != null)
+                {
+                    sortColumnDescription.SortDirection = sortColumnDescription.SortDirection == ListSortDirection.Ascending ? ListSortDirection.Descending : ListSortDirection.Ascending;
+                    ServerDataGrid.SortColumnDescriptions.Remove(sortColumnDescription);
+                }
+                else
+                {
+                    sortColumnDescription = new SortColumnDescription
+                    {
+                        ColumnName = columnName,
+                        SortDirection = ListSortDirection.Ascending
+                    };
+                }
+                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                {
+                }
+                else
+                {
+                    ServerDataGrid.SortColumnDescriptions.Clear();
+                }
+                ServerDataGrid.SortColumnDescriptions.Add(sortColumnDescription);
+            }
+            else
+            {
+                var server = ServerLogViewModel.ServersCollection[recordIndex];
+                server.Enable = !server.Enable;
+                _controller.Save();
+            }
         }
     }
 }

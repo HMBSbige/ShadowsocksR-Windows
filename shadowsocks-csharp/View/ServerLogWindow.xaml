@@ -84,12 +84,12 @@
                                    AllowDeleting="False"
                                    AllowDraggingRows="False" AllowDraggingColumns="True" AllowDrop="False"
                                    AllowGrouping="False" ShowGroupDropArea="False"
-                                   AllowSorting="True" AllowFiltering="False"
+                                   AllowSorting="True" AllowFiltering="False" ShowSortNumbers="True"
                                    ShowToolTip="True"
                                    ShowRowHeader="True"
 
                                    EnableDataVirtualization="True"
-                                   ScrollMode="None" CanMaintainScrollPosition="True"
+                                   ScrollMode="None" CanMaintainScrollPosition="True" ShowBusyIndicator="True"
                                    CellTapped="ServerDataGrid_OnCellTapped"
                                    CellDoubleTapped="ServerDataGrid_OnCellDoubleTapped"
                                    MouseLeftButtonUp="ServerDataGrid_OnMouseLeftButtonUp"
@@ -241,6 +241,8 @@
                             </Style>
                         </syncfusion:GridPercentColumn.CellStyle>
                     </syncfusion:GridPercentColumn>
+
+                    <syncfusion:GridCheckBoxColumn MappingName="Enable" IsHidden="True" />
 
                 </syncfusion:SfDataGrid.Columns>
             </syncfusion:SfDataGrid>
