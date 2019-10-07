@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -54,9 +54,13 @@
     </PackageReference>
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.0.8" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Syncfusion.Licensing" Version="17.3.0.14" />
+    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="17.3.0.14" />
+    <PackageReference Include="Syncfusion.Shared.WPF" Version="17.3.0.14" />
+    <PackageReference Include="Syncfusion.Tools.WPF" Version="17.3.0.14" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="WpfColorFontDialog" Version="1.0.6" />
-    <PackageReference Include="ZXing.Net" Version="0.16.4" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' " />
+    <PackageReference Include="ZXing.Net" Version="0.16.5" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' " />
     <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.6" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' == 'true' " />
   </ItemGroup>
 
@@ -86,6 +90,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="I18N\ServerLogWindow.en-US.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\ServerLogWindow.zh-CN.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\ServerLogWindow.zh-TW.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="I18N\SubscribeWindow.en-US.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -105,5 +118,13 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="cd &quot;$(ProjectDir)&quot;&#xD;&#xA;&#xD;&#xA;SyncfusionLicenseRegister.bat PreBuild Program.cs" />
+  </Target>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="cd &quot;$(ProjectDir)&quot;&#xD;&#xA;&#xD;&#xA;SyncfusionLicenseRegister.bat PostBuild Program.cs" />
+  </Target>
 
 </Project>

@@ -1,7 +1,6 @@
 ﻿using Shadowsocks.Controller;
 using Shadowsocks.Model;
 using System.Collections.ObjectModel;
-using System.Windows.Data;
 
 namespace Shadowsocks.ViewModel
 {
@@ -59,10 +58,6 @@ namespace Shadowsocks.ViewModel
                 }
                 ServersCollection.Add(server);
             }
-
-            var vw = CollectionViewSource.GetDefaultView(ServersCollection);
-            vw.GroupDescriptions.Clear();
-            vw.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Server.SubTag)));
         }
     }
 }

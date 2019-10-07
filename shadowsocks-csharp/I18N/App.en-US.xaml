@@ -76,9 +76,6 @@
     <sys:String x:Key="PortReserved">Port {0} is reserved by system</sys:String>
     <sys:String x:Key="PortOutOfRange">Port out of range</sys:String>
 
-    <sys:String x:Key="Enabled">Enabled</sys:String>
-    <sys:String x:Key="Disabled">Disabled</sys:String>
-
     <sys:String x:Key="ControllerError">ShadowsocksR Error: {0}</sys:String>
 
     <sys:String x:Key="Colon" xml:space="preserve">: </sys:String>
@@ -109,4 +106,7 @@
     <sys:String x:Key="UpdateSubscribeFailure">Update subscribe {0} failure</sys:String>
 
     <sys:String x:Key="QrCodeNotFound">No QRCode found. Try to zoom in or move it to the center of the screen.</sys:String>
+
+    <sys:String x:Key="EmptySubtag">[Empty subscription remarks]</sys:String>
+    <sys:String x:Key="EmptyGroup">[Empty group name]</sys:String>
 </ResourceDictionary>

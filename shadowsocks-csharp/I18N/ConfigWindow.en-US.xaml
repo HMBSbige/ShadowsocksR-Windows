@@ -5,8 +5,8 @@
 
     <sys:String x:Key="Add">Add</sys:String>
     <sys:String x:Key="Delete">Delete</sys:String>
-    <sys:String x:Key="Up">Up</sys:String>
-    <sys:String x:Key="Down">Down</sys:String>
+    <sys:String x:Key="Expand">Expand</sys:String>
+    <sys:String x:Key="Collapse">Collapse</sys:String>
 
     <sys:String x:Key="Title">Edit Servers</sys:String>
     <sys:String x:Key="Any">Any</sys:String>
@@ -36,5 +36,6 @@
     <sys:String x:Key="Apply">Apply</sys:String>
 
     <sys:String x:Key="NoServer">Please add at least one server</sys:String>
+    <sys:String x:Key="AddServerError">Please select a group or server</sys:String>
 
 </ResourceDictionary>

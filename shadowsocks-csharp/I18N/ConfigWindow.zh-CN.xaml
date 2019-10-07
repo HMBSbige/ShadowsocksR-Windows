@@ -5,8 +5,8 @@
 
     <sys:String x:Key="Add">添加</sys:String>
     <sys:String x:Key="Delete">删除</sys:String>
-    <sys:String x:Key="Up">上移</sys:String>
-    <sys:String x:Key="Down">下移</sys:String>
+    <sys:String x:Key="Expand">展开</sys:String>
+    <sys:String x:Key="Collapse">折叠</sys:String>
 
     <sys:String x:Key="Title">编辑服务器</sys:String>
     <sys:String x:Key="Any">任意地址</sys:String>
@@ -24,10 +24,10 @@
     <sys:String x:Key="ObfsParam">混淆参数</sys:String>
     <sys:String x:Key="Remarks">备注</sys:String>
     <sys:String x:Key="Group">群组名</sys:String>
-    <sys:String x:Key="SsrLink">SSR链接</sys:String>
+    <sys:String x:Key="SsrLink">SSR 链接</sys:String>
     <sys:String x:Key="AdvSetting">高级选项</sys:String>
     <sys:String x:Key="AdvSettingDescription">以下选项不是所有服务端都支持</sys:String>
-    <sys:String x:Key="UdpPort">UDP端口</sys:String>
+    <sys:String x:Key="UdpPort">UDP 端口</sys:String>
     <sys:String x:Key="UdpOverTcp">UDP over TCP</sys:String>
     <sys:String x:Key="UdpOverTcpCheckBox">不打钩使用原生 UDP</sys:String>
 
@@ -36,5 +36,6 @@
     <sys:String x:Key="Apply">应用</sys:String>
 
     <sys:String x:Key="NoServer">请添加至少一个服务器</sys:String>
+    <sys:String x:Key="AddServerError">请先选择一个群组或服务器</sys:String>
 
 </ResourceDictionary>

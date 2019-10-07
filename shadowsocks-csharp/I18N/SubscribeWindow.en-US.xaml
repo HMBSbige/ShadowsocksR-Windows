@@ -18,7 +18,6 @@
     <sys:String x:Key="LastUpdate">Last Update</sys:String>
     <sys:String x:Key="AutoUpdate">Auto update</sys:String>
     <sys:String x:Key="Update">Save and Update</sys:String>
-    <sys:String x:Key="UpdateBypassProxy">Save and Update(bypass proxy)</sys:String>
     <sys:String x:Key="SaveError">Subscription remarks cannot have the same</sys:String>
 
     <sys:String x:Key="SaveQuestion" xml:space="preserve">Some subscription servers that are not on the subscription list were found.&#13;Do you want to delete these servers？</sys:String>

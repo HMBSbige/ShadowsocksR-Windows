@@ -777,7 +777,7 @@ namespace Shadowsocks.View
                 if (addNode)
                 {
                     var cfg = controller.GetCurrentConfiguration();
-                    _configWindow.SetServerListSelectedIndex(cfg.index + 1);
+                    _configWindow.MoveToSelectedItem(cfg.index + 1);
                 }
             }
             else
@@ -817,7 +817,7 @@ namespace Shadowsocks.View
                 {
                     _configWindow.WindowState = WindowState.Normal;
                 }
-                _configWindow.SetServerListSelectedIndex(index);
+                _configWindow.MoveToSelectedItem(index);
             }
             else
             {

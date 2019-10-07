@@ -665,9 +665,12 @@ namespace Shadowsocks.Model
         protected override void OnPropertyChanged(string propertyName = null)
         {
             base.OnPropertyChanged(propertyName);
-            base.OnPropertyChanged(nameof(SsLink));
-            base.OnPropertyChanged(nameof(SsrLink));
-            ServerChanged?.Invoke(this, new EventArgs());
+            if (propertyName == null)
+            {
+                base.OnPropertyChanged(nameof(SsLink));
+                base.OnPropertyChanged(nameof(SsrLink));
+                ServerChanged?.Invoke(this, new EventArgs());
+            }
         }
     }
 }

@@ -5,8 +5,8 @@
 
     <sys:String x:Key="Add">新增</sys:String>
     <sys:String x:Key="Delete">刪除</sys:String>
-    <sys:String x:Key="Up">上移</sys:String>
-    <sys:String x:Key="Down">下移</sys:String>
+    <sys:String x:Key="Expand">展開</sys:String>
+    <sys:String x:Key="Collapse">折疊</sys:String>
 
     <sys:String x:Key="Title">編輯伺服器</sys:String>
     <sys:String x:Key="Any">任意地址</sys:String>
@@ -36,5 +36,6 @@
     <sys:String x:Key="Apply">套用</sys:String>
 
     <sys:String x:Key="NoServer">請添加至少一個伺服器</sys:String>
+    <sys:String x:Key="AddServerError">請選擇一個群組或伺服器</sys:String>
 
 </ResourceDictionary>

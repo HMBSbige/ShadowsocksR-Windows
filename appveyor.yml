@@ -1,25 +1,7 @@
 version: 1.0.{build}
 skip_tags: true
-image: Visual Studio 2019 Preview
+image: Visual Studio 2019
 configuration: Release
-install:
-- ps: |
-    function install-devpack ($version, $location) {
-        Write-Host ".NET Framework $($version) Developer Pack..." -ForegroundColor Cyan
-        Write-Host "Downloading..."
-        $exePath = "$env:TEMP\$($version)-devpack.exe"
-        (New-Object Net.WebClient).DownloadFile($location, $exePath)
-        Write-Host "Installing..."
-        cmd /c start /wait "$exePath" /quiet /norestart
-        del $exePath
-        Write-Host "Installed" -ForegroundColor Green
-    }
-    install-devpack -version "4.8" -location "https://download.visualstudio.microsoft.com/download/pr/7afca223-55d2-470a-8edc-6a1739ae3252/c8c829444416e811be84c5765ede6148/ndp48-devpack-enu.exe"
-    Write-Host "Restarting build VM..."
-    sleep 5
-    Restart-Computer -Force
-    sleep 5
-    Write-Host "Restarted" -ForegroundColor Green
 before_build:
 - cmd: nuget restore
 build_script:
@@ -28,9 +10,15 @@ after_build:
 - cmd: |
     7z a ShadowsocksR-netcore.zip %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\ShadowsocksR.exe %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\ShadowsocksR.dll %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\ShadowsocksR.runtimeconfig.json
     7z a ShadowsocksR-net48.zip %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\net48\ShadowsocksR.exe %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\net48\ShadowsocksR.exe.config
+    7z a ShadowsocksR-netcore-win32.zip %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x86\publish\ShadowsocksR.exe %APPVEYOR_BUILD_FOLDER%\clean.cmd
+    7z a ShadowsocksR-netcore-win64.zip %APPVEYOR_BUILD_FOLDER%\shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x64\publish\ShadowsocksR.exe %APPVEYOR_BUILD_FOLDER%\clean.cmd
 test: off
 artifacts:
 - path: ShadowsocksR-netcore.zip
   name: ShadowsocksR-netcore.zip
 - path: ShadowsocksR-net48.zip
   name: ShadowsocksR-net48.zip
+- path: ShadowsocksR-netcore-win32.zip
+  name: ShadowsocksR-netcore-win32.zip
+- path: ShadowsocksR-netcore-win64.zip
+  name: ShadowsocksR-netcore-win64.zip

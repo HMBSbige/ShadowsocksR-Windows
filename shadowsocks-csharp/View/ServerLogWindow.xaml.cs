@@ -1,12 +1,17 @@
 ﻿using Shadowsocks.Controller;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Model;
+using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
+using Syncfusion.UI.Xaml.Grid;
+using Syncfusion.UI.Xaml.Grid.Helpers;
+using Syncfusion.UI.Xaml.ScrollAxis;
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace Shadowsocks.View
 {
@@ -15,11 +20,15 @@ namespace Shadowsocks.View
         public ServerLogWindow(ShadowsocksController controller, WindowStatus status)
         {
             InitializeComponent();
+            I18NUtil.SetLanguage(Resources, @"ServerLogWindow");
+            LoadLanguage();
+
             _controller = controller;
             Closed += (o, e) => { _controller.ConfigChanged -= controller_ConfigChanged; };
             _controller.ConfigChanged += controller_ConfigChanged;
-            LoadLanguage();
-            LoadConfig();
+            LoadConfig(true);
+
+            ServerDataGrid.GridColumnSizer.SortIconWidth = 0;
             if (status == null)
             {
                 SizeToContent = SizeToContent.Width;
@@ -34,159 +43,58 @@ namespace Shadowsocks.View
             }
         }
 
-        private void LoadConfig()
+        private void LoadLanguage()
+        {
+            ServerDataGrid.Columns[Resources[@"IndexMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"Index");
+            ServerDataGrid.Columns[Resources[@"GroupMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"Group");
+            ServerDataGrid.Columns[Resources[@"ServerMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"Server");
+            ServerDataGrid.Columns[Resources[@"ConnectingMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"Connecting");
+            ServerDataGrid.Columns[Resources[@"AvgConnectTimeMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"Latency");
+            ServerDataGrid.Columns[Resources[@"AvgDownloadBytesMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"AvgDSpeed");
+            ServerDataGrid.Columns[Resources[@"MaxDownSpeedMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"MaxDSpeed");
+            ServerDataGrid.Columns[Resources[@"AvgUploadBytesMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"AvgUpSpeed");
+            ServerDataGrid.Columns[Resources[@"MaxUpSpeedMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"MaxUpSpeed");
+            ServerDataGrid.Columns[Resources[@"TotalDownloadBytesMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"Dload");
+            ServerDataGrid.Columns[Resources[@"TotalUploadBytesMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"Upload");
+            ServerDataGrid.Columns[Resources[@"TotalDownloadRawBytesMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"DloadRaw");
+            ServerDataGrid.Columns[Resources[@"ConnectErrorMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"Error");
+            ServerDataGrid.Columns[Resources[@"ErrorTimeoutTimesMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"Timeout");
+            ServerDataGrid.Columns[Resources[@"ErrorEmptyTimesMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"EmptyResponse");
+            ServerDataGrid.Columns[Resources[@"ErrorContinuousTimesMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"Continuous");
+            ServerDataGrid.Columns[Resources[@"ErrorPercentMappingName"].ToString()].HeaderText = this.GetWindowStringValue(@"ErrorPercent");
+        }
+
+        private void LoadConfig(bool isFirstLoad)
         {
             UpdateTitle();
+            ServerDataGrid.View?.BeginInit();
             ServerLogViewModel.ReadConfig(_controller);
-            if (ServerLogViewModel.SelectedServer != null)
+            ServerDataGrid.View?.EndInit();
+
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
             {
-                ServerDataGrid.ScrollIntoView(ServerLogViewModel.SelectedServer, ServerColumn);
-            }
+                if (isFirstLoad && ServerLogViewModel.SelectedServer != null)
+                {
+                    ServerDataGrid.ScrollInView(new RowColumnIndex(ServerLogViewModel.SelectedServer.Index, 2));
+                }
+
+                //Refreshing auto size calculation
+                ServerDataGrid.GridColumnSizer.ResetAutoCalculationforAllColumns();
+                ServerDataGrid.GridColumnSizer.Refresh();
+            }));
         }
 
         private void controller_ConfigChanged(object sender, EventArgs e)
         {
-            LoadConfig();
+            LoadConfig(false);
         }
 
         private readonly ShadowsocksController _controller;
         public ServerLogViewModel ServerLogViewModel { get; set; } = new ServerLogViewModel();
 
-        private void ServerDataGrid_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (ServerDataGrid.SelectedCells.Count > 0 && ServerDataGrid.SelectedCells[0].Column != null)
-            {
-                if (ServerDataGrid.SelectedCells[0].Column.Header is string header && ServerDataGrid.SelectedCells[0].Item is Server serverObject)
-                {
-                    var id = serverObject.Index - 1;
-                    if (header == I18N.GetString(@"Server"))
-                    {
-                        var config = _controller.GetCurrentConfiguration();
-                        Console.WriteLine($@"config.checkSwitchAutoCloseAll:{config.checkSwitchAutoCloseAll}");
-                        if (config.checkSwitchAutoCloseAll)
-                        {
-                            _controller.DisconnectAllConnections();
-                        }
-                        _controller.SelectServerIndex(id);
-                    }
-                    else if (header == I18N.GetString(@"Enable"))
-                    {
-                        var server = ServerLogViewModel.ServersCollection[id];
-                        server.Enable = !server.Enable;
-                        _controller.Save();
-                    }
-                    else if (header == I18N.GetString(@"Group"))
-                    {
-                        var currentServer = ServerLogViewModel.ServersCollection[id];
-                        var group = currentServer.Group;
-                        if (!string.IsNullOrEmpty(group))
-                        {
-                            var enable = !currentServer.Enable;
-                            foreach (var server in ServerLogViewModel.ServersCollection)
-                            {
-                                if (server.Group == group)
-                                {
-                                    if (server.Enable != enable)
-                                    {
-                                        server.Enable = enable;
-                                    }
-                                }
-                            }
-                            _controller.Save();
-                        }
-                    }
-                    else
-                    {
-                        ServerDataGrid.SelectedCells.Clear();
-                        ServerDataGrid.CurrentCell = new DataGridCellInfo(serverObject, ServerDataGrid.Columns[0]);
-                        ServerDataGrid.SelectedCells.Add(ServerDataGrid.CurrentCell);
-                    }
-                }
-            }
-        }
-
-        private void ServerDataGrid_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton != MouseButton.Left)
-            {
-                return;
-            }
-            if (ServerDataGrid.SelectedCells.Count > 0 && ServerDataGrid.SelectedCells[0].Column != null)
-            {
-                if (ServerDataGrid.SelectedCells[0].Column.Header is string header && ServerDataGrid.SelectedCells[0].Item is Server serverObject)
-                {
-                    var id = serverObject.Index - 1;
-                    if (header == I18N.GetString(@"ID"))
-                    {
-                        _controller.ShowConfigForm(id);
-                    }
-                    else if (header == I18N.GetString(@"Connecting"))
-                    {
-                        var server = ServerLogViewModel.ServersCollection[id];
-                        server.GetConnections().CloseAll();
-                    }
-                    else if (header == I18N.GetString(@"Max UpSpeed") || header == I18N.GetString(@"Max DSpeed"))
-                    {
-                        ServerLogViewModel.ServersCollection[id].SpeedLog.ClearMaxSpeed();
-                    }
-                    else if (header == I18N.GetString(@"Dload") || header == I18N.GetString(@"Upload"))
-                    {
-                        ServerLogViewModel.ServersCollection[id].SpeedLog.ClearTrans();
-                    }
-                    else if (header == I18N.GetString(@"DloadRaw"))
-                    {
-                        ServerLogViewModel.ServersCollection[id].SpeedLog.Clear();
-                        ServerLogViewModel.ServersCollection[id].Enable = true;
-                    }
-                    else if (header == I18N.GetString(@"Error")
-                    || header == I18N.GetString(@"Timeout")
-                    || header == I18N.GetString(@"Empty Response")
-                    || header == I18N.GetString(@"Continuous")
-                    || header == I18N.GetString(@"Error Percent")
-                    )
-                    {
-                        ServerLogViewModel.ServersCollection[id].SpeedLog.ClearError();
-                        ServerLogViewModel.ServersCollection[id].Enable = true;
-                    }
-                    else
-                    {
-                        ServerDataGrid.SelectedCells.Clear();
-                        ServerDataGrid.CurrentCell = new DataGridCellInfo(serverObject, ServerDataGrid.Columns[0]);
-                        ServerDataGrid.SelectedCells.Add(ServerDataGrid.CurrentCell);
-                    }
-                }
-            }
-        }
-
         private void UpdateTitle()
         {
-            Title = $@"{I18N.GetString(@"ServerLog")}({(_controller.GetCurrentConfiguration().shareOverLan ? I18N.GetString(@"Any") : I18N.GetString(@"Local"))}:{_controller.GetCurrentConfiguration().localPort} {I18N.GetString(@"Version")}{UpdateChecker.FullVersion})";
-        }
-
-        private void LoadLanguage()
-        {
-            ControlMenuItem.Header = I18N.GetString(@"_Control");
-            DisconnectDirectMenuItem.Header = I18N.GetString(@"_Disconnect direct connections");
-            DisconnectAllMenuItem.Header = I18N.GetString(@"Disconnect _All");
-            ClearMaxMenuItem.Header = I18N.GetString(@"Clear _MaxSpeed");
-            ClearAllMenuItem.Header = I18N.GetString(@"_Clear");
-            ClearSelectedTotalMenuItem.Header = I18N.GetString(@"Clear _Selected Total");
-            ClearTotalMenuItem.Header = I18N.GetString(@"Clear _Total");
-
-            OutMenuItem.Header = I18N.GetString(@"Port _out");
-            CopyCurrentLinkMenuItem.Header = I18N.GetString(@"Copy current link");
-            CopyCurrentGroupLinksMenuItem.Header = I18N.GetString(@"Copy current group links");
-            CopyAllEnableLinksMenuItem.Header = I18N.GetString(@"Copy all enable links");
-            CopyAllLinksMenuItem.Header = I18N.GetString(@"Copy all links");
-
-            WindowMenuItem.Header = I18N.GetString(@"_Window");
-            AutoSizeMenuItem.Header = I18N.GetString(@"Auto _size");
-            AlwaysTopMenuItem.Header = I18N.GetString(@"Always On _Top");
-
-            foreach (var column in ServerDataGrid.Columns)
-            {
-                column.Header = I18N.GetString(column.Header as string);
-            }
+            Title = $@"{this.GetWindowStringValue(@"Title")}({(_controller.GetCurrentConfiguration().shareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{_controller.GetCurrentConfiguration().localPort} {this.GetWindowStringValue(@"Version")}{UpdateChecker.FullVersion})";
         }
 
         private void AlwaysTopMenuItem_OnClick(object sender, RoutedEventArgs e)
@@ -196,10 +104,11 @@ namespace Shadowsocks.View
 
         private void AutoSizeMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            foreach (var column in ServerDataGrid.Columns)
+            foreach (var column in ServerDataGrid.Columns.Where(column => !double.IsNaN(column.Width)))
             {
-                column.Width = new DataGridLength(1, DataGridLengthUnitType.Auto);
+                column.Width = double.NaN;
             }
+            ServerDataGrid.GridColumnSizer.Refresh();
             SizeToContent = SizeToContent.Width;
         }
 
@@ -292,19 +201,140 @@ namespace Shadowsocks.View
             Clipboard.SetDataObject(link);
         }
 
-        private void ServerLogWindow_OnStateChanged(object sender, EventArgs e)
+        private void ServerDataGrid_OnCellTapped(object sender, GridCellTappedEventArgs e)
         {
-            if (ServerDataGrid.SelectedCells.Count > 0 && ServerDataGrid.SelectedCells[0].Column != null)
+            if (e.ChangedButton != MouseButton.Left)
             {
-                if (ServerDataGrid.SelectedCells[0].Item is Server serverObject)
+                return;
+            }
+
+            if (ServerDataGrid.CurrentColumn != null && ServerDataGrid.SelectedItem is Server server)
+            {
+                var index = server.Index - 1;
+                var mappingName = ServerDataGrid.CurrentColumn.MappingName;
+                if (mappingName == Resources[@"ServerMappingName"].ToString())
                 {
-                    ServerDataGrid.ScrollIntoView(serverObject, ServerColumn);
-                    return;
+                    var config = _controller.GetCurrentConfiguration();
+                    Console.WriteLine($@"config.checkSwitchAutoCloseAll:{config.checkSwitchAutoCloseAll}");
+                    if (config.checkSwitchAutoCloseAll)
+                    {
+                        _controller.DisconnectAllConnections();
+                    }
+                    _controller.SelectServerIndex(index);
+                }
+                else if (mappingName == Resources[@"GroupMappingName"].ToString())
+                {
+                    var group = server.Group;
+                    if (!string.IsNullOrEmpty(group))
+                    {
+                        var enable = !server.Enable;
+                        foreach (var sameGroupServer in ServerLogViewModel.ServersCollection)
+                        {
+                            if (sameGroupServer.Group == group)
+                            {
+                                sameGroupServer.Enable = enable;
+                            }
+                        }
+                        _controller.Save();
+                    }
                 }
             }
-            if (ServerLogViewModel.SelectedServer != null)
+        }
+
+        private void ServerDataGrid_OnCellDoubleTapped(object sender, GridCellDoubleTappedEventArgs e)
+        {
+            if (e.ChangedButton != MouseButton.Left)
             {
-                ServerDataGrid.ScrollIntoView(ServerLogViewModel.SelectedServer, ServerColumn);
+                return;
+            }
+
+            if (ServerDataGrid.CurrentColumn != null && ServerDataGrid.SelectedItem is Server server)
+            {
+                var index = server.Index - 1;
+                var mappingName = ServerDataGrid.CurrentColumn.MappingName;
+                if (mappingName == Resources[@"IndexMappingName"].ToString())
+                {
+                    _controller.ShowConfigForm(index);
+                }
+                else if (mappingName == Resources[@"ConnectingMappingName"].ToString())
+                {
+                    server.GetConnections().CloseAll();
+                }
+                else if (mappingName == Resources[@"MaxDownSpeedMappingName"].ToString()
+                        || mappingName == Resources[@"MaxUpSpeedMappingName"].ToString())
+                {
+                    server.SpeedLog.ClearMaxSpeed();
+                }
+                else if (mappingName == Resources[@"TotalDownloadBytesMappingName"].ToString()
+                         || mappingName == Resources[@"TotalUploadBytesMappingName"].ToString())
+                {
+                    server.SpeedLog.ClearTrans();
+                }
+                else if (mappingName == Resources[@"TotalDownloadRawBytesMappingName"].ToString())
+                {
+                    server.SpeedLog.Clear();
+                    server.Enable = true;
+                }
+                else if (mappingName == Resources[@"ConnectErrorMappingName"].ToString()
+                         || mappingName == Resources[@"ErrorTimeoutTimesMappingName"].ToString()
+                         || mappingName == Resources[@"ErrorEmptyTimesMappingName"].ToString()
+                         || mappingName == Resources[@"ErrorContinuousTimesMappingName"].ToString()
+                         || mappingName == Resources[@"ErrorPercentMappingName"].ToString())
+                {
+                    server.SpeedLog.ClearError();
+                    server.Enable = true;
+                }
+                else
+                {
+                    ServerDataGrid.ClearSelections(false);
+                    ServerDataGrid.SelectCell(server, ServerDataGrid.Columns[0]);
+                }
+            }
+        }
+
+        private void ServerDataGrid_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var visualContainer = ServerDataGrid.GetVisualContainer();
+            var rowColumnIndex = visualContainer.PointToCellRowColumnIndex(e.GetPosition(visualContainer));
+            if (rowColumnIndex.IsEmpty)
+                return;
+
+            var columnIndex = ServerDataGrid.ResolveToGridVisibleColumnIndex(rowColumnIndex.ColumnIndex);
+            if (columnIndex != -1)
+                return;
+
+            var recordIndex = ServerDataGrid.ResolveToRecordIndex(rowColumnIndex.RowIndex);
+            if (recordIndex == -1)
+            {
+                const string columnName = @"Enable";
+                var sortColumnDescription = ServerDataGrid.SortColumnDescriptions.FirstOrDefault(col => col.ColumnName == columnName);
+                if (sortColumnDescription != null)
+                {
+                    sortColumnDescription.SortDirection = sortColumnDescription.SortDirection == ListSortDirection.Ascending ? ListSortDirection.Descending : ListSortDirection.Ascending;
+                    ServerDataGrid.SortColumnDescriptions.Remove(sortColumnDescription);
+                }
+                else
+                {
+                    sortColumnDescription = new SortColumnDescription
+                    {
+                        ColumnName = columnName,
+                        SortDirection = ListSortDirection.Ascending
+                    };
+                }
+                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                {
+                }
+                else
+                {
+                    ServerDataGrid.SortColumnDescriptions.Clear();
+                }
+                ServerDataGrid.SortColumnDescriptions.Add(sortColumnDescription);
+            }
+            else
+            {
+                var server = ServerLogViewModel.ServersCollection[recordIndex];
+                server.Enable = !server.Enable;
+                _controller.Save();
             }
         }
     }

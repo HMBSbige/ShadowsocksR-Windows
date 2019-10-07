@@ -76,9 +76,6 @@
     <sys:String x:Key="PortReserved">連接埠號碼 {0} 由系統保留</sys:String>
     <sys:String x:Key="PortOutOfRange">連接埠超出範圍</sys:String>
 
-    <sys:String x:Key="Enabled">已啟用</sys:String>
-    <sys:String x:Key="Disabled">已停用</sys:String>
-
     <sys:String x:Key="ControllerError">ShadowsocksR Error: {0}</sys:String>
 
     <sys:String x:Key="Colon" xml:space="preserve">：</sys:String>
@@ -109,4 +106,7 @@
     <sys:String x:Key="UpdateSubscribeFailure">伺服器訂閱 {0} 更新失敗</sys:String>
 
     <sys:String x:Key="QrCodeNotFound">未發現 QR 碼，嘗試把它放大或移動到靠近屏幕中間的位置</sys:String>
+
+    <sys:String x:Key="EmptySubtag">【不屬於任何訂閱】</sys:String>
+    <sys:String x:Key="EmptyGroup">【空群組名】</sys:String>
 </ResourceDictionary>
