@@ -8,7 +8,9 @@
         mc:Ignorable="d"
         x:Name="Cw" 
         Title="ConfigWindow" Height="560" Width="800" WindowStartupLocation="CenterScreen"
-        Loaded="Window_Loaded">
+        Loaded="Window_Loaded"
+        Activated="ConfigWindow_OnActivated"
+        >
 
     <Window.Resources>
         <ResourceDictionary>
