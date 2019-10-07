@@ -237,11 +237,6 @@ namespace Shadowsocks.View
                         _controller.Save();
                     }
                 }
-                else
-                {
-                    ServerDataGrid.ClearSelections(false);
-                    ServerDataGrid.SelectCell(server, ServerDataGrid.Columns[0]);
-                }
             }
         }
 

@@ -155,7 +155,7 @@ namespace Shadowsocks.View
 
         public void MoveToSelectedItem(int index)
         {
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() =>
             {
                 if (index >= 0 && index < _modifiedConfiguration.configs.Count)
                 {
@@ -450,8 +450,22 @@ namespace Shadowsocks.View
 
         private bool SaveConfig()
         {
+            string oldServerId = null;
+            if (_modifiedConfiguration.index >= 0 && _modifiedConfiguration.index < _modifiedConfiguration.configs.Count)
+            {
+                oldServerId = _modifiedConfiguration.configs[_modifiedConfiguration.index].Id;
+            }
             _modifiedConfiguration.configs.Clear();
             _modifiedConfiguration.configs.AddRange(ServerViewModel.ServerTreeViewModelToList(ServerViewModel.ServersTreeViewCollection));
+            if (oldServerId != null)
+            {
+                var currentIndex = _modifiedConfiguration.configs.FindIndex(server => server.Id == oldServerId);
+                if (currentIndex != -1)
+                {
+                    _modifiedConfiguration.index = currentIndex;
+                }
+            }
+
             if (_modifiedConfiguration.configs.Count == 0)
             {
                 MessageBox.Show(this.GetWindowStringValue(@"NoServer"));

@@ -89,7 +89,7 @@
                                    ShowRowHeader="True"
 
                                    EnableDataVirtualization="True"
-                                   ScrollMode="Async" CanMaintainScrollPosition="True"
+                                   ScrollMode="None" CanMaintainScrollPosition="True"
                                    CellTapped="ServerDataGrid_OnCellTapped"
                                    CellDoubleTapped="ServerDataGrid_OnCellDoubleTapped"
                                    MouseLeftButtonUp="ServerDataGrid_OnMouseLeftButtonUp"

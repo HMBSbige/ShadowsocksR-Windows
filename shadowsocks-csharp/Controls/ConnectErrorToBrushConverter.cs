@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Shadowsocks.Util;
+using System;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Controls
 {
@@ -10,7 +10,7 @@ namespace Shadowsocks.Controls
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is long bytes)
+            if (value is long bytes && bytes > 0)
             {
                 return new SolidColorBrush(ColorConvert.GetConnectErrorColor(bytes));
             }
