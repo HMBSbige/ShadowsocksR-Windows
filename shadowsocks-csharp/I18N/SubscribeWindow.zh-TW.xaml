@@ -3,7 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <sys:String x:Key="ResourceDictionaryName">zh-TW</sys:String>
 
-    <sys:String x:Key="Title">訂閱設置</sys:String>
+    <sys:String x:Key="Title">訂閱設定</sys:String>
 
     <sys:String x:Key="Ok">確定</sys:String>
     <sys:String x:Key="Cancel">取消</sys:String>

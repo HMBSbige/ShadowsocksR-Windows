@@ -4,8 +4,8 @@
     <sys:String x:Key="ResourceDictionaryName">zh-TW</sys:String>
 
     <sys:String x:Key="Title">伺服器記錄</sys:String>
-    <sys:String x:Key="Any">任意地址</sys:String>
-    <sys:String x:Key="Local">本機地址</sys:String>
+    <sys:String x:Key="Any">任意位址</sys:String>
+    <sys:String x:Key="Local">本機位址</sys:String>
     <sys:String x:Key="Version">版本</sys:String>
 
     <sys:String x:Key="Control">操作(_C)</sys:String>
@@ -16,15 +16,15 @@
     <sys:String x:Key="ClearSelectedTotal">清空選中節點歷史流量(_S)</sys:String>
     <sys:String x:Key="ClearTotal">清空所有歷史流量(_T)</sys:String>
 
-    <sys:String x:Key="PortOut">導出(_O)</sys:String>
+    <sys:String x:Key="PortOut">匯出(_O)</sys:String>
     <sys:String x:Key="CopyCurrentLink">複製選中連結</sys:String>
     <sys:String x:Key="CopyCurrentGroupLinks">複製選中組連結</sys:String>
     <sys:String x:Key="CopyAllEnableLinks">複製所有開啟節點連結</sys:String>
     <sys:String x:Key="CopyAllLinks">複製所有節點連結</sys:String>
 
-    <sys:String x:Key="Window">窗口(_W)</sys:String>
+    <sys:String x:Key="Window">視窗(_W)</sys:String>
     <sys:String x:Key="AutoSize">自動調整大小(_S)</sys:String>
-    <sys:String x:Key="AlwaysOnTop">窗口置頂(_T)</sys:String>
+    <sys:String x:Key="AlwaysOnTop">視窗置頂(_T)</sys:String>
 
     <sys:String x:Key="Index">Id</sys:String>
     <sys:String x:Key="Group">群組名</sys:String>

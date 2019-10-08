@@ -9,13 +9,13 @@
     <sys:String x:Key="Collapse">折疊</sys:String>
 
     <sys:String x:Key="Title">編輯伺服器</sys:String>
-    <sys:String x:Key="Any">任意地址</sys:String>
-    <sys:String x:Key="Local">本機地址</sys:String>
+    <sys:String x:Key="Any">任意位址</sys:String>
+    <sys:String x:Key="Local">本機位址</sys:String>
     <sys:String x:Key="Version">版本</sys:String>
 
     <sys:String x:Key="Server">伺服器</sys:String>
     <sys:String x:Key="ServerIp">伺服器 IP</sys:String>
-    <sys:String x:Key="ServerPort">伺服器連接埠</sys:String>
+    <sys:String x:Key="ServerPort">伺服器通訊埠</sys:String>
     <sys:String x:Key="Password">密碼</sys:String>
     <sys:String x:Key="Encryption">加密</sys:String>
     <sys:String x:Key="Protocol">協議</sys:String>
@@ -26,8 +26,8 @@
     <sys:String x:Key="Group">群組名</sys:String>
     <sys:String x:Key="SsrLink">SSR連結</sys:String>
     <sys:String x:Key="AdvSetting">高級選項</sys:String>
-    <sys:String x:Key="AdvSettingDescription">以下選項不是所有伺服器都支持</sys:String>
-    <sys:String x:Key="UdpPort">UDP連接埠</sys:String>
+    <sys:String x:Key="AdvSettingDescription">以下選項不是所有伺服器都支援</sys:String>
+    <sys:String x:Key="UdpPort">UDP通訊埠</sys:String>
     <sys:String x:Key="UdpOverTcp">UDP over TCP</sys:String>
     <sys:String x:Key="UdpOverTcpCheckBox">不打勾使用原生 UDP</sys:String>
 
