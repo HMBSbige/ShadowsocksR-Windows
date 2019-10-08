@@ -7,7 +7,7 @@ using System.Net;
 
 namespace Shadowsocks.Controller.HttpRequest
 {
-    public class UpdateChecker
+    public class UpdateChecker : HttpRequest
     {
         private const string Owner = @"HMBSbige";
         private const string Repo = @"ShadowsocksR-Windows";
@@ -20,8 +20,6 @@ namespace Shadowsocks.Controller.HttpRequest
         public event EventHandler NewVersionFound;
         public event EventHandler NewVersionFoundFailed;
         public event EventHandler NewVersionNotFound;
-        public event EventHandler BeforeCheckVersion;
-        public event EventHandler AfterCheckVersion;
 
         public const string Name = @"ShadowsocksR";
         public const string Copyright = @"Copyright © HMBSbige 2019 & BreakWa11 2017. Fork from Shadowsocks by clowwindy";
@@ -62,9 +60,13 @@ namespace Shadowsocks.Controller.HttpRequest
         {
             try
             {
-                BeforeCheckVersion?.Invoke(this, new EventArgs());
                 var updater = new GitHubRelease.GitHubRelease(Owner, Repo);
-                var json = await updater.GetAllReleaseAsync(CreateProxy(config));
+                var url = updater.AllReleaseUrl;
+                var userAgent = config.proxyUserAgent;
+                var proxy = CreateProxy(config);
+
+                var json = await AutoGetAsync(url, proxy, userAgent, config.connectTimeout * 1000);
+
                 var releases = JsonConvert.DeserializeObject<List<Release>>(json);
                 var latestRelease = VersionUtil.GetLatestRelease(releases, config.isPreRelease);
                 if (VersionUtil.CompareVersion(latestRelease.tag_name, Version) > 0)
@@ -90,10 +92,6 @@ namespace Shadowsocks.Controller.HttpRequest
                 {
                     NewVersionFoundFailed?.Invoke(this, new EventArgs());
                 }
-            }
-            finally
-            {
-                AfterCheckVersion?.Invoke(this, new EventArgs());
             }
         }
     }

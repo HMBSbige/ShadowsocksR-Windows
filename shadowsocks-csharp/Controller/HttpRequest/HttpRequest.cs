@@ -11,7 +11,7 @@ namespace Shadowsocks.Controller.HttpRequest
         private const int DefaultGetTimeout = 30000;
         private const int DefaultHeadTimeout = 4000;
 
-        protected static async Task<string> GetAsync(string url, IWebProxy proxy, string userAgent = @"", double timeout = DefaultGetTimeout)
+        private static async Task<string> GetAsync(string url, IWebProxy proxy, string userAgent = @"", double timeout = DefaultGetTimeout)
         {
             var httpClientHandler = new HttpClientHandler
             {
@@ -32,7 +32,7 @@ namespace Shadowsocks.Controller.HttpRequest
             return resultStr;
         }
 
-        protected static async Task<bool> HeadAsync(string url, IWebProxy proxy, double timeout = DefaultHeadTimeout)
+        private static async Task<bool> HeadAsync(string url, IWebProxy proxy, double timeout = DefaultHeadTimeout)
         {
             var httpClientHandler = new HttpClientHandler
             {
@@ -58,6 +58,22 @@ namespace Shadowsocks.Controller.HttpRequest
             {
                 response?.Dispose();
             }
+        }
+
+        protected static async Task<string> AutoGetAsync(string url, IWebProxy proxy, string userAgent = @"", double headTimeout = DefaultHeadTimeout, double getTimeout = DefaultGetTimeout)
+        {
+            string res;
+            if (await HeadAsync(url, proxy, headTimeout))
+            {
+                Logging.Info($@"GET request by proxy: {url}");
+                res = await GetAsync(url, proxy, userAgent, getTimeout);
+            }
+            else
+            {
+                Logging.Info($@"GET request directly: {url}");
+                res = await GetAsync(url, null, userAgent, getTimeout);
+            }
+            return res;
         }
     }
 }
