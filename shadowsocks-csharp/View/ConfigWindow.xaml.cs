@@ -555,5 +555,10 @@ namespace Shadowsocks.View
         }
 
         #endregion
+
+        private void ConfigWindow_OnActivated(object sender, EventArgs e)
+        {
+            Topmost = false;
+        }
     }
 }

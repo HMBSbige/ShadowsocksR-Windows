@@ -77,10 +77,6 @@ namespace Shadowsocks.View
                 {
                     ServerDataGrid.ScrollInView(new RowColumnIndex(ServerLogViewModel.SelectedServer.Index, 2));
                 }
-
-                //Refreshing auto size calculation
-                ServerDataGrid.GridColumnSizer.ResetAutoCalculationforAllColumns();
-                ServerDataGrid.GridColumnSizer.Refresh();
             }));
         }
 
@@ -104,6 +100,9 @@ namespace Shadowsocks.View
 
         private void AutoSizeMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
+            //Refreshing auto size calculation
+            ServerDataGrid.GridColumnSizer.ResetAutoCalculationforAllColumns();
+            ServerDataGrid.GridColumnSizer.Refresh();
             foreach (var column in ServerDataGrid.Columns.Where(column => !double.IsNaN(column.Width)))
             {
                 column.Width = double.NaN;

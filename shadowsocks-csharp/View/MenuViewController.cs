@@ -817,6 +817,7 @@ namespace Shadowsocks.View
                 {
                     _configWindow.WindowState = WindowState.Normal;
                 }
+                _configWindow.Topmost = true;
                 _configWindow.MoveToSelectedItem(index);
             }
             else
@@ -825,7 +826,7 @@ namespace Shadowsocks.View
                 _configWindow = new ConfigWindow(controller, index);
                 _configWindow.Show();
                 _configWindow.Activate();
-                _configWindow.BringToFront();
+                _configWindow.Topmost = true;
                 _configWindow.Closed += ConfigWindow_Closed;
             }
         }
