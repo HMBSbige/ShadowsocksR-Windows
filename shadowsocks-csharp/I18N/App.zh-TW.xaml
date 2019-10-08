@@ -6,7 +6,7 @@
     <sys:String x:Key="Mode">系統代理模式</sys:String>
     <sys:String x:Key="DisableProxy">直連模式</sys:String>
     <sys:String x:Key="PacProxy">PAC 模式</sys:String>
-    <sys:String x:Key="GlobalProxy">全局模式</sys:String>
+    <sys:String x:Key="GlobalProxy">全域模式</sys:String>
     <sys:String x:Key="NoProxy">保持當前狀態不修改</sys:String>
 
     <sys:String x:Key="Pac">PAC</sys:String>
@@ -16,44 +16,44 @@
     <sys:String x:Key="UpdateGfwList">更新PAC為GFWList</sys:String>
     <sys:String x:Key="UpdateChnOnlyPac">更新PAC為僅通過大陸常見域名（國外訪問大陸）</sys:String>
     <sys:String x:Key="CopyPacUrl">複製 PAC URL</sys:String>
-    <sys:String x:Key="EditPacFile">編輯本地 PAC 文件...</sys:String>
-    <sys:String x:Key="EditGfwListUserRule">編輯 GFWList 的用戶規則...</sys:String>
+    <sys:String x:Key="EditPacFile">編輯本地 PAC 檔...</sys:String>
+    <sys:String x:Key="EditGfwListUserRule">編輯 GFWList 的使用者規則...</sys:String>
 
     <sys:String x:Key="ProxyRule">代理規則</sys:String>
     <sys:String x:Key="BypassLan">繞過區域網路</sys:String>
     <sys:String x:Key="BypassLanChina">繞過區域網路和大陸</sys:String>
     <sys:String x:Key="BypassLanNotChina">繞過區域網路和非大陸</sys:String>
-    <sys:String x:Key="UserCustom">用戶自定義</sys:String>
-    <sys:String x:Key="DisableBypass">全局</sys:String>
+    <sys:String x:Key="UserCustom">使用者自訂</sys:String>
+    <sys:String x:Key="DisableBypass">全域</sys:String>
 
     <sys:String x:Key="Servers">伺服器</sys:String>
     <sys:String x:Key="EditServers">編輯伺服器...</sys:String>
-    <sys:String x:Key="ImportServers">從文件導入伺服器...</sys:String>
+    <sys:String x:Key="ImportServers">自檔案匯入伺服器...</sys:String>
     <sys:String x:Key="LoadBalance">伺服器負載均衡</sys:String>
     <sys:String x:Key="SameHostForSameAddress">優先相同節點連接同一位址</sys:String>
     <sys:String x:Key="ServerStatistic">伺服器連接統計...</sys:String>
     <sys:String x:Key="DisconnectCurrent">斷開當前所有連接</sys:String>
 
     <sys:String x:Key="ServersSubscribe">伺服器訂閱</sys:String>
-    <sys:String x:Key="SubscribeSetting">伺服器訂閱設置...</sys:String>
+    <sys:String x:Key="SubscribeSetting">伺服器訂閱設定...</sys:String>
     <sys:String x:Key="UpdateSubscribeSsrNode">更新伺服器訂閱</sys:String>
 
-    <sys:String x:Key="GlobalSettings">選項設置...</sys:String>
-    <sys:String x:Key="PortSettings">連接埠設置...</sys:String>
+    <sys:String x:Key="GlobalSettings">選項設定...</sys:String>
+    <sys:String x:Key="PortSettings">通訊埠設定...</sys:String>
     <sys:String x:Key="ShowLogs">顯示日誌...</sys:String>
     <sys:String x:Key="UpdateAvailable">可用更新</sys:String>
     <sys:String x:Key="ScanQrCode">QR 碼掃描...</sys:String>
-    <sys:String x:Key="ImportSsrLinksFromClipboard">剪貼板批量導入連結...</sys:String>
+    <sys:String x:Key="ImportSsrLinksFromClipboard">剪貼板批量匯入連結...</sys:String>
 
     <sys:String x:Key="Help">幫助</sys:String>
     <sys:String x:Key="Update">更新...</sys:String>
     <sys:String x:Key="CheckUpdate">檢查更新</sys:String>
     <sys:String x:Key="AutoCheckUpdate">自動檢查更新</sys:String>
     <sys:String x:Key="AllowPreRelease">包括測試版更新</sys:String>
-    <sys:String x:Key="OpenWiki">打開Wiki文檔...</sys:String>
-    <sys:String x:Key="Feedback">問題反饋...</sys:String>
-    <sys:String x:Key="GenQrCode">自定義生成 QR 碼</sys:String>
-    <sys:String x:Key="ResetPassword">設置客戶端密碼...</sys:String>
+    <sys:String x:Key="OpenWiki">打開Wiki文件...</sys:String>
+    <sys:String x:Key="Feedback">問題回饋...</sys:String>
+    <sys:String x:Key="GenQrCode">自訂產生 QR 碼</sys:String>
+    <sys:String x:Key="ResetPassword">設定用戶端密碼...</sys:String>
     <sys:String x:Key="About">關於...</sys:String>
     <sys:String x:Key="Donate">捐助...</sys:String>
 
@@ -61,20 +61,20 @@
 
     <sys:String x:Key="NewVersionNotFound">沒有找到新版本</sys:String>
     <sys:String x:Key="NewVersionFound">{0} {1} 更新</sys:String>
-    <sys:String x:Key="ClickMenuToDownload">點擊菜單項下載</sys:String>
-    <sys:String x:Key="NewVersionAvailable">【點擊下載新版本 {0} {1}】</sys:String>
+    <sys:String x:Key="ClickMenuToDownload">點選選單項下載</sys:String>
+    <sys:String x:Key="NewVersionAvailable">【點選下載新版本 {0} {1}】</sys:String>
     <sys:String x:Key="NewVersionFoundFailed">檢查更新失敗</sys:String>
 
     <sys:String x:Key="UnexpectedError">Unexpected error, ShadowsocksR will exit.</sys:String>
-    <sys:String x:Key="SuccessiveInstancesMessage1">請在工作列裡尋找 ShadowsocksR 圖標。</sys:String>
+    <sys:String x:Key="SuccessiveInstancesMessage1">請在工作列裡尋找 ShadowsocksR 圖示。</sys:String>
     <sys:String x:Key="SuccessiveInstancesMessage2">如果想啟動多份，可以另外複製一份到別的目錄。</sys:String>
-    <sys:String x:Key="SuccessiveInstancesCaption">ShadowsocksR 已經在運行</sys:String>
+    <sys:String x:Key="SuccessiveInstancesCaption">ShadowsocksR 已經在執行</sys:String>
 
     <sys:String x:Key="NewServer">未配置的伺服器</sys:String>
 
-    <sys:String x:Key="PortInUse">連接埠號碼 {0} 已被使用</sys:String>
-    <sys:String x:Key="PortReserved">連接埠號碼 {0} 由系統保留</sys:String>
-    <sys:String x:Key="PortOutOfRange">連接埠超出範圍</sys:String>
+    <sys:String x:Key="PortInUse">通訊埠 {0} 已被使用</sys:String>
+    <sys:String x:Key="PortReserved">通訊埠 {0} 由系統保留</sys:String>
+    <sys:String x:Key="PortOutOfRange">通訊埠超出範圍</sys:String>
 
     <sys:String x:Key="ControllerError">ShadowsocksR Error: {0}</sys:String>
 
@@ -91,9 +91,9 @@
     <sys:String x:Key="BalanceInGroup">所選組切換</sys:String>
     <sys:String x:Key="AutoBan">自動禁用出錯伺服器</sys:String>
 
-    <sys:String x:Key="RunningPort">正在運行：連接埠 {0}</sys:String>
+    <sys:String x:Key="RunningPort">正在執行：通訊埠 {0}</sys:String>
 
-    <sys:String x:Key="UpdatePacFailed">更新 PAC 文件失敗</sys:String>
+    <sys:String x:Key="UpdatePacFailed">更新 PAC 檔失敗</sys:String>
     <sys:String x:Key="GfwListPacUpdated">更新 GFWList PAC 成功</sys:String>
     <sys:String x:Key="PacUpdated">更新 PAC 成功</sys:String>
     <sys:String x:Key="GfwListPacNotFound">未發現更新。如有問題請提交給 GFWList</sys:String>
@@ -105,7 +105,7 @@
     <sys:String x:Key="UpdateSubscribeSuccess">伺服器訂閱 {0} 更新成功</sys:String>
     <sys:String x:Key="UpdateSubscribeFailure">伺服器訂閱 {0} 更新失敗</sys:String>
 
-    <sys:String x:Key="QrCodeNotFound">未發現 QR 碼，嘗試把它放大或移動到靠近屏幕中間的位置</sys:String>
+    <sys:String x:Key="QrCodeNotFound">未發現 QR 碼，嘗試把它放大或移動到靠近螢幕中間的位置</sys:String>
 
     <sys:String x:Key="EmptySubtag">【不屬於任何訂閱】</sys:String>
     <sys:String x:Key="EmptyGroup">【空群組名】</sys:String>

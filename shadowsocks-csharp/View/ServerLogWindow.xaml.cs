@@ -3,6 +3,7 @@ using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
+using Syncfusion.Data;
 using Syncfusion.UI.Xaml.Grid;
 using Syncfusion.UI.Xaml.Grid.Helpers;
 using Syncfusion.UI.Xaml.ScrollAxis;
@@ -331,9 +332,14 @@ namespace Shadowsocks.View
             }
             else
             {
-                var server = ServerLogViewModel.ServersCollection[recordIndex];
-                server.Enable = !server.Enable;
-                _controller.Save();
+                var entry = ServerDataGrid.View.GroupDescriptions.Count == 0
+                        ? ServerDataGrid.View.Records[recordIndex]
+                        : ServerDataGrid.View.TopLevelGroup.DisplayElements[recordIndex];
+                if (entry.IsRecords && entry is RecordEntry recordEntry && recordEntry.Data is Server server)
+                {
+                    server.Enable = !server.Enable;
+                    _controller.Save();
+                }
             }
         }
     }
