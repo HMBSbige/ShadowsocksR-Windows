@@ -30,7 +30,7 @@
             <DataTemplate x:Key="ListBoxTemplate" DataType="model:ServerSubscribe">
                 <StackPanel Margin="3">
                     <DockPanel>
-                        <TextBlock Text="{Binding Group}" Foreground="Green" FontWeight="Bold" />
+                        <TextBlock Text="{Binding Tag}" Foreground="Green" FontWeight="Bold" />
                     </DockPanel>
                     <DockPanel>
                         <TextBlock FontWeight="Bold" Text="{Binding Url}" Foreground="DarkOrange"
@@ -84,7 +84,7 @@
                 <TextBox Grid.Row="0" Grid.Column="1"
                 Text="{Binding SelectedServer.Url,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBox Grid.Row="1" Grid.Column="1"
-                Text="{Binding SelectedServer.Group,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                Text="{Binding SelectedServer.Tag,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBox Grid.Row="2" Grid.Column="1" IsReadOnly="True" Background="{StaticResource DisabledBackgroundBrush}"
                 Text="{Binding SelectedServer.LastUpdateTime,Converter={StaticResource UlongToDateTimeString},Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
                 <CheckBox Grid.Row="3" Grid.Column="1" Content="{DynamicResource AutoUpdate}" VerticalAlignment="Center" Margin="0,5,0,0" 

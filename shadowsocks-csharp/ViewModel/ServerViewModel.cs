@@ -73,7 +73,7 @@ namespace Shadowsocks.ViewModel
                     sub1.Nodes[0].Name = subTag;
                     sub1.Nodes[0].Type = ServerTreeViewType.Subtag;
                     sub1.Nodes[0].Parent = null;
-                    ServersTreeViewCollection.Add(sub1.Nodes.First());
+                    ServersTreeViewCollection.Add(sub1.Nodes[0]);
                 }
                 else
                 {
