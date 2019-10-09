@@ -39,7 +39,6 @@ namespace Shadowsocks.View
             else
             {
                 SizeToContent = SizeToContent.Manual;
-                WindowStartupLocation = WindowStartupLocation.Manual;
                 status.SetStatus(this);
             }
         }
