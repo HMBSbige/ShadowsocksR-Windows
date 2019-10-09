@@ -70,7 +70,7 @@ namespace Shadowsocks.View
         {
             _modifiedConfiguration.configs.RemoveAll(server =>
                     !string.IsNullOrEmpty(server.SubTag)
-                    && _modifiedConfiguration.serverSubscribes.All(subscribe => subscribe.Group != server.SubTag));
+                    && _modifiedConfiguration.serverSubscribes.All(subscribe => subscribe.Tag != server.SubTag));
         }
 
         private bool SaveConfig()
@@ -78,18 +78,18 @@ namespace Shadowsocks.View
             var remarks = new HashSet<string>();
             foreach (var serverSubscribe in SubscribeWindowViewModel.SubscribeCollection)
             {
-                if (remarks.Contains(serverSubscribe.Group))
+                if (remarks.Contains(serverSubscribe.Tag))
                 {
                     return false;
                 }
-                remarks.Add(serverSubscribe.Group);
+                remarks.Add(serverSubscribe.Tag);
             }
             _modifiedConfiguration.serverSubscribes.Clear();
             _modifiedConfiguration.serverSubscribes.AddRange(SubscribeWindowViewModel.SubscribeCollection);
 
             if (_modifiedConfiguration.configs.Any(server =>
             !string.IsNullOrEmpty(server.SubTag)
-            && _modifiedConfiguration.serverSubscribes.All(subscribe => subscribe.Group != server.SubTag)))
+            && _modifiedConfiguration.serverSubscribes.All(subscribe => subscribe.Tag != server.SubTag)))
             {
                 if (MessageBox.Show(this.GetWindowStringValue(@"SaveQuestion"),
                         UpdateChecker.Name, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes)
@@ -155,7 +155,7 @@ namespace Shadowsocks.View
             var index = ServerSubscribeListBox.SelectedIndex;
             if (ServerSubscribeListBox.SelectedItem is ServerSubscribe serverSubscribe)
             {
-                var tag = serverSubscribe.Group;
+                var tag = serverSubscribe.Tag;
                 _modifiedConfiguration.configs = _modifiedConfiguration.configs.Where(server => server.SubTag != tag).ToList();
                 SubscribeWindowViewModel.SubscribeCollection.Remove(serverSubscribe);
             }

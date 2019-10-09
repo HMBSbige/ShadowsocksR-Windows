@@ -440,11 +440,7 @@ namespace Shadowsocks.View
                 var urls = new List<string>();
                 _updateNodeChecker.FreeNodeResult = _updateNodeChecker.FreeNodeResult.TrimEnd('\r', '\n', ' ');
                 var config = controller.GetCurrentConfiguration();
-                Server selectedServer = null;
-                if (config.index >= 0 && config.index < config.configs.Count)
-                {
-                    selectedServer = config.configs[config.index];
-                }
+                var selectedServer = config.configs.ElementAtOrDefault(config.index);
                 try
                 {
                     _updateNodeChecker.FreeNodeResult = Base64.DecodeBase64(_updateNodeChecker.FreeNodeResult);
@@ -454,19 +450,13 @@ namespace Shadowsocks.View
                     _updateNodeChecker.FreeNodeResult = string.Empty;
                 }
                 Utils.URL_Split(_updateNodeChecker.FreeNodeResult, ref urls);
-                for (var i = urls.Count - 1; i >= 0; --i)
-                {
-                    if (!urls[i].StartsWith(@"ssr://"))
-                    {
-                        urls.RemoveAt(i);
-                    }
-                }
+                urls.RemoveAll(url => !url.StartsWith(@"ssr://"));
                 if (urls.Count > 0)
                 {
                     urls.Reverse();
 
-                    var curGroup = updateSubscribeManager.CurrentServerSubscribe.OriginGroup;
-                    if (string.IsNullOrWhiteSpace(curGroup))
+                    lastGroup = updateSubscribeManager.CurrentServerSubscribe.OriginTag;
+                    if (string.IsNullOrEmpty(lastGroup))
                     {
                         foreach (var url in urls)
                         {
@@ -475,15 +465,18 @@ namespace Shadowsocks.View
                                 var server = new Server(url, null);
                                 if (!string.IsNullOrEmpty(server.Group))
                                 {
-                                    var hasSameGroup = config.serverSubscribes.Any(subscribe => subscribe.Group == server.Group);
-                                    if (hasSameGroup)
+                                    if (config.serverSubscribes.Any(subscribe => subscribe.Tag == server.Group))
                                     {
                                         continue;
                                     }
 
-                                    foreach (var serverSubscribe in config.serverSubscribes.Where(serverSubscribe => serverSubscribe.Url == updateSubscribeManager.CurrentServerSubscribe.Url))
+                                    var serverSubscribe = config.serverSubscribes.Find(sub =>
+                                    sub.Url == updateSubscribeManager.CurrentServerSubscribe.Url
+                                    && string.IsNullOrEmpty(sub.OriginTag));
+
+                                    if (serverSubscribe != null)
                                     {
-                                        curGroup = serverSubscribe.Group = server.Group;
+                                        lastGroup = serverSubscribe.Tag = server.Group;
                                     }
 
                                     break;
@@ -495,24 +488,18 @@ namespace Shadowsocks.View
                             }
                         }
                     }
-                    if (string.IsNullOrWhiteSpace(curGroup))
+                    if (string.IsNullOrEmpty(lastGroup))
                     {
-                        curGroup = updateSubscribeManager.CurrentServerSubscribe.UrlMd5;
+                        lastGroup = updateSubscribeManager.CurrentServerSubscribe.UrlMd5;
                     }
 
-                    lastGroup = curGroup;
-
-                    // import all, find difference
-                    var oldServers = new List<Server>();
-                    var firstInsertIndex = config.configs.Count;
                     //Find old servers
-                    for (var i = config.configs.Count - 1; i >= 0; --i)
+                    var firstInsertIndex = config.configs.Count;
+                    var oldServers = config.configs.FindAll(server => server.SubTag == lastGroup);
+                    var index = config.configs.FindIndex(server => server.SubTag == lastGroup);
+                    if (index >= 0)
                     {
-                        if (lastGroup == config.configs[i].SubTag)
-                        {
-                            oldServers.Add(config.configs[i]);
-                            firstInsertIndex = i;
-                        }
+                        firstInsertIndex = index;
                     }
 
                     //Find new servers
@@ -521,7 +508,7 @@ namespace Shadowsocks.View
                     {
                         try
                         {
-                            var server = new Server(url, curGroup) { Index = firstInsertIndex++ };
+                            var server = new Server(url, lastGroup) { Index = firstInsertIndex++ };
                             newServers.Add(server);
                         }
                         catch
@@ -538,15 +525,8 @@ namespace Shadowsocks.View
                     //Remove servers
                     foreach (var server in removeServers)
                     {
-                        for (var i = config.configs.Count - 1; i >= 0; --i)
-                        {
-                            if (config.configs[i].Id == server.Id)
-                            {
-                                config.configs[i].GetConnections().CloseAll();
-                                config.configs.RemoveAt(i);
-                                break;
-                            }
-                        }
+                        server.GetConnections().CloseAll();
+                        config.configs.Remove(server);
                     }
 
                     //Add servers
@@ -560,39 +540,22 @@ namespace Shadowsocks.View
                     }
 
                     controller.SaveServersConfig(config);
+
                     //Set SelectedServer
                     config = controller.GetCurrentConfiguration();
+                    var selectedIndex = -1;
                     if (selectedServer != null)
                     {
-                        var match = false;
-                        for (var i = config.configs.Count - 1; i >= 0; --i)
-                        {
-                            if (config.configs[i].Id == selectedServer.Id)
-                            {
-                                config.index = i;
-                                match = true;
-                                break;
-                            }
-
-                            if (config.configs[i].SubTag == selectedServer.SubTag)
-                            {
-                                if (config.configs[i].IsMatchServer(selectedServer))
-                                {
-                                    config.index = i;
-                                    match = true;
-                                    break;
-                                }
-                            }
-                        }
-                        if (!match)
-                        {
-                            config.index = config.configs.Count - 1;
-                        }
+                        selectedIndex = config.configs.FindIndex(server =>
+                          server.Id == selectedServer.Id
+                          || server.SubTag == selectedServer.SubTag && server.IsMatchServer(selectedServer));
                     }
-                    else
+
+                    if (selectedServer == null || selectedIndex == -1)
                     {
                         config.index = config.configs.Count - 1;
                     }
+
                     //If Update Success
                     if (count > 0)
                     {
@@ -615,9 +578,9 @@ namespace Shadowsocks.View
             }
             else
             {
-                if (lastGroup == null)
+                if (string.IsNullOrEmpty(lastGroup))
                 {
-                    lastGroup = _updateNodeChecker.SubscribeTask.Group;
+                    lastGroup = _updateNodeChecker.SubscribeTask.Tag;
                 }
 
                 if (_updateNodeChecker.Notify)
@@ -751,7 +714,7 @@ namespace Shadowsocks.View
             {
                 if (pair.Key == defGroup)
                 {
-                    pair.Value.Header = @"(empty group)";
+                    pair.Value.Header = I18NUtil.GetAppStringValue(@"EmptyGroup");
                 }
 
                 if (pair.Key == selectGroup)
