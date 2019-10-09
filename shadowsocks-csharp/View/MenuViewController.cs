@@ -552,6 +552,10 @@ namespace Shadowsocks.View
                     //Add servers
                     foreach (var server in addServers)
                     {
+                        if (server.Index > config.configs.Count)
+                        {
+                            server.Index = config.configs.Count;
+                        }
                         config.configs.Insert(server.Index, server);
                     }
 
