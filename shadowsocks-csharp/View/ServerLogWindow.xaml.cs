@@ -35,9 +35,11 @@ namespace Shadowsocks.View
                 SizeToContent = SizeToContent.Width;
                 Height = 600;
                 WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                ServerDataGrid.ShowBusyIndicator = false;
             }
             else
             {
+                ServerDataGrid.ShowBusyIndicator = true;
                 SizeToContent = SizeToContent.Manual;
                 status.SetStatus(this);
             }

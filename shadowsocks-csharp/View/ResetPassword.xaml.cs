@@ -1,6 +1,6 @@
-﻿using Shadowsocks.Controller;
-using Shadowsocks.Controller.HttpRequest;
+﻿using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Model;
+using Shadowsocks.Util;
 using System.Windows;
 using System.Windows.Input;
 
@@ -11,20 +11,8 @@ namespace Shadowsocks.View
         public ResetPassword()
         {
             InitializeComponent();
-            LoadLanguage();
+            I18NUtil.SetLanguage(Resources, @"ResetPassword");
             OldPassword.Focus();
-        }
-
-        private void LoadLanguage()
-        {
-            Title = I18N.GetString(@"ResetPassword");
-            OldPasswordLabel.Content = $@"{I18N.GetString(@"Old password")}{I18N.GetString(@": ")}";
-            OldPassword.ToolTip = I18N.GetString(@"Old password");
-            NewPassword1Label.Content = $@"{I18N.GetString(@"New password")}{I18N.GetString(@": ")}";
-            NewPassword1.ToolTip = I18N.GetString(@"New password");
-            NewPassword2Label.Content = $@"{I18N.GetString(@"Confirm new password")}{I18N.GetString(@": ")}";
-            NewPassword2.ToolTip = I18N.GetString(@"Confirm new password");
-            OkButton.Content = I18N.GetString(@"OK");
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -38,7 +26,7 @@ namespace Shadowsocks.View
             }
             else
             {
-                MessageBox.Show(I18N.GetString(@"Password NOT match"), I18N.GetString(UpdateChecker.Name), MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(this.GetWindowStringValue(@"PasswordMatchError"), UpdateChecker.Name, MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

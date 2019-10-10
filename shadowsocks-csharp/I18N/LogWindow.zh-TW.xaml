@@ -1,0 +1,17 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="ResourceDictionaryName">zh-TW</sys:String>
+
+    <sys:String x:Key="Title">Log Viewer</sys:String>
+
+    <sys:String x:Key="File">檔案(_F)</sys:String>
+    <sys:String x:Key="ClearLog">清空日誌(_L)</sys:String>
+    <sys:String x:Key="ShowInExplorer">在檔案總管中顯示(_E)</sys:String>
+    <sys:String x:Key="Close">關閉(_C)</sys:String>
+    <sys:String x:Key="View">視圖(_V)</sys:String>
+    <sys:String x:Key="Font">字型設定(_F)</sys:String>
+    <sys:String x:Key="WrapText">自動換行(_W)</sys:String>
+    <sys:String x:Key="AlwaysOnTop">置於頂層(_A)</sys:String>
+
+</ResourceDictionary>

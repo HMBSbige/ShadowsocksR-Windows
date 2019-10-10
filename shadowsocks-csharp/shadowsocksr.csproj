@@ -90,6 +90,24 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="I18N\ResetPassword.en-US.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\ResetPassword.zh-CN.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\ResetPassword.zh-TW.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\InputPasswordWindow.en-US.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\InputPasswordWindow.zh-CN.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\InputPasswordWindow.zh-TW.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="I18N\ServerLogWindow.en-US.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -97,6 +115,15 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="I18N\ServerLogWindow.zh-TW.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\LogWindow.en-US.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\LogWindow.zh-CN.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\LogWindow.zh-TW.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="I18N\SubscribeWindow.en-US.xaml">

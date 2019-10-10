@@ -8,19 +8,26 @@
         ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Closed="Window_Closed">
 
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../I18N/LogWindow.en-US.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid>
         <DockPanel>
-            <Menu DockPanel.Dock="Top" Background="White" Height="25">
-                <MenuItem x:Name="FileMenuItem" Header="_File" Height="25">
-                    <MenuItem x:Name="ClearLogMenuItem" Header="Clear _log" Click="ClearLogMenuItem_Click" />
-                    <MenuItem x:Name="ShowInExplorerMenuItem" Header="Show in _Explorer" Click="ShowInExplorerMenuItem_Click" />
+            <Menu DockPanel.Dock="Top" Background="White">
+                <MenuItem Header="{DynamicResource File}">
+                    <MenuItem Header="{DynamicResource ClearLog}" Click="ClearLogMenuItem_Click" />
+                    <MenuItem Header="{DynamicResource ShowInExplorer}" Click="ShowInExplorerMenuItem_Click" />
                     <Separator />
-                    <MenuItem x:Name="CloseMenuItem" Header="_Close" Click="CloseMenuItem_Click" />
+                    <MenuItem Header="{DynamicResource Close}" Click="CloseMenuItem_Click" />
                 </MenuItem>
-                <MenuItem x:Name="ViewMenuItem" Header="_View" Height="25">
-                    <MenuItem x:Name="FontMenuItem" Header="_Font..." Click="FontMenuItem_Click" />
-                    <MenuItem x:Name="WrapTextMenuItem" Header="_Wrap Text" Click="WrapTextMenuItem_Click" Checked="WrapTextMenuItem_Checked" Unchecked="WrapTextMenuItem_Checked" />
-                    <MenuItem x:Name="AlwaysOnTopMenuItem" Header="_Always on top" Click="AlwaysOnTopMenuItem_Click" Checked="AlwaysOnTopMenuItem_Checked" Unchecked="AlwaysOnTopMenuItem_Checked" />
+                <MenuItem Header="{DynamicResource View}">
+                    <MenuItem Header="{DynamicResource Font}" Click="FontMenuItem_Click" />
+                    <MenuItem x:Name="WrapTextMenuItem" Header="{DynamicResource WrapText}" Click="WrapTextMenuItem_Click" Checked="WrapTextMenuItem_Checked" Unchecked="WrapTextMenuItem_Checked" />
+                    <MenuItem x:Name="AlwaysOnTopMenuItem" Header="{DynamicResource AlwaysOnTop}" Click="AlwaysOnTopMenuItem_Click" Checked="AlwaysOnTopMenuItem_Checked" Unchecked="AlwaysOnTopMenuItem_Checked" />
                 </MenuItem>
             </Menu>
             <TextBox x:Name="LogTextBox"

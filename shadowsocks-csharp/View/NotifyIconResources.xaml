@@ -3,7 +3,7 @@
     <Style x:Key="TrayMenuItem" TargetType="MenuItem">
         <Setter Property="BorderThickness" Value="3"></Setter>
     </Style>
-    <ContextMenu x:Shared="false" x:Key="SysTrayMenu">
+    <ContextMenu x:Shared="False" x:Key="SysTrayMenu">
         <MenuItem x:Name="Mode" Style="{StaticResource TrayMenuItem}">
             <MenuItem x:Name="DisableProxy" Style="{StaticResource TrayMenuItem}" />
             <MenuItem x:Name="PacProxy" Style="{StaticResource TrayMenuItem}" />
