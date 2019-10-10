@@ -71,7 +71,7 @@ namespace Shadowsocks.View
             ServerLogViewModel.ReadConfig(_controller);
             ServerDataGrid.View?.EndInit();
 
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() =>
             {
                 if (isFirstLoad && ServerLogViewModel.SelectedServer != null)
                 {
