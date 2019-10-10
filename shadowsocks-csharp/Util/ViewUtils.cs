@@ -164,5 +164,20 @@ namespace Shadowsocks.Util
                 resources.MergedDictionaries.Add(langRd);
             }
         }
+
+        public static bool IsOnScreen(Window window)
+        {
+            return IsOnScreen(window.Left, window.Top)
+                || IsOnScreen(window.Left + window.Width, window.Top + window.Height);
+        }
+
+        public static bool IsOnScreen(double x, double y)
+        {
+            return
+                    SystemParameters.VirtualScreenLeft <= x &&
+                    SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth >= x &&
+                    SystemParameters.VirtualScreenTop <= y &&
+                    SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight >= y;
+        }
     }
 }

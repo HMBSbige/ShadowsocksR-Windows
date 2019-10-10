@@ -6,7 +6,7 @@
 
 #### Build
 
-[![](https://github.com/HMBSbige/ShadowsocksR-Windows/workflows/.NET%20Build/badge.svg)](https://github.com/HMBSbige/ShadowsocksR-Windows)
+[![](https://github.com/HMBSbige/ShadowsocksR-Windows/workflows/.NET%20Build/badge.svg)](https://github.com/HMBSbige/ShadowsocksR-Windows/actions)
 
 [![Build Status]][Appveyor]
 

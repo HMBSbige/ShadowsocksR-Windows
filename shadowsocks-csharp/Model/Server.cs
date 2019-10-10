@@ -73,10 +73,7 @@ namespace Shadowsocks.Model
         }
 
         [JsonIgnore]
-        public string GroupName => string.IsNullOrEmpty(Group) ? @"(empty group)" : Group;
-
-        [JsonIgnore]
-        public string RemarkName => string.IsNullOrEmpty(Remarks) ? @"(empty remark)" : Remarks;
+        public string GroupName => string.IsNullOrEmpty(Group) ? I18NUtil.GetAppStringValue(@"EmptyGroup") : Group;
 
         [JsonIgnore]
         public string Remarks
@@ -354,7 +351,6 @@ namespace Shadowsocks.Model
                     remarks_base64 = value;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(Remarks));
-                    OnPropertyChanged(nameof(RemarkName));
                     OnPropertyChanged(nameof(FriendlyName));
                 }
             }

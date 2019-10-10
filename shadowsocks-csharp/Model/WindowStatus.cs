@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using Shadowsocks.Util;
+using System.Windows;
 
 namespace Shadowsocks.Model
 {
@@ -35,6 +36,7 @@ namespace Shadowsocks.Model
             window.Left = Left;
             window.Top = Top;
             window.WindowState = State;
+            window.WindowStartupLocation = ViewUtils.IsOnScreen(window) ? WindowStartupLocation.Manual : WindowStartupLocation.CenterScreen;
         }
     }
 }
