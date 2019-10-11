@@ -467,7 +467,7 @@ namespace Shadowsocks.Model
             ObfsParam = @"";
             Password = @"0";
             Remarks_Base64 = @"";
-            Group = @"FreeSSR-public";
+            Group = @"Default Group";
             SubTag = @"";
             UdpOverTcp = false;
             Enable = true;
