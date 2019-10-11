@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Shadowsocks.Controller;
+using Shadowsocks.Util;
+using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using Shadowsocks.Controller;
 using WpfColorFontDialog;
 
 namespace Shadowsocks.View
@@ -13,7 +15,7 @@ namespace Shadowsocks.View
         public LogWindow()
         {
             InitializeComponent();
-            LoadLanguage();
+            I18NUtil.SetLanguage(Resources, @"LogWindow");
         }
 
         private const int MaxReadSize = 65536;
@@ -22,18 +24,7 @@ namespace Shadowsocks.View
         private string _currentLogFileName;
         private long _currentOffset;
 
-        private void LoadLanguage()
-        {
-            Title = I18N.GetString(@"Log Viewer");
-            FileMenuItem.Header = I18N.GetString(@"_File");
-            ClearLogMenuItem.Header = I18N.GetString(@"Clear _log");
-            ShowInExplorerMenuItem.Header = I18N.GetString(@"Show in _Explorer");
-            CloseMenuItem.Header = I18N.GetString(@"_Close");
-            ViewMenuItem.Header = I18N.GetString(@"_View");
-            FontMenuItem.Header = I18N.GetString(@"_Font...");
-            WrapTextMenuItem.Header = I18N.GetString(@"_Wrap Text");
-            AlwaysOnTopMenuItem.Header = I18N.GetString(@"_Always on top");
-        }
+        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
         private void ReadLog()
         {
@@ -66,7 +57,15 @@ namespace Shadowsocks.View
                 if (!string.IsNullOrEmpty(txt))
                 {
                     LogTextBox.AppendText(txt);
-                    LogTextBox.ScrollToEnd();
+
+                    if (LogTextBox.SelectionStart == 0 || LogTextBox.IsScrolledToEnd())
+                    {
+                        LogTextBox.ScrollToEnd();
+                    }
+                    else
+                    {
+                        LogTextBox.ScrollToLine(LogTextBox.GetLineIndexFromCharacterIndex(LogTextBox.SelectionStart));
+                    }
                 }
 
                 _currentOffset = reader.BaseStream.Position;
@@ -80,7 +79,7 @@ namespace Shadowsocks.View
 
             }
 
-            Title = $@"{I18N.GetString(@"Log Viewer")} {_currentLogFileName}";
+            Title = $@"{this.GetWindowStringValue(@"Title")} {_currentLogFileName}";
         }
 
         private void ClearLogMenuItem_Click(object sender, RoutedEventArgs e)
@@ -95,7 +94,7 @@ namespace Shadowsocks.View
             try
             {
                 var argument = $@"/n,/select,{Logging.LogFile}";
-                System.Diagnostics.Process.Start(@"explorer.exe", argument);
+                Process.Start(@"explorer.exe", argument);
             }
             catch (Exception e)
             {
@@ -107,8 +106,6 @@ namespace Shadowsocks.View
         {
             SyncLog(_cts);
         }
-
-        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
         private async void SyncLog(CancellationTokenSource cts)
         {

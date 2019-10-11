@@ -179,5 +179,10 @@ namespace Shadowsocks.Util
                     SystemParameters.VirtualScreenTop <= y &&
                     SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight >= y;
         }
+
+        public static bool IsScrolledToEnd(this TextBox textBox)
+        {
+            return Math.Abs(textBox.VerticalOffset + textBox.ViewportHeight - textBox.ExtentHeight) < 0.001;
+        }
     }
 }

@@ -15,13 +15,15 @@ namespace Shadowsocks.View
         public SettingsWindow(ShadowsocksController controller)
         {
             InitializeComponent();
+            I18NUtil.SetLanguage(Resources, @"SettingsWindow");
             Closed += (o, e) => { _controller.ConfigChanged -= controller_ConfigChanged; };
             _controller = controller;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs _)
         {
-            LoadLanguage();
+            UpdateTitle();
+            LoadItems();
             _controller.ConfigChanged += controller_ConfigChanged;
             foreach (var c in ViewUtils.FindVisualChildren<TextBox>(this))
             {
@@ -66,36 +68,14 @@ namespace Shadowsocks.View
 
         private void UpdateTitle()
         {
-            Title = $@"{I18N.GetString(@"Global Settings")}({(_controller.GetCurrentConfiguration().shareOverLan ? I18N.GetString(@"Any") : I18N.GetString(@"Local"))}:{_controller.GetCurrentConfiguration().localPort} {I18N.GetString(@"Version")}:{UpdateChecker.FullVersion})";
+            Title = $@"{this.GetWindowStringValue(@"Title")}({(_controller.GetCurrentConfiguration().shareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{_controller.GetCurrentConfiguration().localPort} {this.GetWindowStringValue(@"Version")}:{UpdateChecker.FullVersion})";
         }
 
-        private void LoadLanguage()
+        private void LoadItems()
         {
-            UpdateTitle();
-
-            foreach (var c in ViewUtils.FindVisualChildren<Label>(this))
-            {
-                c.Content = I18N.GetString(c.Content.ToString());
-            }
-
-            foreach (var c in ViewUtils.FindVisualChildren<Button>(this))
-            {
-                c.Content = I18N.GetString(c.Content.ToString());
-            }
-
-            foreach (var c in ViewUtils.FindVisualChildren<CheckBox>(this))
-            {
-                c.Content = I18N.GetString(c.Content.ToString());
-            }
-
-            foreach (var c in ViewUtils.FindVisualChildren<GroupBox>(this))
-            {
-                c.Header = I18N.GetString(c.Header.ToString());
-            }
-
-            ProxyTypeComboBox.Items.Add(I18N.GetString(@"Socks5(support UDP)"));
-            ProxyTypeComboBox.Items.Add(I18N.GetString(@"Http tunnel"));
-            ProxyTypeComboBox.Items.Add(I18N.GetString(@"TCP Port tunnel"));
+            ProxyTypeComboBox.Items.Add(this.GetWindowStringValue(@"Socks5"));
+            ProxyTypeComboBox.Items.Add(this.GetWindowStringValue(@"Http"));
+            ProxyTypeComboBox.Items.Add(this.GetWindowStringValue(@"TcpPortTunnel"));
             foreach (var value in Enum.GetValues(typeof(LoadBalance)))
             {
                 var str = value.ToString();
@@ -115,7 +95,7 @@ namespace Shadowsocks.View
 
                 if (AutoStartupCheckBox.IsChecked != AutoStartup.Check() && !AutoStartup.Set(AutoStartupCheckBox.IsChecked.GetValueOrDefault()))
                 {
-                    MessageBox.Show(I18N.GetString(@"Failed to update registry"));
+                    MessageBox.Show(this.GetWindowStringValue(@"FailAutoStartUp"));
                 }
 
                 _modifiedConfiguration.random = BalanceCheckBox.IsChecked.GetValueOrDefault();

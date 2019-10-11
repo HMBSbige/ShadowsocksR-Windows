@@ -19,6 +19,7 @@
     <sys:String x:Key="EditPacFile">Edit local PAC file...</sys:String>
     <sys:String x:Key="EditGfwListUserRule">Edit user rule for GFWList...</sys:String>
 
+    <sys:String x:Key="ProxySetting">Proxy setting</sys:String>
     <sys:String x:Key="ProxyRule">Proxy rule</sys:String>
     <sys:String x:Key="BypassLan">Bypass LAN</sys:String>
     <sys:String x:Key="BypassLanChina">Bypass LAN &amp;&amp; China</sys:String>
@@ -28,34 +29,33 @@
 
     <sys:String x:Key="Servers">Servers</sys:String>
     <sys:String x:Key="EditServers">Edit servers...</sys:String>
+    <sys:String x:Key="ScanQrCode">Scan QRCode from screen...</sys:String>
+    <sys:String x:Key="ImportSsrLinksFromClipboard">Import links from clipboard...</sys:String>
     <sys:String x:Key="ImportServers">Import servers from file...</sys:String>
     <sys:String x:Key="LoadBalance">Load balance</sys:String>
     <sys:String x:Key="SameHostForSameAddress">Same host for same address</sys:String>
     <sys:String x:Key="ServerStatistic">Server statistic...</sys:String>
     <sys:String x:Key="DisconnectCurrent">Disconnect current</sys:String>
 
-    <sys:String x:Key="ServersSubscribe">Servers Subscribe</sys:String>
-    <sys:String x:Key="SubscribeSetting">Subscribe setting...</sys:String>
-    <sys:String x:Key="UpdateSubscribeSsrNode">Update subscribe node</sys:String>
+    <sys:String x:Key="ServersSubscribe">Subscription</sys:String>
+    <sys:String x:Key="SubscribeSetting">Setting</sys:String>
+    <sys:String x:Key="UpdateSubscribeSsrNode">Update</sys:String>
 
-    <sys:String x:Key="GlobalSettings">Global settings...</sys:String>
-    <sys:String x:Key="PortSettings">Port settings...</sys:String>
     <sys:String x:Key="ShowLogs">Show logs...</sys:String>
     <sys:String x:Key="UpdateAvailable">Update available</sys:String>
-    <sys:String x:Key="ScanQrCode">Scan QRCode from screen...</sys:String>
-    <sys:String x:Key="ImportSsrLinksFromClipboard">Import links from clipboard...</sys:String>
 
-    <sys:String x:Key="Help">Help</sys:String>
+    <sys:String x:Key="More">More</sys:String>
+    <sys:String x:Key="GlobalSettings">Global settings...</sys:String>
+    <sys:String x:Key="PortSettings">Port settings...</sys:String>
+    <sys:String x:Key="OpenWiki">Open wiki...</sys:String>
+    <sys:String x:Key="Feedback">Feedback...</sys:String>
+    <sys:String x:Key="Donate">Donate...</sys:String>
+    <sys:String x:Key="GenQrCode">Gen custom QRCode...</sys:String>
+    <sys:String x:Key="ResetPassword">Reset password...</sys:String>
     <sys:String x:Key="Update">Update...</sys:String>
     <sys:String x:Key="CheckUpdate">Check update</sys:String>
     <sys:String x:Key="AutoCheckUpdate">Auto check update</sys:String>
     <sys:String x:Key="AllowPreRelease">Include prerelease version</sys:String>
-    <sys:String x:Key="OpenWiki">Open wiki...</sys:String>
-    <sys:String x:Key="Feedback">Feedback...</sys:String>
-    <sys:String x:Key="GenQrCode">Gen custom QRCode...</sys:String>
-    <sys:String x:Key="ResetPassword">Reset password...</sys:String>
-    <sys:String x:Key="About">About...</sys:String>
-    <sys:String x:Key="Donate">Donate...</sys:String>
 
     <sys:String x:Key="Quit">Quit</sys:String>
 

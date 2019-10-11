@@ -85,39 +85,6 @@ namespace Shadowsocks.Properties {
         }
         
         /// <summary>
-        ///   查找类似 # translation for Simplified Chinese
-        ///
-        ///Shadowsocks=Shadowsocks
-        ///ShadowsocksR=ShadowsocksR
-        ///: =：
-        ///
-        ///# Menu items
-        ///
-        ///Mode=系统代理模式
-        ///No modify system proxy=保持当前状态不修改
-        ///Disable system proxy=直连模式
-        ///PAC=PAC 模式
-        ///Global=全局模式
-        ///Proxy rule=代理规则
-        ///Bypass LAN=绕过局域网
-        ///Bypass LAN &amp;&amp; China=绕过局域网和大陆
-        ///Bypass LAN &amp;&amp; not China=绕过局域网和非大陆
-        ///User custom=用户自定义
-        ///Disable bypass=全局
-        ///Servers=服务器
-        ///Edit servers...=编辑服务器...
-        ///Import servers from file...=从文件导入服务器...
-        ///Servers Subscribe=服务器订阅
-        ///Subscribe setting...=SSR服务器订阅设置...
-        ///Update subscribe S [字符串的其余部分被截断]&quot;; 的本地化字符串。
-        /// </summary>
-        internal static string cn {
-            get {
-                return ResourceManager.GetString("cn", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   查找 System.Byte[] 类型的本地化资源。
         /// </summary>
         internal static byte[] libsscrypto_dll {
@@ -143,7 +110,7 @@ namespace Shadowsocks.Properties {
         ///logfile ShadowsocksR.log
         ///show-on-task-bar 0
         ///activity-animation 0
-        ///forward-socks5 / 127.0.0.1:__SOCKS_PORT__ .
+        ///forward-socks5 / __SOCKS_HOST__:__SOCKS_PORT__ .
         ///max-client-connections 2048
         ///hide-console
         /// 的本地化字符串。
@@ -208,39 +175,6 @@ namespace Shadowsocks.Properties {
         internal static string user_rule {
             get {
                 return ResourceManager.GetString("user_rule", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找类似 # translation for Traditional Chinese
-        ///
-        ///Shadowsocks=Shadowsocks
-        ///ShadowsocksR=ShadowsocksR
-        ///: =：
-        ///
-        ///# Menu items
-        ///
-        ///Mode=系統代理模式
-        ///No modify system proxy=保持當前狀態不修改
-        ///Disable system proxy=直連模式
-        ///PAC=PAC 模式
-        ///Global=全局模式
-        ///Proxy rule=代理規則
-        ///Bypass LAN=繞過區域網路
-        ///Bypass LAN &amp;&amp; China=繞過區域網路和大陸
-        ///Bypass LAN &amp;&amp; not China=繞過區域網路和非大陸
-        ///User custom=用戶自定義
-        ///Disable bypass=全局
-        ///Servers=伺服器
-        ///Edit servers...=編輯伺服器...
-        ///Import servers from file...=從文件導入伺服器...
-        ///Servers Subscribe=伺服器訂閱
-        ///Subscribe setting...=SSR伺服器訂閱設置...
-        ///Update subscri [字符串的其余部分被截断]&quot;; 的本地化字符串。
-        /// </summary>
-        internal static string zh_tw {
-            get {
-                return ResourceManager.GetString("zh_tw", resourceCulture);
             }
         }
     }

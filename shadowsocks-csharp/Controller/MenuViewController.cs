@@ -240,8 +240,7 @@ namespace Shadowsocks.Controller
         {
             var t = new MenuItem
             {
-                Header = text,
-                BorderThickness = new Thickness(3)
+                Header = text
             };
             foreach (var item in items)
             {
@@ -276,25 +275,25 @@ namespace Shadowsocks.Controller
                             noModifyItem.Click += NoModifyItem_Click;
                             break;
                         }
-                        case @"PAC":
+                        case @"ProxySetting":
                         {
-                            ((MenuItem)menuItem.Items[0]).Click += UpdatePACFromLanIPListItem_Click;
-                            ((MenuItem)menuItem.Items[2]).Click += UpdatePACFromCNWhiteListItem_Click;
-                            ((MenuItem)menuItem.Items[3]).Click += UpdatePACFromCNIPListItem_Click;
-                            ((MenuItem)menuItem.Items[4]).Click += UpdatePACFromGFWListItem_Click;
-                            ((MenuItem)menuItem.Items[6]).Click += UpdatePACFromCNOnlyListItem_Click;
-                            ((MenuItem)menuItem.Items[8]).Click += CopyPacUrlItem_Click;
-                            ((MenuItem)menuItem.Items[9]).Click += EditPACFileItem_Click;
-                            ((MenuItem)menuItem.Items[10]).Click += EditUserRuleFileForGFWListItem_Click;
-                            break;
-                        }
-                        case @"ProxyRule":
-                        {
-                            ruleBypassLan = (MenuItem)menuItem.Items[0];
-                            ruleBypassChina = (MenuItem)menuItem.Items[1];
-                            ruleBypassNotChina = (MenuItem)menuItem.Items[2];
-                            ruleUser = (MenuItem)menuItem.Items[3];
-                            ruleDisableBypass = (MenuItem)menuItem.Items[5];
+                            var pacMenuItem = (MenuItem)menuItem.Items[0];
+                            var proxyMenuItem = (MenuItem)menuItem.Items[1];
+
+                            ((MenuItem)pacMenuItem.Items[0]).Click += UpdatePACFromLanIPListItem_Click;
+                            ((MenuItem)pacMenuItem.Items[2]).Click += UpdatePACFromCNWhiteListItem_Click;
+                            ((MenuItem)pacMenuItem.Items[3]).Click += UpdatePACFromCNIPListItem_Click;
+                            ((MenuItem)pacMenuItem.Items[4]).Click += UpdatePACFromGFWListItem_Click;
+                            ((MenuItem)pacMenuItem.Items[6]).Click += UpdatePACFromCNOnlyListItem_Click;
+                            ((MenuItem)pacMenuItem.Items[8]).Click += CopyPacUrlItem_Click;
+                            ((MenuItem)pacMenuItem.Items[9]).Click += EditPACFileItem_Click;
+                            ((MenuItem)pacMenuItem.Items[10]).Click += EditUserRuleFileForGFWListItem_Click;
+
+                            ruleBypassLan = (MenuItem)proxyMenuItem.Items[0];
+                            ruleBypassChina = (MenuItem)proxyMenuItem.Items[1];
+                            ruleBypassNotChina = (MenuItem)proxyMenuItem.Items[2];
+                            ruleUser = (MenuItem)proxyMenuItem.Items[3];
+                            ruleDisableBypass = (MenuItem)proxyMenuItem.Items[5];
 
                             ruleBypassLan.Click += RuleBypassLanItem_Click;
                             ruleBypassChina.Click += RuleBypassChinaItem_Click;
@@ -307,31 +306,23 @@ namespace Shadowsocks.Controller
                         {
                             ServersItem = menuItem;
                             SeparatorItem = (Separator)menuItem.Items[0];
-                            SelectRandomItem = (MenuItem)menuItem.Items[4];
-                            sameHostForSameTargetItem = (MenuItem)menuItem.Items[5];
+                            SelectRandomItem = (MenuItem)menuItem.Items[7];
+                            sameHostForSameTargetItem = (MenuItem)menuItem.Items[8];
 
                             ((MenuItem)menuItem.Items[1]).Click += Config_Click;
-                            ((MenuItem)menuItem.Items[2]).Click += Import_Click;
+                            ((MenuItem)menuItem.Items[3]).Click += ScanQRCodeItem_Click;
+                            ((MenuItem)menuItem.Items[4]).Click += ImportAddressFromClipboard_Click;
+                            ((MenuItem)menuItem.Items[5]).Click += Import_Click;
                             SelectRandomItem.Click += SelectRandomItem_Click;
                             sameHostForSameTargetItem.Click += SelectSameHostForSameTargetItem_Click;
-                            ((MenuItem)menuItem.Items[7]).Click += ShowServerLogItem_Click;
-                            ((MenuItem)menuItem.Items[8]).Click += DisconnectCurrent_Click;
+                            ((MenuItem)menuItem.Items[10]).Click += ShowServerLogItem_Click;
+                            ((MenuItem)menuItem.Items[11]).Click += DisconnectCurrent_Click;
                             break;
                         }
                         case @"ServersSubscribe":
                         {
                             ((MenuItem)menuItem.Items[0]).Click += SubscribeSetting_Click;
                             ((MenuItem)menuItem.Items[1]).Click += CheckNodeUpdate_Click;
-                            break;
-                        }
-                        case @"GlobalSettings":
-                        {
-                            menuItem.Click += Setting_Click;
-                            break;
-                        }
-                        case @"PortSettings":
-                        {
-                            menuItem.Click += ShowPortMapItem_Click;
                             break;
                         }
                         case @"ShowLogs":
@@ -345,26 +336,17 @@ namespace Shadowsocks.Controller
                             UpdateItem.Click += UpdateItem_Clicked;
                             break;
                         }
-                        case @"ScanQrCode":
+                        case @"More":
                         {
-                            menuItem.Click += ScanQRCodeItem_Click;
-                            break;
-                        }
-                        case @"ImportSsrLinksFromClipboard":
-                        {
-                            menuItem.Click += ImportAddressFromClipboard_Click;
-                            break;
-                        }
-                        case @"Help":
-                        {
-                            ((MenuItem)menuItem.Items[0]).Click += OpenWiki_Click;
-                            ((MenuItem)menuItem.Items[1]).Click += FeedbackItem_Click;
-                            ((MenuItem)menuItem.Items[2]).Click += DonateMenuItem_Click;
-                            ((MenuItem)menuItem.Items[4]).Click += showURLFromQRCode;
-                            ((MenuItem)menuItem.Items[5]).Click += ResetPasswordItem_Click;
-                            ((MenuItem)menuItem.Items[8]).Click += AboutItem_Click;
+                            ((MenuItem)menuItem.Items[0]).Click += Setting_Click;
+                            ((MenuItem)menuItem.Items[1]).Click += ShowPortMapItem_Click;
+                            ((MenuItem)menuItem.Items[3]).Click += OpenWiki_Click;
+                            ((MenuItem)menuItem.Items[4]).Click += FeedbackItem_Click;
+                            ((MenuItem)menuItem.Items[5]).Click += DonateMenuItem_Click;
+                            ((MenuItem)menuItem.Items[7]).Click += showURLFromQRCode;
+                            ((MenuItem)menuItem.Items[8]).Click += ResetPasswordItem_Click;
 
-                            var updateMenu = (MenuItem)menuItem.Items[7];
+                            var updateMenu = (MenuItem)menuItem.Items[10];
                             ((MenuItem)updateMenu.Items[0]).Click += CheckUpdate_Click;
                             AutoCheckUpdateItem = (MenuItem)updateMenu.Items[2];
                             AllowPreReleaseItem = (MenuItem)updateMenu.Items[3];
@@ -672,7 +654,7 @@ namespace Shadowsocks.Controller
         }
 
         private void UpdateServersMenu()
-        {
+        {//TODO
             var items = ServersItem.Items;
             while (!Equals(items[0], SeparatorItem))
             {
@@ -987,29 +969,24 @@ namespace Shadowsocks.Controller
             Application.Current.Shutdown();
         }
 
-        private void OpenWiki_Click(object sender, RoutedEventArgs e)
+        private static void OpenWiki_Click(object sender, RoutedEventArgs e)
         {
             Utils.OpenURL(@"https://github.com/HMBSbige/ShadowsocksR-Windows/wiki");
         }
 
-        private void FeedbackItem_Click(object sender, RoutedEventArgs e)
+        private static void FeedbackItem_Click(object sender, RoutedEventArgs e)
         {
             Utils.OpenURL(@"https://github.com/HMBSbige/ShadowsocksR-Windows/issues/new/choose");
         }
 
-        private void ResetPasswordItem_Click(object sender, RoutedEventArgs e)
+        private static void ResetPasswordItem_Click(object sender, RoutedEventArgs e)
         {
             var dlg = new ResetPassword();
             dlg.Show();
             dlg.Activate();
         }
 
-        private void AboutItem_Click(object sender, RoutedEventArgs e)
-        {
-            Utils.OpenURL(@"https://github.com/HMBSbige/ShadowsocksR-Windows");
-        }
-
-        private void DonateMenuItem_Click(object sender, RoutedEventArgs e)
+        private static void DonateMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Utils.OpenURL(@"https://github.com/HMBSbige/ShadowsocksR-Windows/blob/master/pic/wechat.jpg");
         }

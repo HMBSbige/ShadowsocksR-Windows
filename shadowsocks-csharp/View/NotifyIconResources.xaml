@@ -1,77 +1,79 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Style x:Key="TrayMenuItem" TargetType="MenuItem">
+    <Style TargetType="MenuItem">
         <Setter Property="BorderThickness" Value="3"></Setter>
     </Style>
-    <ContextMenu x:Shared="false" x:Key="SysTrayMenu">
-        <MenuItem x:Name="Mode" Style="{StaticResource TrayMenuItem}">
-            <MenuItem x:Name="DisableProxy" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="PacProxy" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="GlobalProxy" Style="{StaticResource TrayMenuItem}" />
+    <ContextMenu x:Shared="False" x:Key="SysTrayMenu">
+        <MenuItem x:Name="Mode">
+            <MenuItem x:Name="DisableProxy" />
+            <MenuItem x:Name="PacProxy" />
+            <MenuItem x:Name="GlobalProxy" />
             <Separator />
-            <MenuItem x:Name="NoProxy" Style="{StaticResource TrayMenuItem}" />
+            <MenuItem x:Name="NoProxy" />
         </MenuItem>
-        <MenuItem x:Name="PAC" Style="{StaticResource TrayMenuItem}">
-            <MenuItem x:Name="UpdateLanPac" Style="{StaticResource TrayMenuItem}" />
-            <Separator />
-            <MenuItem x:Name="UpdateChnDomainPac" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="UpdateChnDomainIpPac" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="UpdateGfwList" Style="{StaticResource TrayMenuItem}" />
-            <Separator />
-            <MenuItem x:Name="UpdateChnOnlyPac" Style="{StaticResource TrayMenuItem}" />
-            <Separator />
-            <MenuItem x:Name="CopyPacUrl" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="EditPacFile" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="EditGfwListUserRule" Style="{StaticResource TrayMenuItem}" />
-        </MenuItem>
-        <MenuItem x:Name="ProxyRule" Style="{StaticResource TrayMenuItem}">
-            <MenuItem x:Name="BypassLan" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="BypassLanChina" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="BypassLanNotChina" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="UserCustom" Style="{StaticResource TrayMenuItem}" />
-            <Separator />
-            <MenuItem x:Name="DisableBypass" Style="{StaticResource TrayMenuItem}" />
-        </MenuItem>
-        <Separator />
-        <MenuItem x:Name="Servers" Style="{StaticResource TrayMenuItem}">
-            <Separator />
-            <MenuItem x:Name="EditServers" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="ImportServers" Style="{StaticResource TrayMenuItem}" />
-            <Separator />
-            <MenuItem x:Name="LoadBalance" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="SameHostForSameAddress" Style="{StaticResource TrayMenuItem}" />
-            <Separator />
-            <MenuItem x:Name="ServerStatistic" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="DisconnectCurrent" Style="{StaticResource TrayMenuItem}" />
-        </MenuItem>
-        <MenuItem x:Name="ServersSubscribe" Style="{StaticResource TrayMenuItem}">
-            <MenuItem x:Name="SubscribeSetting" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="UpdateSubscribeSsrNode" Style="{StaticResource TrayMenuItem}" />
-        </MenuItem>
-        <MenuItem x:Name="GlobalSettings" Style="{StaticResource TrayMenuItem}" />
-        <MenuItem x:Name="PortSettings" Style="{StaticResource TrayMenuItem}" />
-        <MenuItem x:Name="ShowLogs" Style="{StaticResource TrayMenuItem}" />
-        <MenuItem x:Name="UpdateAvailable" Style="{StaticResource TrayMenuItem}" Visibility="Collapsed"/>
-        <Separator />
-        <MenuItem x:Name="ScanQrCode" Style="{StaticResource TrayMenuItem}" />
-        <MenuItem x:Name="ImportSsrLinksFromClipboard" Style="{StaticResource TrayMenuItem}" />
-        <Separator />
-        <MenuItem x:Name="Help" Style="{StaticResource TrayMenuItem}">
-            <MenuItem x:Name="OpenWiki" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="Feedback" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="Donate" Style="{StaticResource TrayMenuItem}" />
-            <Separator />
-            <MenuItem x:Name="GenQrCode" Style="{StaticResource TrayMenuItem}" />
-            <MenuItem x:Name="ResetPassword" Style="{StaticResource TrayMenuItem}" />
-            <Separator />
-            <MenuItem x:Name="Update" Style="{StaticResource TrayMenuItem}">
-                <MenuItem x:Name="CheckUpdate" Style="{StaticResource TrayMenuItem}" />
+        <MenuItem x:Name="ProxySetting">
+            <MenuItem x:Name="Pac">
+                <MenuItem x:Name="UpdateLanPac" />
                 <Separator />
-                <MenuItem x:Name="AutoCheckUpdate" Style="{StaticResource TrayMenuItem}" />
-                <MenuItem x:Name="AllowPreRelease" Style="{StaticResource TrayMenuItem}" />
+                <MenuItem x:Name="UpdateChnDomainPac" />
+                <MenuItem x:Name="UpdateChnDomainIpPac" />
+                <MenuItem x:Name="UpdateGfwList" />
+                <Separator />
+                <MenuItem x:Name="UpdateChnOnlyPac" />
+                <Separator />
+                <MenuItem x:Name="CopyPacUrl" />
+                <MenuItem x:Name="EditPacFile" />
+                <MenuItem x:Name="EditGfwListUserRule" />
             </MenuItem>
-            <MenuItem x:Name="About" Style="{StaticResource TrayMenuItem}" />
+            <MenuItem x:Name="ProxyRule">
+                <MenuItem x:Name="BypassLan" />
+                <MenuItem x:Name="BypassLanChina" />
+                <MenuItem x:Name="BypassLanNotChina" />
+                <MenuItem x:Name="UserCustom" />
+                <Separator />
+                <MenuItem x:Name="DisableBypass" />
+            </MenuItem>
         </MenuItem>
-        <MenuItem x:Name="Quit" Style="{StaticResource TrayMenuItem}" />
+        <Separator />
+        <MenuItem x:Name="Servers">
+            <Separator />
+            <MenuItem x:Name="EditServers" />
+            <Separator />
+            <MenuItem x:Name="ScanQrCode" />
+            <MenuItem x:Name="ImportSsrLinksFromClipboard" />
+            <MenuItem x:Name="ImportServers" />
+            <Separator />
+            <MenuItem x:Name="LoadBalance" />
+            <MenuItem x:Name="SameHostForSameAddress" />
+            <Separator />
+            <MenuItem x:Name="ServerStatistic" />
+            <MenuItem x:Name="DisconnectCurrent" />
+        </MenuItem>
+        <MenuItem x:Name="ServersSubscribe">
+            <MenuItem x:Name="SubscribeSetting" />
+            <MenuItem x:Name="UpdateSubscribeSsrNode" />
+        </MenuItem>
+        <MenuItem x:Name="ShowLogs" />
+        <MenuItem x:Name="UpdateAvailable" Visibility="Collapsed"/>
+        <Separator />
+        <MenuItem x:Name="More">
+            <MenuItem x:Name="GlobalSettings" />
+            <MenuItem x:Name="PortSettings" />
+            <Separator />
+            <MenuItem x:Name="OpenWiki" />
+            <MenuItem x:Name="Feedback" />
+            <MenuItem x:Name="Donate" />
+            <Separator />
+            <MenuItem x:Name="GenQrCode" />
+            <MenuItem x:Name="ResetPassword" />
+            <Separator />
+            <MenuItem x:Name="Update">
+                <MenuItem x:Name="CheckUpdate" />
+                <Separator />
+                <MenuItem x:Name="AutoCheckUpdate" />
+                <MenuItem x:Name="AllowPreRelease" />
+            </MenuItem>
+        </MenuItem>
+        <MenuItem x:Name="Quit" />
     </ContextMenu>
 </ResourceDictionary>

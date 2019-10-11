@@ -121,9 +121,6 @@
   <data name="abp" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Data\abp.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;gb2312</value>
   </data>
-  <data name="cn" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\data\cn.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
   <data name="libsscrypto64_dll" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Data\libsscrypto64.dll.gz;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
@@ -144,8 +141,5 @@
   </data>
   <data name="user_rule" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\data\user-rule.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
-  <data name="zh_tw" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Data\zh-tw.txt;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
 </root>

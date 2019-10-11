@@ -1,0 +1,27 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="ResourceDictionaryName">zh-TW</sys:String>
+
+    <sys:String x:Key="Title">通訊埠設定</sys:String>
+
+    <sys:String x:Key="PortForward">通訊埠轉發</sys:String>
+    <sys:String x:Key="ForceProxy">強制代理</sys:String>
+    <sys:String x:Key="ProxyWithRule">規則代理</sys:String>
+
+    <sys:String x:Key="MapSetting">映射設定</sys:String>
+    <sys:String x:Key="Enable">開關</sys:String>
+    <sys:String x:Key="Type">類型</sys:String>
+    <sys:String x:Key="ServerId">伺服器 ID</sys:String>
+    <sys:String x:Key="LocalPort">本地通訊埠</sys:String>
+    <sys:String x:Key="TargetAddress">目標位址</sys:String>
+    <sys:String x:Key="TargetPort">目標通訊埠</sys:String>
+    <sys:String x:Key="Remarks">備註</sys:String>
+
+    <sys:String x:Key="Add">新增</sys:String>
+    <sys:String x:Key="Delete">刪除</sys:String>
+    <sys:String x:Key="Ok">確定</sys:String>
+    <sys:String x:Key="Cancel">取消</sys:String>
+    <sys:String x:Key="Apply">套用</sys:String>
+
+</ResourceDictionary>

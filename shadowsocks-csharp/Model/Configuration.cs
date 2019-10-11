@@ -299,8 +299,10 @@ namespace Shadowsocks.Model
             sysProxyMode = ProxyMode.NoModify;
             proxyRuleMode = ProxyRuleMode.Disable;
 
+            checkSwitchAutoCloseAll = true;
+
             AutoCheckUpdate = true;
-            isPreRelease = false;
+            isPreRelease = true;
 
             serverSubscribes = new List<ServerSubscribe>();
 

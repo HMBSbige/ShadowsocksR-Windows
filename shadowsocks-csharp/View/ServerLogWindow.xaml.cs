@@ -35,9 +35,11 @@ namespace Shadowsocks.View
                 SizeToContent = SizeToContent.Width;
                 Height = 600;
                 WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                ServerDataGrid.ShowBusyIndicator = false;
             }
             else
             {
+                ServerDataGrid.ShowBusyIndicator = true;
                 SizeToContent = SizeToContent.Manual;
                 status.SetStatus(this);
             }
@@ -71,7 +73,7 @@ namespace Shadowsocks.View
             ServerLogViewModel.ReadConfig(_controller);
             ServerDataGrid.View?.EndInit();
 
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() =>
             {
                 if (isFirstLoad && ServerLogViewModel.SelectedServer != null)
                 {

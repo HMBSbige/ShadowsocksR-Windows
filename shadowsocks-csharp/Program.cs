@@ -1,4 +1,4 @@
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using Shadowsocks.Controller;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Model;
@@ -83,7 +83,7 @@ namespace Shadowsocks
             Logging.DefaultOut = Console.Out;
             Logging.DefaultError = Console.Error;
 
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
 
             _viewController = new MenuViewController(_controller);
             SystemEvents.SessionEnding += _viewController.Quit_Click;
