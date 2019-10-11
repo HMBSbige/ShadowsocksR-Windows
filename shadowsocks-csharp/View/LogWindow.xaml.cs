@@ -1,6 +1,7 @@
 ﻿using Shadowsocks.Controller;
 using Shadowsocks.Util;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,7 +57,15 @@ namespace Shadowsocks.View
                 if (!string.IsNullOrEmpty(txt))
                 {
                     LogTextBox.AppendText(txt);
-                    LogTextBox.ScrollToEnd();
+
+                    if (LogTextBox.SelectionStart == 0 || LogTextBox.IsScrolledToEnd())
+                    {
+                        LogTextBox.ScrollToEnd();
+                    }
+                    else
+                    {
+                        LogTextBox.ScrollToLine(LogTextBox.GetLineIndexFromCharacterIndex(LogTextBox.SelectionStart));
+                    }
                 }
 
                 _currentOffset = reader.BaseStream.Position;
@@ -85,7 +94,7 @@ namespace Shadowsocks.View
             try
             {
                 var argument = $@"/n,/select,{Logging.LogFile}";
-                System.Diagnostics.Process.Start(@"explorer.exe", argument);
+                Process.Start(@"explorer.exe", argument);
             }
             catch (Exception e)
             {

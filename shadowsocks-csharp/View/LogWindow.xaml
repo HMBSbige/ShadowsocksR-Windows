@@ -35,7 +35,8 @@
             TextWrapping="NoWrap" IsReadOnly="True"
             Background="Black" Foreground="White"
             FontFamily="Courier New" FontSize="14" FontWeight="Bold"
-            ></TextBox>
+            
+            />
         </DockPanel>
     </Grid>
 </Window>
