@@ -1,0 +1,52 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="ResourceDictionaryName">zh-CN</sys:String>
+
+    <sys:String x:Key="Title">选项设置</sys:String>
+    <sys:String x:Key="Any">任意地址</sys:String>
+    <sys:String x:Key="Local">本机地址</sys:String>
+    <sys:String x:Key="Version">版本</sys:String>
+
+    <sys:String x:Key="Ok">确定</sys:String>
+    <sys:String x:Key="Cancel">取消</sys:String>
+    <sys:String x:Key="Apply">应用</sys:String>
+
+    <sys:String x:Key="Socks5">Socks5(支持UDP)</sys:String>
+    <sys:String x:Key="Http">HTTP 隧道</sys:String>
+    <sys:String x:Key="TcpPortTunnel">TCP 端口转发</sys:String>
+
+    <sys:String x:Key="FailAutoStartUp">无法修改注册表</sys:String>
+
+    <sys:String x:Key="RemoteProxy">二级（前置）代理</sys:String>
+    <sys:String x:Key="ProxyOn">开启代理</sys:String>
+    <sys:String x:Key="Pac">PAC “直连” 使用二级代理</sys:String>
+
+    <sys:String x:Key="ServerIp">服务器 IP</sys:String>
+    <sys:String x:Key="ServerPort">服务器端口</sys:String>
+    <sys:String x:Key="Username">用户名</sys:String>
+    <sys:String x:Key="Password">密码</sys:String>
+    <sys:String x:Key="UserAgent">用户代理</sys:String>
+
+    <sys:String x:Key="LocalProxy">本地代理</sys:String>
+    <sys:String x:Key="AllowLan">允许来自局域网的连接</sys:String>
+    <sys:String x:Key="LocalPort">本地端口</sys:String>
+
+    <sys:String x:Key="Misc">杂项</sys:String>
+    <sys:String x:Key="Balance">负载均衡</sys:String>
+    <sys:String x:Key="Logging">日志记录</sys:String>
+    <sys:String x:Key="StartOnBoot">开机启动</sys:String>
+    <sys:String x:Key="SwitchAutoCloseTcpLinks">切换服务器前断开所有连接</sys:String>
+    <sys:String x:Key="LoadBalance">服务器负载均衡</sys:String>
+    <sys:String x:Key="BalanceInGroup">所选组切换</sys:String>
+    <sys:String x:Key="AutoBan">自动禁用出错服务器</sys:String>
+    <sys:String x:Key="EnableLog">开启日志</sys:String>
+
+    <sys:String x:Key="SetDefault">重置默认值</sys:String>
+    <sys:String x:Key="Dns">DNS</sys:String>
+    <sys:String x:Key="LocalDns">递归 DNS</sys:String>
+    <sys:String x:Key="ReconnectTimes">重连次数</sys:String>
+    <sys:String x:Key="ConnectTimeout">连接超时</sys:String>
+    <sys:String x:Key="Ttl">空闲断开秒数</sys:String>
+
+</ResourceDictionary>

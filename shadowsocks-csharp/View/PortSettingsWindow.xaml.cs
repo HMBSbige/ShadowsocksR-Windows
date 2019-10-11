@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
-using Shadowsocks.Controller;
+﻿using Shadowsocks.Controller;
 using Shadowsocks.Controls;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
+using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace Shadowsocks.View
 {
@@ -20,13 +20,14 @@ namespace Shadowsocks.View
         public PortSettingsWindow(ShadowsocksController controller)
         {
             InitializeComponent();
+            I18NUtil.SetLanguage(Resources, @"PortSettingsWindow");
             Closed += (o, e) => { _controller.ConfigChanged -= controller_ConfigChanged; };
             _controller = controller;
+            LoadItems();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs _)
         {
-            LoadLanguage();
             _controller.ConfigChanged += controller_ConfigChanged;
             ValueChanged += PortSettingsWindow_ValueChanged;
 
@@ -76,40 +77,15 @@ namespace Shadowsocks.View
             ApplyButton.IsEnabled = true;
         }
 
-        private void LoadLanguage()
+        private void LoadItems()
         {
-            Title = I18N.GetString(@"Port Settings");
-
-            foreach (var c in ViewUtils.FindVisualChildren<Label>(this))
-            {
-                c.Content = I18N.GetString(c.Content.ToString());
-            }
-
-            foreach (var c in ViewUtils.FindVisualChildren<Button>(this))
-            {
-                c.Content = I18N.GetString(c.Content.ToString());
-            }
-
-            foreach (var c in ViewUtils.FindVisualChildren<CheckBox>(this))
-            {
-                c.Content = I18N.GetString(c.Content.ToString());
-            }
-
-            foreach (var c in ViewUtils.FindVisualChildren<GroupBox>(this))
-            {
-                c.Header = I18N.GetString(c.Header.ToString());
-            }
-
-            TypeComboBox.DisplayMemberPath = "Text";
-            TypeComboBox.SelectedValuePath = "Value";
             var items = new[]
             {
-                    new {Text = I18N.GetString("Port Forward"), Value = PortMapType.Forward},
-                    new {Text = I18N.GetString("Force Proxy"), Value = PortMapType.ForceProxy},
-                    new {Text = I18N.GetString("Proxy With Rule"), Value = PortMapType.RuleProxy}
+                    new {Text = this.GetWindowStringValue(@"PortForward"), Value = PortMapType.Forward},
+                    new {Text = this.GetWindowStringValue(@"ForceProxy"), Value = PortMapType.ForceProxy},
+                    new {Text = this.GetWindowStringValue(@"ProxyWithRule"), Value = PortMapType.RuleProxy}
             };
             TypeComboBox.ItemsSource = items;
-            TypeComboBox.SelectedIndex = 0;
         }
 
         private void controller_ConfigChanged(object sender, EventArgs e)

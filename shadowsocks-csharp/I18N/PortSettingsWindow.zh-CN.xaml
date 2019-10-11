@@ -1,0 +1,27 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="ResourceDictionaryName">zh-CN</sys:String>
+
+    <sys:String x:Key="Title">端口设置</sys:String>
+
+    <sys:String x:Key="PortForward">端口转发</sys:String>
+    <sys:String x:Key="ForceProxy">强制代理</sys:String>
+    <sys:String x:Key="ProxyWithRule">规则代理</sys:String>
+
+    <sys:String x:Key="MapSetting">映射设置</sys:String>
+    <sys:String x:Key="Enable">开关</sys:String>
+    <sys:String x:Key="Type">类型</sys:String>
+    <sys:String x:Key="ServerId">服务器 ID</sys:String>
+    <sys:String x:Key="LocalPort">本地端口</sys:String>
+    <sys:String x:Key="TargetAddress">目标地址</sys:String>
+    <sys:String x:Key="TargetPort">本地端口</sys:String>
+    <sys:String x:Key="Remarks">备注</sys:String>
+
+    <sys:String x:Key="Add">添加</sys:String>
+    <sys:String x:Key="Delete">删除</sys:String>
+    <sys:String x:Key="Ok">确定</sys:String>
+    <sys:String x:Key="Cancel">取消</sys:String>
+    <sys:String x:Key="Apply">应用</sys:String>
+
+</ResourceDictionary>
