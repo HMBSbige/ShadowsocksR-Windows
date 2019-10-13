@@ -54,6 +54,8 @@ namespace Shadowsocks.Model
         public bool isPreRelease;
         public bool AutoCheckUpdate;
 
+        public string LangName;
+
         public List<ServerSubscribe> serverSubscribes;
 
         public Dictionary<string, string> token = new Dictionary<string, string>();
@@ -304,6 +306,8 @@ namespace Shadowsocks.Model
             AutoCheckUpdate = true;
             isPreRelease = true;
 
+            LangName = string.Empty;
+
             serverSubscribes = new List<ServerSubscribe>();
 
             configs = new List<Server>();
@@ -342,6 +346,7 @@ namespace Shadowsocks.Model
             AutoCheckUpdate = config.AutoCheckUpdate;
             isPreRelease = config.isPreRelease;
             serverSubscribes = config.serverSubscribes;
+            LangName = config.LangName;
         }
 
         public void FixConfiguration()
