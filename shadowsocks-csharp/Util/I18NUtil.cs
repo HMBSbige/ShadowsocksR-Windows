@@ -24,10 +24,14 @@ namespace Shadowsocks.Util
                 {@"en-US", @"en-US"}
         };
 
-        public static string GetLanguage()
+        public static string GetLanguage(string langName = @"")
         {
-            var name = System.Globalization.CultureInfo.CurrentCulture.Name;
-            if (SupportLanguage.TryGetValue(name, out var res))
+            if (string.IsNullOrEmpty(langName))
+            {
+                langName = System.Globalization.CultureInfo.CurrentCulture.Name;
+            }
+
+            if (SupportLanguage.TryGetValue(langName, out var res))
             {
                 return res;
             }
@@ -60,17 +64,7 @@ namespace Shadowsocks.Util
 
         public static void SetLanguage(ResourceDictionary resources, string filename, string langName = @"")
         {
-            if (string.IsNullOrEmpty(langName))
-            {
-                if (string.IsNullOrEmpty(CurrentLanguage))
-                {
-                    langName = GetLanguage();
-                }
-                else
-                {
-                    langName = CurrentLanguage;
-                }
-            }
+            langName = GetLanguage(langName);
 
             var url = new Uri($@"../I18N/{filename}.{langName}.xaml", UriKind.Relative);
             if (resources.MergedDictionaries.Count > 0)

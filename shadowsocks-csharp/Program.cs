@@ -51,8 +51,13 @@ namespace Shadowsocks
 
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
+            SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
+            app.Exit += App_Exit;
+
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("##SyncfusionLicense##");
+
             var tryTimes = 0;
-            Configuration cfg = Configuration.Load();
+            var cfg = Configuration.Load();
             while (cfg == null)
             {
                 if (tryTimes >= 5)
@@ -66,17 +71,12 @@ namespace Shadowsocks
                 {
                     return;
                 }
-                tryTimes += 1;
+                ++tryTimes;
                 cfg = Configuration.Load();
             }
 
-            I18NUtil.SetLanguage(cfg.GetLanguage());
+            I18NUtil.SetLanguage(app.Resources, @"App", cfg.LangName);
             ViewUtils.SetResource(app.Resources, @"../View/NotifyIconResources.xaml", 1);
-
-            SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
-            app.Exit += App_Exit;
-
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("##SyncfusionLicense##");
 
             _controller = new ShadowsocksController();
             HostMap.Instance().LoadHostFile();

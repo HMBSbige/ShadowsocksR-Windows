@@ -54,7 +54,7 @@ namespace Shadowsocks.Model
         public bool isPreRelease;
         public bool AutoCheckUpdate;
 
-        public string langName = @"";
+        public string LangName;
 
         public List<ServerSubscribe> serverSubscribes;
 
@@ -306,6 +306,8 @@ namespace Shadowsocks.Model
             AutoCheckUpdate = true;
             isPreRelease = true;
 
+            LangName = string.Empty;
+
             serverSubscribes = new List<ServerSubscribe>();
 
             configs = new List<Server>();
@@ -344,19 +346,7 @@ namespace Shadowsocks.Model
             AutoCheckUpdate = config.AutoCheckUpdate;
             isPreRelease = config.isPreRelease;
             serverSubscribes = config.serverSubscribes;
-            langName = config.langName;
-        }
-
-        public string GetLanguage()
-        {
-            if (string.IsNullOrEmpty(langName))
-            {
-                return I18NUtil.GetLanguage();
-            }
-            else
-            {
-                return langName;
-            }
+            LangName = config.LangName;
         }
 
         public void FixConfiguration()
