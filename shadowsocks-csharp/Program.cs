@@ -75,7 +75,7 @@ namespace Shadowsocks
                 cfg = Configuration.Load();
             }
 
-            I18NUtil.SetLanguage(app.Resources, @"App", cfg.LangName);
+            I18NUtil.SetLanguage(cfg.LangName);
             ViewUtils.SetResource(app.Resources, @"../View/NotifyIconResources.xaml", 1);
 
             _controller = new ShadowsocksController();

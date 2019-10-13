@@ -64,7 +64,7 @@ namespace Shadowsocks.Util
 
         public static void SetLanguage(ResourceDictionary resources, string filename, string langName = @"")
         {
-            langName = GetLanguage(langName);
+            langName = GetLanguage(string.IsNullOrEmpty(langName) ? CurrentLanguage : langName);
 
             var url = new Uri($@"../I18N/{filename}.{langName}.xaml", UriKind.Relative);
             if (resources.MergedDictionaries.Count > 0)
