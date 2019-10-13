@@ -62,7 +62,14 @@ namespace Shadowsocks.Util
         {
             if (string.IsNullOrEmpty(langName))
             {
-                langName = GetLanguage();
+                if (string.IsNullOrEmpty(CurrentLanguage))
+                {
+                    langName = GetLanguage();
+                }
+                else
+                {
+                    langName = CurrentLanguage;
+                }
             }
 
             var url = new Uri($@"../I18N/{filename}.{langName}.xaml", UriKind.Relative);
