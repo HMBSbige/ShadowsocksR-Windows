@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using Shadowsocks.Util;
+using System.Windows.Input;
 
 namespace Shadowsocks.View
 {
@@ -7,6 +8,7 @@ namespace Shadowsocks.View
         public InputPasswordWindow()
         {
             InitializeComponent();
+            I18NUtil.SetLanguage(Resources, @"InputPasswordWindow");
         }
 
         public string Password { private set; get; }
