@@ -62,13 +62,20 @@ namespace Shadowsocks.Controller.HttpRequest
 
         protected static async Task<string> AutoGetAsync(string url, IWebProxy proxy, string userAgent = @"", double headTimeout = DefaultHeadTimeout, double getTimeout = DefaultGetTimeout)
         {
-            string res;
+            string res = null;
             if (await HeadAsync(url, proxy, headTimeout))
             {
                 Logging.Info($@"GET request by proxy: {url}");
-                res = await GetAsync(url, proxy, userAgent, getTimeout);
+                try
+                {
+                    res = await GetAsync(url, proxy, userAgent, getTimeout);
+                }
+                catch
+                {
+                    res = null;
+                }
             }
-            else
+            if (res == null)
             {
                 Logging.Info($@"GET request directly: {url}");
                 res = await GetAsync(url, null, userAgent, getTimeout);
