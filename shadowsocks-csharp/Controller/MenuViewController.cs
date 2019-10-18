@@ -342,16 +342,20 @@ namespace Shadowsocks.Controller
                             ((MenuItem)menuItem.Items[1]).Click += ShowPortMapItem_Click;
                             ((MenuItem)menuItem.Items[3]).Click += OpenWiki_Click;
                             ((MenuItem)menuItem.Items[4]).Click += FeedbackItem_Click;
-                            ((MenuItem)menuItem.Items[5]).Click += DonateMenuItem_Click;
-                            ((MenuItem)menuItem.Items[7]).Click += showURLFromQRCode;
-                            ((MenuItem)menuItem.Items[8]).Click += ResetPasswordItem_Click;
+                            ((MenuItem)menuItem.Items[6]).Click += showURLFromQRCode;
+                            ((MenuItem)menuItem.Items[7]).Click += ResetPasswordItem_Click;
 
-                            var updateMenu = (MenuItem)menuItem.Items[10];
+                            var updateMenu = (MenuItem)menuItem.Items[9];
                             ((MenuItem)updateMenu.Items[0]).Click += CheckUpdate_Click;
                             AutoCheckUpdateItem = (MenuItem)updateMenu.Items[2];
                             AllowPreReleaseItem = (MenuItem)updateMenu.Items[3];
                             AutoCheckUpdateItem.Click += AutoCheckUpdateItem_Click;
                             AllowPreReleaseItem.Click += AllowPreRelease_Click;
+                            break;
+                        }
+                        case @"Donate":
+                        {
+                            menuItem.Click += DonateMenuItem_Click;
                             break;
                         }
                         case @"Quit":

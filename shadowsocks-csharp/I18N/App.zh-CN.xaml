@@ -3,7 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <sys:String x:Key="ResourceDictionaryName">zh-CN</sys:String>
 
-    <sys:String x:Key="Mode">代理模式</sys:String>
+    <sys:String x:Key="Mode">系统代理</sys:String>
     <sys:String x:Key="DisableProxy">直连</sys:String>
     <sys:String x:Key="PacProxy">PAC</sys:String>
     <sys:String x:Key="GlobalProxy">全局</sys:String>
@@ -49,8 +49,8 @@
     <sys:String x:Key="PortSettings">端口设置</sys:String>
     <sys:String x:Key="OpenWiki">帮助文档</sys:String>
     <sys:String x:Key="Feedback">问题反馈</sys:String>
-    <sys:String x:Key="Donate">打赏作者</sys:String>
-    <sys:String x:Key="GenQrCode">自定义生成二维码</sys:String>
+    <sys:String x:Key="Donate">捐赠</sys:String>
+    <sys:String x:Key="GenQrCode">二维码生成器</sys:String>
     <sys:String x:Key="ResetPassword">设置客户端密码</sys:String>
     <sys:String x:Key="Update">更新</sys:String>
     <sys:String x:Key="CheckUpdate">检查更新</sys:String>

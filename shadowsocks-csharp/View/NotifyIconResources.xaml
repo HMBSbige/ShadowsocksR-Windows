@@ -62,7 +62,6 @@
             <Separator />
             <MenuItem x:Name="OpenWiki" />
             <MenuItem x:Name="Feedback" />
-            <MenuItem x:Name="Donate" />
             <Separator />
             <MenuItem x:Name="GenQrCode" />
             <MenuItem x:Name="ResetPassword" />
@@ -74,6 +73,7 @@
                 <MenuItem x:Name="AllowPreRelease" />
             </MenuItem>
         </MenuItem>
+        <MenuItem x:Name="Donate" />
         <MenuItem x:Name="Quit" />
     </ContextMenu>
 </ResourceDictionary>
