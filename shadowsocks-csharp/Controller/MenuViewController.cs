@@ -537,6 +537,10 @@ namespace Shadowsocks.Controller
                     {
                         config.index = config.configs.Count - 1;
                     }
+                    else
+                    {
+                        config.index = selectedIndex;
+                    }
 
                     //If Update Success
                     if (count > 0)
