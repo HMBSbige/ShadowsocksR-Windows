@@ -96,7 +96,7 @@ namespace Shadowsocks.Controller.HttpRequest
             http.Proxy = proxy;
             http.BaseAddress = GFWLIST_URL;
             http.DownloadStringCompleted += http_DownloadStringCompleted;
-            http.DownloadStringAsync(new Uri($@"{GFWLIST_URL}?rnd={RNG.RandUInt32()}"));
+            http.DownloadStringAsync(new Uri($@"{GFWLIST_URL}?rnd={Rng.RandUInt32()}"));
         }
 
         #region OnlinePAC
@@ -141,7 +141,7 @@ namespace Shadowsocks.Controller.HttpRequest
             }
             http.Proxy = proxy;
             http.DownloadStringCompleted += http_DownloadOnlinePACCompleted;
-            http.DownloadStringAsync(new Uri($@"{url}?rnd={RNG.RandUInt32()}"));
+            http.DownloadStringAsync(new Uri($@"{url}?rnd={Rng.RandUInt32()}"));
         }
 
         #endregion

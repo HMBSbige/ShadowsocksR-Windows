@@ -338,9 +338,9 @@ namespace Shadowsocks.Model
             LangName = config.LangName;
         }
 
-        public void FixConfiguration()
+        private void FixConfiguration()
         {
-            if (localPort == 0)
+            if (!IsPort(localPort))
             {
                 localPort = 1080;
             }
@@ -365,40 +365,26 @@ namespace Shadowsocks.Model
             }
             if (localAuthPassword == null || localAuthPassword.Length < 16)
             {
-                localAuthPassword = RandString(20);
+                localAuthPassword = Rng.RandId();
             }
-
-            var id = new Dictionary<string, int>();
-            if (index < 0 || index >= configs.Count) index = 0;
+            if (index < 0 || index >= configs.Count)
+            {
+                index = 0;
+            }
             if (configs.Count == 0)
             {
                 configs.Add(GetDefaultServer());
             }
+
+            var id = new HashSet<string>();
             foreach (var server in configs)
             {
-                if (id.ContainsKey(server.Id))
+                while (id.Contains(server.Id))
                 {
-                    var newId = new byte[16];
-                    RNG.RandBytes(newId, newId.Length);
-                    server.Id = BitConverter.ToString(newId).Replace("-", string.Empty);
+                    server.Id = Rng.RandId();
                 }
-                else
-                {
-                    id[server.Id] = 0;
-                }
+                id.Add(server.Id);
             }
-        }
-
-        private static string RandString(int len)
-        {
-            const string set = @"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
-            var ret = string.Empty;
-            var random = new Random();
-            for (var i = 0; i < len; ++i)
-            {
-                ret += set[random.Next(set.Length)];
-            }
-            return ret;
         }
 
         public static Configuration LoadFile(string filename)
@@ -502,11 +488,15 @@ namespace Shadowsocks.Model
 
         public static void CheckPort(int port)
         {
-            if (port <= IPEndPoint.MinPort || port > IPEndPoint.MaxPort)
+            if (!IsPort(port))
             {
                 throw new ConfigurationException(I18NUtil.GetAppStringValue(@"PortOutOfRange"));
             }
         }
 
+        private static bool IsPort(int port)
+        {
+            return port > IPEndPoint.MinPort && port <= IPEndPoint.MaxPort;
+        }
     }
 }

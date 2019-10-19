@@ -39,7 +39,7 @@ namespace UnitTest
         public void EncryptStringTest()
         {
             var largeBytes = new byte[ushort.MaxValue * 100];
-            RNG.RandBytes(largeBytes);
+            Rng.RandBytes(largeBytes);
             var largeStr = Encoding.UTF8.GetString(largeBytes);
             using var encryptor = EncryptorFactory.GetEncryptor(@"aes-256-cfb", @"密码");
 

@@ -471,12 +471,8 @@ namespace Shadowsocks.Model
             SubTag = @"";
             UdpOverTcp = false;
             Enable = true;
-            var randId = new byte[16];
-            RNG.RandBytes(randId, randId.Length);
-            Id = BitConverter.ToString(randId).Replace(@"-", @"");
-
+            Id = Rng.RandId();
             SpeedLog = new ServerSpeedLog();
-
             Index = 0;
             IsSelected = false;
         }
@@ -624,8 +620,7 @@ namespace Shadowsocks.Model
 
         private string GetSsrLink()
         {
-            var mainPart =
-                    $@"{server}:{Server_Port}:{Protocol}:{Method}:{obfs}:{Base64.EncodeUrlSafeBase64(Password)}";
+            var mainPart = $@"{server}:{Server_Port}:{Protocol}:{Method}:{obfs}:{Base64.EncodeUrlSafeBase64(Password)}";
             var paramStr = $@"obfsparam={Base64.EncodeUrlSafeBase64(ObfsParam ?? string.Empty)}";
             if (!string.IsNullOrEmpty(ProtocolParam))
             {
