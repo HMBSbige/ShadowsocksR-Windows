@@ -81,7 +81,7 @@ namespace Shadowsocks.Controller
             Errored?.Invoke(this, new ErrorEventArgs(e));
         }
 
-        public void ReloadIPRange()
+        private void ReloadIPRange()
         {
             _rangeSet = new IPRangeSet();
             _rangeSet.LoadChn();
