@@ -50,16 +50,16 @@
   <ItemGroup>
     <PackageReference Include="Costura.Fody" Version="4.1.0" Condition=" '$(SelfContained)' != 'true' " />
     <PackageReference Include="DnsClient" Version="1.2.0" />
-    <PackageReference Include="Fody" Version="6.0.0" Condition=" '$(SelfContained)' != 'true' ">
+    <PackageReference Include="Fody" Version="6.0.2" Condition=" '$(SelfContained)' != 'true' ">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.0.8" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="Syncfusion.Licensing" Version="17.3.0.14" />
-    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="17.3.0.14" />
-    <PackageReference Include="Syncfusion.Shared.WPF" Version="17.3.0.14" />
-    <PackageReference Include="Syncfusion.Tools.WPF" Version="17.3.0.14" />
+    <PackageReference Include="Syncfusion.Licensing" Version="17.3.0.17" />
+    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="17.3.0.17" />
+    <PackageReference Include="Syncfusion.Shared.WPF" Version="17.3.0.17" />
+    <PackageReference Include="Syncfusion.Tools.WPF" Version="17.3.0.17" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="WpfColorFontDialog" Version="1.0.6" />
     <PackageReference Include="ZXing.Net" Version="0.16.5" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' " />
