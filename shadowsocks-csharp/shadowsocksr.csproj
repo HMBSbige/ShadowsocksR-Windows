@@ -35,11 +35,9 @@
     <None Remove="Controls\NumberUpDown.xaml" />
     <None Remove="Resources\ssw128.png" />
     <None Remove="View\ConfigWindow.xaml" />
-    <None Remove="View\InputPasswordWindow.xaml" />
     <None Remove="View\LogWindow.xaml" />
     <None Remove="View\PortSettingsWindow.xaml" />
     <None Remove="View\QRCodeSplashWindow.xaml" />
-    <None Remove="View\ResetPassword.xaml" />
     <None Remove="View\ServerLogWindow.xaml" />
     <None Remove="View\ShowTextWindow.xaml" />
     <None Remove="View\SubscribeWindow.xaml" />
@@ -106,24 +104,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="I18N\PortSettingsWindow.zh-TW.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\ResetPassword.en-US.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\ResetPassword.zh-CN.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\ResetPassword.zh-TW.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\InputPasswordWindow.en-US.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\InputPasswordWindow.zh-CN.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\InputPasswordWindow.zh-TW.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="I18N\ServerLogWindow.en-US.xaml">

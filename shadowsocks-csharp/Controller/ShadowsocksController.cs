@@ -42,6 +42,7 @@ namespace Shadowsocks.Controller
         public event EventHandler ToggleRuleModeChanged;
         //public event EventHandler ShareOverLANStatusChanged;
         public event EventHandler ShowConfigFormEvent;
+        public event EventHandler ShowSubscribeWindowEvent;
 
         // when user clicked Edit PAC, and PAC file has already created
         public event EventHandler<PathEventArgs> PACFileReadyToOpen;
@@ -76,7 +77,12 @@ namespace Shadowsocks.Controller
             Reload();
         }
 
-        protected void ReportError(Exception e)
+        public bool IsDefaultConfig()
+        {
+            return _config?.IsDefaultConfig() ?? false;
+        }
+
+        private void ReportError(Exception e)
         {
             Errored?.Invoke(this, new ErrorEventArgs(e));
         }
@@ -434,7 +440,7 @@ namespace Shadowsocks.Controller
             _listener?.Stop();
 
             privoxyRunner.Stop();
-            // don't put PrivoxyRunner.Start() before pacServer.Stop()
+            // don't put privoxyRunner.Start() before pacServer.Stop()
             // or bind will fail when switching bind address from 0.0.0.0 to 127.0.0.1
             // though UseShellExecute is set to true now
             // http://stackoverflow.com/questions/10235093/socket-doesnt-close-after-application-exits-if-a-launched-process-is-open
@@ -567,9 +573,14 @@ namespace Shadowsocks.Controller
             UpdatePACFromChnDomainsAndIPCompleted?.Invoke(sender, e);
         }
 
-        public void ShowConfigForm(int index)
+        public void ShowConfigForm(int? index = null)
         {
             ShowConfigFormEvent?.Invoke(index, new EventArgs());
+        }
+
+        public void ShowSubscribeWindow()
+        {
+            ShowSubscribeWindowEvent?.Invoke(default, default);
         }
 
         /// <summary>

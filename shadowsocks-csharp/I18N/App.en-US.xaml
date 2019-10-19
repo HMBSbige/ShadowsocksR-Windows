@@ -51,7 +51,6 @@
     <sys:String x:Key="Feedback">Feedback...</sys:String>
     <sys:String x:Key="Donate">Donate...</sys:String>
     <sys:String x:Key="GenQrCode">Gen custom QRCode...</sys:String>
-    <sys:String x:Key="ResetPassword">Reset password...</sys:String>
     <sys:String x:Key="Update">Update...</sys:String>
     <sys:String x:Key="CheckUpdate">Check update</sys:String>
     <sys:String x:Key="AutoCheckUpdate">Auto check update</sys:String>
@@ -109,4 +108,8 @@
 
     <sys:String x:Key="EmptySubtag">[Empty subscription remarks]</sys:String>
     <sys:String x:Key="EmptyGroup">[Empty group name]</sys:String>
+
+    <sys:String x:Key="ImportConfigFailed">Import servers failed</sys:String>
+    <sys:String x:Key="DefaultConfigMessage">Default configuration detected</sys:String>
+    <sys:String x:Key="DefaultConfigQuestion">Tap ‘Yes’ to open config window or ‘No’ to open subscription window</sys:String>
 </ResourceDictionary>

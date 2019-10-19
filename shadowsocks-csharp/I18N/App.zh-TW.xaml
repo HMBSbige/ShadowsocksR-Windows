@@ -50,7 +50,6 @@
     <sys:String x:Key="OpenWiki">打開Wiki文件...</sys:String>
     <sys:String x:Key="Feedback">問題回饋...</sys:String>
     <sys:String x:Key="GenQrCode">自訂產生 QR 碼</sys:String>
-    <sys:String x:Key="ResetPassword">設定用戶端密碼...</sys:String>
     <sys:String x:Key="Update">更新...</sys:String>
     <sys:String x:Key="CheckUpdate">檢查更新</sys:String>
     <sys:String x:Key="AutoCheckUpdate">自動檢查更新</sys:String>
@@ -109,4 +108,8 @@
 
     <sys:String x:Key="EmptySubtag">【不屬於任何訂閱】</sys:String>
     <sys:String x:Key="EmptyGroup">【空群組名】</sys:String>
+
+    <sys:String x:Key="ImportConfigFailed">匯入伺服器失敗</sys:String>
+    <sys:String x:Key="DefaultConfigMessage">檢測到是默認伺服器</sys:String>
+    <sys:String x:Key="DefaultConfigQuestion">「是」開啟伺服器設定，「否」開啟訂閱設定</sys:String>
 </ResourceDictionary>

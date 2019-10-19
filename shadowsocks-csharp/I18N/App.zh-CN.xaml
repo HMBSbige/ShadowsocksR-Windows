@@ -51,7 +51,6 @@
     <sys:String x:Key="Feedback">问题反馈</sys:String>
     <sys:String x:Key="Donate">捐赠</sys:String>
     <sys:String x:Key="GenQrCode">二维码生成器</sys:String>
-    <sys:String x:Key="ResetPassword">设置客户端密码</sys:String>
     <sys:String x:Key="Update">更新</sys:String>
     <sys:String x:Key="CheckUpdate">检查更新</sys:String>
     <sys:String x:Key="AutoCheckUpdate">自动检查更新</sys:String>
@@ -109,4 +108,8 @@
 
     <sys:String x:Key="EmptySubtag">【不属于任何订阅】</sys:String>
     <sys:String x:Key="EmptyGroup">【空群组名】</sys:String>
+
+    <sys:String x:Key="ImportConfigFailed">导入服务器失败</sys:String>
+    <sys:String x:Key="DefaultConfigMessage">检测到是默认服务器</sys:String>
+    <sys:String x:Key="DefaultConfigQuestion">“是”打开服务器设置，“否”打开订阅设置</sys:String>
 </ResourceDictionary>

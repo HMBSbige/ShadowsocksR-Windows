@@ -59,12 +59,10 @@
         <MenuItem x:Name="More">
             <MenuItem x:Name="GlobalSettings" />
             <MenuItem x:Name="PortSettings" />
+            <MenuItem x:Name="GenQrCode" />
             <Separator />
             <MenuItem x:Name="OpenWiki" />
             <MenuItem x:Name="Feedback" />
-            <Separator />
-            <MenuItem x:Name="GenQrCode" />
-            <MenuItem x:Name="ResetPassword" />
             <Separator />
             <MenuItem x:Name="Update">
                 <MenuItem x:Name="CheckUpdate" />

@@ -41,14 +41,7 @@ namespace Shadowsocks.Model
 
         public void Clear(HostMap newInstance)
         {
-            if (newInstance == null)
-            {
-                instance = new HostMap();
-            }
-            else
-            {
-                instance = newInstance;
-            }
+            instance = newInstance ?? new HostMap();
         }
 
         public void AddHost(string host, string addr)

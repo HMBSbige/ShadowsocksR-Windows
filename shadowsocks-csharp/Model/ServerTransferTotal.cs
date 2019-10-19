@@ -1,10 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using Newtonsoft.Json;
-using Shadowsocks.Encryption;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Model
 {
@@ -22,21 +19,11 @@ namespace Shadowsocks.Model
             try
             {
                 var config_str = File.ReadAllText(LOG_FILE);
-                var config = new ServerTransferTotal();
-                try
+                var config = new ServerTransferTotal
                 {
-                    if (GlobalConfiguration.config_password.Length > 0)
-                    {
-                        using var encryptor = EncryptorFactory.GetEncryptor(@"aes-256-cfb", GlobalConfiguration.config_password);
-                        config_str = Encoding.UTF8.GetString(Utils.DecryptLargeBase64StringToBytes(encryptor, config_str));
-                    }
-                }
-                catch
-                {
-                    // ignored
-                }
+                    servers = JsonConvert.DeserializeObject<Dictionary<string, ServerTrans>>(config_str)
+                };
 
-                config.servers = JsonConvert.DeserializeObject<Dictionary<string, ServerTrans>>(config_str);
                 config.Init();
                 return config;
             }
@@ -66,12 +53,6 @@ namespace Shadowsocks.Model
             {
                 using var sw = new StreamWriter(File.Open(LOG_FILE, FileMode.Create));
                 var jsonString = JsonConvert.SerializeObject(config.servers, Formatting.Indented);
-                if (GlobalConfiguration.config_password.Length > 0)
-                {
-                    using var encryptor = EncryptorFactory.GetEncryptor(@"aes-256-cfb", GlobalConfiguration.config_password);
-                    var cfgData = Encoding.UTF8.GetBytes(jsonString);
-                    jsonString = Utils.EncryptLargeBytesToBase64String(encryptor, cfgData);
-                }
                 sw.Write(jsonString);
                 sw.Flush();
             }

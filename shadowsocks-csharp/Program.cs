@@ -4,7 +4,6 @@ using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
 using Shadowsocks.Util.SingleInstance;
-using Shadowsocks.View;
 using System;
 using System.IO;
 using System.Linq;
@@ -54,28 +53,9 @@ namespace Shadowsocks
             SystemEvents.PowerModeChanged += SystemEvents_PowerModeChanged;
             app.Exit += App_Exit;
 
-            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("##SyncfusionLicense##");
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(@"##SyncfusionLicense##");
 
-            var tryTimes = 0;
-            var cfg = Configuration.Load();
-            while (cfg == null)
-            {
-                if (tryTimes >= 5)
-                    return;
-                var dlg = new InputPasswordWindow();
-                if (dlg.ShowDialog() == true)
-                {
-                    Configuration.SetPassword(dlg.Password);
-                }
-                else
-                {
-                    return;
-                }
-                ++tryTimes;
-                cfg = Configuration.Load();
-            }
-
-            I18NUtil.SetLanguage(cfg.LangName);
+            I18NUtil.SetLanguage(Configuration.Load().LangName);
             ViewUtils.SetResource(app.Resources, @"../View/NotifyIconResources.xaml", 1);
 
             _controller = new ShadowsocksController();
@@ -91,6 +71,30 @@ namespace Shadowsocks
             SystemEvents.SessionEnding += _viewController.Quit_Click;
 
             _controller.Start();
+            if (_controller.IsDefaultConfig())
+            {
+                var res = MessageBox.Show(
+                $@"{I18NUtil.GetAppStringValue(@"DefaultConfigMessage")}{Environment.NewLine}{I18NUtil.GetAppStringValue(@"DefaultConfigQuestion")}",
+                UpdateChecker.Name, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.OK);
+                switch (res)
+                {
+                    case MessageBoxResult.Yes:
+                    {
+                        _controller.ShowConfigForm();
+                        break;
+                    }
+                    case MessageBoxResult.No:
+                    {
+                        _controller.ShowSubscribeWindow();
+                        break;
+                    }
+                    default:
+                    {
+                        StopController();
+                        return;
+                    }
+                }
+            }
 #if !DEBUG
             Reg.SetUrlProtocol(@"ssr");
             Reg.SetUrlProtocol(@"sub");
@@ -99,14 +103,20 @@ namespace Shadowsocks
             app.Run();
         }
 
+        private static void StopController()
+        {
+            _viewController?.Quit_Click(default, default);
+            _controller?.Stop();
+            _controller = null;
+        }
+
         private static void App_Exit(object sender, ExitEventArgs e)
         {
 #if !DEBUG
             Reg.RemoveUrlProtocol(@"ssr");
             Reg.RemoveUrlProtocol(@"sub");
 #endif
-            _controller?.Stop();
-            _controller = null;
+            StopController();
         }
 
         private static void SystemEvents_PowerModeChanged(object sender, PowerModeChangedEventArgs e)
