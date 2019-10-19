@@ -341,7 +341,7 @@ namespace Shadowsocks.Controller
                         {
                             ((MenuItem)menuItem.Items[0]).Click += Setting_Click;
                             ((MenuItem)menuItem.Items[1]).Click += ShowPortMapItem_Click;
-                            ((MenuItem)menuItem.Items[2]).Click += showURLFromQRCode;
+                            ((MenuItem)menuItem.Items[2]).Click += ShowUrlFromQrCode;
                             ((MenuItem)menuItem.Items[4]).Click += OpenWiki_Click;
                             ((MenuItem)menuItem.Items[5]).Click += FeedbackItem_Click;
 
@@ -995,7 +995,7 @@ namespace Shadowsocks.Controller
 
         private static void DonateMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            Utils.OpenURL(@"https://github.com/HMBSbige/ShadowsocksR-Windows/blob/master/pic/wechat.jpg");
+            new ImageWindow().Show();
         }
 
         private void notifyIcon_TrayLeftMouseUp(object sender, RoutedEventArgs e)
@@ -1334,7 +1334,7 @@ namespace Shadowsocks.Controller
             ShowSubscribeSettingForm();
         }
 
-        private void showURLFromQRCode()
+        private void ShowUrlFromQrCode()
         {
             var dlg = new ShowTextWindow(_urlToOpen);
             dlg.Show();
@@ -1344,12 +1344,12 @@ namespace Shadowsocks.Controller
 
         private void Splash_Closed2(object sender, EventArgs e)
         {
-            showURLFromQRCode();
+            ShowUrlFromQrCode();
         }
 
-        private void showURLFromQRCode(object sender, RoutedEventArgs e)
+        private void ShowUrlFromQrCode(object sender, RoutedEventArgs e)
         {
-            showURLFromQRCode();
+            ShowUrlFromQrCode();
         }
 
         #endregion

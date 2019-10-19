@@ -44,6 +44,10 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Resource Include="..\pic\wechat.jpg" Link="Resources\wechat.jpg" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <PackageReference Include="Costura.Fody" Version="4.1.0" Condition=" '$(SelfContained)' != 'true' " />
     <PackageReference Include="DnsClient" Version="1.2.0" />
     <PackageReference Include="Fody" Version="6.0.0" Condition=" '$(SelfContained)' != 'true' ">

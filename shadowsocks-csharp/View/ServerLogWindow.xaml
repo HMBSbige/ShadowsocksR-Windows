@@ -81,6 +81,7 @@
                                    AutoGenerateColumns="False"
                                    ColumnSizer="Auto"
                                    AlternatingRowStyle="{StaticResource AlternatingRowStyle}"
+                                   RowSelectionBrush="#40A3F1"
 
                                    SelectionUnit="Cell" SelectionMode="Single"
                                    AllowEditing="False" AddNewRowPosition="None"
