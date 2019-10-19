@@ -1,4 +1,4 @@
-﻿using Hardcodet.Wpf.TaskbarNotification;
+using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Win32;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Controller.Service;
@@ -1001,23 +1001,27 @@ namespace Shadowsocks.Controller
         private void notifyIcon_TrayLeftMouseUp(object sender, RoutedEventArgs e)
         {
             var key = Keyboard.IsKeyDown(Key.LeftShift) ? 1 : 0;
+            key |= Keyboard.IsKeyDown(Key.RightShift) ? 1 : 0;
             key |= Keyboard.IsKeyDown(Key.LeftCtrl) ? 2 : 0;
+            key |= Keyboard.IsKeyDown(Key.RightCtrl) ? 2 : 0;
             key |= Keyboard.IsKeyDown(Key.LeftAlt) ? 4 : 0;
-            if (key == 2)
+            switch (key)
             {
-                ShowServerLogForm();
-            }
-            else if (key == 1)
-            {
-                ShowSettingForm();
-            }
-            else if (key == 4)
-            {
-                ShowPortMapForm();
-            }
-            else
-            {
-                ShowConfigForm(false);
+                case 1:
+                    ShowSettingForm();
+                    break;
+                case 2:
+                    ShowServerLogForm();
+                    break;
+                case 3:
+                    ShowSubscribeSettingForm();
+                    break;
+                case 4:
+                    ShowPortMapForm();
+                    break;
+                default:
+                    ShowConfigForm(false);
+                    break;
             }
         }
 
