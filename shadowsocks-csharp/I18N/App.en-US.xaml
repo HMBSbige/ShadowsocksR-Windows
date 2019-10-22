@@ -26,7 +26,6 @@
     <sys:String x:Key="BypassLanNotChina">Bypass LAN &amp;&amp; not China</sys:String>
     <sys:String x:Key="UserCustom">User custom</sys:String>
     <sys:String x:Key="DisableBypass">Disable bypass</sys:String>
-    <sys:String x:Key="ReloadUserRule">Reload user rule</sys:String>
 
     <sys:String x:Key="Servers">Servers</sys:String>
     <sys:String x:Key="EditServers">Edit servers...</sys:String>

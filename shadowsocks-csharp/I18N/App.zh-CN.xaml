@@ -26,7 +26,6 @@
     <sys:String x:Key="BypassLanNotChina">绕过局域网和非大陆</sys:String>
     <sys:String x:Key="UserCustom">用户自定义</sys:String>
     <sys:String x:Key="DisableBypass">全局</sys:String>
-    <sys:String x:Key="ReloadUserRule">重载用户规则</sys:String>
 
     <sys:String x:Key="Servers">服务器</sys:String>
     <sys:String x:Key="EditServers">编辑服务器</sys:String>

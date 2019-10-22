@@ -26,7 +26,6 @@
     <sys:String x:Key="BypassLanNotChina">繞過區域網路和非大陸</sys:String>
     <sys:String x:Key="UserCustom">使用者自訂</sys:String>
     <sys:String x:Key="DisableBypass">全域</sys:String>
-    <sys:String x:Key="ReloadUserRule">重載用戶規則</sys:String>
 
     <sys:String x:Key="Servers">伺服器</sys:String>
     <sys:String x:Key="EditServers">編輯伺服器...</sys:String>

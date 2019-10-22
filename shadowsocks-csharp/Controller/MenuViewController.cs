@@ -303,7 +303,7 @@ namespace Shadowsocks.Controller
                             ruleDisableBypass.Click += RuleBypassDisableItem_Click;
                             break;
                         }
-                        case @"ReloadUserRule":
+                        case @"ReloadUserRole":
                         {
                             menuItem.Click += ReloadUserRule;
                             break;

@@ -34,7 +34,7 @@
                 <MenuItem x:Name="DisableBypass" />
             </MenuItem>
         </MenuItem>
-        <MenuItem x:Name="ReloadUserRule" />
+        <MenuItem x:Name="ReloadUserRole" />
         <Separator />
         <MenuItem x:Name="Servers">
             <Separator />
