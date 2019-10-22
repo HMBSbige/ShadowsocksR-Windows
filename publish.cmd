@@ -1,9 +1,11 @@
 @echo off
 
-for /f "tokens=*" %%s in ('findstr /C:"public const string Version = @" shadowsocks-csharp\Controller\HttpRequest\UpdateChecker.cs') do (
+for /f "tokens=*" %%s in ('findstr /C:"public const string Version = @" %~dp0\shadowsocks-csharp\Controller\HttpRequest\UpdateChecker.cs') do (
     set version=%%s
 )
 set version=%version:~32,-2%
+
+echo Version: %version%
 
 echo package .NET Core
 7z a ShadowsocksR-netcore-%version%.zip %~dp0\shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\ShadowsocksR.exe %~dp0\shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\ShadowsocksR.dll %~dp0\shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\ShadowsocksR.runtimeconfig.json
