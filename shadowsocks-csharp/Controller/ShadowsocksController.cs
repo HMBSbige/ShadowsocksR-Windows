@@ -403,9 +403,7 @@ namespace Shadowsocks.Controller
             Logging.OpenLogFile();
             ReloadIPRange();
 
-            var hostMap = new HostMap();
-            hostMap.LoadHostFile();
-            HostMap.Instance().Clear(hostMap);
+            ReloadUserRule();
 
             GlobalConfiguration.OSSupportsLocalIPv6 = Socket.OSSupportsIPv6;
 
@@ -519,6 +517,13 @@ namespace Shadowsocks.Controller
 
             UpdateSystemProxy();
             Utils.ReleaseMemory();
+        }
+        
+        public void ReloadUserRule()
+        {
+            HostMap hostMap = new HostMap();
+            hostMap.LoadHostFile();
+            HostMap.Instance().Clear(hostMap);
         }
 
         private void SaveConfig(Configuration newConfig)

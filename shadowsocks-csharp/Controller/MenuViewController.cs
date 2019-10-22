@@ -303,6 +303,11 @@ namespace Shadowsocks.Controller
                             ruleDisableBypass.Click += RuleBypassDisableItem_Click;
                             break;
                         }
+                        case @"ReloadUserRole":
+                        {
+                            menuItem.Click += ReloadUserRule;
+                            break;
+                        }
                         case @"Servers":
                         {
                             ServersItem = menuItem;
@@ -997,6 +1002,12 @@ namespace Shadowsocks.Controller
         {
             new ImageWindow().Show();
         }
+        
+        private void ReloadUserRule(object sender, EventArgs e)
+        {
+            controller.ReloadUserRule();
+        }
+
 
         private void notifyIcon_TrayLeftMouseUp(object sender, RoutedEventArgs e)
         {
