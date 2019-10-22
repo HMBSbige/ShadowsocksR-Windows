@@ -30,7 +30,10 @@ namespace Shadowsocks.Model
     {
         Dictionary<string, HostNode> root = new Dictionary<string, HostNode>();
         IPSegment ips = new IPSegment("remoteproxy");
-
+        private FileSystemWatcher _fileSystemWatcher;
+        private DateTime _lastWatchTime;
+        private object _watchingLock = new object();
+        
         static HostMap instance = new HostMap();
         const string HOST_FILENAME = "user.rule";
 
@@ -123,31 +126,65 @@ namespace Shadowsocks.Model
             var absFilePath = Path.Combine(Directory.GetCurrentDirectory(), filename);
             if (File.Exists(absFilePath))
             {
-                try
+                if (_fileSystemWatcher == null)
                 {
-                    using (var stream = File.OpenText(absFilePath))
+                    lock (_watchingLock)
                     {
-                        while (true)
+                        if (_fileSystemWatcher == null)
                         {
-                            var line = stream.ReadLine();
-                            if (line == null)
-                                break;
-                            if (line.Length > 0 && line.StartsWith("#"))
-                                continue;
-                            var parts = line.Split(new[] { ' ', '\t' }, 2, StringSplitOptions.RemoveEmptyEntries);
-                            if (parts.Length < 2)
-                                continue;
-                            AddHost(parts[0], parts[1]);
+                            _fileSystemWatcher = new FileSystemWatcher
+                            {
+                                Path = Directory.GetCurrentDirectory(),
+                                Filter = filename,
+                                NotifyFilter = NotifyFilters.LastWrite,
+                                EnableRaisingEvents = true
+                            };
+
+                            _fileSystemWatcher.Changed += Watcher;
                         }
                     }
-                    return true;
                 }
-                catch
-                {
-                    return false;
-                }
+
+                return InternalLoadHostFile(absFilePath);
             }
             return false;
+        }
+        
+        private void Watcher(object o, FileSystemEventArgs e)
+        {
+            lock (_watchingLock)
+            {
+                _fileSystemWatcher.EnableRaisingEvents = false;
+                InternalLoadHostFile(e.FullPath);
+                _fileSystemWatcher.EnableRaisingEvents = true;
+            }
+        }
+
+        private bool InternalLoadHostFile(string absFilePath)
+        {
+            try
+            {
+                using (var stream = File.OpenText(absFilePath))
+                {
+                    while (true)
+                    {
+                        var line = stream.ReadLine();
+                        if (line == null)
+                            break;
+                        if (line.Length > 0 && line.StartsWith("#"))
+                            continue;
+                        var parts = line.Split(new[] {' ', '\t'}, 2, StringSplitOptions.RemoveEmptyEntries);
+                        if (parts.Length < 2)
+                            continue;
+                        AddHost(parts[0], parts[1]);
+                    }
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
