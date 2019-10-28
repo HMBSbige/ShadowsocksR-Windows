@@ -1,11 +1,10 @@
 ﻿using Newtonsoft.Json;
-using Shadowsocks.Encryption;
 using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
-using System.Text;
 
 namespace Shadowsocks.Model
 {
@@ -54,6 +53,8 @@ namespace Shadowsocks.Model
         public bool isPreRelease;
         public bool AutoCheckUpdate;
 
+        public string LangName;
+
         public List<ServerSubscribe> serverSubscribes;
 
         public Dictionary<string, string> token = new Dictionary<string, string>();
@@ -75,16 +76,6 @@ namespace Shadowsocks.Model
 
         [JsonIgnore]
         public static string AnyHost => GlobalConfiguration.OSSupportsLocalIPv6 ? $@"[{IPAddress.IPv6Any}]" : $@"{IPAddress.Any}";
-
-        public static void SetPassword(string password)
-        {
-            GlobalConfiguration.config_password = password;
-        }
-
-        public static bool SetPasswordTry(string oldPassword)
-        {
-            return oldPassword == GlobalConfiguration.config_password;
-        }
 
         public bool KeepCurrentServer(int port, string targetAddr, string id)
         {
@@ -304,6 +295,8 @@ namespace Shadowsocks.Model
             AutoCheckUpdate = true;
             isPreRelease = true;
 
+            LangName = string.Empty;
+
             serverSubscribes = new List<ServerSubscribe>();
 
             configs = new List<Server>();
@@ -342,11 +335,12 @@ namespace Shadowsocks.Model
             AutoCheckUpdate = config.AutoCheckUpdate;
             isPreRelease = config.isPreRelease;
             serverSubscribes = config.serverSubscribes;
+            LangName = config.LangName;
         }
 
-        public void FixConfiguration()
+        private void FixConfiguration()
         {
-            if (localPort == 0)
+            if (!IsPort(localPort))
             {
                 localPort = 1080;
             }
@@ -371,50 +365,41 @@ namespace Shadowsocks.Model
             }
             if (localAuthPassword == null || localAuthPassword.Length < 16)
             {
-                localAuthPassword = RandString(20);
+                localAuthPassword = Rng.RandId();
             }
-
-            var id = new Dictionary<string, int>();
-            if (index < 0 || index >= configs.Count) index = 0;
+            if (index < 0 || index >= configs.Count)
+            {
+                index = 0;
+            }
             if (configs.Count == 0)
             {
                 configs.Add(GetDefaultServer());
             }
+
+            var id = new HashSet<string>();
             foreach (var server in configs)
             {
-                if (id.ContainsKey(server.Id))
+                while (id.Contains(server.Id))
                 {
-                    var newId = new byte[16];
-                    RNG.RandBytes(newId, newId.Length);
-                    server.Id = BitConverter.ToString(newId).Replace("-", string.Empty);
+                    server.Id = Rng.RandId();
                 }
-                else
-                {
-                    id[server.Id] = 0;
-                }
+                id.Add(server.Id);
             }
-        }
-
-        private static string RandString(int len)
-        {
-            const string set = @"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
-            var ret = string.Empty;
-            var random = new Random();
-            for (var i = 0; i < len; ++i)
-            {
-                ret += set[random.Next(set.Length)];
-            }
-            return ret;
         }
 
         public static Configuration LoadFile(string filename)
         {
+            Configuration config;
             try
             {
                 if (File.Exists(filename))
                 {
                     var configContent = File.ReadAllText(filename);
-                    return Load(configContent);
+                    config = Load(configContent);
+                    if (config != null)
+                    {
+                        return config;
+                    }
                 }
             }
             catch (Exception e)
@@ -422,7 +407,7 @@ namespace Shadowsocks.Model
                 Console.WriteLine(e);
             }
 
-            var config = new Configuration();
+            config = new Configuration();
             config.FixConfiguration();
             return config;
         }
@@ -445,12 +430,6 @@ namespace Shadowsocks.Model
             try
             {
                 var jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
-                if (GlobalConfiguration.config_password.Length > 0)
-                {
-                    using var encryptor = EncryptorFactory.GetEncryptor(@"aes-256-cfb", GlobalConfiguration.config_password);
-                    var cfgData = Encoding.UTF8.GetBytes(jsonString);
-                    jsonString = Utils.EncryptLargeBytesToBase64String(encryptor, cfgData);
-                }
                 using (var sw = new StreamWriter(File.Open(CONFIG_FILE, FileMode.Create)))
                 {
                     sw.Write(jsonString);
@@ -481,54 +460,43 @@ namespace Shadowsocks.Model
         {
             try
             {
-                if (GlobalConfiguration.config_password.Length > 0)
-                {
-                    using var encryptor = EncryptorFactory.GetEncryptor(@"aes-256-cfb", GlobalConfiguration.config_password);
-                    config_str = Encoding.UTF8.GetString(Utils.DecryptLargeBase64StringToBytes(encryptor, config_str));
-                }
-            }
-            catch
-            {
-                // ignored
-            }
-
-            try
-            {
                 var config = JsonConvert.DeserializeObject<Configuration>(config_str);
                 config.FixConfiguration();
                 return config;
             }
             catch
             {
-                // ignored
+                return null;
             }
-
-            return null;
         }
 
-        public static Server GetDefaultServer()
+        private static Server GetDefaultServer()
         {
             return new Server();
         }
 
         public bool IsDefaultConfig()
         {
-            return configs.Count == 1 && configs[0].server == GetDefaultServer().server;
+            return configs.All(server => server.server == GetDefaultServer().server);
         }
 
         private static Server GetErrorServer()
         {
-            var server = new Server { server = "invalid" };
+            var server = new Server { server = @"invalid" };
             return server;
         }
 
         public static void CheckPort(int port)
         {
-            if (port <= IPEndPoint.MinPort || port > IPEndPoint.MaxPort)
+            if (!IsPort(port))
             {
                 throw new ConfigurationException(I18NUtil.GetAppStringValue(@"PortOutOfRange"));
             }
         }
 
+        private static bool IsPort(int port)
+        {
+            return port > IPEndPoint.MinPort && port <= IPEndPoint.MaxPort;
+        }
     }
 }

@@ -1,22 +1,22 @@
-﻿using System;
+﻿using Shadowsocks.Properties;
+using Shadowsocks.Util;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Text;
 
 namespace Shadowsocks.Model
 {
     public class IPRangeSet
     {
-        private const string APNIC_FILENAME = "delegated-apnic-latest";
-        private const string APNIC_EXT_FILENAME = "delegated-apnic-extended-latest";
-        private const string CHN_FILENAME = "chn_ip.txt";
-        private uint[] _set;
+        private const string ApnicFilename = @"delegated-apnic-latest";
+        private const string ApnicExtFilename = @"delegated-apnic-extended-latest";
+        private const string ChnFilename = @"chn_ip.txt";
+        private readonly uint[] _set = new uint[256 * 256 * 8];
 
-        public IPRangeSet()
-        {
-            _set = new uint[256 * 256 * 8];
-        }
-
-        public void InsertRange(uint begin, uint end)
+        private void InsertRange(uint begin, uint end)
         {
             begin /= 256;
             end /= 256;
@@ -28,19 +28,19 @@ namespace Shadowsocks.Model
             }
         }
 
-        public void Insert(uint begin, uint size)
+        private void Insert(uint begin, uint size)
         {
             InsertRange(begin, begin + size - 1);
         }
 
-        public void Insert(IPAddress addr, uint size)
+        private void Insert(IPAddress addr, uint size)
         {
             var bytes_addr = addr.GetAddressBytes();
             Array.Reverse(bytes_addr);
             Insert(BitConverter.ToUInt32(bytes_addr, 0), size);
         }
 
-        public void Insert(IPAddress addr_beg, IPAddress addr_end)
+        private void Insert(IPAddress addr_beg, IPAddress addr_end)
         {
             var bytes_addr_beg = addr_beg.GetAddressBytes();
             Array.Reverse(bytes_addr_beg);
@@ -49,7 +49,7 @@ namespace Shadowsocks.Model
             InsertRange(BitConverter.ToUInt32(bytes_addr_beg, 0), BitConverter.ToUInt32(bytes_addr_end, 0));
         }
 
-        public bool isIn(uint ip)
+        private bool IsIn(uint ip)
         {
             ip /= 256;
             var pos = ip / 32;
@@ -61,16 +61,16 @@ namespace Shadowsocks.Model
         {
             var bytes_addr = addr.GetAddressBytes();
             Array.Reverse(bytes_addr);
-            return isIn(BitConverter.ToUInt32(bytes_addr, 0));
+            return IsIn(BitConverter.ToUInt32(bytes_addr, 0));
         }
 
-        public bool LoadApnic(string zone)
+        private bool LoadApnic(string zone)
         {
-            var filename = APNIC_EXT_FILENAME;
+            var filename = ApnicExtFilename;
             var absFilePath = Path.Combine(Directory.GetCurrentDirectory(), filename);
             if (!File.Exists(absFilePath))
             {
-                filename = APNIC_FILENAME;
+                filename = ApnicFilename;
                 absFilePath = Path.Combine(Directory.GetCurrentDirectory(), filename);
             }
             if (File.Exists(absFilePath))
@@ -79,7 +79,7 @@ namespace Shadowsocks.Model
                 {
                     using (var stream = File.OpenText(absFilePath))
                     {
-                        using var out_stream = new StreamWriter(File.OpenWrite(CHN_FILENAME));
+                        using var out_stream = new StreamWriter(File.OpenWrite(ChnFilename));
                         while (true)
                         {
                             var line = stream.ReadLine();
@@ -107,50 +107,78 @@ namespace Shadowsocks.Model
                 }
                 catch
                 {
-                    return false;
+                    // ignored
                 }
             }
             return false;
+        }
+
+        private bool LoadChn(IEnumerable<string> lines)
+        {
+            try
+            {
+                foreach (var line in lines)
+                {
+                    if (line == null)
+                    {
+                        break;
+                    }
+                    var parts = line.Split(' ');
+                    if (parts.Length < 2)
+                    {
+                        continue;
+                    }
+
+                    IPAddress.TryParse(parts[0], out var addr_begin);
+                    IPAddress.TryParse(parts[1], out var addr_end);
+                    Insert(addr_begin, addr_end);
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool IsEmpty()
+        {
+            return _set.All(unit => unit == 0u);
+        }
+
+        private void Clear()
+        {
+            Array.Clear(_set, 0, _set.Length);
         }
 
         public bool LoadChn()
         {
-            var absFilePath = Path.Combine(Directory.GetCurrentDirectory(), CHN_FILENAME);
+            var absFilePath = Path.Combine(Directory.GetCurrentDirectory(), ChnFilename);
             if (File.Exists(absFilePath))
             {
-                try
+                if (!LoadChn(File.ReadLines(absFilePath, Encoding.UTF8)))
                 {
-                    using var stream = File.OpenText(absFilePath);
-                    while (true)
-                    {
-                        var line = stream.ReadLine();
-                        if (line == null)
-                            break;
-                        var parts = line.Split(' ');
-                        if (parts.Length < 2)
-                            continue;
-
-                        IPAddress.TryParse(parts[0], out var addr_beg);
-                        IPAddress.TryParse(parts[1], out var addr_end);
-                        Insert(addr_beg, addr_end);
-                    }
-                }
-                catch
-                {
-                    return false;
+                    Clear();
                 }
             }
-            else
+            if (IsEmpty())
             {
-                return !LoadApnic("CN");
+                if (!LoadApnic(@"CN"))
+                {
+                    Clear();
+                }
             }
-            return false;
+            if (IsEmpty())
+            {
+                return LoadChn(Resources.chn_ip.GetLines());
+            }
+            return true;
         }
 
         public void Reverse()
         {
-            IPAddress.TryParse("240.0.0.0", out var addr_beg);
-            IPAddress.TryParse("255.255.255.255", out var addr_end);
+            IPAddress.TryParse(@"240.0.0.0", out var addr_beg);
+            IPAddress.TryParse(@"255.255.255.255", out var addr_end);
             Insert(addr_beg, addr_end);
             for (uint i = 0; i < _set.Length; ++i)
             {

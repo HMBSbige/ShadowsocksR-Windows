@@ -1,4 +1,4 @@
-﻿using Hardcodet.Wpf.TaskbarNotification;
+using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Win32;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Controller.Service;
@@ -99,6 +99,7 @@ namespace Shadowsocks.Controller
             controller.UpdatePACFromChnDomainsAndIPCompleted += controller_UpdatePACFromChnDomainsAndIPCompleted;
             controller.UpdatePACFromGFWListError += controller_UpdatePACFromGFWListError;
             controller.ShowConfigFormEvent += Config_Click;
+            controller.ShowSubscribeWindowEvent += Controller_ShowSubscribeWindowEvent;
 
             _notifyIcon = new TaskbarIcon();
             UpdateTrayIcon();
@@ -340,18 +341,21 @@ namespace Shadowsocks.Controller
                         {
                             ((MenuItem)menuItem.Items[0]).Click += Setting_Click;
                             ((MenuItem)menuItem.Items[1]).Click += ShowPortMapItem_Click;
-                            ((MenuItem)menuItem.Items[3]).Click += OpenWiki_Click;
-                            ((MenuItem)menuItem.Items[4]).Click += FeedbackItem_Click;
-                            ((MenuItem)menuItem.Items[5]).Click += DonateMenuItem_Click;
-                            ((MenuItem)menuItem.Items[7]).Click += showURLFromQRCode;
-                            ((MenuItem)menuItem.Items[8]).Click += ResetPasswordItem_Click;
+                            ((MenuItem)menuItem.Items[2]).Click += ShowUrlFromQrCode;
+                            ((MenuItem)menuItem.Items[4]).Click += OpenWiki_Click;
+                            ((MenuItem)menuItem.Items[5]).Click += FeedbackItem_Click;
 
-                            var updateMenu = (MenuItem)menuItem.Items[10];
+                            var updateMenu = (MenuItem)menuItem.Items[7];
                             ((MenuItem)updateMenu.Items[0]).Click += CheckUpdate_Click;
                             AutoCheckUpdateItem = (MenuItem)updateMenu.Items[2];
                             AllowPreReleaseItem = (MenuItem)updateMenu.Items[3];
                             AutoCheckUpdateItem.Click += AutoCheckUpdateItem_Click;
                             AllowPreReleaseItem.Click += AllowPreRelease_Click;
+                            break;
+                        }
+                        case @"Donate":
+                        {
+                            menuItem.Click += DonateMenuItem_Click;
                             break;
                         }
                         case @"Quit":
@@ -537,6 +541,10 @@ namespace Shadowsocks.Controller
                     {
                         config.index = config.configs.Count - 1;
                     }
+                    else
+                    {
+                        config.index = selectedIndex;
+                    }
 
                     //If Update Success
                     if (count > 0)
@@ -654,7 +662,8 @@ namespace Shadowsocks.Controller
         }
 
         private void UpdateServersMenu()
-        {//TODO
+        {
+            //TODO:按订阅分组
             var items = ServersItem.Items;
             while (!Equals(items[0], SeparatorItem))
             {
@@ -913,6 +922,11 @@ namespace Shadowsocks.Controller
             }
         }
 
+        private void Controller_ShowSubscribeWindowEvent(object sender, EventArgs e)
+        {
+            ShowSubscribeSettingForm();
+        }
+
         private void Import_Click(object sender, RoutedEventArgs e)
         {
             Task.Run(() =>
@@ -925,9 +939,9 @@ namespace Shadowsocks.Controller
                 {
                     var name = dlg.FileName;
                     var cfg = Configuration.LoadFile(name);
-                    if (cfg.configs.Count == 1 && cfg.configs[0].server == Configuration.GetDefaultServer().server)
+                    if (cfg.IsDefaultConfig())
                     {
-                        MessageBox.Show(@"Load config file failed", UpdateChecker.Name);
+                        MessageBox.Show(I18NUtil.GetAppStringValue(@"ImportConfigFailed"), UpdateChecker.Name);
                     }
                     else
                     {
@@ -979,38 +993,35 @@ namespace Shadowsocks.Controller
             Utils.OpenURL(@"https://github.com/HMBSbige/ShadowsocksR-Windows/issues/new/choose");
         }
 
-        private static void ResetPasswordItem_Click(object sender, RoutedEventArgs e)
-        {
-            var dlg = new ResetPassword();
-            dlg.Show();
-            dlg.Activate();
-        }
-
         private static void DonateMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            Utils.OpenURL(@"https://github.com/HMBSbige/ShadowsocksR-Windows/blob/master/pic/wechat.jpg");
+            new ImageWindow().Show();
         }
 
         private void notifyIcon_TrayLeftMouseUp(object sender, RoutedEventArgs e)
         {
             var key = Keyboard.IsKeyDown(Key.LeftShift) ? 1 : 0;
+            key |= Keyboard.IsKeyDown(Key.RightShift) ? 1 : 0;
             key |= Keyboard.IsKeyDown(Key.LeftCtrl) ? 2 : 0;
+            key |= Keyboard.IsKeyDown(Key.RightCtrl) ? 2 : 0;
             key |= Keyboard.IsKeyDown(Key.LeftAlt) ? 4 : 0;
-            if (key == 2)
+            switch (key)
             {
-                ShowServerLogForm();
-            }
-            else if (key == 1)
-            {
-                ShowSettingForm();
-            }
-            else if (key == 4)
-            {
-                ShowPortMapForm();
-            }
-            else
-            {
-                ShowConfigForm(false);
+                case 1:
+                    ShowSettingForm();
+                    break;
+                case 2:
+                    ShowServerLogForm();
+                    break;
+                case 3:
+                    ShowSubscribeSettingForm();
+                    break;
+                case 4:
+                    ShowPortMapForm();
+                    break;
+                default:
+                    ShowConfigForm(false);
+                    break;
             }
         }
 
@@ -1327,7 +1338,7 @@ namespace Shadowsocks.Controller
             ShowSubscribeSettingForm();
         }
 
-        private void showURLFromQRCode()
+        private void ShowUrlFromQrCode()
         {
             var dlg = new ShowTextWindow(_urlToOpen);
             dlg.Show();
@@ -1337,12 +1348,12 @@ namespace Shadowsocks.Controller
 
         private void Splash_Closed2(object sender, EventArgs e)
         {
-            showURLFromQRCode();
+            ShowUrlFromQrCode();
         }
 
-        private void showURLFromQRCode(object sender, RoutedEventArgs e)
+        private void ShowUrlFromQrCode(object sender, RoutedEventArgs e)
         {
-            showURLFromQRCode();
+            ShowUrlFromQrCode();
         }
 
         #endregion

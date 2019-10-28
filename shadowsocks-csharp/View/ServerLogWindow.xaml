@@ -45,6 +45,9 @@
             <Style TargetType="syncfusion:GridRowHeaderCell">
                 <Setter Property="Background" Value="{Binding Path=Enable,Converter={StaticResource BooleanToEnabledConverter},Mode=OneWay}" />
             </Style>
+            <Style TargetType="syncfusion:VirtualizingCellsControl" x:Key="AlternatingRowStyle">
+                <Setter Property="Background" Value="#D9D9D9" />
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -77,6 +80,8 @@
                                    SourceType="{x:Type model:Server}"
                                    AutoGenerateColumns="False"
                                    ColumnSizer="Auto"
+                                   AlternatingRowStyle="{StaticResource AlternatingRowStyle}"
+                                   RowSelectionBrush="#40A3F1"
 
                                    SelectionUnit="Cell" SelectionMode="Single"
                                    AllowEditing="False" AddNewRowPosition="None"

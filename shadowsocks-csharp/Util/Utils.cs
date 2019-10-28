@@ -398,5 +398,19 @@ namespace Shadowsocks.Util
         {
             return from xi in x let found = y.Any(xi.IsMatchServer) where !found select xi;
         }
+
+        public static IEnumerable<string> GetLines(this string str, bool removeEmptyLines = true)
+        {
+            using var sr = new StringReader(str);
+            string line;
+            while ((line = sr.ReadLine()) != null)
+            {
+                if (removeEmptyLines && string.IsNullOrWhiteSpace(line))
+                {
+                    continue;
+                }
+                yield return line;
+            }
+        }
     }
 }

@@ -213,7 +213,7 @@ namespace Shadowsocks.Controller.HttpRequest
                     default:
                         throw new ArgumentOutOfRangeException(nameof(template), template, null);
                 }
-                http.DownloadStringAsync(new Uri(TEMPLATE_URL + @"?rnd=" + RNG.RandUInt32()));
+                http.DownloadStringAsync(new Uri(TEMPLATE_URL + @"?rnd=" + Rng.RandUInt32()));
             }
             else if (cnIpRange == null || cnIp16Range == null)
             {
@@ -226,7 +226,7 @@ namespace Shadowsocks.Controller.HttpRequest
                 }
                 http.Proxy = proxy;
                 http.DownloadStringCompleted += HttpDownloadCNIPCompleted;
-                http.DownloadStringAsync(new Uri(CNIP_URL + @"?rnd=" + RNG.RandUInt32()));
+                http.DownloadStringAsync(new Uri(CNIP_URL + @"?rnd=" + Rng.RandUInt32()));
             }
             else
             {
@@ -239,7 +239,7 @@ namespace Shadowsocks.Controller.HttpRequest
                 }
                 http.Proxy = proxy;
                 http.DownloadStringCompleted += HttpDownloadDomainsCompleted;
-                http.DownloadStringAsync(new Uri(CNDOMAINS_URL + @"?rnd=" + RNG.RandUInt32()));
+                http.DownloadStringAsync(new Uri(CNDOMAINS_URL + @"?rnd=" + Rng.RandUInt32()));
             }
         }
 

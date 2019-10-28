@@ -96,7 +96,7 @@ namespace Shadowsocks.Encryption.Stream
             if (_key == null)
                 _key = CachedKeys.Get(k);
             Array.Resize(ref _iv, ivLen);
-            RNG.RandBytes(_iv, ivLen);
+            Rng.RandBytes(_iv, ivLen);
         }
 
         public static void bytesToKey(byte[] password, byte[] key)
@@ -210,7 +210,7 @@ namespace Shadowsocks.Encryption.Stream
         public override void ResetEncrypt()
         {
             _encryptIVSent = false;
-            RNG.RandBytes(_iv, ivLen);
+            Rng.RandBytes(_iv, ivLen);
         }
 
         public override void ResetDecrypt()

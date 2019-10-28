@@ -3,7 +3,7 @@ using System.Security.Cryptography;
 
 namespace Shadowsocks.Util
 {
-    public static class RNG
+    public static class Rng
     {
         public static void RandBytes(byte[] buf, int length = -1)
         {
@@ -30,6 +30,11 @@ namespace Shadowsocks.Util
             }
 
             return BitConverter.ToUInt32(temp, 0);
+        }
+
+        public static string RandId()
+        {
+            return Guid.NewGuid().ToString().Replace(@"-", string.Empty);
         }
     }
 }
