@@ -8,7 +8,7 @@ namespace Shadowsocks.Controller.Service
     public class UpdateSubscribeManager
     {
         private Configuration _config;
-        private List<ServerSubscribe> _serverSubscribes;
+        private Queue<ServerSubscribe> _serverSubscribes;
         private UpdateNode _updater;
         private bool _notify;
 
@@ -19,22 +19,22 @@ namespace Shadowsocks.Controller.Service
                 _config = config;
                 _updater = updater;
                 _notify = updateManually;
-                _serverSubscribes = new List<ServerSubscribe>();
+                _serverSubscribes = new Queue<ServerSubscribe>();
                 if (serverSubscribe != null)
                 {
-                    _serverSubscribes.Add(serverSubscribe);
+                    _serverSubscribes.Enqueue(serverSubscribe);
                 }
                 else
                 {
                     if (updateManually)
                     {
-                        _serverSubscribes.AddRange(config.serverSubscribes);
+                        config.serverSubscribes.ForEach(sub => _serverSubscribes.Enqueue(sub));
                     }
                     else
                     {
                         foreach (var server in config.serverSubscribes.Where(server => server.AutoCheckUpdate))
                         {
-                            _serverSubscribes.Add(server);
+                            _serverSubscribes.Enqueue(server);
                         }
                     }
                 }
@@ -50,9 +50,8 @@ namespace Shadowsocks.Controller.Service
                 return false;
             }
 
-            CurrentServerSubscribe = _serverSubscribes[0];
+            CurrentServerSubscribe = _serverSubscribes.Dequeue();
             _updater.CheckUpdate(_config, CurrentServerSubscribe, _notify);
-            _serverSubscribes.RemoveAt(0);
             return true;
         }
 
