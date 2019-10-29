@@ -1,4 +1,4 @@
-using Hardcodet.Wpf.TaskbarNotification;
+﻿using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Win32;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Controller.Service;
@@ -578,10 +578,8 @@ namespace Shadowsocks.Controller
                     _notifyIcon.ShowBalloonTip(I18NUtil.GetAppStringValue(@"Error"), string.Format(I18NUtil.GetAppStringValue(@"UpdateSubscribeFailure"), lastGroup), BalloonIcon.Info);
                 }
             }
-            if (updateSubscribeManager.Next())
-            {
 
-            }
+            updateSubscribeManager.Next();
         }
 
         private void updateChecker_NewVersionFound(object sender, EventArgs e)

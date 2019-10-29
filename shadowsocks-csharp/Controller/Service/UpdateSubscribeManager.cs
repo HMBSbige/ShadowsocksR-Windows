@@ -42,17 +42,16 @@ namespace Shadowsocks.Controller.Service
             }
         }
 
-        public bool Next()
+        public void Next()
         {
             if (_serverSubscribes.Count == 0)
             {
                 _config = null;
-                return false;
+                return;
             }
 
             CurrentServerSubscribe = _serverSubscribes.Dequeue();
             _updater.CheckUpdate(_config, CurrentServerSubscribe, _notify);
-            return true;
         }
 
         public ServerSubscribe CurrentServerSubscribe { get; private set; }
