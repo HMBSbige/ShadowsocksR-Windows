@@ -59,7 +59,6 @@ namespace Shadowsocks
             ViewUtils.SetResource(app.Resources, @"../View/NotifyIconResources.xaml", 1);
 
             _controller = new ShadowsocksController();
-            HostMap.Instance().LoadHostFile();
 
             // Logging
             Logging.DefaultOut = Console.Out;
@@ -70,7 +69,7 @@ namespace Shadowsocks
             _viewController = new MenuViewController(_controller);
             SystemEvents.SessionEnding += _viewController.Quit_Click;
 
-            _controller.Start();
+            _controller.Reload();
             if (_controller.IsDefaultConfig())
             {
                 var res = MessageBox.Show(
@@ -133,7 +132,7 @@ namespace Shadowsocks
                             Thread.Sleep(10 * 1000);
                             try
                             {
-                                _controller.Start();
+                                _controller.Reload();
                                 Logging.Info("controller started");
                             }
                             catch (Exception ex)
