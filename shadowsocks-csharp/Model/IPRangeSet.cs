@@ -13,7 +13,7 @@ namespace Shadowsocks.Model
     {
         private const string ApnicFilename = @"delegated-apnic-latest";
         private const string ApnicExtFilename = @"delegated-apnic-extended-latest";
-        private const string ChnFilename = @"chn_ip.txt";
+        public const string ChnFilename = @"chn_ip.txt";
         private readonly uint[] _set = new uint[256 * 256 * 8];
 
         private void InsertRange(uint begin, uint end)
