@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shadowsocks.Util;
+using System;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
@@ -13,14 +14,13 @@ namespace Shadowsocks.Controls
             {
                 if (targetType == typeof(Brush))
                 {
-                    return enable ? Brushes.LightGreen : Brushes.Red;
+                    return enable ? ColorConvert.EnableBrush : ColorConvert.DisableBrush;
                 }
             }
             return DependencyProperty.UnsetValue;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter,
-                System.Globalization.CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             throw new NotSupportedException();
         }

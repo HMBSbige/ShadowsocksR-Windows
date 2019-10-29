@@ -37,16 +37,30 @@
             <controls:ConnectEmptyToBrushConverter x:Key="ConnectEmptyToBrushConverter" />
             <controls:ErrorPercentToBrushConverter x:Key="ErrorPercentToBrushConverter" />
             <controls:BooleanToEnabledConverter x:Key="BooleanToEnabledConverter" />
+            <controls:TotalDownloadBackgroundBrushConvert x:Key="TotalDownloadBackgroundBrushConvert" />
+            <controls:TotalUploadBackgroundBrushConvert x:Key="TotalUploadBackgroundBrushConvert" />
+            <controls:TotalDownloadRawBackgroundBrushConvert x:Key="TotalDownloadRawBackgroundBrushConvert" />
+            <SolidColorBrush x:Key="BorderBrush">#E5E5E5</SolidColorBrush>
             <Style TargetType="syncfusion:GridHeaderCellControl">
-                <Setter Property="HorizontalContentAlignment" Value="Center" />
                 <Setter Property="Foreground" Value="Black" />
-                <Setter Property="Background" Value="Bisque" />
+                <Setter Property="BorderBrush" Value="#808080" />
+                <Setter Property="Background" Value="#CCCCCC" />
+            </Style>
+            <Style TargetType="syncfusion:HeaderRowControl">
             </Style>
             <Style TargetType="syncfusion:GridRowHeaderCell">
                 <Setter Property="Background" Value="{Binding Path=Enable,Converter={StaticResource BooleanToEnabledConverter},Mode=OneWay}" />
+                <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+                <Setter Property="BorderThickness" Value="0,0,1,1" />
             </Style>
             <Style TargetType="syncfusion:VirtualizingCellsControl" x:Key="AlternatingRowStyle">
-                <Setter Property="Background" Value="#D9D9D9" />
+                <Setter Property="Background" Value="#FAFAFA" />
+            </Style>
+            <Style TargetType="syncfusion:GridCell">
+                <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+            </Style>
+            <Style TargetType="syncfusion:GridCell" x:Key="BaseGridCell">
+                <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
             </Style>
         </ResourceDictionary>
     </Window.Resources>
@@ -81,7 +95,8 @@
                                    AutoGenerateColumns="False"
                                    ColumnSizer="Auto"
                                    AlternatingRowStyle="{StaticResource AlternatingRowStyle}"
-                                   RowSelectionBrush="#40A3F1"
+                                   RowSelectionBrush="Transparent"
+                                   BorderThickness="0,1,0,0"
 
                                    SelectionUnit="Cell" SelectionMode="Single"
                                    AllowEditing="False" AddNewRowPosition="None"
@@ -106,10 +121,10 @@
 
                     <syncfusion:GridTextColumn MappingName="{StaticResource ServerMappingName}" AllowFiltering="True" >
                         <syncfusion:GridTextColumn.CellStyle>
-                            <Style TargetType="syncfusion:GridCell">
+                            <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsSelected,Mode=OneWay}" Value="True">
-                                        <Setter Property="Background" Value="Cyan" />
+                                        <Setter Property="Background" Value="#FF00FFAA" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -118,7 +133,7 @@
 
                     <syncfusion:GridNumericColumn MappingName="{StaticResource ConnectingMappingName}" NumberDecimalDigits="0" TextAlignment="Left">
                         <syncfusion:GridNumericColumn.CellStyle>
-                            <Style TargetType="syncfusion:GridCell">
+                            <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
                                 <Setter Property="Background"
                                 Value="{Binding Path=SpeedLog.Connecting,Converter={StaticResource ConnectNumberToBrushConverter},Mode=OneWay}" />
                             </Style>
@@ -131,7 +146,7 @@
                                                DisplayBinding="{Binding SpeedLog.AvgDownloadBytesText,Mode=OneWay}" 
                                                ValueBinding="{Binding SpeedLog.AvgDownloadBytes,Mode=OneWay}" SortMode="Value">
                         <syncfusion:GridTextColumn.CellStyle>
-                            <Style TargetType="syncfusion:GridCell">
+                            <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
                                 <Setter Property="Background"
                                 Value="{Binding SpeedLog.AvgDownloadBytes,Converter={StaticResource SpeedToBrushConverter},Mode=OneWay}" />
                             </Style>
@@ -142,7 +157,7 @@
                                                DisplayBinding="{Binding SpeedLog.MaxDownSpeedText,Mode=OneWay}"
                                                ValueBinding="{Binding SpeedLog.MaxDownSpeed,Mode=OneWay}" SortMode="Value">
                         <syncfusion:GridTextColumn.CellStyle>
-                            <Style TargetType="syncfusion:GridCell">
+                            <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
                                 <Setter Property="Background" 
                                 Value="{Binding SpeedLog.MaxDownSpeed,Converter={StaticResource SpeedToBrushConverter},Mode=OneWay}" />
                             </Style>
@@ -153,7 +168,7 @@
                                                DisplayBinding="{Binding SpeedLog.AvgUploadBytesText,Mode=OneWay}"
                                                ValueBinding="{Binding SpeedLog.AvgUploadBytes,Mode=OneWay}" SortMode="Value">
                         <syncfusion:GridTextColumn.CellStyle>
-                            <Style TargetType="syncfusion:GridCell">
+                            <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
                                 <Setter Property="Background"
                                         Value="{Binding SpeedLog.AvgUploadBytes,Converter={StaticResource SpeedToBrushConverter},Mode=OneWay}" />
                             </Style>
@@ -164,7 +179,7 @@
                                                DisplayBinding="{Binding SpeedLog.MaxUpSpeedText,Mode=OneWay}"
                                                ValueBinding="{Binding SpeedLog.MaxUpSpeed,Mode=OneWay}" SortMode="Value">
                         <syncfusion:GridTextColumn.CellStyle>
-                            <Style TargetType="syncfusion:GridCell">
+                            <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
                                 <Setter Property="Background"
                                         Value="{Binding SpeedLog.MaxUpSpeed,Converter={StaticResource SpeedToBrushConverter},Mode=OneWay}" />
                             </Style>
@@ -175,8 +190,8 @@
                                                DisplayBinding="{Binding SpeedLog.TotalDownloadBytesText,Mode=OneWay}"
                                                ValueBinding="{Binding SpeedLog.TotalDownloadBytes,Mode=OneWay}" SortMode="Value">
                         <syncfusion:GridTextColumn.CellStyle>
-                            <Style TargetType="syncfusion:GridCell">
-                                <Setter Property="Background" Value="#FFFFF0F0" />
+                            <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
+                                <Setter Property="Background" Value="{Binding Index,Converter={StaticResource TotalDownloadBackgroundBrushConvert},Mode=OneWay}" />
                             </Style>
                         </syncfusion:GridTextColumn.CellStyle>
                     </syncfusion:GridTextColumn>
@@ -185,8 +200,8 @@
                                                DisplayBinding="{Binding SpeedLog.TotalUploadBytesText,Mode=OneWay}"
                                                ValueBinding="{Binding SpeedLog.TotalUploadBytes,Mode=OneWay}" SortMode="Value">
                         <syncfusion:GridTextColumn.CellStyle>
-                            <Style TargetType="syncfusion:GridCell">
-                                <Setter Property="Background" Value="#FFF4FFF4" />
+                            <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
+                                <Setter Property="Background" Value="{Binding Index,Converter={StaticResource TotalUploadBackgroundBrushConvert},Mode=OneWay}" />
                             </Style>
                         </syncfusion:GridTextColumn.CellStyle>
                     </syncfusion:GridTextColumn>
@@ -195,15 +210,15 @@
                                                DisplayBinding="{Binding SpeedLog.TotalDownloadRawBytesText,Mode=OneWay}"
                                                ValueBinding="{Binding SpeedLog.TotalDownloadRawBytes,Mode=OneWay}" SortMode="Value">
                         <syncfusion:GridTextColumn.CellStyle>
-                            <Style TargetType="syncfusion:GridCell">
-                                <Setter Property="Background" Value="#FFFF8080" />
+                            <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
+                                <Setter Property="Background" Value="{Binding Index,Converter={StaticResource TotalDownloadRawBackgroundBrushConvert},Mode=OneWay}" />
                             </Style>
                         </syncfusion:GridTextColumn.CellStyle>
                     </syncfusion:GridTextColumn>
 
                     <syncfusion:GridNumericColumn MappingName="{StaticResource ConnectErrorMappingName}" NumberDecimalDigits="0" TextAlignment="Left">
                         <syncfusion:GridNumericColumn.CellStyle>
-                            <Style TargetType="syncfusion:GridCell">
+                            <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
                                 <Setter Property="Background"
                                         Value="{Binding SpeedLog.ConnectError,Converter={StaticResource ConnectErrorToBrushConverter},Mode=OneWay}" />
                             </Style>
@@ -212,7 +227,7 @@
 
                     <syncfusion:GridNumericColumn MappingName="{StaticResource ErrorTimeoutTimesMappingName}" NumberDecimalDigits="0" TextAlignment="Left">
                         <syncfusion:GridNumericColumn.CellStyle>
-                            <Style TargetType="syncfusion:GridCell">
+                            <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
                                 <Setter Property="Background"
                                         Value="{Binding SpeedLog.ErrorTimeoutTimes,Converter={StaticResource ConnectEmptyToBrushConverter},Mode=OneWay}" />
                             </Style>
@@ -221,7 +236,7 @@
 
                     <syncfusion:GridNumericColumn MappingName="{StaticResource ErrorEmptyTimesMappingName}" NumberDecimalDigits="0" TextAlignment="Left">
                         <syncfusion:GridNumericColumn.CellStyle>
-                            <Style TargetType="syncfusion:GridCell">
+                            <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
                                 <Setter Property="Background"
                                         Value="{Binding SpeedLog.ErrorEmptyTimes,Converter={StaticResource ConnectEmptyToBrushConverter},Mode=OneWay}" />
                             </Style>
@@ -230,7 +245,7 @@
 
                     <syncfusion:GridNumericColumn MappingName="{StaticResource ErrorContinuousTimesMappingName}" NumberDecimalDigits="0" TextAlignment="Left">
                         <syncfusion:GridNumericColumn.CellStyle>
-                            <Style TargetType="syncfusion:GridCell">
+                            <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
                                 <Setter Property="Background"
                                         Value="{Binding SpeedLog.ErrorContinuousTimes,Converter={StaticResource ConnectEmptyToBrushConverter},Mode=OneWay}" />
                             </Style>
@@ -240,7 +255,7 @@
                     <syncfusion:GridPercentColumn MappingName="{StaticResource ErrorPercentMappingName}" NullValue="0" AllowNullValue="True" 
                                                   PercentDecimalDigits="0" TextAlignment="Left">
                         <syncfusion:GridPercentColumn.CellStyle>
-                            <Style TargetType="syncfusion:GridCell">
+                            <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
                                 <Setter Property="Background"
                                         Value="{Binding SpeedLog.ErrorPercent,Converter={StaticResource ErrorPercentToBrushConverter},Mode=OneWay}" />
                             </Style>
