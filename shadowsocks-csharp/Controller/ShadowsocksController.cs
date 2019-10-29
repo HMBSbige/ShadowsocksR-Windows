@@ -26,7 +26,8 @@ namespace Shadowsocks.Controller
         private PACServer _pacServer;
         private Configuration _config;
         private ServerTransferTotal _transfer;
-        private IPRangeSet _rangeSet;
+        private HostDaemon _hostDaemon;
+        private IPRangeSet _chnRangeSet;
         private HttpProxyRunner privoxyRunner;
         private GFWListUpdater gfwListUpdater;
         private ChnDomainsAndIPUpdater chnDomainsAndIPUpdater;
@@ -72,11 +73,6 @@ namespace Shadowsocks.Controller
             StartReleasingMemory();
         }
 
-        public void Start()
-        {
-            Reload();
-        }
-
         public bool IsDefaultConfig()
         {
             return _config?.IsDefaultConfig() ?? false;
@@ -89,11 +85,11 @@ namespace Shadowsocks.Controller
 
         private void ReloadIPRange()
         {
-            _rangeSet = new IPRangeSet();
-            _rangeSet.LoadChn();
+            _chnRangeSet = new IPRangeSet();
+            _chnRangeSet.LoadChn();
             if (_config.proxyRuleMode == ProxyRuleMode.BypassLanAndNotChina)
             {
-                _rangeSet.Reverse();
+                _chnRangeSet.Reverse();
             }
         }
 
@@ -108,7 +104,7 @@ namespace Shadowsocks.Controller
             return _config;
         }
 
-        private int FindFirstMatchServer(Server server, IReadOnlyList<Server> servers)
+        private static int FindFirstMatchServer(Server server, IReadOnlyList<Server> servers)
         {
             for (var i = 0; i < servers.Count; ++i)
             {
@@ -120,7 +116,7 @@ namespace Shadowsocks.Controller
             return -1;
         }
 
-        public void AppendConfiguration(Configuration mergeConfig, IReadOnlyList<Server> servers)
+        private static void AppendConfiguration(Configuration mergeConfig, IReadOnlyList<Server> servers)
         {
             if (servers != null)
             {
@@ -137,7 +133,7 @@ namespace Shadowsocks.Controller
             }
         }
 
-        public IEnumerable<Server> MergeConfiguration(Configuration mergeConfig, IReadOnlyList<Server> servers)
+        private static IEnumerable<Server> MergeConfiguration(Configuration mergeConfig, IReadOnlyList<Server> servers)
         {
             if (servers != null)
             {
@@ -156,7 +152,7 @@ namespace Shadowsocks.Controller
             return from t in mergeConfig.configs let j = FindFirstMatchServer(t, servers) where j == -1 select t;
         }
 
-        public Configuration MergeGetConfiguration(Configuration mergeConfig)
+        private static Configuration MergeGetConfiguration(Configuration mergeConfig)
         {
             var ret = Configuration.Load();
             if (mergeConfig != null)
@@ -346,12 +342,12 @@ namespace Shadowsocks.Controller
             ServerTransferTotal.Save(_transfer);
         }
 
-        public void ClearTransferTotal(string server_addr)
+        public void ClearTransferTotal(string serverName)
         {
-            _transfer.Clear(server_addr);
+            _transfer.Clear(serverName);
             foreach (var server in _config.configs)
             {
-                if (server.server == server_addr)
+                if (server.server == serverName)
                 {
                     if (_transfer.servers.ContainsKey(server.server))
                     {
@@ -386,7 +382,7 @@ namespace Shadowsocks.Controller
             gfwListUpdater?.UpdateOnlinePAC(_config, url);
         }
 
-        private void Reload()
+        public void Reload()
         {
             if (_port_map_listener != null)
             {
@@ -401,8 +397,14 @@ namespace Shadowsocks.Controller
             _config.FlushPortMapCache();
             Logging.save_to_file = _config.logEnable;
             Logging.OpenLogFile();
-            ReloadIPRange();
 
+            if (_hostDaemon == null)
+            {
+                _hostDaemon = new HostDaemon();
+                _hostDaemon.ChnIpChanged += (o, args) => ReloadIPRange();
+                _hostDaemon.UserRuleChanged += (o, args) => HostMap.Reload();
+            }
+            ReloadIPRange();
             HostMap.Reload();
 
             GlobalConfiguration.OSSupportsLocalIPv6 = Socket.OSSupportsIPv6;
@@ -414,7 +416,7 @@ namespace Shadowsocks.Controller
             if (_pacDaemon == null)
             {
                 _pacDaemon = new PACDaemon();
-                _pacDaemon.PACFileChanged += PacDaemon_PACFileChanged;
+                _pacDaemon.PACFileChanged += (o, args) => UpdateSystemProxy();
                 _pacDaemon.UserRuleFileChanged += PacDaemon_UserRuleFileChanged;
             }
             if (_pacServer == null)
@@ -425,14 +427,14 @@ namespace Shadowsocks.Controller
             if (gfwListUpdater == null)
             {
                 gfwListUpdater = new GFWListUpdater();
-                gfwListUpdater.UpdateCompleted += pacServer_PACUpdateCompleted;
-                gfwListUpdater.Error += pacServer_PACUpdateError;
+                gfwListUpdater.UpdateCompleted += (o, args) => UpdatePACFromGFWListCompleted?.Invoke(o, args);
+                gfwListUpdater.Error += (o, args) => UpdatePACFromGFWListError?.Invoke(o, args);
             }
             if (chnDomainsAndIPUpdater == null)
             {
                 chnDomainsAndIPUpdater = new ChnDomainsAndIPUpdater();
-                chnDomainsAndIPUpdater.UpdateCompleted += pacServer_PACUpdateCompleted;
-                chnDomainsAndIPUpdater.Error += pacServer_PACUpdateError;
+                chnDomainsAndIPUpdater.UpdateCompleted += (o, args) => UpdatePACFromChnDomainsAndIPCompleted?.Invoke(o, args);
+                chnDomainsAndIPUpdater.Error += (o, args) => UpdatePACFromGFWListError?.Invoke(o, args);
             }
 
             _listener?.Stop();
@@ -446,7 +448,7 @@ namespace Shadowsocks.Controller
             {
                 privoxyRunner.Start(_config);
 
-                var local = new Local(_config, _transfer, _rangeSet);
+                var local = new Local(_config, _transfer, _chnRangeSet);
                 var services = new List<Listener.IService>
                 {
                     local,
@@ -487,7 +489,7 @@ namespace Shadowsocks.Controller
             {
                 try
                 {
-                    var local = new Local(_config, _transfer, _rangeSet);
+                    var local = new Local(_config, _transfer, _chnRangeSet);
                     var services = new List<Listener.IService> { local };
                     var listener = new Listener(services);
                     listener.Start(_config, pair.Key);
@@ -499,13 +501,14 @@ namespace Shadowsocks.Controller
                     // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
                     if (e is SocketException se)
                     {
-                        if (se.SocketErrorCode == SocketError.AddressAlreadyInUse)
+                        switch (se.SocketErrorCode)
                         {
-                            e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortInUse"), pair.Key), e);
-                        }
-                        else if (se.SocketErrorCode == SocketError.AccessDenied)
-                        {
-                            e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortReserved"), pair.Key), se);
+                            case SocketError.AddressAlreadyInUse:
+                                e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortInUse"), pair.Key), e);
+                                break;
+                            case SocketError.AccessDenied:
+                                e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortReserved"), pair.Key), se);
+                                break;
                         }
                     }
                     Logging.LogUsefulException(e);
@@ -533,11 +536,6 @@ namespace Shadowsocks.Controller
             }
         }
 
-        private void PacDaemon_PACFileChanged(object sender, EventArgs e)
-        {
-            UpdateSystemProxy();
-        }
-
         private void PacDaemon_UserRuleFileChanged(object sender, EventArgs e)
         {
             if (!Utils.IsGFWListPAC(PACDaemon.PAC_FILE))
@@ -554,21 +552,6 @@ namespace Shadowsocks.Controller
             }
 
             UpdateSystemProxy();
-        }
-
-        private void pacServer_PACUpdateCompleted(object sender, GFWListUpdater.ResultEventArgs e)
-        {
-            UpdatePACFromGFWListCompleted?.Invoke(sender, e);
-        }
-
-        private void pacServer_PACUpdateError(object sender, ErrorEventArgs e)
-        {
-            UpdatePACFromGFWListError?.Invoke(sender, e);
-        }
-
-        private void pacServer_PACUpdateCompleted(object sender, ChnDomainsAndIPUpdater.ResultEventArgs e)
-        {
-            UpdatePACFromChnDomainsAndIPCompleted?.Invoke(sender, e);
         }
 
         public void ShowConfigForm(int? index = null)

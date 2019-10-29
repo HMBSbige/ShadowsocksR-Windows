@@ -1,32 +1,33 @@
-﻿using Shadowsocks.Controller;
+﻿using Shadowsocks.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Threading.Tasks;
 
-namespace Shadowsocks.Model
+namespace Shadowsocks.Controller.Service
 {
     public static class HostMap
     {
         private static readonly Dictionary<string, HostNode> Root = new Dictionary<string, HostNode>();
         private static IPSegment _ips;
 
-        private static FileSystemWatcher _userRuleWatcher;
-
-        private const string UserRule = @"user.rule";
+        public const string UserRule = @"user.rule";
 
         static HostMap()
         {
-            Reload();
+            Clear();
+        }
 
-            WatchUserRule();
+        private static void Clear()
+        {
+            Root.Clear();
+            _ips = new IPSegment(@"remoteproxy");
         }
 
         public static void Reload()
         {
-            Root.Clear();
-            _ips = new IPSegment(@"remoteproxy");
+            Clear();
+            LoadHostFile();
         }
 
         private static void AddHost(string host, string addr)
@@ -102,60 +103,26 @@ namespace Shadowsocks.Model
             return addr != null;
         }
 
-        public static void LoadHostFile()
+        private static void LoadHostFile()
         {
             if (File.Exists(UserRule))
             {
-                LoadHostFile(UserRule);
-            }
-        }
-
-        private static void WatchUserRule()
-        {
-            _userRuleWatcher?.Dispose();
-            _userRuleWatcher = new FileSystemWatcher(Directory.GetCurrentDirectory())
-            {
-                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName,
-                Filter = UserRule
-            };
-            _userRuleWatcher.Changed += UserRuleWatcher_Changed;
-            _userRuleWatcher.Created += UserRuleWatcher_Changed;
-            _userRuleWatcher.Deleted += UserRuleWatcher_Changed;
-            _userRuleWatcher.Renamed += UserRuleWatcher_Changed;
-            _userRuleWatcher.EnableRaisingEvents = true;
-        }
-
-        private static void UserRuleWatcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            try
-            {
-                ((FileSystemWatcher)sender).EnableRaisingEvents = false;
-                Logging.Info($@"Detected: user rule file '{e.Name}' was {e.ChangeType.ToString().ToLower()}.");
-                Task.Delay(10).ContinueWith(task => { LoadHostFile(e.FullPath); });
-            }
-            finally
-            {
-                ((FileSystemWatcher)sender).EnableRaisingEvents = true;
-            }
-        }
-
-        private static void LoadHostFile(string filePath)
-        {
-            try
-            {
-                foreach (var line in File.ReadLines(filePath))
+                try
                 {
-                    if (line.Length > 0 && line.StartsWith(@"#"))
-                        continue;
-                    var parts = line.Split(new[] { ' ', '\t' }, 2, StringSplitOptions.RemoveEmptyEntries);
-                    if (parts.Length < 2)
-                        continue;
-                    AddHost(parts[0], parts[1]);
+                    foreach (var line in File.ReadLines(UserRule))
+                    {
+                        if (line.Length > 0 && line.StartsWith(@"#"))
+                            continue;
+                        var parts = line.Split(new[] { ' ', '\t' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                        if (parts.Length < 2)
+                            continue;
+                        AddHost(parts[0], parts[1]);
+                    }
                 }
-            }
-            catch
-            {
-                // ignored
+                catch
+                {
+                    // ignored
+                }
             }
         }
     }

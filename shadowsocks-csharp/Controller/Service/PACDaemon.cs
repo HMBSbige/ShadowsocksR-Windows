@@ -30,7 +30,6 @@ namespace Shadowsocks.Controller.Service
             WatchUserRuleFile();
         }
 
-
         public string TouchPACFile()
         {
             if (!File.Exists(PAC_FILE))
@@ -55,10 +54,7 @@ namespace Shadowsocks.Controller.Service
             {
                 return File.ReadAllText(PAC_FILE, Encoding.UTF8);
             }
-            else
-            {
-                return Resources.proxy_pac;
-            }
+            return Resources.proxy_pac;
         }
 
         private void WatchPacFile()
@@ -97,35 +93,31 @@ namespace Shadowsocks.Controller.Service
         // Add a short delay to avoid raise event twice in a short period
         private void PACFileWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            if (PACFileChanged != null)
+            if (PACFileChanged == null) return;
+            try
             {
-                try
-                {
-                    ((FileSystemWatcher)sender).EnableRaisingEvents = false;
-                    Logging.Info($"Detected: PAC file '{e.Name}' was {e.ChangeType.ToString().ToLower()}.");
-                    Task.Delay(10).ContinueWith(task => { PACFileChanged(this, new EventArgs()); });
-                }
-                finally
-                {
-                    ((FileSystemWatcher)sender).EnableRaisingEvents = true;
-                }
+                ((FileSystemWatcher)sender).EnableRaisingEvents = false;
+                Logging.Info($@"Detected: PAC file '{e.Name}' was {e.ChangeType.ToString().ToLower()}.");
+                Task.Delay(10).ContinueWith(task => { PACFileChanged(this, new EventArgs()); });
+            }
+            finally
+            {
+                ((FileSystemWatcher)sender).EnableRaisingEvents = true;
             }
         }
 
         private void UserRuleFileWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            if (UserRuleFileChanged != null)
+            if (UserRuleFileChanged == null) return;
+            try
             {
-                try
-                {
-                    ((FileSystemWatcher)sender).EnableRaisingEvents = false;
-                    Logging.Info($"Detected: User Rule file '{e.Name}' was {e.ChangeType.ToString().ToLower()}.");
-                    Task.Delay(10).ContinueWith(task => { UserRuleFileChanged(this, new EventArgs()); });
-                }
-                finally
-                {
-                    ((FileSystemWatcher)sender).EnableRaisingEvents = true;
-                }
+                ((FileSystemWatcher)sender).EnableRaisingEvents = false;
+                Logging.Info($@"Detected: User Rule file '{e.Name}' was {e.ChangeType.ToString().ToLower()}.");
+                Task.Delay(10).ContinueWith(task => { UserRuleFileChanged(this, new EventArgs()); });
+            }
+            finally
+            {
+                ((FileSystemWatcher)sender).EnableRaisingEvents = true;
             }
         }
         #endregion
