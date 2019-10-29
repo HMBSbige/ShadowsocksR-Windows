@@ -33,6 +33,9 @@ namespace Shadowsocks.Util
         private static readonly Color[] ConnectionColorList = { Colors.White, Colors.LightGreen, Colors.Yellow, Colors.Red };
         private static readonly long[] ConnectionBytesList = { 0, 16, 32, 64 };
 
+        private static readonly Color[] LatencyColorList = { Colors.White, Colors.LightGreen, Colors.Yellow, Colors.Red };
+        private static readonly long[] LatencyList = { 0, 100, 300, 1000 };
+
         private static byte ColorMix(byte a, byte b, double alpha)
         {
             return (byte)(b * alpha + a * (1 - alpha));
@@ -68,6 +71,20 @@ namespace Shadowsocks.Util
                     return ColorMix(ConnectionColorList[i - 1],
                                     ConnectionColorList[i],
                                     (double)(connections - ConnectionBytesList[i - 1]) / (ConnectionBytesList[i] - ConnectionBytesList[i - 1]));
+                }
+            }
+            return ConnectionColorList.Last();
+        }
+
+        public static Color GetLatencyColor(long latency)
+        {
+            for (var i = 1; i < ConnectionColorList.Length; ++i)
+            {
+                if (latency < LatencyList[i])
+                {
+                    return ColorMix(LatencyColorList[i - 1],
+                                    LatencyColorList[i],
+                                    (double)(latency - LatencyList[i - 1]) / (LatencyList[i] - LatencyList[i - 1]));
                 }
             }
             return ConnectionColorList.Last();

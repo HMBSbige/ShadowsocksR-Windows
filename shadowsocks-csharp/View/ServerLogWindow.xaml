@@ -33,6 +33,7 @@
 
             <controls:SpeedToBrushConverter x:Key="SpeedToBrushConverter" />
             <controls:ConnectNumberToBrushConverter x:Key="ConnectNumberToBrushConverter" />
+            <controls:LatencyToBrushConverter x:Key="LatencyToBrushConverter" />
             <controls:ConnectErrorToBrushConverter x:Key="ConnectErrorToBrushConverter" />
             <controls:ConnectEmptyToBrushConverter x:Key="ConnectEmptyToBrushConverter" />
             <controls:ErrorPercentToBrushConverter x:Key="ErrorPercentToBrushConverter" />
@@ -140,7 +141,14 @@
                         </syncfusion:GridNumericColumn.CellStyle>
                     </syncfusion:GridNumericColumn>
 
-                    <syncfusion:GridNumericColumn MappingName="{StaticResource AvgConnectTimeMappingName}" NumberDecimalDigits="0" TextAlignment="Left" />
+                    <syncfusion:GridNumericColumn MappingName="{StaticResource AvgConnectTimeMappingName}" NumberDecimalDigits="0" TextAlignment="Left">
+                        <syncfusion:GridNumericColumn.CellStyle>
+                            <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
+                                <Setter Property="Background"
+                                        Value="{Binding Path=SpeedLog.AvgConnectTimeText,Converter={StaticResource LatencyToBrushConverter},Mode=OneWay}" />
+                            </Style>
+                        </syncfusion:GridNumericColumn.CellStyle>
+                    </syncfusion:GridNumericColumn>
 
                     <syncfusion:GridTextColumn MappingName="{StaticResource AvgDownloadBytesMappingName}" 
                                                DisplayBinding="{Binding SpeedLog.AvgDownloadBytesText,Mode=OneWay}" 
@@ -191,7 +199,7 @@
                                                ValueBinding="{Binding SpeedLog.TotalDownloadBytes,Mode=OneWay}" SortMode="Value">
                         <syncfusion:GridTextColumn.CellStyle>
                             <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
-                                <Setter Property="Background" Value="{Binding Index,Converter={StaticResource TotalDownloadBackgroundBrushConvert},Mode=OneWay}" />
+                                <Setter Property="Background" Value="{Binding Index,Converter={StaticResource TotalDownloadBackgroundBrushConvert},Mode=OneTime}" />
                             </Style>
                         </syncfusion:GridTextColumn.CellStyle>
                     </syncfusion:GridTextColumn>
@@ -201,7 +209,7 @@
                                                ValueBinding="{Binding SpeedLog.TotalUploadBytes,Mode=OneWay}" SortMode="Value">
                         <syncfusion:GridTextColumn.CellStyle>
                             <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
-                                <Setter Property="Background" Value="{Binding Index,Converter={StaticResource TotalUploadBackgroundBrushConvert},Mode=OneWay}" />
+                                <Setter Property="Background" Value="{Binding Index,Converter={StaticResource TotalUploadBackgroundBrushConvert},Mode=OneTime}" />
                             </Style>
                         </syncfusion:GridTextColumn.CellStyle>
                     </syncfusion:GridTextColumn>
@@ -211,7 +219,7 @@
                                                ValueBinding="{Binding SpeedLog.TotalDownloadRawBytes,Mode=OneWay}" SortMode="Value">
                         <syncfusion:GridTextColumn.CellStyle>
                             <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
-                                <Setter Property="Background" Value="{Binding Index,Converter={StaticResource TotalDownloadRawBackgroundBrushConvert},Mode=OneWay}" />
+                                <Setter Property="Background" Value="{Binding Index,Converter={StaticResource TotalDownloadRawBackgroundBrushConvert},Mode=OneTime}" />
                             </Style>
                         </syncfusion:GridTextColumn.CellStyle>
                     </syncfusion:GridTextColumn>
