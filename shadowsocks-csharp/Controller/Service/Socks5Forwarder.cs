@@ -79,8 +79,7 @@ namespace Shadowsocks.Controller.Service
                                 {
                                     if (_config.proxyRuleMode == ProxyRuleMode.UserCustom)
                                     {
-                                        var hostMap = HostMap.Instance();
-                                        if (hostMap.GetHost(host, out var host_addr))
+                                        if (HostMap.GetHost(host, out var host_addr))
                                         {
                                             if (!string.IsNullOrEmpty(host_addr))
                                             {
@@ -150,8 +149,7 @@ namespace Shadowsocks.Controller.Service
                 {
                     if (_config.proxyRuleMode == ProxyRuleMode.UserCustom)
                     {
-                        var hostMap = HostMap.Instance();
-                        if (hostMap.GetIP(ipAddress, out var host_addr))
+                        if (HostMap.GetIP(ipAddress, out var host_addr))
                         {
                             var lower_host_addr = host_addr.ToLower();
                             if (lower_host_addr.StartsWith("reject")
@@ -271,8 +269,7 @@ namespace Shadowsocks.Controller.Service
                                 {
                                     if (_config.proxyRuleMode == ProxyRuleMode.UserCustom)
                                     {
-                                        var hostMap = HostMap.Instance();
-                                        if (hostMap.GetHost(_remote_host, out var host_addr))
+                                        if (HostMap.GetHost(_remote_host, out var host_addr))
                                         {
                                             if (!string.IsNullOrEmpty(host_addr))
                                             {
@@ -318,8 +315,7 @@ namespace Shadowsocks.Controller.Service
                     }
                     if (ipAddress != null && _config.proxyRuleMode == ProxyRuleMode.UserCustom)
                     {
-                        var hostMap = HostMap.Instance();
-                        if (hostMap.GetIP(ipAddress, out var host_addr))
+                        if (HostMap.GetIP(ipAddress, out var host_addr))
                         {
                             var lower_host_addr = host_addr.ToLower();
                             if (lower_host_addr.StartsWith("reject")

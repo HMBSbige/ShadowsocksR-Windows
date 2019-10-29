@@ -403,9 +403,7 @@ namespace Shadowsocks.Controller
             Logging.OpenLogFile();
             ReloadIPRange();
 
-            var hostMap = new HostMap();
-            hostMap.LoadHostFile();
-            HostMap.Instance().Clear(hostMap);
+            HostMap.Reload();
 
             GlobalConfiguration.OSSupportsLocalIPv6 = Socket.OSSupportsIPv6;
 

@@ -59,7 +59,7 @@ namespace Shadowsocks
             ViewUtils.SetResource(app.Resources, @"../View/NotifyIconResources.xaml", 1);
 
             _controller = new ShadowsocksController();
-            HostMap.Instance().LoadHostFile();
+            HostMap.LoadHostFile();
 
             // Logging
             Logging.DefaultOut = Console.Out;
