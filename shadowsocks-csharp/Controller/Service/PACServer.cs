@@ -1,6 +1,5 @@
 ﻿using Shadowsocks.Model;
 using Shadowsocks.Util;
-using Shadowsocks.Util.NetUtils;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -10,6 +9,8 @@ namespace Shadowsocks.Controller.Service
 {
     public class PACServer : Listener.Service
     {
+        private const string ResourceName = @"pac";
+
         public static string gfwlist_FILE = @"gfwlist.txt";
 
         public static string WHITELIST_FILE = @"whitelist.txt";
@@ -29,8 +30,8 @@ namespace Shadowsocks.Controller.Service
         public void UpdatePacUrl(Configuration config)
         {
             _config = config;
-            //Lots of software do not support ipv6 pac url
-            PacUrl = $@"http://{IPAddress.Loopback}:{config.localPort}/pac?auth={config.localAuthPassword}&t={Utils.GetTimestamp(DateTime.Now)}";
+            //Lots of software do not support ipv6 pac url yet
+            PacUrl = $@"http://{IPAddress.Loopback}:{config.localPort}/{ResourceName}?t={Utils.GetTimestamp(DateTime.Now)}";
         }
 
         public override bool Handle(byte[] firstPacket, int length, Socket socket)
@@ -42,49 +43,52 @@ namespace Shadowsocks.Controller.Service
             try
             {
                 var request = Encoding.UTF8.GetString(firstPacket, 0, length);
-                var lines = request.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                var lines = request.GetLines();
                 bool hostMatch = false, pathMatch = false;
                 var socksType = 0;
                 string proxy = null;
+
                 foreach (var line in lines)
                 {
                     var kv = line.Split(new[] { ':' }, 2);
-                    if (kv.Length == 2)
+                    switch (kv.Length)
                     {
-                        if (kv[0] == "Host")
+                        case 2:
                         {
-                            if (kv[1].Trim() == ((IPEndPoint)socket.LocalEndPoint).ToString())
+                            if (kv[0] == @"Host")
                             {
-                                hostMatch = true;
+                                if (kv[1].Trim() == ((IPEndPoint)socket.LocalEndPoint).ToString())
+                                {
+                                    hostMatch = true;
+                                }
                             }
+                            break;
                         }
-                    }
-                    else if (kv.Length == 1)
-                    {
-                        if (!IPSubnet.IsLocal(socket) || line.IndexOf($@"auth={_config.localAuthPassword}", StringComparison.Ordinal) > 0)
+                        case 1:
                         {
-                            if (line.IndexOf(" /pac?", StringComparison.Ordinal) > 0 && line.IndexOf("GET", StringComparison.Ordinal) == 0)
+                            if (line.IndexOf($" /{ResourceName}?", StringComparison.Ordinal) > 0 && line.IndexOf(@"GET", StringComparison.Ordinal) == 0)
                             {
                                 var url = line.Substring(line.IndexOf(" ", StringComparison.Ordinal) + 1);
                                 url = url.Substring(0, url.IndexOf(" ", StringComparison.Ordinal));
                                 pathMatch = true;
-                                var port_pos = url.IndexOf("port=", StringComparison.Ordinal);
-                                if (port_pos > 0)
+                                var portPos = url.IndexOf("port=", StringComparison.Ordinal);
+                                if (portPos > 0)
                                 {
-                                    var port = url.Substring(port_pos + 5);
+                                    var port = url.Substring(portPos + 5);
                                     if (port.IndexOf("&", StringComparison.Ordinal) >= 0)
                                     {
                                         port = port.Substring(0, port.IndexOf("&", StringComparison.Ordinal));
                                     }
 
-                                    var ip_pos = url.IndexOf("ip=", StringComparison.Ordinal);
-                                    if (ip_pos > 0)
+                                    var ipPos = url.IndexOf("ip=", StringComparison.Ordinal);
+                                    if (ipPos > 0)
                                     {
-                                        proxy = url.Substring(ip_pos + 3);
+                                        proxy = url.Substring(ipPos + 3);
                                         if (proxy.IndexOf("&", StringComparison.Ordinal) >= 0)
                                         {
                                             proxy = proxy.Substring(0, proxy.IndexOf("&", StringComparison.Ordinal));
                                         }
+
                                         proxy += $@":{port};";
                                     }
                                     else
@@ -93,15 +97,19 @@ namespace Shadowsocks.Controller.Service
                                     }
                                 }
 
-                                if (url.IndexOf("type=socks4", StringComparison.Ordinal) > 0 || url.IndexOf("type=s4", StringComparison.Ordinal) > 0)
+                                if (url.IndexOf("type=socks4", StringComparison.Ordinal) > 0 ||
+                                    url.IndexOf("type=s4", StringComparison.Ordinal) > 0)
                                 {
                                     socksType = 4;
                                 }
-                                if (url.IndexOf("type=socks5", StringComparison.Ordinal) > 0 || url.IndexOf("type=s5", StringComparison.Ordinal) > 0)
+
+                                if (url.IndexOf("type=socks5", StringComparison.Ordinal) > 0 ||
+                                    url.IndexOf("type=s5", StringComparison.Ordinal) > 0)
                                 {
                                     socksType = 5;
                                 }
                             }
+                            break;
                         }
                     }
                 }
@@ -118,7 +126,7 @@ namespace Shadowsocks.Controller.Service
             }
         }
 
-        public void SendResponse(Socket socket, int socksType, string setProxy)
+        private void SendResponse(Socket socket, int socksType, string setProxy)
         {
             try
             {
@@ -188,15 +196,12 @@ Connection: Close
             var localhost = localEndPoint.AddressFamily == AddressFamily.InterNetworkV6
                     ? $@"[{localEndPoint.Address}]"
                     : $@"{localEndPoint.Address}";
-            if (socksType == 5)
+            return socksType switch
             {
-                return $@"SOCKS5 {localhost}:{_config.localPort};";
-            }
-            if (socksType == 4)
-            {
-                return $@"SOCKS {localhost}:{_config.localPort};";
-            }
-            return $@"PROXY {localhost}:{_config.localPort};";
+                5 => $@"SOCKS5 {localhost}:{_config.localPort};",
+                4 => $@"SOCKS {localhost}:{_config.localPort};",
+                _ => $@"PROXY {localhost}:{_config.localPort};"
+            };
         }
     }
 }

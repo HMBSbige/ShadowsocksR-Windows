@@ -19,7 +19,6 @@ namespace Shadowsocks.Model
         public ProxyMode sysProxyMode;
         public bool shareOverLan;
         public int localPort;
-        public string localAuthPassword;
 
         public string localDnsServer;
         public string dnsServer;
@@ -45,7 +44,7 @@ namespace Shadowsocks.Model
 
         public bool autoBan;
         public bool checkSwitchAutoCloseAll;
-        public bool logEnable = true;
+        public bool logEnable;
         public bool sameHostForSameTarget;
 
         public int keepVisitTime;
@@ -57,7 +56,6 @@ namespace Shadowsocks.Model
 
         public List<ServerSubscribe> serverSubscribes;
 
-        public Dictionary<string, string> token = new Dictionary<string, string>();
         public Dictionary<string, PortMapConfig> portMap = new Dictionary<string, PortMapConfig>();
 
         #endregion
@@ -291,6 +289,7 @@ namespace Shadowsocks.Model
             proxyRuleMode = ProxyRuleMode.Disable;
 
             checkSwitchAutoCloseAll = true;
+            logEnable = true;
 
             AutoCheckUpdate = true;
             isPreRelease = true;
@@ -352,20 +351,12 @@ namespace Shadowsocks.Model
             {
                 portMap = new Dictionary<string, PortMapConfig>();
             }
-            if (token == null)
-            {
-                token = new Dictionary<string, string>();
-            }
             if (connectTimeout == 0)
             {
                 connectTimeout = 10;
                 reconnectTimes = 2;
                 TTL = 180;
                 keepVisitTime = 180;
-            }
-            if (localAuthPassword == null || localAuthPassword.Length < 16)
-            {
-                localAuthPassword = Rng.RandId();
             }
             if (index < 0 || index >= configs.Count)
             {

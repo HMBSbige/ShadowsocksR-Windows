@@ -110,37 +110,6 @@ namespace Shadowsocks.Util
             return value.ToString("yyyyMMddHHmmssffff");
         }
 
-        public static string UrlDecode(string str)
-        {
-            var ret = "";
-            for (var i = 0; i < str.Length; ++i)
-            {
-                if (str[i] == '%' && i < str.Length - 2)
-                {
-                    var s = str.Substring(i + 1, 2).ToLower();
-                    var val = 0;
-                    var c1 = s[0];
-                    var c2 = s[1];
-                    val += c1 < 'a' ? c1 - '0' : 10 + (c1 - 'a');
-                    val *= 16;
-                    val += c2 < 'a' ? c2 - '0' : 10 + (c2 - 'a');
-
-                    ret += (char)val;
-                    i += 2;
-                }
-                else if (str[i] == '+')
-                {
-                    ret += ' ';
-                }
-                else
-                {
-                    ret += str[i];
-                }
-            }
-
-            return ret;
-        }
-
         public static void SetArrayMinSize<T>(ref T[] array, int size)
         {
             if (size > array.Length)
