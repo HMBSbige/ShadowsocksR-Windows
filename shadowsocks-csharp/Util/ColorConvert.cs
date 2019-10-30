@@ -34,7 +34,7 @@ namespace Shadowsocks.Util
         private static readonly long[] ConnectionBytesList = { 0, 16, 32, 64 };
 
         private static readonly Color[] LatencyColorList = { Colors.White, Colors.LightGreen, Colors.Yellow, Colors.Red };
-        private static readonly long[] LatencyList = { 0, 100, 300, 1000 };
+        private static readonly long[] LatencyList = { 0, 128, 256, 512 };
 
         private static byte ColorMix(byte a, byte b, double alpha)
         {
