@@ -24,7 +24,6 @@ namespace Shadowsocks.Model
         private long maxTransDownload;
         private long maxTransUpload;
         private long avgConnectTime = -1;
-        //private List<TransLog> speedLog = null;
         private readonly LinkedList<ErrorLog> errList = new LinkedList<ErrorLog>();
 
         private const int AvgTime = 5;
@@ -602,7 +601,7 @@ namespace Shadowsocks.Model
             OnPropertyChanged(nameof(ErrorEmptyTimes));
         }
 
-        public void AddConnectTime(int millisecond)
+        public void AddConnectTime(long millisecond)
         {
             lock (this)
             {
