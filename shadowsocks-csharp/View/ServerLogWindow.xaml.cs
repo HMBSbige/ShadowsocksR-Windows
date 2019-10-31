@@ -149,7 +149,7 @@ namespace Shadowsocks.View
             {
                 try
                 {
-                    _controller.ClearTransferTotal(config.configs[config.index].server);
+                    _controller.ClearTransferTotal(config.configs[config.index].Id);
                 }
                 catch
                 {
@@ -163,7 +163,7 @@ namespace Shadowsocks.View
             var config = _controller.GetCurrentConfiguration();
             foreach (var server in config.configs)
             {
-                _controller.ClearTransferTotal(server.server);
+                _controller.ClearTransferTotal(server.Id);
             }
         }
 

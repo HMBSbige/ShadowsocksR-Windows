@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Shadowsocks.Model
+namespace Shadowsocks.Model.Transfer
 {
     public class ServerSpeedLog : ViewModelBase
     {

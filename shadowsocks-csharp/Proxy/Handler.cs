@@ -1,6 +1,7 @@
 ﻿using Shadowsocks.Controller;
 using Shadowsocks.Controller.Service;
 using Shadowsocks.Model;
+using Shadowsocks.Model.Transfer;
 using Shadowsocks.Obfs;
 using Shadowsocks.Util;
 using Shadowsocks.Util.NetUtils;
@@ -205,7 +206,7 @@ namespace Shadowsocks.Proxy
 
         public void setServerTransferTotal(ServerTransferTotal transfer)
         {
-            speedTester.transfer = transfer;
+            speedTester.Transfer = transfer;
         }
 
         public int LogSocketException(Exception e)
@@ -347,7 +348,7 @@ namespace Shadowsocks.Proxy
                     handler.cfg.ReconnectTimes = cfg.ReconnectTimes + 1;
                 }
 
-                handler.speedTester.transfer = speedTester.transfer;
+                handler.speedTester.Transfer = speedTester.Transfer;
 
                 var total_len = 0;
                 var newFirstPacket = remoteHeaderSendBuffer;
@@ -623,10 +624,10 @@ namespace Shadowsocks.Proxy
             }
             if (lastErrCode == 0 && server != null && speedTester != null)
             {
-                if (!local_error && speedTester.sizeProtocolRecv == 0 && speedTester.sizeUpload > 0)
+                if (!local_error && speedTester.SizeProtocolRecv == 0 && speedTester.SizeUpload > 0)
                 {
                     if (is_protocol_sendback
-                        || is_obfs_sendback && speedTester.sizeDownload == 0)
+                        || is_obfs_sendback && speedTester.SizeDownload == 0)
                     {
                         lastErrCode = 16;
                         server.SpeedLog.AddErrorDecodeTimes();
@@ -759,7 +760,7 @@ namespace Shadowsocks.Proxy
                     server = getCurrentServer(localPort, select_server, cfg.TargetHost, true, true, cfg.ForceRandom);
                 }
             }
-            speedTester.server = server.server;
+            speedTester.ServerId = server.Id;
             Logging.Info($@"Connect {cfg.TargetHost}:{cfg.TargetPort.ToString()} via {server.server}:{server.Server_Port}");
 
             ResetTimeout(cfg.Ttl);
@@ -1248,7 +1249,7 @@ namespace Shadowsocks.Proxy
                     remote.GetAsyncResultSize(ar);
                     if (speedTester.BeginDownload())
                     {
-                        var pingTime = Convert.ToInt64((speedTester.timeBeginDownload - speedTester.timeBeginUpload).TotalMilliseconds);
+                        var pingTime = Convert.ToInt64((speedTester.TimeBeginDownload - speedTester.TimeBeginUpload).TotalMilliseconds);
                         if (pingTime >= 0)
                             server.SpeedLog.AddConnectTime(pingTime);
                     }
@@ -1331,7 +1332,7 @@ namespace Shadowsocks.Proxy
                     }
                     if (speedTester.BeginDownload())
                     {
-                        var pingTime = Convert.ToInt64((speedTester.timeBeginDownload - speedTester.timeBeginUpload).TotalMilliseconds);
+                        var pingTime = Convert.ToInt64((speedTester.TimeBeginDownload - speedTester.TimeBeginUpload).TotalMilliseconds);
                         if (pingTime >= 0)
                             server.SpeedLog.AddConnectTime(pingTime);
                     }
@@ -1417,7 +1418,7 @@ namespace Shadowsocks.Proxy
                     var bytesRecv = remoteUDP.GetAsyncResultSize(ar);
                     if (speedTester.BeginDownload())
                     {
-                        var pingTime = Convert.ToInt64((speedTester.timeBeginDownload - speedTester.timeBeginUpload).TotalMilliseconds);
+                        var pingTime = Convert.ToInt64((speedTester.TimeBeginDownload - speedTester.TimeBeginUpload).TotalMilliseconds);
                         if (pingTime >= 0)
                             server.SpeedLog.AddConnectTime(pingTime);
                     }
@@ -1535,7 +1536,7 @@ namespace Shadowsocks.Proxy
                             Logging.LogBin(LogLevel.Debug, "remote send", connetionRecvBuffer, bytesRead);
                         }
                     }
-                    if (speedTester.sizeRecv > 0)
+                    if (speedTester.SizeRecv > 0)
                     {
                         connectionSendBufferList = null;
                         server.SpeedLog.ResetContinuousTimes();
