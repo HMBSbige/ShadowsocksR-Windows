@@ -453,7 +453,6 @@ namespace Shadowsocks.Controller
                 {
                     local,
                     _pacServer,
-                    new APIServer(this, _config),
                     new HttpPortForwarder(privoxyRunner.RunningPort, _config)
                 };
                 _listener = new Listener(services);

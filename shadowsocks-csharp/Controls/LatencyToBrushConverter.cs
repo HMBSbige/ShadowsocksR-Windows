@@ -6,21 +6,20 @@ using System.Windows.Media;
 
 namespace Shadowsocks.Controls
 {
-    public class BooleanToEnabledConverter : IValueConverter
+    public class LatencyToBrushConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is bool enable)
+            if (value is long bytes && bytes > 0)
             {
-                if (targetType == typeof(Brush))
-                {
-                    return enable ? ColorConvert.EnableBrush : ColorConvert.DisableBrush;
-                }
+                return new SolidColorBrush(ColorConvert.GetLatencyColor(bytes));
             }
+
             return DependencyProperty.UnsetValue;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter,
+                System.Globalization.CultureInfo culture)
         {
             throw new NotSupportedException();
         }

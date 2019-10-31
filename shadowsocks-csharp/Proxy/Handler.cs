@@ -1248,7 +1248,7 @@ namespace Shadowsocks.Proxy
                     remote.GetAsyncResultSize(ar);
                     if (speedTester.BeginDownload())
                     {
-                        var pingTime = (int)(speedTester.timeBeginDownload - speedTester.timeBeginUpload).TotalMilliseconds;
+                        var pingTime = Convert.ToInt64((speedTester.timeBeginDownload - speedTester.timeBeginUpload).TotalMilliseconds);
                         if (pingTime >= 0)
                             server.SpeedLog.AddConnectTime(pingTime);
                     }
@@ -1331,7 +1331,7 @@ namespace Shadowsocks.Proxy
                     }
                     if (speedTester.BeginDownload())
                     {
-                        var pingTime = (int)(speedTester.timeBeginDownload - speedTester.timeBeginUpload).TotalMilliseconds;
+                        var pingTime = Convert.ToInt64((speedTester.timeBeginDownload - speedTester.timeBeginUpload).TotalMilliseconds);
                         if (pingTime >= 0)
                             server.SpeedLog.AddConnectTime(pingTime);
                     }
@@ -1417,7 +1417,7 @@ namespace Shadowsocks.Proxy
                     var bytesRecv = remoteUDP.GetAsyncResultSize(ar);
                     if (speedTester.BeginDownload())
                     {
-                        var pingTime = (int)(speedTester.timeBeginDownload - speedTester.timeBeginUpload).TotalMilliseconds;
+                        var pingTime = Convert.ToInt64((speedTester.timeBeginDownload - speedTester.timeBeginUpload).TotalMilliseconds);
                         if (pingTime >= 0)
                             server.SpeedLog.AddConnectTime(pingTime);
                     }

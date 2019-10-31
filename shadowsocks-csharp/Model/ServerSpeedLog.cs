@@ -23,8 +23,7 @@ namespace Shadowsocks.Model
         private readonly List<TransLog> upTransLog = new List<TransLog>();
         private long maxTransDownload;
         private long maxTransUpload;
-        private int avgConnectTime = -1;
-        //private List<TransLog> speedLog = null;
+        private long avgConnectTime = -1;
         private readonly LinkedList<ErrorLog> errList = new LinkedList<ErrorLog>();
 
         private const int AvgTime = 5;
@@ -41,32 +40,6 @@ namespace Shadowsocks.Model
         {
             upload = MaxUpSpeed;
             download = MaxDownSpeed;
-        }
-
-        public ServerSpeedLogShow Translate()
-        {
-            var ret = new ServerSpeedLogShow();
-            lock (this)
-            {
-                Sweep();
-                ret.avgDownloadBytes = AvgDownloadBytes;
-                ret.avgUploadBytes = AvgUploadBytes;
-                ret.avgConnectTime = AvgConnectTime;
-                ret.maxDownloadBytes = MaxDownSpeed;
-                ret.maxUploadBytes = MaxUpSpeed;
-                ret.totalConnectTimes = TotalConnectTimes;
-                ret.totalDisconnectTimes = TotalDisconnectTimes;
-                ret.errorConnectTimes = ErrorConnectTimes;
-                ret.errorTimeoutTimes = ErrorTimeoutTimes;
-                ret.errorDecodeTimes = ErrorDecodeTimes;
-                ret.errorEmptyTimes = ErrorEmptyTimes;
-                ret.errorLogTimes = errList.Count;
-                ret.errorContinurousTimes = ErrorContinuousTimes;
-                ret.totalUploadBytes = TotalUploadBytes;
-                ret.totalDownloadBytes = TotalDownloadBytes;
-                ret.totalDownloadRawBytes = TotalDownloadRawBytes;
-            }
-            return ret;
         }
 
         /// <summary>
@@ -177,15 +150,15 @@ namespace Shadowsocks.Model
 
         #region 延迟
 
-        public int AvgConnectTime => avgConnectTime;
+        public long AvgConnectTime => Interlocked.Read(ref avgConnectTime);
 
         public long AvgConnectTimeText
         {
             get
             {
-                if (avgConnectTime > 0)
+                if (AvgConnectTime > 0)
                 {
-                    return avgConnectTime / 1000;
+                    return AvgConnectTime / 1000;
                 }
 
                 return 0;
@@ -628,7 +601,7 @@ namespace Shadowsocks.Model
             OnPropertyChanged(nameof(ErrorEmptyTimes));
         }
 
-        public void AddConnectTime(int millisecond)
+        public void AddConnectTime(long millisecond)
         {
             lock (this)
             {
