@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,7 +70,7 @@ namespace Shadowsocks.Model.Transfer
                     .ToDictionary(pair => pair.Key, pair => pair.Value);
                 }
                 var jsonString = JsonConvert.SerializeObject(config.Servers, Formatting.Indented);
-                File.WriteAllTextAsync(LogFile, jsonString);
+                Utils.WriteAllTextAsync(LogFile, jsonString);
             }
             catch (IOException e)
             {
