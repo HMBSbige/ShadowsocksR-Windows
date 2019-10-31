@@ -155,7 +155,6 @@ namespace Shadowsocks.Obfs
             if (send_back_cmd.Count > 0)
             {
                 cmdlen += 2;
-                //TODO
                 send_tcp_mss = recv_tcp_mss;
                 rand_len = GetSendRandLen(datalength + cmdlen);
                 outlength = rand_len + datalength + cmdlen + 2;

@@ -7,7 +7,6 @@ using Shadowsocks.Properties;
 using Shadowsocks.Util;
 using Shadowsocks.View;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -17,6 +16,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Shapes;
+using Brushes = System.Windows.Media.Brushes;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace Shadowsocks.Controller
 {
@@ -24,8 +26,8 @@ namespace Shadowsocks.Controller
     {
         private class EventParams
         {
-            public object sender;
-            public EventArgs e;
+            public readonly object sender;
+            public readonly EventArgs e;
 
             public EventParams(object sender, EventArgs e)
             {
@@ -129,7 +131,7 @@ namespace Shadowsocks.Controller
 
         private void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            timerDelayCheckUpdate.Interval = 1000.0 * 60 * 60 * 1;// 1 hours
+            timerDelayCheckUpdate.Interval = 1000.0 * 60 * 60 * 1;// 1 hour
 
             var cfg = controller.GetCurrentConfiguration();
             if (cfg.AutoCheckUpdate)
@@ -235,19 +237,6 @@ namespace Shadowsocks.Controller
 
             var text = $@"{line1}{line2}{line3}{line4}{line5}";
             _notifyIcon.ToolTipText = text;
-        }
-
-        private static MenuItem CreateMenuGroup(string text, IEnumerable items)
-        {
-            var t = new MenuItem
-            {
-                Header = text
-            };
-            foreach (var item in items)
-            {
-                t.Items.Add(item);
-            }
-            return t;
         }
 
         private void LoadMenu()
@@ -659,9 +648,20 @@ namespace Shadowsocks.Controller
             AllowPreReleaseItem.IsChecked = config.isPreRelease;
         }
 
+        private static Grid CreateSelectedIcon()
+        {
+            var icon = new Grid();
+            icon.Children.Add(new Ellipse
+            {
+                Width = 8,
+                Height = 8,
+                Fill = Brushes.Black
+            });
+            return icon;
+        }
+
         private void UpdateServersMenu()
         {
-            //TODO:按订阅分组
             var items = ServersItem.Items;
             while (!Equals(items[0], SeparatorItem))
             {
@@ -669,54 +669,71 @@ namespace Shadowsocks.Controller
             }
 
             var configuration = controller.GetCurrentConfiguration();
-            var group = new SortedDictionary<string, MenuItem>();
-            const string defGroup = @"!(no group)";
-            var selectGroup = string.Empty;
-            for (var i = 0; i < configuration.configs.Count; i++)
+            for (var i = 0; i < configuration.configs.Count;)
             {
-                var server = configuration.configs[i];
-                var groupName = string.IsNullOrEmpty(server.Group) ? defGroup : server.Group;
-
-                var item = new MenuItem
+                configuration.configs[i].Index = ++i;
+            }
+            var sub = new List<MenuItem>();
+            var subTags = new HashSet<string>(configuration.configs.Select(server => server.SubTag));
+            foreach (var subTag in subTags)
+            {
+                var isSelected = false;
+                var subItem = new MenuItem
                 {
-                    Header = server.FriendlyName,
-                    Tag = i
+                    Header = string.IsNullOrEmpty(subTag) ? I18NUtil.GetAppStringValue(@"EmptySubtag") : subTag
                 };
-                item.Click += AServerItem_Click;
-                if (configuration.index == i)
+                var servers = configuration.configs.Where(server => server.SubTag == subTag).ToArray();
+                var groups = new HashSet<string>(servers.Select(server => server.Group));
+                foreach (var group in groups)
                 {
-                    item.IsChecked = true;
-                    selectGroup = groupName;
+                    var groupItem = new MenuItem
+                    {
+                        Header = string.IsNullOrEmpty(group) ? I18NUtil.GetAppStringValue(@"EmptyGroup") : group
+                    };
+                    var subServers = servers.Where(server => server.Group == group);
+                    foreach (var server in subServers)
+                    {
+                        var item = new MenuItem
+                        {
+                            Header = server.FriendlyName,
+                            Tag = server.Index - 1
+                        };
+                        item.Click += AServerItem_Click;
+                        if (configuration.index == Convert.ToInt32(item.Tag))
+                        {
+                            item.IsChecked = true;
+                            isSelected = true;
+                        }
+                        groupItem.Items.Add(item);
+                    }
+                    if (groups.Count > 1)
+                    {
+                        subItem.Items.Add(groupItem);
+                        if (isSelected)
+                        {
+                            groupItem.Icon = CreateSelectedIcon();
+                            subItem.Icon = CreateSelectedIcon();
+                            isSelected = false;
+                        }
+                    }
+                    else
+                    {
+                        sub.Add(groupItem);
+                        if (isSelected)
+                        {
+                            groupItem.Icon = CreateSelectedIcon();
+                        }
+                    }
                 }
-
-                if (group.ContainsKey(groupName))
+                if (groups.Count > 1)
                 {
-                    group[groupName].Items.Add(item);
-                }
-                else
-                {
-                    group[groupName] = CreateMenuGroup(groupName, new[] { item });
+                    sub.Add(subItem);
                 }
             }
             var index = 0;
-            foreach (var pair in group)
+            foreach (var menuItem in sub)
             {
-                if (pair.Key == defGroup)
-                {
-                    pair.Value.Header = I18NUtil.GetAppStringValue(@"EmptyGroup");
-                }
-
-                if (pair.Key == selectGroup)
-                {
-                    pair.Value.Header = @"● " + pair.Value.Header;
-                }
-                else
-                {
-                    pair.Value.Header = @"　" + pair.Value.Header;
-                }
-
-                items.Insert(index, pair.Value);
-                ++index;
+                items.Insert(index++, menuItem);
             }
         }
 
