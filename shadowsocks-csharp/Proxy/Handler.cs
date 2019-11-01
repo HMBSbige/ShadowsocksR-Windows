@@ -652,7 +652,7 @@ namespace Shadowsocks.Proxy
                     {
                         if (State != ConnectState.READY && State != ConnectState.HANDSHAKE && server != null)
                         {
-                            if (server.GetConnections().DecRef(this))
+                            if (server.Connections.DecRef(this))
                             {
                                 server.SpeedLog.AddDisconnectTimes();
                             }
@@ -797,7 +797,7 @@ namespace Shadowsocks.Proxy
                 {
                     State = ConnectState.CONNECTING;
                 }
-                server.GetConnections().AddRef(this);
+                server.Connections.AddRef(this);
             }
             try
             {

@@ -115,13 +115,13 @@ namespace Shadowsocks.View
 
         private void DisconnectDirectMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            Server.GetForwardServerRef().GetConnections().CloseAll();
+            Server.GetForwardServerRef().Connections.CloseAll();
         }
 
         private void DisconnectAllMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             _controller.DisconnectAllConnections();
-            Server.GetForwardServerRef().GetConnections().CloseAll();
+            Server.GetForwardServerRef().Connections.CloseAll();
         }
 
         private void ClearMaxMenuItem_OnClick(object sender, RoutedEventArgs e)
@@ -215,12 +215,7 @@ namespace Shadowsocks.View
                 var mappingName = ServerDataGrid.CurrentColumn.MappingName;
                 if (mappingName == Resources[@"ServerMappingName"].ToString())
                 {
-                    var config = _controller.GetCurrentConfiguration();
-                    Console.WriteLine($@"config.checkSwitchAutoCloseAll:{config.checkSwitchAutoCloseAll}");
-                    if (config.checkSwitchAutoCloseAll)
-                    {
-                        _controller.DisconnectAllConnections();
-                    }
+                    _controller.DisconnectAllConnections(true);
                     _controller.SelectServerIndex(index);
                 }
                 else if (mappingName == Resources[@"GroupMappingName"].ToString())
@@ -259,7 +254,7 @@ namespace Shadowsocks.View
                 }
                 else if (mappingName == Resources[@"ConnectingMappingName"].ToString())
                 {
-                    server.GetConnections().CloseAll();
+                    server.Connections.CloseAll();
                 }
                 else if (mappingName == Resources[@"MaxDownSpeedMappingName"].ToString()
                         || mappingName == Resources[@"MaxUpSpeedMappingName"].ToString())
