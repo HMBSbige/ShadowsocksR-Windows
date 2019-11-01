@@ -3,6 +3,9 @@ using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.Model;
 using System;
+#if !IsDotNetCore
+using System.Collections.Concurrent;
+#endif
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -381,5 +384,25 @@ namespace Shadowsocks.Util
                 yield return line;
             }
         }
+
+        public static async void WriteAllTextAsync(string path, string str)
+        {
+#if IsDotNetCore
+            await File.WriteAllTextAsync(path, str);
+#else
+            using var sw = new StreamWriter(path);
+            await sw.WriteAsync(str);
+#endif
+        }
+
+#if !IsDotNetCore
+        public static void Clear<T>(this ConcurrentQueue<T> queue)
+        {
+            while (queue.IsEmpty)
+            {
+                queue.TryDequeue(out _);
+            }
+        }
+#endif
     }
 }

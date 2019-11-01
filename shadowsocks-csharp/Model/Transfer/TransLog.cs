@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shadowsocks.Model
+namespace Shadowsocks.Model.Transfer
 {
     public class TransLog
     {

@@ -1,6 +1,7 @@
 ﻿using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Controller.Service;
 using Shadowsocks.Model;
+using Shadowsocks.Model.Transfer;
 using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
@@ -63,9 +64,9 @@ namespace Shadowsocks.Controller
 
             foreach (var server in _config.configs)
             {
-                if (_transfer.servers.TryGetValue(server.server, out var st))
+                if (_transfer.Servers.TryGetValue(server.Id, out var st))
                 {
-                    var log = new ServerSpeedLog(st.totalUploadBytes, st.totalDownloadBytes);
+                    var log = new ServerSpeedLog(st.TotalUploadBytes, st.TotalDownloadBytes);
                     server.SpeedLog = log;
                 }
             }
@@ -166,17 +167,6 @@ namespace Shadowsocks.Controller
         {
             AppendConfiguration(_config, mergeConfig.configs);
             Save();
-        }
-
-        public bool SaveServersConfig(string config)
-        {
-            var new_cfg = Configuration.Load(config);
-            if (new_cfg != null)
-            {
-                SaveServersConfig(new_cfg);
-                return true;
-            }
-            return false;
         }
 
         public void SaveServersConfig(Configuration config)
@@ -339,22 +329,14 @@ namespace Shadowsocks.Controller
             {
                 SystemProxy.SystemProxy.Update(_config, true, null);
             }
-            ServerTransferTotal.Save(_transfer);
+            ServerTransferTotal.Save(_transfer, _config.configs);
         }
 
-        public void ClearTransferTotal(string serverName)
+        public void ClearTransferTotal(string serverId)
         {
-            _transfer.Clear(serverName);
-            foreach (var server in _config.configs)
-            {
-                if (server.server == serverName)
-                {
-                    if (_transfer.servers.ContainsKey(server.server))
-                    {
-                        server.SpeedLog.ClearTrans();
-                    }
-                }
-            }
+            _transfer.Clear(serverId);
+            var server = _config.configs.Find(s => s.Id == serverId);
+            server?.SpeedLog.ClearTrans();
         }
 
         public void TouchPACFile()

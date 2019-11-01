@@ -1,6 +1,7 @@
 ﻿using Shadowsocks.Controller;
 using Shadowsocks.Controller.Service;
 using Shadowsocks.Model;
+using Shadowsocks.Model.Transfer;
 using Shadowsocks.Util.NetUtils;
 using System;
 using System.Collections.Generic;

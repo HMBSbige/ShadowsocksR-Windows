@@ -1,11 +1,13 @@
 ﻿using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
 using System;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Shadowsocks.Model
+namespace Shadowsocks.Model.Transfer
 {
     public class ServerSpeedLog : ViewModelBase
     {
@@ -24,7 +26,7 @@ namespace Shadowsocks.Model
         private long maxTransDownload;
         private long maxTransUpload;
         private long avgConnectTime = -1;
-        private readonly LinkedList<ErrorLog> errList = new LinkedList<ErrorLog>();
+        private readonly ConcurrentQueue<ErrorLog> _errorQueue = new ConcurrentQueue<ErrorLog>();
 
         private const int AvgTime = 5;
 
@@ -60,31 +62,27 @@ namespace Shadowsocks.Model
         {
             get
             {
-                List<TransLog> transLog;
-                lock (this)
+                var transLog = ArrayList.Synchronized(downTransLog).Cast<TransLog>().ToList();
+
+                double totalTime = 0;
+                if (transLog.Count == 0 || transLog.Count > 0 && DateTime.Now > transLog.Last().recvTime.AddSeconds(AvgTime))
                 {
-                    transLog = downTransLog.ToList();
-                }
-                {
-                    double totalTime = 0;
-                    if (transLog.Count == 0 || transLog.Count > 0 && DateTime.Now > transLog[transLog.Count - 1].recvTime.AddSeconds(AvgTime))
-                    {
-                        return 0;
-                    }
-
-                    var totalBytes = transLog.Aggregate<TransLog, long>(0, (current, t) => current + t.size);
-                    totalBytes -= transLog[0].firstsize;
-
-                    if (transLog.Count > 1)
-                        totalTime = (transLog[transLog.Count - 1].endTime - transLog[0].recvTime).TotalSeconds;
-                    if (totalTime > 0.2)
-                    {
-                        var ret = (long)(totalBytes / totalTime);
-                        return ret;
-                    }
-
                     return 0;
                 }
+
+                var totalBytes = transLog.Aggregate<TransLog, long>(0, (current, t) => current + t.size);
+                totalBytes -= transLog[0].firstsize;
+
+                if (transLog.Count > 1)
+                {
+                    totalTime = (transLog.Last().endTime - transLog[0].recvTime).TotalSeconds;
+                }
+                if (totalTime > 0.2)
+                {
+                    var ret = (long)(totalBytes / totalTime);
+                    return ret;
+                }
+                return 0;
             }
         }
 
@@ -98,33 +96,27 @@ namespace Shadowsocks.Model
         {
             get
             {
-                List<TransLog> transLog;
-                lock (this)
+                var transLog = ArrayList.Synchronized(upTransLog).Cast<TransLog>().ToList();
+                double totalTime = 0;
+                if (transLog.Count == 0 || transLog.Count > 0 && DateTime.Now > transLog.Last().recvTime.AddSeconds(AvgTime))
                 {
-                    if (upTransLog == null)
-                        return 0;
-                    transLog = upTransLog.ToList();
-                }
-                {
-                    double totalTime = 0;
-                    if (transLog.Count == 0 || transLog.Count > 0 && DateTime.Now > transLog[transLog.Count - 1].recvTime.AddSeconds(AvgTime))
-                    {
-                        return 0;
-                    }
-
-                    var totalBytes = transLog.Aggregate<TransLog, long>(0, (current, t) => current + t.size);
-                    totalBytes -= transLog[0].firstsize;
-
-                    if (transLog.Count > 1)
-                        totalTime = (transLog[transLog.Count - 1].endTime - transLog[0].recvTime).TotalSeconds;
-                    if (totalTime > 0.2)
-                    {
-                        var ret = (long)(totalBytes / totalTime);
-                        return ret;
-                    }
-
                     return 0;
                 }
+
+                var totalBytes = transLog.Aggregate<TransLog, long>(0, (current, t) => current + t.size);
+                totalBytes -= transLog[0].firstsize;
+
+                if (transLog.Count > 1)
+                {
+                    totalTime = (transLog.Last().endTime - transLog[0].recvTime).TotalSeconds;
+                }
+                if (totalTime > 0.2)
+                {
+                    var ret = (long)(totalBytes / totalTime);
+                    return ret;
+                }
+
+                return 0;
             }
         }
 
@@ -221,18 +213,12 @@ namespace Shadowsocks.Model
         {
             get
             {
-                int errorLogTimes;
-                lock (this)
-                {
-                    errorLogTimes = errList.Count;
-                }
-
+                var errorLogTimes = _errorQueue.Count;
                 var m = errorLogTimes + Connecting;
                 if (m > 0)
                 {
                     return (ConnectError + ErrorTimeoutTimes) * 100.0 / m;
                 }
-
                 return null;
             }
         }
@@ -267,10 +253,7 @@ namespace Shadowsocks.Model
             Interlocked.Exchange(ref errorDecodeTimes, 0);
             Interlocked.Exchange(ref errorEmptyTimes, 0);
             Interlocked.Exchange(ref errorContinuousTimes, 0);
-            lock (this)
-            {
-                errList.Clear();
-            }
+            _errorQueue.Clear();
 
             OnPropertyChanged(nameof(Connecting));
             OnPropertyChanged(nameof(TotalConnectTimes));
@@ -321,49 +304,55 @@ namespace Shadowsocks.Model
             OnPropertyChanged(nameof(ErrorPercent));
         }
 
-        protected void Sweep()
+        private void Sweep()
         {
-            while (errList.Count > 0)
+            while (_errorQueue.Count > 0)
             {
-                if ((DateTime.Now - errList.First.Value.time).TotalMinutes < 30 && errList.Count < 100)
+                if (!_errorQueue.TryDequeue(out var error)) continue;
+                if ((DateTime.Now - error.time).TotalMinutes < 30 && _errorQueue.Count < 100)
                 {
                     break;
                 }
-
-                var errCode = errList.First.Value.errno;
-                errList.RemoveFirst();
-                if (errCode == 1)
+                var errCode = error.errno;
+                switch (errCode)
                 {
-                    if (ErrorConnectTimes > 0)
+                    case 1:
                     {
-                        Interlocked.Decrement(ref errorConnectTimes);
-                        OnPropertyChanged(nameof(ErrorConnectTimes));
-                        OnPropertyChanged(nameof(ConnectError));
+                        if (ErrorConnectTimes > 0)
+                        {
+                            Interlocked.Decrement(ref errorConnectTimes);
+                            OnPropertyChanged(nameof(ErrorConnectTimes));
+                            OnPropertyChanged(nameof(ConnectError));
+                        }
+                        break;
                     }
-                }
-                else if (errCode == 2)
-                {
-                    if (ErrorTimeoutTimes > 0)
+                    case 2:
                     {
-                        Interlocked.Decrement(ref errorTimeoutTimes);
-                        OnPropertyChanged(nameof(ErrorTimeoutTimes));
+                        if (ErrorTimeoutTimes > 0)
+                        {
+                            Interlocked.Decrement(ref errorTimeoutTimes);
+                            OnPropertyChanged(nameof(ErrorTimeoutTimes));
+                        }
+                        break;
                     }
-                }
-                else if (errCode == 3)
-                {
-                    if (ErrorDecodeTimes > 0)
+                    case 3:
                     {
-                        Interlocked.Decrement(ref errorDecodeTimes);
-                        OnPropertyChanged(nameof(ErrorDecodeTimes));
-                        OnPropertyChanged(nameof(ConnectError));
+                        if (ErrorDecodeTimes > 0)
+                        {
+                            Interlocked.Decrement(ref errorDecodeTimes);
+                            OnPropertyChanged(nameof(ErrorDecodeTimes));
+                            OnPropertyChanged(nameof(ConnectError));
+                        }
+                        break;
                     }
-                }
-                else if (errCode == 4)
-                {
-                    if (ErrorEmptyTimes > 0)
+                    case 4:
                     {
-                        Interlocked.Decrement(ref errorEmptyTimes);
-                        OnPropertyChanged(nameof(ErrorEmptyTimes));
+                        if (ErrorEmptyTimes > 0)
+                        {
+                            Interlocked.Decrement(ref errorEmptyTimes);
+                            OnPropertyChanged(nameof(ErrorEmptyTimes));
+                        }
+                        break;
                     }
                 }
                 OnPropertyChanged(nameof(ErrorPercent));
@@ -372,11 +361,9 @@ namespace Shadowsocks.Model
 
         public void AddNoErrorTimes()
         {
-            lock (this)
-            {
-                errList.AddLast(new ErrorLog(0));
-                Sweep();
-            }
+            _errorQueue.Enqueue(new ErrorLog(0));
+            Sweep();
+
             Interlocked.Exchange(ref errorEmptyTimes, 0);
             OnPropertyChanged(nameof(ErrorEmptyTimes));
         }
@@ -386,11 +373,8 @@ namespace Shadowsocks.Model
             Interlocked.Increment(ref errorConnectTimes);
             Interlocked.Add(ref errorContinuousTimes, 2);
 
-            lock (this)
-            {
-                errList.AddLast(new ErrorLog(1));
-                Sweep();
-            }
+            _errorQueue.Enqueue(new ErrorLog(1));
+            Sweep();
 
             OnPropertyChanged(nameof(ErrorConnectTimes));
             OnPropertyChanged(nameof(ErrorContinuousTimes));
@@ -401,11 +385,9 @@ namespace Shadowsocks.Model
         {
             Interlocked.Increment(ref errorTimeoutTimes);
             Interlocked.Increment(ref errorContinuousTimes);
-            lock (this)
-            {
-                errList.AddLast(new ErrorLog(2));
-                Sweep();
-            }
+
+            _errorQueue.Enqueue(new ErrorLog(2));
+            Sweep();
 
             OnPropertyChanged(nameof(ErrorTimeoutTimes));
             OnPropertyChanged(nameof(ErrorContinuousTimes));
@@ -416,11 +398,9 @@ namespace Shadowsocks.Model
         {
             Interlocked.Increment(ref errorDecodeTimes);
             Interlocked.Add(ref errorContinuousTimes, 10);
-            lock (this)
-            {
-                errList.AddLast(new ErrorLog(3));
-                Sweep();
-            }
+
+            _errorQueue.Enqueue(new ErrorLog(3));
+            Sweep();
 
             OnPropertyChanged(nameof(ErrorDecodeTimes));
             OnPropertyChanged(nameof(ErrorContinuousTimes));
@@ -431,11 +411,9 @@ namespace Shadowsocks.Model
         {
             Interlocked.Increment(ref errorEmptyTimes);
             Interlocked.Increment(ref errorContinuousTimes);
-            lock (this)
-            {
-                errList.AddLast(new ErrorLog(0));
-                Sweep();
-            }
+
+            _errorQueue.Enqueue(new ErrorLog(0));
+            Sweep();
 
             OnPropertyChanged(nameof(ErrorEmptyTimes));
             OnPropertyChanged(nameof(ErrorContinuousTimes));
@@ -446,80 +424,63 @@ namespace Shadowsocks.Model
         {
             if (transLog.Count > 0)
             {
-                const int base_time_diff = 100;
-                const int max_time_diff = 3 * base_time_diff;
-                var time_diff = (int)(now - transLog[transLog.Count - 1].recvTime).TotalMilliseconds;
-                if (time_diff < 0)
+                const int baseTimeDiff = 100;
+                const int maxTimeDiff = 3 * baseTimeDiff;
+                var timeDiff = (int)(now - transLog.Last().recvTime).TotalMilliseconds;
+                if (timeDiff < 0)
                 {
                     transLog.Clear();
                     transLog.Add(new TransLog(bytes, now));
                     return;
                 }
-                if (time_diff < base_time_diff)
+                if (timeDiff < baseTimeDiff)
                 {
-                    transLog[transLog.Count - 1].times++;
-                    transLog[transLog.Count - 1].size += bytes;
-                    if (transLog[transLog.Count - 1].endTime < now)
-                        transLog[transLog.Count - 1].endTime = now;
+                    ++transLog.Last().times;
+                    transLog.Last().size += bytes;
+                    if (transLog.Last().endTime < now)
+                        transLog.Last().endTime = now;
                 }
                 else
                 {
-                    if (time_diff >= 0)
-                    {
-                        transLog.Add(new TransLog(bytes, now));
+                    transLog.Add(new TransLog(bytes, now));
 
-                        var base_times = 1 + (maxTrans > 1024 * 512 ? 1 : 0);
-                        var last_index = transLog.Count - 1 - 2;
-                        if (updateMaxTrans && transLog.Count >= 6 && transLog[last_index].times > base_times)
+                    var baseTimes = 1 + (maxTrans > 1024 * 512 ? 1 : 0);
+                    var lastIndex = transLog.Count - 1 - 2;
+                    if (updateMaxTrans && transLog.Count >= 6 && transLog[lastIndex].times > baseTimes)
+                    {
+                        var beginIndex = lastIndex - 1;
+                        for (; beginIndex > 0; --beginIndex)
                         {
-                            var begin_index = last_index - 1;
-                            for (; begin_index > 0; --begin_index)
+                            if ((transLog[beginIndex + 1].recvTime - transLog[beginIndex].endTime).TotalMilliseconds >
+                                maxTimeDiff
+                                || transLog[beginIndex].times <= baseTimes)
                             {
-                                if ((transLog[begin_index + 1].recvTime - transLog[begin_index].endTime).TotalMilliseconds > max_time_diff
-                                    || transLog[begin_index].times <= base_times
-                                    )
-                                {
-                                    break;
-                                }
-                            }
-                            if (begin_index <= last_index - 4)
-                            {
-                                begin_index++;
-                                var t = new TransLog(transLog[begin_index].firstsize, transLog[begin_index].recvTime)
-                                {
-                                    endTime = transLog[last_index].endTime,
-                                    size = 0
-                                };
-                                for (var i = begin_index; i <= last_index; ++i)
-                                {
-                                    t.size += transLog[i].size;
-                                }
-                                if (maxTrans == 0)
-                                {
-                                    maxTrans = (long)((t.size - t.firstsize) / (t.endTime - t.recvTime).TotalSeconds * 0.7);
-                                }
-                                else
-                                {
-                                    const double a = 2.0 / (1 + 32);
-                                    maxTrans = (long)(0.5 + maxTrans * (1 - a) + a * ((t.size - t.firstsize) / (t.endTime - t.recvTime).TotalSeconds));
-                                }
+                                break;
                             }
                         }
-                    }
-                    else
-                    {
-                        var i = transLog.Count - 1;
-                        for (; i >= 0; --i)
+
+                        if (beginIndex <= lastIndex - 4)
                         {
-                            if (transLog[i].recvTime > now && i > 0)
-                                continue;
+                            ++beginIndex;
+                            var t = new TransLog(transLog[beginIndex].firstsize, transLog[beginIndex].recvTime)
+                            {
+                                endTime = transLog[lastIndex].endTime,
+                                size = 0
+                            };
+                            for (var i = beginIndex; i <= lastIndex; ++i)
+                            {
+                                t.size += transLog[i].size;
+                            }
 
-                            transLog[i].times += 1;
-                            transLog[i].size += bytes;
-                            if (transLog[i].endTime < now)
-                                transLog[i].endTime = now;
-
-                            break;
+                            if (maxTrans == 0)
+                            {
+                                maxTrans = (long)((t.size - t.firstsize) / (t.endTime - t.recvTime).TotalSeconds * 0.7);
+                            }
+                            else
+                            {
+                                const double a = 2.0 / (1 + 32);
+                                maxTrans = (long)(0.5 + maxTrans * (1 - a) + a * ((t.size - t.firstsize) / (t.endTime - t.recvTime).TotalSeconds));
+                            }
                         }
                     }
                 }
@@ -603,27 +564,24 @@ namespace Shadowsocks.Model
 
         public void AddConnectTime(long millisecond)
         {
-            lock (this)
+            if (millisecond == 0)
             {
-                if (millisecond == 0)
-                {
-                    millisecond = 10;
-                }
-                else
-                {
-                    millisecond *= 1000;
-                }
+                millisecond = 10;
+            }
+            else
+            {
+                millisecond *= 1000;
+            }
 
-                var oldValue = AvgConnectTime;
-                if (oldValue == -1)
-                {
-                    Interlocked.Exchange(ref avgConnectTime, millisecond);
-                }
-                else
-                {
-                    const double a = 2.0 / (1 + 16);
-                    Interlocked.Exchange(ref avgConnectTime, (int)(0.5 + oldValue * (1 - a) + a * millisecond));
-                }
+            var oldValue = AvgConnectTime;
+            if (oldValue == -1)
+            {
+                Interlocked.Exchange(ref avgConnectTime, millisecond);
+            }
+            else
+            {
+                const double a = 2.0 / (1 + 16);
+                Interlocked.Exchange(ref avgConnectTime, Convert.ToInt64(0.5 + oldValue * (1 - a) + a * millisecond));
             }
             OnPropertyChanged(nameof(AvgConnectTimeText));
         }

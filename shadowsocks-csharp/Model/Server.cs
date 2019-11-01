@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Shadowsocks.Model.Transfer;
 using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
 using System;

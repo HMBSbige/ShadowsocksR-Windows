@@ -199,7 +199,7 @@
                                                ValueBinding="{Binding SpeedLog.TotalDownloadBytes,Mode=OneWay}" SortMode="Value">
                         <syncfusion:GridTextColumn.CellStyle>
                             <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
-                                <Setter Property="Background" Value="{Binding ColumnBase.RowIndex,RelativeSource={RelativeSource Self},Converter={StaticResource TotalDownloadBackgroundBrushConvert},Mode=OneTime}" />
+                                <Setter Property="Background" Value="{Binding ColumnBase.RowIndex,RelativeSource={RelativeSource Self},Converter={StaticResource TotalDownloadBackgroundBrushConvert},Mode=OneWay}" />
                             </Style>
                         </syncfusion:GridTextColumn.CellStyle>
                     </syncfusion:GridTextColumn>
@@ -209,7 +209,7 @@
                                                ValueBinding="{Binding SpeedLog.TotalUploadBytes,Mode=OneWay}" SortMode="Value">
                         <syncfusion:GridTextColumn.CellStyle>
                             <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
-                                <Setter Property="Background" Value="{Binding ColumnBase.RowIndex,RelativeSource={RelativeSource Self},Converter={StaticResource TotalUploadBackgroundBrushConvert},Mode=OneTime}" />
+                                <Setter Property="Background" Value="{Binding ColumnBase.RowIndex,RelativeSource={RelativeSource Self},Converter={StaticResource TotalUploadBackgroundBrushConvert},Mode=OneWay}" />
                             </Style>
                         </syncfusion:GridTextColumn.CellStyle>
                     </syncfusion:GridTextColumn>
@@ -219,7 +219,7 @@
                                                ValueBinding="{Binding SpeedLog.TotalDownloadRawBytes,Mode=OneWay}" SortMode="Value">
                         <syncfusion:GridTextColumn.CellStyle>
                             <Style TargetType="syncfusion:GridCell" BasedOn="{StaticResource BaseGridCell}">
-                                <Setter Property="Background" Value="{Binding ColumnBase.RowIndex,RelativeSource={RelativeSource Self},Converter={StaticResource TotalDownloadRawBackgroundBrushConvert},Mode=OneTime}" />
+                                <Setter Property="Background" Value="{Binding ColumnBase.RowIndex,RelativeSource={RelativeSource Self},Converter={StaticResource TotalDownloadRawBackgroundBrushConvert},Mode=OneWay}" />
                             </Style>
                         </syncfusion:GridTextColumn.CellStyle>
                     </syncfusion:GridTextColumn>

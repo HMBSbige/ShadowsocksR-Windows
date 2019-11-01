@@ -54,7 +54,6 @@
             <MenuItem x:Name="UpdateSubscribeSsrNode" />
         </MenuItem>
         <MenuItem x:Name="ShowLogs" />
-        <MenuItem x:Name="UpdateAvailable" Visibility="Collapsed"/>
         <Separator />
         <MenuItem x:Name="More">
             <MenuItem x:Name="GlobalSettings" />
@@ -66,6 +65,7 @@
             <Separator />
             <MenuItem x:Name="Update">
                 <MenuItem x:Name="CheckUpdate" />
+                <MenuItem x:Name="UpdateAvailable" Visibility="Collapsed" />
                 <Separator />
                 <MenuItem x:Name="AutoCheckUpdate" />
                 <MenuItem x:Name="AllowPreRelease" />

@@ -1,4 +1,5 @@
 ﻿using Shadowsocks.Model;
+using Shadowsocks.Model.Transfer;
 using Shadowsocks.Proxy;
 using System.Diagnostics;
 using System.Net;
