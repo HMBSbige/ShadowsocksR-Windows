@@ -499,7 +499,7 @@ namespace Shadowsocks.Controller
                     //Remove servers
                     foreach (var server in removeServers)
                     {
-                        server.GetConnections().CloseAll();
+                        server.Connections.CloseAll();
                         config.configs.Remove(server);
                     }
 
@@ -1177,12 +1177,7 @@ namespace Shadowsocks.Controller
             var index = (int)item.Tag;
             Task.Run(() =>
             {
-                var config = controller.GetCurrentConfiguration();
-                Console.WriteLine($@"config.checkSwitchAutoCloseAll:{config.checkSwitchAutoCloseAll}");
-                if (config.checkSwitchAutoCloseAll)
-                {
-                    controller.DisconnectAllConnections();
-                }
+                controller.DisconnectAllConnections(true);
                 controller.SelectServerIndex(index);
             });
         }

@@ -175,7 +175,7 @@ namespace Shadowsocks.Controller
             _config.CopyFrom(config);
             foreach (var s in missingServers)
             {
-                s.GetConnections().CloseAll();
+                s.Connections.CloseAll();
             }
             SelectServerIndex(_config.index);
         }
@@ -548,12 +548,17 @@ namespace Shadowsocks.Controller
         /// <summary>
         /// Disconnect all connections from the remote host.
         /// </summary>
-        public void DisconnectAllConnections()
+        public void DisconnectAllConnections(bool checkSwitchAutoCloseAll = false)
         {
             var config = GetCurrentConfiguration();
+            if (checkSwitchAutoCloseAll && !config.checkSwitchAutoCloseAll)
+            {
+                Console.WriteLine(@"config.checkSwitchAutoCloseAll:False");
+                return;
+            }
             foreach (var server in config.configs)
             {
-                server.GetConnections().CloseAll();
+                server.Connections.CloseAll();
             }
         }
 

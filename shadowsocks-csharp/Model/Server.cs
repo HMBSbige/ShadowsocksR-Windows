@@ -35,7 +35,8 @@ namespace Shadowsocks.Model
 
         private ServerSpeedLog serverSpeedLog;
         private DnsBuffer dnsBuffer = new DnsBuffer();
-        private Connections Connections = new Connections();
+        [JsonIgnore]
+        public Connections Connections { get; private set; } = new Connections();
         private static readonly Server ForwardServer = new Server();
 
         private int _index;
@@ -404,11 +405,6 @@ namespace Shadowsocks.Model
         public static Server GetForwardServerRef()
         {
             return ForwardServer;
-        }
-
-        public Connections GetConnections()
-        {
-            return Connections;
         }
 
         public DnsBuffer DnsBuffer()
