@@ -63,6 +63,8 @@ namespace Shadowsocks.Controller
         private MenuItem ServersItem;
         private MenuItem SelectRandomItem;
         private MenuItem sameHostForSameTargetItem;
+        private MenuItem _moreMenu;
+        private MenuItem _updateMenu;
         private MenuItem UpdateItem;
         private MenuItem AutoCheckUpdateItem;
         private MenuItem AllowPreReleaseItem;
@@ -320,24 +322,21 @@ namespace Shadowsocks.Controller
                             menuItem.Click += ShowLogItem_Click;
                             break;
                         }
-                        case @"UpdateAvailable":
-                        {
-                            UpdateItem = menuItem;
-                            UpdateItem.Click += UpdateItem_Clicked;
-                            break;
-                        }
                         case @"More":
                         {
-                            ((MenuItem)menuItem.Items[0]).Click += Setting_Click;
-                            ((MenuItem)menuItem.Items[1]).Click += ShowPortMapItem_Click;
-                            ((MenuItem)menuItem.Items[2]).Click += ShowUrlFromQrCode;
-                            ((MenuItem)menuItem.Items[4]).Click += OpenWiki_Click;
-                            ((MenuItem)menuItem.Items[5]).Click += FeedbackItem_Click;
+                            _moreMenu = menuItem;
+                            ((MenuItem)_moreMenu.Items[0]).Click += Setting_Click;
+                            ((MenuItem)_moreMenu.Items[1]).Click += ShowPortMapItem_Click;
+                            ((MenuItem)_moreMenu.Items[2]).Click += ShowUrlFromQrCode;
+                            ((MenuItem)_moreMenu.Items[4]).Click += OpenWiki_Click;
+                            ((MenuItem)_moreMenu.Items[5]).Click += FeedbackItem_Click;
 
-                            var updateMenu = (MenuItem)menuItem.Items[7];
-                            ((MenuItem)updateMenu.Items[0]).Click += CheckUpdate_Click;
-                            AutoCheckUpdateItem = (MenuItem)updateMenu.Items[2];
-                            AllowPreReleaseItem = (MenuItem)updateMenu.Items[3];
+                            _updateMenu = (MenuItem)_moreMenu.Items[7];
+                            ((MenuItem)_updateMenu.Items[0]).Click += CheckUpdate_Click;
+                            UpdateItem = (MenuItem)_updateMenu.Items[1];
+                            AutoCheckUpdateItem = (MenuItem)_updateMenu.Items[3];
+                            AllowPreReleaseItem = (MenuItem)_updateMenu.Items[4];
+                            UpdateItem.Click += UpdateItem_Clicked;
                             AutoCheckUpdateItem.Click += AutoCheckUpdateItem_Click;
                             AllowPreReleaseItem.Click += AllowPreRelease_Click;
                             break;
@@ -584,6 +583,8 @@ namespace Shadowsocks.Controller
                                 UpdateChecker.Name, updateChecker.LatestVersionNumber),
                                 I18NUtil.GetAppStringValue(@"ClickMenuToDownload"), BalloonIcon.Info);
                     }
+                    _moreMenu.Icon = CreateSelectedIcon();
+                    _updateMenu.Icon = CreateSelectedIcon();
                     UpdateItem.Visibility = Visibility.Visible;
                     UpdateItem.Header = string.Format(I18NUtil.GetAppStringValue(@"NewVersionAvailable"),
                             UpdateChecker.Name, updateChecker.LatestVersionNumber);
@@ -604,6 +605,8 @@ namespace Shadowsocks.Controller
         private void UpdateItem_Clicked(object sender, RoutedEventArgs e)
         {
             Utils.OpenURL(updateChecker.LatestVersionUrl);
+            _moreMenu.Icon = null;
+            _updateMenu.Icon = null;
             UpdateItem.Visibility = Visibility.Collapsed;
             updateChecker.Found = false;
         }
