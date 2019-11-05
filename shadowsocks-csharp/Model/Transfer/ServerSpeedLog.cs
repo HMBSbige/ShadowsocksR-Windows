@@ -24,7 +24,7 @@ namespace Shadowsocks.Model.Transfer
         private long maxTransDownload;
         private long maxTransUpload;
         private long avgConnectTime = -1;
-        private readonly LinkedList<ErrorLog> errList = new LinkedList<ErrorLog>();
+        private readonly Queue<ErrorLog> errList = new Queue<ErrorLog>();
 
         private const int AvgTime = 5;
 
@@ -321,49 +321,58 @@ namespace Shadowsocks.Model.Transfer
             OnPropertyChanged(nameof(ErrorPercent));
         }
 
-        protected void Sweep()
+        private void Sweep()
         {
             while (errList.Count > 0)
             {
-                if ((DateTime.Now - errList.First.Value.time).TotalMinutes < 30 && errList.Count < 100)
+                var first = errList.Dequeue();
+                if ((DateTime.Now - first.time).TotalMinutes < 30 && errList.Count < 100)
                 {
                     break;
                 }
+                switch (first.errno)
+                {
+                    case 1:
+                    {
+                        if (ErrorConnectTimes > 0)
+                        {
+                            Interlocked.Decrement(ref errorConnectTimes);
+                            OnPropertyChanged(nameof(ErrorConnectTimes));
+                            OnPropertyChanged(nameof(ConnectError));
+                        }
 
-                var errCode = errList.First.Value.errno;
-                errList.RemoveFirst();
-                if (errCode == 1)
-                {
-                    if (ErrorConnectTimes > 0)
-                    {
-                        Interlocked.Decrement(ref errorConnectTimes);
-                        OnPropertyChanged(nameof(ErrorConnectTimes));
-                        OnPropertyChanged(nameof(ConnectError));
+                        break;
                     }
-                }
-                else if (errCode == 2)
-                {
-                    if (ErrorTimeoutTimes > 0)
+                    case 2:
                     {
-                        Interlocked.Decrement(ref errorTimeoutTimes);
-                        OnPropertyChanged(nameof(ErrorTimeoutTimes));
+                        if (ErrorTimeoutTimes > 0)
+                        {
+                            Interlocked.Decrement(ref errorTimeoutTimes);
+                            OnPropertyChanged(nameof(ErrorTimeoutTimes));
+                        }
+
+                        break;
                     }
-                }
-                else if (errCode == 3)
-                {
-                    if (ErrorDecodeTimes > 0)
+                    case 3:
                     {
-                        Interlocked.Decrement(ref errorDecodeTimes);
-                        OnPropertyChanged(nameof(ErrorDecodeTimes));
-                        OnPropertyChanged(nameof(ConnectError));
+                        if (ErrorDecodeTimes > 0)
+                        {
+                            Interlocked.Decrement(ref errorDecodeTimes);
+                            OnPropertyChanged(nameof(ErrorDecodeTimes));
+                            OnPropertyChanged(nameof(ConnectError));
+                        }
+
+                        break;
                     }
-                }
-                else if (errCode == 4)
-                {
-                    if (ErrorEmptyTimes > 0)
+                    case 4:
                     {
-                        Interlocked.Decrement(ref errorEmptyTimes);
-                        OnPropertyChanged(nameof(ErrorEmptyTimes));
+                        if (ErrorEmptyTimes > 0)
+                        {
+                            Interlocked.Decrement(ref errorEmptyTimes);
+                            OnPropertyChanged(nameof(ErrorEmptyTimes));
+                        }
+
+                        break;
                     }
                 }
                 OnPropertyChanged(nameof(ErrorPercent));
@@ -374,7 +383,7 @@ namespace Shadowsocks.Model.Transfer
         {
             lock (this)
             {
-                errList.AddLast(new ErrorLog(0));
+                errList.Enqueue(new ErrorLog(0));
                 Sweep();
             }
             Interlocked.Exchange(ref errorEmptyTimes, 0);
@@ -388,7 +397,7 @@ namespace Shadowsocks.Model.Transfer
 
             lock (this)
             {
-                errList.AddLast(new ErrorLog(1));
+                errList.Enqueue(new ErrorLog(1));
                 Sweep();
             }
 
@@ -403,7 +412,7 @@ namespace Shadowsocks.Model.Transfer
             Interlocked.Increment(ref errorContinuousTimes);
             lock (this)
             {
-                errList.AddLast(new ErrorLog(2));
+                errList.Enqueue(new ErrorLog(2));
                 Sweep();
             }
 
@@ -418,7 +427,7 @@ namespace Shadowsocks.Model.Transfer
             Interlocked.Add(ref errorContinuousTimes, 10);
             lock (this)
             {
-                errList.AddLast(new ErrorLog(3));
+                errList.Enqueue(new ErrorLog(3));
                 Sweep();
             }
 
@@ -433,7 +442,7 @@ namespace Shadowsocks.Model.Transfer
             Interlocked.Increment(ref errorContinuousTimes);
             lock (this)
             {
-                errList.AddLast(new ErrorLog(0));
+                errList.Enqueue(new ErrorLog(0));
                 Sweep();
             }
 
@@ -622,7 +631,7 @@ namespace Shadowsocks.Model.Transfer
                 else
                 {
                     const double a = 2.0 / (1 + 16);
-                    Interlocked.Exchange(ref avgConnectTime, (int)(0.5 + oldValue * (1 - a) + a * millisecond));
+                    Interlocked.Exchange(ref avgConnectTime, Convert.ToInt64(0.5 + oldValue * (1 - a) + a * millisecond));
                 }
             }
             OnPropertyChanged(nameof(AvgConnectTimeText));
