@@ -14,16 +14,13 @@ msbuild -v:m -t:Restore -p:Configuration=Release -p:TargetFramework=netcoreapp3.
 msbuild -v:m -t:Publish -p:Configuration=Release -p:TargetFramework=netcoreapp3.0 || goto :error
 
 echo Building .NET Framework x86 and x64
-msbuild -v:m -t:Restore -p:Configuration=Release -p:TargetFramework=net48 || goto :error
-msbuild -v:m -t:Build -p:Configuration=Release -p:TargetFramework=net48 || goto :error
+msbuild -v:m -r -t:Build -p:Configuration=Release -p:TargetFramework=net48 || goto :error
 
 echo Building .NET Core SelfContained x86
-msbuild -v:m -t:Restore -p:Configuration=Release -p:TargetFramework=netcoreapp3.0 -p:RuntimeIdentifier=win-x86 -p:SelfContained=True|| goto :error
-msbuild -v:m -t:Publish -p:Configuration=Release -p:TargetFramework=netcoreapp3.0 -p:RuntimeIdentifier=win-x86 -p:SelfContained=True|| goto :error
+msbuild -v:m -r -t:Publish -p:Configuration=Release -p:TargetFramework=netcoreapp3.0 -p:RuntimeIdentifier=win-x86 -p:SelfContained=True|| goto :error
 
 echo Building .NET Core SelfContained x64
-msbuild -v:m -t:Restore -p:Configuration=Release -p:TargetFramework=netcoreapp3.0 -p:RuntimeIdentifier=win-x64 -p:SelfContained=True|| goto :error
-msbuild -v:m -t:Publish -p:Configuration=Release -p:TargetFramework=netcoreapp3.0 -p:RuntimeIdentifier=win-x64 -p:SelfContained=True|| goto :error
+msbuild -v:m -r -t:Publish -p:Configuration=Release -p:TargetFramework=netcoreapp3.0 -p:RuntimeIdentifier=win-x64 -p:SelfContained=True|| goto :error
 
 cd..
 goto :EOF
