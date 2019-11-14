@@ -1,6 +1,7 @@
 ﻿using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.Encryption.Stream;
+using Shadowsocks.Enums;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;

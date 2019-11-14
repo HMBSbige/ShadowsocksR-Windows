@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Shadowsocks.Enums;
 using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;

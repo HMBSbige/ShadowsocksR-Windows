@@ -1,4 +1,5 @@
-﻿using Shadowsocks.Model.Transfer;
+﻿using Shadowsocks.Enums;
+using Shadowsocks.Model.Transfer;
 using System;
 using System.Collections.Generic;
 

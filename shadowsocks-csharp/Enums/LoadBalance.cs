@@ -1,4 +1,4 @@
-﻿namespace Shadowsocks.Model
+﻿namespace Shadowsocks.Enums
 {
     public enum LoadBalance
     {

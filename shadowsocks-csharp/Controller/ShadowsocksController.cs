@@ -1,5 +1,6 @@
 ﻿using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Controller.Service;
+using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Model.Transfer;
 using Shadowsocks.Util;
@@ -429,25 +430,7 @@ namespace Shadowsocks.Controller
             }
             catch (Exception e)
             {
-                // translate Microsoft language into human language
-                // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
-                if (e is SocketException se)
-                {
-                    switch (se.SocketErrorCode)
-                    {
-                        case SocketError.AddressAlreadyInUse:
-                        {
-                            e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortInUse"), _config.localPort), se);
-                            break;
-                        }
-                        case SocketError.AccessDenied:
-                        {
-                            e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortReserved"), _config.localPort), se);
-                            break;
-                        }
-                    }
-                }
-
+                ThrowSocketException(ref e);
                 Logging.LogUsefulException(e);
                 ReportError(e);
             }
@@ -465,20 +448,7 @@ namespace Shadowsocks.Controller
                 }
                 catch (Exception e)
                 {
-                    // translate Microsoft language into human language
-                    // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
-                    if (e is SocketException se)
-                    {
-                        switch (se.SocketErrorCode)
-                        {
-                            case SocketError.AddressAlreadyInUse:
-                                e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortInUse"), pair.Key), e);
-                                break;
-                            case SocketError.AccessDenied:
-                                e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortReserved"), pair.Key), se);
-                                break;
-                        }
-                    }
+                    ThrowSocketException(ref e);
                     Logging.LogUsefulException(e);
                     ReportError(e);
                 }
@@ -494,6 +464,28 @@ namespace Shadowsocks.Controller
         {
             Configuration.Save(newConfig);
             Reload();
+        }
+
+        private void ThrowSocketException(ref Exception e)
+        {
+            // translate Microsoft language into human language
+            // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
+            if (e is SocketException se)
+            {
+                switch (se.SocketErrorCode)
+                {
+                    case SocketError.AddressAlreadyInUse:
+                    {
+                        e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortInUse"), _config.localPort), se);
+                        break;
+                    }
+                    case SocketError.AccessDenied:
+                    {
+                        e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortReserved"), _config.localPort), se);
+                        break;
+                    }
+                }
+            }
         }
 
         private void UpdateSystemProxy()

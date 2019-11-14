@@ -1,4 +1,5 @@
-﻿using Shadowsocks.Model;
+﻿using Shadowsocks.Enums;
+using Shadowsocks.Model;
 using Shadowsocks.Proxy;
 using Shadowsocks.Util.NetUtils;
 using System;
@@ -122,12 +123,10 @@ namespace Shadowsocks.Controller.Service
                                     if (ipAddress != null)
                                     {
                                         DnsUtil.DnsBuffer.Set(host, new IPAddress(ipAddress.GetAddressBytes()));
-                                        if (host.IndexOf('.') >= 0)
+                                        if (host.IndexOf('.') >= 0 && IPSubnet.IsLan(ipAddress))
                                         {
-                                            if (IPSubnet.IsLan(ipAddress)) // assume that it is polution if return LAN address
-                                            {
-                                                return CONNECT_REMOTEPROXY;
-                                            }
+                                            // assume that it is pollution if return LAN address
+                                            return CONNECT_REMOTEPROXY;
                                         }
                                     }
                                     else
