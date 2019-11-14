@@ -9,12 +9,14 @@
     <sys:String x:Key="GlobalProxy">全局</sys:String>
     <sys:String x:Key="NoProxy">不修改</sys:String>
 
-    <sys:String x:Key="Pac">PAC</sys:String>
-    <sys:String x:Key="UpdateLanPac">更新 PAC 为绕过局域网 IP</sys:String>
-    <sys:String x:Key="UpdateChnDomainPac">更新 PAC 为绕过大陆域名</sys:String>
-    <sys:String x:Key="UpdateChnDomainIpPac">更新 PAC 为绕过大陆域名和 IP</sys:String>
-    <sys:String x:Key="UpdateGfwList">更新 PAC 为 GFWList</sys:String>
-    <sys:String x:Key="UpdateChnOnlyPac">更新 PAC 为仅通过大陆常见域名（国外访问大陆）</sys:String>
+    <sys:String x:Key="UpdatePac">更新 PAC</sys:String>
+    <sys:String x:Key="UpdateLanPac">绕过局域网 IP</sys:String>
+    <sys:String x:Key="UpdateChnDomainPac">绕过大陆域名</sys:String>
+    <sys:String x:Key="UpdateChnDomainIpPac">绕过大陆域名和 IP</sys:String>
+    <sys:String x:Key="UpdateChnIpPac">绕过大陆 IP</sys:String>
+    <sys:String x:Key="UpdateGfwList">GFWList</sys:String>
+    <sys:String x:Key="UpdateChnOnlyPac">仅大陆常见域名（回国）</sys:String>
+    <sys:String x:Key="UpdateChnOnlyPacFireFox">仅大陆常见域名（支持火狐）</sys:String>
     <sys:String x:Key="CopyPacUrl">复制 PAC URL</sys:String>
     <sys:String x:Key="EditPacFile">编辑本地 PAC 文件</sys:String>
     <sys:String x:Key="EditGfwListUserRule">编辑 GFWList 的用户规则</sys:String>

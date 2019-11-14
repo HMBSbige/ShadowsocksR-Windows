@@ -270,15 +270,19 @@ namespace Shadowsocks.Controller
                         {
                             var pacMenuItem = (MenuItem)menuItem.Items[0];
                             var proxyMenuItem = (MenuItem)menuItem.Items[1];
+                            ((MenuItem)menuItem.Items[3]).Click += CopyPacUrlItem_Click;
+                            ((MenuItem)menuItem.Items[4]).Click += EditPACFileItem_Click;
+                            ((MenuItem)menuItem.Items[5]).Click += EditUserRuleFileForGFWListItem_Click;
 
                             ((MenuItem)pacMenuItem.Items[0]).Click += UpdatePACFromLanIPListItem_Click;
+
                             ((MenuItem)pacMenuItem.Items[2]).Click += UpdatePACFromCNWhiteListItem_Click;
-                            ((MenuItem)pacMenuItem.Items[3]).Click += UpdatePACFromCnIpListItem_Click;
-                            ((MenuItem)pacMenuItem.Items[4]).Click += UpdatePACFromGFWListItem_Click;
-                            ((MenuItem)pacMenuItem.Items[6]).Click += UpdatePACFromCNOnlyListItem_Click;
-                            ((MenuItem)pacMenuItem.Items[8]).Click += CopyPacUrlItem_Click;
-                            ((MenuItem)pacMenuItem.Items[9]).Click += EditPACFileItem_Click;
-                            ((MenuItem)pacMenuItem.Items[10]).Click += EditUserRuleFileForGFWListItem_Click;
+                            ((MenuItem)pacMenuItem.Items[3]).Click += UpdatePACFromCnWhiteListIpItem_Click;
+                            ((MenuItem)pacMenuItem.Items[4]).Click += UpdatePACFromChnIpItem_Click;
+                            ((MenuItem)pacMenuItem.Items[5]).Click += UpdatePACFromGFWListItem_Click;
+
+                            ((MenuItem)pacMenuItem.Items[7]).Click += UpdatePACFromCNOnlyListItem_Click;
+                            ((MenuItem)pacMenuItem.Items[8]).Click += UpdatePACFromCNOnlyListFireFoxItem_Click;
 
                             ruleBypassLan = (MenuItem)proxyMenuItem.Items[0];
                             ruleBypassChina = (MenuItem)proxyMenuItem.Items[1];
@@ -1156,10 +1160,22 @@ namespace Shadowsocks.Controller
             controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white_r.pac");
         }
 
-        private void UpdatePACFromCnIpListItem_Click(object sender, RoutedEventArgs e)
+        private void UpdatePACFromCNOnlyListFireFoxItem_Click(object sender, RoutedEventArgs e)
+        {
+            //回国
+            controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white_r_Firefox.pac");
+        }
+
+        private void UpdatePACFromCnWhiteListIpItem_Click(object sender, RoutedEventArgs e)
         {
             //域名白名单+国内IP
             controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_cnall.pac");
+        }
+
+        private void UpdatePACFromChnIpItem_Click(object sender, RoutedEventArgs e)
+        {
+            //国内IP
+            controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_cnip.pac");
         }
 
         private void EditUserRuleFileForGFWListItem_Click(object sender, RoutedEventArgs e)

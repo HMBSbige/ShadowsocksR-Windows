@@ -9,12 +9,14 @@
     <sys:String x:Key="GlobalProxy">Global</sys:String>
     <sys:String x:Key="NoProxy">No modify system proxy</sys:String>
 
-    <sys:String x:Key="Pac">PAC</sys:String>
-    <sys:String x:Key="UpdateLanPac">Update local PAC from Lan IP list</sys:String>
-    <sys:String x:Key="UpdateChnDomainPac">Update local PAC from Chn Domain list</sys:String>
-    <sys:String x:Key="UpdateChnDomainIpPac">Update local PAC from Chn Domain and IP list</sys:String>
-    <sys:String x:Key="UpdateGfwList">Update local PAC from GFWList</sys:String>
-    <sys:String x:Key="UpdateChnOnlyPac">Update local PAC from Chn Only list</sys:String>
+    <sys:String x:Key="UpdatePac">Update PAC</sys:String>
+    <sys:String x:Key="UpdateLanPac">Lan IP list</sys:String>
+    <sys:String x:Key="UpdateChnDomainPac">Chn Domain list</sys:String>
+    <sys:String x:Key="UpdateChnDomainIpPac">Chn Domain and IP list</sys:String>
+    <sys:String x:Key="UpdateChnIpPac">Chn IP list</sys:String>
+    <sys:String x:Key="UpdateGfwList">GFWList</sys:String>
+    <sys:String x:Key="UpdateChnOnlyPac">Chn Only list</sys:String>
+    <sys:String x:Key="UpdateChnOnlyPacFireFox">Chn Only list (FireFox)</sys:String>
     <sys:String x:Key="CopyPacUrl">Copy PAC URL</sys:String>
     <sys:String x:Key="EditPacFile">Edit local PAC file...</sys:String>
     <sys:String x:Key="EditGfwListUserRule">Edit user rule for GFWList...</sys:String>
