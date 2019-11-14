@@ -31,7 +31,6 @@ namespace Shadowsocks.Controller
         private IPRangeSet _chnRangeSet;
         private HttpProxyRunner privoxyRunner;
         private GFWListUpdater gfwListUpdater;
-        private ChnDomainsAndIPUpdater chnDomainsAndIPUpdater;
         private bool stopped;
 
         public class PathEventArgs : EventArgs
@@ -51,7 +50,6 @@ namespace Shadowsocks.Controller
         public event EventHandler<PathEventArgs> UserRuleFileReadyToOpen;
 
         public event EventHandler<GFWListUpdater.ResultEventArgs> UpdatePACFromGFWListCompleted;
-        public event EventHandler<ChnDomainsAndIPUpdater.ResultEventArgs> UpdatePACFromChnDomainsAndIPCompleted;
 
         public event ErrorEventHandler UpdatePACFromGFWListError;
 
@@ -354,11 +352,6 @@ namespace Shadowsocks.Controller
             gfwListUpdater?.UpdatePACFromGFWList(_config);
         }
 
-        public void UpdatePACFromChnDomainsAndIP(ChnDomainsAndIPUpdater.Templates template)
-        {
-            chnDomainsAndIPUpdater?.UpdatePACFromChnDomainsAndIP(_config, template);
-        }
-
         public void UpdatePACFromOnlinePac(string url)
         {
             gfwListUpdater?.UpdateOnlinePAC(_config, url);
@@ -411,12 +404,6 @@ namespace Shadowsocks.Controller
                 gfwListUpdater = new GFWListUpdater();
                 gfwListUpdater.UpdateCompleted += (o, args) => UpdatePACFromGFWListCompleted?.Invoke(o, args);
                 gfwListUpdater.Error += (o, args) => UpdatePACFromGFWListError?.Invoke(o, args);
-            }
-            if (chnDomainsAndIPUpdater == null)
-            {
-                chnDomainsAndIPUpdater = new ChnDomainsAndIPUpdater();
-                chnDomainsAndIPUpdater.UpdateCompleted += (o, args) => UpdatePACFromChnDomainsAndIPCompleted?.Invoke(o, args);
-                chnDomainsAndIPUpdater.Error += (o, args) => UpdatePACFromGFWListError?.Invoke(o, args);
             }
 
             _listener?.Stop();

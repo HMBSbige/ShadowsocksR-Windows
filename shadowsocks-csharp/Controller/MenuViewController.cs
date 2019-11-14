@@ -100,7 +100,6 @@ namespace Shadowsocks.Controller
             controller.UserRuleFileReadyToOpen += controller_FileReadyToOpen;
             controller.Errored += ControllerError;
             controller.UpdatePACFromGFWListCompleted += controller_UpdatePACFromGFWListCompleted;
-            controller.UpdatePACFromChnDomainsAndIPCompleted += controller_UpdatePACFromChnDomainsAndIPCompleted;
             controller.UpdatePACFromGFWListError += controller_UpdatePACFromGFWListError;
             controller.ShowConfigFormEvent += Config_Click;
             controller.ShowSubscribeWindowEvent += Controller_ShowSubscribeWindowEvent;
@@ -274,7 +273,7 @@ namespace Shadowsocks.Controller
 
                             ((MenuItem)pacMenuItem.Items[0]).Click += UpdatePACFromLanIPListItem_Click;
                             ((MenuItem)pacMenuItem.Items[2]).Click += UpdatePACFromCNWhiteListItem_Click;
-                            ((MenuItem)pacMenuItem.Items[3]).Click += UpdatePACFromCNIPListItem_Click;
+                            ((MenuItem)pacMenuItem.Items[3]).Click += UpdatePACFromCnIpListItem_Click;
                             ((MenuItem)pacMenuItem.Items[4]).Click += UpdatePACFromGFWListItem_Click;
                             ((MenuItem)pacMenuItem.Items[6]).Click += UpdatePACFromCNOnlyListItem_Click;
                             ((MenuItem)pacMenuItem.Items[8]).Click += CopyPacUrlItem_Click;
@@ -391,12 +390,6 @@ namespace Shadowsocks.Controller
             var result = e.Success ?
                 updater.UpdateType < 1 ? I18NUtil.GetAppStringValue(@"GfwListPacUpdated") : I18NUtil.GetAppStringValue(@"PacUpdated")
                 : I18NUtil.GetAppStringValue(@"GfwListPacNotFound");
-            _notifyIcon.ShowBalloonTip(UpdateChecker.Name, result, BalloonIcon.Info);
-        }
-
-        private void controller_UpdatePACFromChnDomainsAndIPCompleted(object sender, ChnDomainsAndIPUpdater.ResultEventArgs e)
-        {
-            var result = e.Success ? I18NUtil.GetAppStringValue(@"PacUpdated") : I18NUtil.GetAppStringValue(@"PacNotFound");
             _notifyIcon.ShowBalloonTip(UpdateChecker.Name, result, BalloonIcon.Info);
         }
 
@@ -1153,17 +1146,20 @@ namespace Shadowsocks.Controller
 
         private void UpdatePACFromCNWhiteListItem_Click(object sender, RoutedEventArgs e)
         {
-            controller.UpdatePACFromChnDomainsAndIP(ChnDomainsAndIPUpdater.Templates.ss_white);
+            //域名白名单
+            controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white.pac");
         }
 
         private void UpdatePACFromCNOnlyListItem_Click(object sender, RoutedEventArgs e)
         {
-            controller.UpdatePACFromChnDomainsAndIP(ChnDomainsAndIPUpdater.Templates.ss_white_r);
+            //回国
+            controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white_r.pac");
         }
 
-        private void UpdatePACFromCNIPListItem_Click(object sender, RoutedEventArgs e)
+        private void UpdatePACFromCnIpListItem_Click(object sender, RoutedEventArgs e)
         {
-            controller.UpdatePACFromChnDomainsAndIP(ChnDomainsAndIPUpdater.Templates.ss_cnip);
+            //域名白名单+国内IP
+            controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_cnall.pac");
         }
 
         private void EditUserRuleFileForGFWListItem_Click(object sender, RoutedEventArgs e)

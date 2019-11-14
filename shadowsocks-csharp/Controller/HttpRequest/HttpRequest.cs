@@ -7,7 +7,7 @@ namespace Shadowsocks.Controller.HttpRequest
 {
     public abstract class HttpRequest
     {
-        private const string DefaultUserAgent = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36";
+        protected const string DefaultUserAgent = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.97 Safari/537.36";
         private const int DefaultGetTimeout = 30000;
         private const int DefaultHeadTimeout = 4000;
 
