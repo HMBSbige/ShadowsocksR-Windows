@@ -8,7 +8,7 @@
         public int Type;
         public string InnerLibName;
 
-        public EncryptorInfo(int key, int iv, bool display, int type, string innerLibName = "")
+        public EncryptorInfo(int key, int iv, int type, string innerLibName = @"", bool display = true)
         {
             KeySize = key;
             IvSize = iv;

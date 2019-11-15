@@ -31,7 +31,7 @@ namespace Shadowsocks.View
             };
 
             _controller = controller;
-            foreach (var name in from name in EncryptorFactory.GetEncryptor().Keys let info = EncryptorFactory.GetEncryptorInfo(name) where info.Display select name)
+            foreach (var name in from name in EncryptorFactory.RegisteredEncryptors.Keys let info = EncryptorFactory.GetEncryptorInfo(name) where info.Display select name)
             {
                 EncryptionComboBox.Items.Add(name);
             }
