@@ -72,7 +72,7 @@ namespace Shadowsocks.Encryption
             var c = t.GetConstructor(_constructorTypes);
             if (c == null)
             {
-                throw new Exception("Invalid ctor");
+                throw new System.Exception("Invalid ctor");
             }
             var result = (IEncryptor)c.Invoke(new object[] { method, password });
             return result;
@@ -89,7 +89,7 @@ namespace Shadowsocks.Encryption
             var c = t.GetConstructor(_constructorTypes);
             if (c == null)
             {
-                throw new Exception("Invalid ctor");
+                throw new System.Exception("Invalid ctor");
             }
             var result = (IEncryptor)c.Invoke(new object[] { method, "0" });
             var info = result.getInfo();

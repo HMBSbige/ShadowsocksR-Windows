@@ -47,11 +47,11 @@ namespace Shadowsocks.Encryption.Stream
             return _ciphers;
         }
 
-        protected override void initCipher(byte[] iv, bool isCipher)
+        protected override void InitCipher(byte[] iv, bool isEncrypt)
         {
-            base.initCipher(iv, isCipher);
+            base.InitCipher(iv, isEncrypt);
             var ctx = Marshal.AllocHGlobal(MbedTLS.cipher_get_size_ex());
-            if (isCipher)
+            if (isEncrypt)
             {
                 _encryptCtx = ctx;
             }
@@ -72,9 +72,9 @@ namespace Shadowsocks.Encryption.Stream
                 realKey = _key;
             }
             MbedTLS.cipher_init(ctx);
-            if (MbedTLS.cipher_setup(ctx, MbedTLS.cipher_info_from_string(getInfo().name)) != 0)
+            if (MbedTLS.cipher_setup(ctx, MbedTLS.cipher_info_from_string(getInfo().InnerLibName)) != 0)
             {
-                throw new Exception("Cannot initialize mbed TLS cipher context");
+                throw new System.Exception("Cannot initialize mbed TLS cipher context");
             }
             /*
              * MbedTLS takes key length by bit
@@ -88,15 +88,15 @@ namespace Shadowsocks.Encryption.Stream
              *  
              */
             if (MbedTLS.cipher_setkey(ctx, realKey, keyLen * 8,
-                isCipher ? MbedTLS.MBEDTLS_ENCRYPT : MbedTLS.MBEDTLS_DECRYPT) != 0)
-                throw new Exception("Cannot set mbed TLS cipher key");
+                isEncrypt ? MbedTLS.MBEDTLS_ENCRYPT : MbedTLS.MBEDTLS_DECRYPT) != 0)
+                throw new System.Exception("Cannot set mbed TLS cipher key");
             if (MbedTLS.cipher_set_iv(ctx, iv, ivLen) != 0)
-                throw new Exception("Cannot set mbed TLS cipher IV");
+                throw new System.Exception("Cannot set mbed TLS cipher IV");
             if (MbedTLS.cipher_reset(ctx) != 0)
-                throw new Exception("Cannot finalize mbed TLS cipher context");
+                throw new System.Exception("Cannot finalize mbed TLS cipher context");
         }
 
-        protected override void cipherUpdate(bool isCipher, int length, byte[] buf, byte[] outbuf)
+        protected override void CipherUpdate(bool isCipher, int length, byte[] buf, byte[] outbuf)
         {
             // C# could be multi-threaded
             if (_disposed)
@@ -105,7 +105,7 @@ namespace Shadowsocks.Encryption.Stream
             }
             if (MbedTLS.cipher_update(isCipher ? _encryptCtx : _decryptCtx, buf, length, outbuf, ref length) != 0)
             {
-                throw new Exception("Cannot update mbed TLS cipher context");
+                throw new System.Exception("Cannot update mbed TLS cipher context");
             }
         }
 

@@ -1,7 +1,6 @@
 ﻿using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,7 +62,11 @@ namespace Shadowsocks.Model.Transfer
         {
             get
             {
-                var transLog = ArrayList.Synchronized(_downTransLog).Cast<TransLog>().ToList();
+                List<TransLog> transLog;
+                lock (this)
+                {
+                    transLog = _downTransLog.ToList();
+                }
                 double totalTime = 0;
                 if (transLog.Count == 0 || transLog.Count > 0 &&
                     DateTime.Now > transLog.Last().recvTime.AddSeconds(AvgTime))
@@ -96,7 +99,11 @@ namespace Shadowsocks.Model.Transfer
         {
             get
             {
-                var transLog = ArrayList.Synchronized(_upTransLog).Cast<TransLog>().ToList();
+                List<TransLog> transLog;
+                lock (this)
+                {
+                    transLog = _upTransLog.ToList();
+                }
                 double totalTime = 0;
                 if (transLog.Count == 0 || transLog.Count > 0 &&
                     DateTime.Now > transLog.Last().recvTime.AddSeconds(AvgTime))

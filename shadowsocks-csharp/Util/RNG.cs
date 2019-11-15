@@ -7,7 +7,7 @@ namespace Shadowsocks.Util
     {
         public static void RandBytes(byte[] buf, int length = -1)
         {
-            if (length == -1)
+            if (length < 0)
             {
                 length = buf.Length;
             }
@@ -18,7 +18,7 @@ namespace Shadowsocks.Util
                 rngServiceProvider.GetBytes(temp);
             }
 
-            temp.CopyTo(buf, 0);
+            Buffer.BlockCopy(temp, 0, buf, 0, length);
         }
 
         public static uint RandUInt32()

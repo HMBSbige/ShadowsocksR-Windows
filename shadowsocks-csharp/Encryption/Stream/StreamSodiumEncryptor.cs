@@ -65,7 +65,7 @@ namespace Shadowsocks.Encryption.Stream
             return new List<string>(_ciphers.Keys);
         }
 
-        protected override void cipherUpdate(bool isCipher, int length, byte[] buf, byte[] outbuf)
+        protected override void CipherUpdate(bool isCipher, int length, byte[] buf, byte[] outbuf)
         {
             int bytesRemaining;
             ulong ic;
@@ -103,20 +103,6 @@ namespace Shadowsocks.Encryption.Stream
                 _decryptBytesRemaining = bytesRemaining;
                 _decryptIC = ic;
             }
-        }
-
-        public override void ResetEncrypt()
-        {
-            _encryptIVSent = false;
-            _encryptIC = 0;
-            _encryptBytesRemaining = 0;
-        }
-
-        public override void ResetDecrypt()
-        {
-            _decryptIVReceived = 0;
-            _decryptIC = 0;
-            _decryptBytesRemaining = 0;
         }
 
         void crypto_stream_chacha20_ietf_xor_ic(byte[] c, byte[] m, ulong mlen, byte[] n, ulong ic, byte[] k)

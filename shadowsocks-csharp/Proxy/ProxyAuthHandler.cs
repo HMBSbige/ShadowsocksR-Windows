@@ -26,8 +26,9 @@ namespace Shadowsocks.Proxy
         private Socket _connectionUDP;
         private string local_sendback_protocol;
 
-        protected const int RECV_SIZE = 16384;
-        protected byte[] _connetionRecvBuffer = new byte[RECV_SIZE * 2];
+        protected const int RecvSize = 2048;
+        public const int BufferSize = 18497;
+        protected byte[] _connetionRecvBuffer = new byte[BufferSize];
 
         public byte command;
         protected byte[] _remoteHeaderSendBuffer;

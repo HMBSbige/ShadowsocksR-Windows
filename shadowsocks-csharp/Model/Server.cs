@@ -618,7 +618,7 @@ namespace Shadowsocks.Model
         private string GetSsrLink()
         {
             var mainPart = $@"{server}:{Server_Port}:{Protocol}:{Method}:{obfs}:{Base64.EncodeUrlSafeBase64(Password)}";
-            var paramStr = $@"obfsparam={Base64.EncodeUrlSafeBase64(ObfsParam ?? string.Empty)}";
+            var paramStr = $@"obfsparam={Base64.EncodeUrlSafeBase64(ObfsParam)}";
             if (!string.IsNullOrEmpty(ProtocolParam))
             {
                 paramStr += $@"&protoparam={Base64.EncodeUrlSafeBase64(ProtocolParam)}";

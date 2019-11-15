@@ -25,7 +25,7 @@ namespace Shadowsocks.Encryption.Stream
             return _ciphers;
         }
 
-        protected override void cipherUpdate(bool isCipher, int length, byte[] buf, byte[] outbuf)
+        protected override void CipherUpdate(bool isCipher, int length, byte[] buf, byte[] outbuf)
         {
             if (_disposed)
             {

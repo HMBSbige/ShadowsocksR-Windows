@@ -27,7 +27,7 @@ namespace Shadowsocks.Encryption
             catch (IOException)
             {
             }
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 Logging.LogUsefulException(e);
             }
@@ -38,7 +38,7 @@ namespace Shadowsocks.Encryption
                 {
                     if (sodium_init() == -1)
                     {
-                        throw new Exception(@"Failed to initialize sodium");
+                        throw new System.Exception(@"Failed to initialize sodium");
                     }
 
                     _initialized = true;
