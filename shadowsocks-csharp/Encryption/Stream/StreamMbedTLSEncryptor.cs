@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shadowsocks.Encryption.Exception;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
@@ -19,25 +20,26 @@ namespace Shadowsocks.Encryption.Stream
         }
 
         private static readonly Dictionary<string, EncryptorInfo> _ciphers = new Dictionary<string, EncryptorInfo> {
-            { "aes-128-cbc", new EncryptorInfo(16, 16, false, CIPHER_AES, "AES-128-CBC") },
-            { "aes-192-cbc", new EncryptorInfo(24, 16, false, CIPHER_AES, "AES-192-CBC") },
-            { "aes-256-cbc", new EncryptorInfo(32, 16, false, CIPHER_AES, "AES-256-CBC") },
-            { "aes-128-ctr", new EncryptorInfo(16, 16, true, CIPHER_AES, "AES-128-CTR") },
-            { "aes-192-ctr", new EncryptorInfo(24, 16, true, CIPHER_AES, "AES-192-CTR") },
-            { "aes-256-ctr", new EncryptorInfo(32, 16, true, CIPHER_AES, "AES-256-CTR") },
-            { "aes-128-cfb", new EncryptorInfo(16, 16, true, CIPHER_AES, "AES-128-CFB128") },
-            { "aes-192-cfb", new EncryptorInfo(24, 16, true, CIPHER_AES, "AES-192-CFB128") },
-            { "aes-256-cfb", new EncryptorInfo(32, 16, true, CIPHER_AES, "AES-256-CFB128") },
-            { "bf-cfb", new EncryptorInfo(16, 8, false, CIPHER_BLOWFISH, "BLOWFISH-CFB64") },
-            { "camellia-128-cfb", new EncryptorInfo(16, 16, false, CIPHER_CAMELLIA, "CAMELLIA-128-CFB128") },
-            { "camellia-192-cfb", new EncryptorInfo(24, 16, false, CIPHER_CAMELLIA, "CAMELLIA-192-CFB128") },
-            { "camellia-256-cfb", new EncryptorInfo(32, 16, false, CIPHER_CAMELLIA, "CAMELLIA-256-CFB128") },
-            { "rc4", new EncryptorInfo(16, 0, true, CIPHER_RC4, "ARC4-128") },
-            { "rc4-md5", new EncryptorInfo(16, 16, true, CIPHER_RC4, "ARC4-128") },
-            { "rc4-md5-6", new EncryptorInfo(16, 6, true, CIPHER_RC4, "ARC4-128") }
+            { @"aes-128-cbc", new EncryptorInfo(16, 16, CIPHER_AES, @"AES-128-CBC", false) },
+            { @"aes-192-cbc", new EncryptorInfo(24, 16, CIPHER_AES, @"AES-192-CBC", false) },
+            { @"aes-256-cbc", new EncryptorInfo(32, 16, CIPHER_AES, @"AES-256-CBC", false) },
+
+            { @"aes-128-ctr", new EncryptorInfo(16, 16, CIPHER_AES, @"AES-128-CTR") },
+            { @"aes-192-ctr", new EncryptorInfo(24, 16, CIPHER_AES, @"AES-192-CTR") },
+            { @"aes-256-ctr", new EncryptorInfo(32, 16, CIPHER_AES, @"AES-256-CTR") },
+            { @"aes-128-cfb", new EncryptorInfo(16, 16, CIPHER_AES, @"AES-128-CFB128") },
+            { @"aes-192-cfb", new EncryptorInfo(24, 16, CIPHER_AES, @"AES-192-CFB128") },
+            { @"aes-256-cfb", new EncryptorInfo(32, 16, CIPHER_AES, @"AES-256-CFB128") },
+            { @"bf-cfb", new EncryptorInfo(16, 8, CIPHER_BLOWFISH, @"BLOWFISH-CFB64", false) },
+            { @"camellia-128-cfb", new EncryptorInfo(16, 16, CIPHER_CAMELLIA, @"CAMELLIA-128-CFB128", false) },
+            { @"camellia-192-cfb", new EncryptorInfo(24, 16, CIPHER_CAMELLIA, @"CAMELLIA-192-CFB128", false) },
+            { @"camellia-256-cfb", new EncryptorInfo(32, 16, CIPHER_CAMELLIA, @"CAMELLIA-256-CFB128", false) },
+            { @"rc4", new EncryptorInfo(16, 0, CIPHER_RC4, @"ARC4-128") },
+            { @"rc4-md5", new EncryptorInfo(16, 16, CIPHER_RC4, @"ARC4-128") },
+            { @"rc4-md5-6", new EncryptorInfo(16, 6, CIPHER_RC4, @"ARC4-128") }
         };
 
-        public static IEnumerable<string> SupportedCiphers()
+        public static List<string> SupportedCiphers()
         {
             return new List<string>(_ciphers.Keys);
         }
@@ -47,11 +49,11 @@ namespace Shadowsocks.Encryption.Stream
             return _ciphers;
         }
 
-        protected override void initCipher(byte[] iv, bool isCipher)
+        protected override void InitCipher(byte[] iv, bool isEncrypt)
         {
-            base.initCipher(iv, isCipher);
+            base.InitCipher(iv, isEncrypt);
             var ctx = Marshal.AllocHGlobal(MbedTLS.cipher_get_size_ex());
-            if (isCipher)
+            if (isEncrypt)
             {
                 _encryptCtx = ctx;
             }
@@ -72,9 +74,9 @@ namespace Shadowsocks.Encryption.Stream
                 realKey = _key;
             }
             MbedTLS.cipher_init(ctx);
-            if (MbedTLS.cipher_setup(ctx, MbedTLS.cipher_info_from_string(getInfo().name)) != 0)
+            if (MbedTLS.cipher_setup(ctx, MbedTLS.cipher_info_from_string(getInfo().InnerLibName)) != 0)
             {
-                throw new Exception("Cannot initialize mbed TLS cipher context");
+                throw new System.Exception("Cannot initialize mbed TLS cipher context");
             }
             /*
              * MbedTLS takes key length by bit
@@ -88,15 +90,15 @@ namespace Shadowsocks.Encryption.Stream
              *  
              */
             if (MbedTLS.cipher_setkey(ctx, realKey, keyLen * 8,
-                isCipher ? MbedTLS.MBEDTLS_ENCRYPT : MbedTLS.MBEDTLS_DECRYPT) != 0)
-                throw new Exception("Cannot set mbed TLS cipher key");
+                isEncrypt ? MbedTLS.MBEDTLS_ENCRYPT : MbedTLS.MBEDTLS_DECRYPT) != 0)
+                throw new System.Exception("Cannot set mbed TLS cipher key");
             if (MbedTLS.cipher_set_iv(ctx, iv, ivLen) != 0)
-                throw new Exception("Cannot set mbed TLS cipher IV");
+                throw new System.Exception("Cannot set mbed TLS cipher IV");
             if (MbedTLS.cipher_reset(ctx) != 0)
-                throw new Exception("Cannot finalize mbed TLS cipher context");
+                throw new System.Exception("Cannot finalize mbed TLS cipher context");
         }
 
-        protected override void cipherUpdate(bool isCipher, int length, byte[] buf, byte[] outbuf)
+        protected override void CipherUpdate(bool isCipher, int length, byte[] buf, byte[] outbuf)
         {
             // C# could be multi-threaded
             if (_disposed)
@@ -105,13 +107,16 @@ namespace Shadowsocks.Encryption.Stream
             }
             if (MbedTLS.cipher_update(isCipher ? _encryptCtx : _decryptCtx, buf, length, outbuf, ref length) != 0)
             {
-                throw new Exception("Cannot update mbed TLS cipher context");
+                throw new CryptoErrorException("Cannot update mbed TLS cipher context");
             }
         }
 
         #region IDisposable
 
         private bool _disposed;
+
+        // instance based lock
+        private readonly object _lock = new object();
 
         public override void Dispose()
         {
@@ -126,7 +131,7 @@ namespace Shadowsocks.Encryption.Stream
 
         private void Dispose(bool disposing)
         {
-            lock (this)
+            lock (_lock)
             {
                 if (_disposed)
                 {

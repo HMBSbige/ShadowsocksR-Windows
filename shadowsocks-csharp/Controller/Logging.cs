@@ -1,4 +1,5 @@
-﻿using Shadowsocks.Obfs;
+﻿using Shadowsocks.Enums;
+using Shadowsocks.Obfs;
 using Shadowsocks.Util;
 using System;
 using System.Diagnostics;
@@ -8,15 +9,6 @@ using System.Net.Sockets;
 
 namespace Shadowsocks.Controller
 {
-    public enum LogLevel
-    {
-        Debug = 0,
-        Info,
-        Warn,
-        Error,
-        Assert
-    }
-
     public class Logging
     {
         public static string LogFile;

@@ -73,7 +73,7 @@ namespace Shadowsocks.Encryption
             catch (IOException)
             {
             }
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 Logging.LogUsefulException(e);
             }

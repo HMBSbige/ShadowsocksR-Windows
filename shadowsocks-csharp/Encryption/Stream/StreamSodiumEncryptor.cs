@@ -1,17 +1,18 @@
-﻿using System;
+﻿using Shadowsocks.Encryption.Exception;
+using System;
 using System.Collections.Generic;
 
 namespace Shadowsocks.Encryption.Stream
 {
     public class StreamSodiumEncryptor : StreamEncryptor
     {
-        const int CIPHER_SALSA20 = 1;
-        const int CIPHER_CHACHA20 = 2;
-        const int CIPHER_CHACHA20_IETF = 3;
-        const int CIPHER_XSALSA20 = 4 + 1;
-        const int CIPHER_XCHACHA20 = 4 + 2;
+        private const int CIPHER_SALSA20 = 1;
+        private const int CIPHER_CHACHA20 = 2;
+        private const int CIPHER_CHACHA20_IETF = 3;
+        private const int CIPHER_XSALSA20 = 4 + 1;
+        private const int CIPHER_XCHACHA20 = 4 + 2;
 
-        const int SODIUM_BLOCK_SIZE = 64;
+        private const int SODIUM_BLOCK_SIZE = 64;
 
         protected int _encryptBytesRemaining;
         protected int _decryptBytesRemaining;
@@ -20,39 +21,30 @@ namespace Shadowsocks.Encryption.Stream
         protected byte[] _encryptBuf;
         protected byte[] _decryptBuf;
 
-        private delegate void CryptoStream(byte[] c, byte[] m, ulong mlen, byte[] n, ulong ic, byte[] k);
+        private delegate int CryptoStream(byte[] c, byte[] m, ulong mlen, byte[] n, ulong ic, byte[] k);
         private readonly CryptoStream _encryptorDelegate;
 
         public StreamSodiumEncryptor(string method, string password) : base(method, password)
         {
             _encryptBuf = new byte[MAX_INPUT_SIZE + SODIUM_BLOCK_SIZE];
             _decryptBuf = new byte[MAX_INPUT_SIZE + SODIUM_BLOCK_SIZE];
-            switch (_cipher)
+            _encryptorDelegate = _cipher switch
             {
-                case CIPHER_SALSA20:
-                    _encryptorDelegate = Sodium.crypto_stream_salsa20_xor_ic;
-                    break;
-                case CIPHER_CHACHA20:
-                    _encryptorDelegate = Sodium.crypto_stream_chacha20_xor_ic;
-                    break;
-                case CIPHER_XSALSA20:
-                    _encryptorDelegate = Sodium.crypto_stream_xsalsa20_xor_ic;
-                    break;
-                case CIPHER_XCHACHA20:
-                    _encryptorDelegate = Sodium.crypto_stream_xchacha20_xor_ic;
-                    break;
-                case CIPHER_CHACHA20_IETF:
-                    _encryptorDelegate = crypto_stream_chacha20_ietf_xor_ic;
-                    break;
-            }
+                CIPHER_SALSA20 => Sodium.crypto_stream_salsa20_xor_ic,
+                CIPHER_CHACHA20 => Sodium.crypto_stream_chacha20_xor_ic,
+                CIPHER_XSALSA20 => Sodium.crypto_stream_xsalsa20_xor_ic,
+                CIPHER_XCHACHA20 => Sodium.crypto_stream_xchacha20_xor_ic,
+                CIPHER_CHACHA20_IETF => crypto_stream_chacha20_ietf_xor_ic,
+                _ => _encryptorDelegate
+            };
         }
 
         private static Dictionary<string, EncryptorInfo> _ciphers = new Dictionary<string, EncryptorInfo> {
-                {"salsa20", new EncryptorInfo(32, 8, true, CIPHER_SALSA20)},
-                {"chacha20", new EncryptorInfo(32, 8, true, CIPHER_CHACHA20)},
-                {"xsalsa20", new EncryptorInfo(32, 24, true, CIPHER_XSALSA20)},
-                {"xchacha20", new EncryptorInfo(32, 24, true, CIPHER_XCHACHA20)},
-                {"chacha20-ietf", new EncryptorInfo(32, 12, true, CIPHER_CHACHA20_IETF)}
+                {@"salsa20", new EncryptorInfo(32, 8,  CIPHER_SALSA20)},
+                {@"chacha20", new EncryptorInfo(32, 8,  CIPHER_CHACHA20)},
+                {@"xsalsa20", new EncryptorInfo(32, 24,  CIPHER_XSALSA20)},
+                {@"xchacha20", new EncryptorInfo(32, 24,  CIPHER_XCHACHA20)},
+                {@"chacha20-ietf", new EncryptorInfo(32, 12,  CIPHER_CHACHA20_IETF)}
         };
 
         protected override Dictionary<string, EncryptorInfo> getCiphers()
@@ -60,12 +52,12 @@ namespace Shadowsocks.Encryption.Stream
             return _ciphers;
         }
 
-        public static IEnumerable<string> SupportedCiphers()
+        public static List<string> SupportedCiphers()
         {
             return new List<string>(_ciphers.Keys);
         }
 
-        protected override void cipherUpdate(bool isCipher, int length, byte[] buf, byte[] outbuf)
+        protected override void CipherUpdate(bool isCipher, int length, byte[] buf, byte[] outbuf)
         {
             int bytesRemaining;
             ulong ic;
@@ -87,7 +79,9 @@ namespace Shadowsocks.Encryption.Stream
             }
             var padding = bytesRemaining;
             Buffer.BlockCopy(buf, 0, sodiumBuf, padding, length);
-            _encryptorDelegate(sodiumBuf, sodiumBuf, (ulong)(padding + length), iv, ic, _key);
+            var ret = _encryptorDelegate(sodiumBuf, sodiumBuf, (ulong)(padding + length), iv, ic, _key);
+            if (ret != 0) throw new CryptoErrorException();
+
             Buffer.BlockCopy(sodiumBuf, padding, outbuf, 0, length);
             padding += length;
             ic += (ulong)padding / SODIUM_BLOCK_SIZE;
@@ -105,23 +99,9 @@ namespace Shadowsocks.Encryption.Stream
             }
         }
 
-        public override void ResetEncrypt()
+        private int crypto_stream_chacha20_ietf_xor_ic(byte[] c, byte[] m, ulong mlen, byte[] n, ulong ic, byte[] k)
         {
-            _encryptIVSent = false;
-            _encryptIC = 0;
-            _encryptBytesRemaining = 0;
-        }
-
-        public override void ResetDecrypt()
-        {
-            _decryptIVReceived = 0;
-            _decryptIC = 0;
-            _decryptBytesRemaining = 0;
-        }
-
-        void crypto_stream_chacha20_ietf_xor_ic(byte[] c, byte[] m, ulong mlen, byte[] n, ulong ic, byte[] k)
-        {
-            Sodium.crypto_stream_chacha20_ietf_xor_ic(c, m, mlen, n, (uint)ic, k);
+            return Sodium.crypto_stream_chacha20_ietf_xor_ic(c, m, mlen, n, (uint)ic, k);
         }
 
         public override void Dispose()

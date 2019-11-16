@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Model;
+﻿using Shadowsocks.Enums;
 using System;
 using System.Globalization;
 using System.Windows;

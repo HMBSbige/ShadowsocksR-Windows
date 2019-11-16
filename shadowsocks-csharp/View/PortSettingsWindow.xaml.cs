@@ -1,5 +1,6 @@
 ﻿using Shadowsocks.Controller;
 using Shadowsocks.Controls;
+using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
 using System;

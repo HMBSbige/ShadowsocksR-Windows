@@ -6,13 +6,11 @@ namespace Shadowsocks.Encryption.Stream
     public sealed class NoneEncryptor : StreamEncryptor
     {
         public NoneEncryptor(string method, string password) : base(method, password)
-        {
-
-        }
+        { }
 
         private static Dictionary<string, EncryptorInfo> _ciphers = new Dictionary<string, EncryptorInfo>
         {
-                {"none", new EncryptorInfo(16, 0, true, 1)}
+                {@"none", new EncryptorInfo(16, 0, 1)}
         };
 
         public static List<string> SupportedCiphers()
@@ -25,7 +23,7 @@ namespace Shadowsocks.Encryption.Stream
             return _ciphers;
         }
 
-        protected override void cipherUpdate(bool isCipher, int length, byte[] buf, byte[] outbuf)
+        protected override void CipherUpdate(bool isCipher, int length, byte[] buf, byte[] outbuf)
         {
             if (_disposed)
             {
@@ -34,7 +32,6 @@ namespace Shadowsocks.Encryption.Stream
 
             Array.Copy(buf, outbuf, length);
         }
-
 
         #region IDisposable
 

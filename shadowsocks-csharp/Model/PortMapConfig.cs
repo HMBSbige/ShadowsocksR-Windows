@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shadowsocks.Enums;
+using System;
 
 namespace Shadowsocks.Model
 {

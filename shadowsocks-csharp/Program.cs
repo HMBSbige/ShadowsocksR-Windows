@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using Shadowsocks.Controller;
 using Shadowsocks.Controller.HttpRequest;
+using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
 using Shadowsocks.Util.SingleInstance;

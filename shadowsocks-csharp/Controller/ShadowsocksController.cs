@@ -1,5 +1,6 @@
 ﻿using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Controller.Service;
+using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Model.Transfer;
 using Shadowsocks.Util;
@@ -30,8 +31,7 @@ namespace Shadowsocks.Controller
         private HostDaemon _hostDaemon;
         private IPRangeSet _chnRangeSet;
         private HttpProxyRunner privoxyRunner;
-        private GFWListUpdater gfwListUpdater;
-        private ChnDomainsAndIPUpdater chnDomainsAndIPUpdater;
+        private GfwListUpdater gfwListUpdater;
         private bool stopped;
 
         public class PathEventArgs : EventArgs
@@ -50,8 +50,7 @@ namespace Shadowsocks.Controller
         public event EventHandler<PathEventArgs> PACFileReadyToOpen;
         public event EventHandler<PathEventArgs> UserRuleFileReadyToOpen;
 
-        public event EventHandler<GFWListUpdater.ResultEventArgs> UpdatePACFromGFWListCompleted;
-        public event EventHandler<ChnDomainsAndIPUpdater.ResultEventArgs> UpdatePACFromChnDomainsAndIPCompleted;
+        public event EventHandler<GfwListUpdater.ResultEventArgs> UpdatePACFromGFWListCompleted;
 
         public event ErrorEventHandler UpdatePACFromGFWListError;
 
@@ -351,17 +350,12 @@ namespace Shadowsocks.Controller
 
         public void UpdatePACFromGFWList()
         {
-            gfwListUpdater?.UpdatePACFromGFWList(_config);
-        }
-
-        public void UpdatePACFromChnDomainsAndIP(ChnDomainsAndIPUpdater.Templates template)
-        {
-            chnDomainsAndIPUpdater?.UpdatePACFromChnDomainsAndIP(_config, template);
+            gfwListUpdater?.UpdatePacFromGfwList(_config);
         }
 
         public void UpdatePACFromOnlinePac(string url)
         {
-            gfwListUpdater?.UpdateOnlinePAC(_config, url);
+            gfwListUpdater?.UpdateOnlinePac(_config, url);
         }
 
         public void Reload()
@@ -408,15 +402,9 @@ namespace Shadowsocks.Controller
             _pacServer.UpdatePacUrl(_config);
             if (gfwListUpdater == null)
             {
-                gfwListUpdater = new GFWListUpdater();
+                gfwListUpdater = new GfwListUpdater();
                 gfwListUpdater.UpdateCompleted += (o, args) => UpdatePACFromGFWListCompleted?.Invoke(o, args);
                 gfwListUpdater.Error += (o, args) => UpdatePACFromGFWListError?.Invoke(o, args);
-            }
-            if (chnDomainsAndIPUpdater == null)
-            {
-                chnDomainsAndIPUpdater = new ChnDomainsAndIPUpdater();
-                chnDomainsAndIPUpdater.UpdateCompleted += (o, args) => UpdatePACFromChnDomainsAndIPCompleted?.Invoke(o, args);
-                chnDomainsAndIPUpdater.Error += (o, args) => UpdatePACFromGFWListError?.Invoke(o, args);
             }
 
             _listener?.Stop();
@@ -442,25 +430,7 @@ namespace Shadowsocks.Controller
             }
             catch (Exception e)
             {
-                // translate Microsoft language into human language
-                // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
-                if (e is SocketException se)
-                {
-                    switch (se.SocketErrorCode)
-                    {
-                        case SocketError.AddressAlreadyInUse:
-                        {
-                            e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortInUse"), _config.localPort), se);
-                            break;
-                        }
-                        case SocketError.AccessDenied:
-                        {
-                            e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortReserved"), _config.localPort), se);
-                            break;
-                        }
-                    }
-                }
-
+                ThrowSocketException(ref e);
                 Logging.LogUsefulException(e);
                 ReportError(e);
             }
@@ -478,20 +448,7 @@ namespace Shadowsocks.Controller
                 }
                 catch (Exception e)
                 {
-                    // translate Microsoft language into human language
-                    // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
-                    if (e is SocketException se)
-                    {
-                        switch (se.SocketErrorCode)
-                        {
-                            case SocketError.AddressAlreadyInUse:
-                                e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortInUse"), pair.Key), e);
-                                break;
-                            case SocketError.AccessDenied:
-                                e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortReserved"), pair.Key), se);
-                                break;
-                        }
-                    }
+                    ThrowSocketException(ref e);
                     Logging.LogUsefulException(e);
                     ReportError(e);
                 }
@@ -507,6 +464,28 @@ namespace Shadowsocks.Controller
         {
             Configuration.Save(newConfig);
             Reload();
+        }
+
+        private void ThrowSocketException(ref Exception e)
+        {
+            // translate Microsoft language into human language
+            // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
+            if (e is SocketException se)
+            {
+                switch (se.SocketErrorCode)
+                {
+                    case SocketError.AddressAlreadyInUse:
+                    {
+                        e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortInUse"), _config.localPort), se);
+                        break;
+                    }
+                    case SocketError.AccessDenied:
+                    {
+                        e = new Exception(string.Format(I18NUtil.GetAppStringValue(@"PortReserved"), _config.localPort), se);
+                        break;
+                    }
+                }
+            }
         }
 
         private void UpdateSystemProxy()
@@ -529,7 +508,7 @@ namespace Shadowsocks.Controller
             }
             else
             {
-                GFWListUpdater.MergeAndWritePACFile(FileManager.NonExclusiveReadAllText(Utils.GetTempPath(PACServer.gfwlist_FILE)));
+                GfwListUpdater.MergeAndWritePacFile(FileManager.NonExclusiveReadAllText(Utils.GetTempPath(PACServer.gfwlist_FILE)));
             }
 
             UpdateSystemProxy();

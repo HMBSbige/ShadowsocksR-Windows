@@ -102,14 +102,12 @@ namespace Shadowsocks.Util.NetUtils
                     {
                         try
                         {
-                            r = client.Query(host, QueryType.AAAA).Answers.OfType<AaaaRecord>().FirstOrDefault()
-                                    ?.Address;
+                            r = client.Query(host, QueryType.AAAA).Answers.OfType<AaaaRecord>().FirstOrDefault()?.Address;
                         }
                         catch (DnsResponseException)
                         {
                             client.UseTcpOnly = true;
-                            r = client.Query(host, QueryType.AAAA).Answers.OfType<AaaaRecord>().FirstOrDefault()
-                                    ?.Address;
+                            r = client.Query(host, QueryType.AAAA).Answers.OfType<AaaaRecord>().FirstOrDefault()?.Address;
                         }
 
                         if (r != null)

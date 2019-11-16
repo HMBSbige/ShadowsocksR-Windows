@@ -19,7 +19,7 @@ namespace Shadowsocks.Controller.HttpRequest
             Notify = notify;
             try
             {
-                var proxy = UpdateChecker.CreateProxy(config);
+                var proxy = CreateProxy(config);
                 SubscribeTask = subscribeTask;
                 var url = subscribeTask.Url ?? DefaultUpdateUrl;
                 Update(proxy, config.connectTimeout * 1000, url, config.proxyUserAgent);

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Shadowsocks.Enums;
 
 namespace Shadowsocks.Model
 {
@@ -188,7 +189,6 @@ namespace Shadowsocks.Model
 
         public IVirtualTree Parent { get; set; }
 
-        //TODO:
         public int ItemsCount { get; set; }
         public double ExtentHeight { get; set; }
 

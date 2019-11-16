@@ -1,4 +1,6 @@
-﻿namespace Shadowsocks.Model
+﻿using Shadowsocks.Enums;
+
+namespace Shadowsocks.Model
 {
     public class PortMapConfigCache
     {

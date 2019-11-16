@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Controller.Service;
+using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
 using Shadowsocks.Util;
@@ -100,7 +101,6 @@ namespace Shadowsocks.Controller
             controller.UserRuleFileReadyToOpen += controller_FileReadyToOpen;
             controller.Errored += ControllerError;
             controller.UpdatePACFromGFWListCompleted += controller_UpdatePACFromGFWListCompleted;
-            controller.UpdatePACFromChnDomainsAndIPCompleted += controller_UpdatePACFromChnDomainsAndIPCompleted;
             controller.UpdatePACFromGFWListError += controller_UpdatePACFromGFWListError;
             controller.ShowConfigFormEvent += Config_Click;
             controller.ShowSubscribeWindowEvent += Controller_ShowSubscribeWindowEvent;
@@ -271,15 +271,19 @@ namespace Shadowsocks.Controller
                         {
                             var pacMenuItem = (MenuItem)menuItem.Items[0];
                             var proxyMenuItem = (MenuItem)menuItem.Items[1];
+                            ((MenuItem)menuItem.Items[3]).Click += CopyPacUrlItem_Click;
+                            ((MenuItem)menuItem.Items[4]).Click += EditPACFileItem_Click;
+                            ((MenuItem)menuItem.Items[5]).Click += EditUserRuleFileForGFWListItem_Click;
 
                             ((MenuItem)pacMenuItem.Items[0]).Click += UpdatePACFromLanIPListItem_Click;
+
                             ((MenuItem)pacMenuItem.Items[2]).Click += UpdatePACFromCNWhiteListItem_Click;
-                            ((MenuItem)pacMenuItem.Items[3]).Click += UpdatePACFromCNIPListItem_Click;
-                            ((MenuItem)pacMenuItem.Items[4]).Click += UpdatePACFromGFWListItem_Click;
-                            ((MenuItem)pacMenuItem.Items[6]).Click += UpdatePACFromCNOnlyListItem_Click;
-                            ((MenuItem)pacMenuItem.Items[8]).Click += CopyPacUrlItem_Click;
-                            ((MenuItem)pacMenuItem.Items[9]).Click += EditPACFileItem_Click;
-                            ((MenuItem)pacMenuItem.Items[10]).Click += EditUserRuleFileForGFWListItem_Click;
+                            ((MenuItem)pacMenuItem.Items[3]).Click += UpdatePACFromCnWhiteListIpItem_Click;
+                            ((MenuItem)pacMenuItem.Items[4]).Click += UpdatePACFromChnIpItem_Click;
+                            ((MenuItem)pacMenuItem.Items[5]).Click += UpdatePACFromGFWListItem_Click;
+
+                            ((MenuItem)pacMenuItem.Items[7]).Click += UpdatePACFromCNOnlyListItem_Click;
+                            ((MenuItem)pacMenuItem.Items[8]).Click += UpdatePACFromCNOnlyListFireFoxItem_Click;
 
                             ruleBypassLan = (MenuItem)proxyMenuItem.Items[0];
                             ruleBypassChina = (MenuItem)proxyMenuItem.Items[1];
@@ -385,18 +389,12 @@ namespace Shadowsocks.Controller
             Logging.LogUsefulException(e.GetException());
         }
 
-        private void controller_UpdatePACFromGFWListCompleted(object sender, GFWListUpdater.ResultEventArgs e)
+        private void controller_UpdatePACFromGFWListCompleted(object sender, GfwListUpdater.ResultEventArgs e)
         {
-            var updater = (GFWListUpdater)sender;
             var result = e.Success ?
-                updater.UpdateType < 1 ? I18NUtil.GetAppStringValue(@"GfwListPacUpdated") : I18NUtil.GetAppStringValue(@"PacUpdated")
+                    e.PacType == PacType.GfwList ?
+                    I18NUtil.GetAppStringValue(@"GfwListPacUpdated") : I18NUtil.GetAppStringValue(@"PacUpdated")
                 : I18NUtil.GetAppStringValue(@"GfwListPacNotFound");
-            _notifyIcon.ShowBalloonTip(UpdateChecker.Name, result, BalloonIcon.Info);
-        }
-
-        private void controller_UpdatePACFromChnDomainsAndIPCompleted(object sender, ChnDomainsAndIPUpdater.ResultEventArgs e)
-        {
-            var result = e.Success ? I18NUtil.GetAppStringValue(@"PacUpdated") : I18NUtil.GetAppStringValue(@"PacNotFound");
             _notifyIcon.ShowBalloonTip(UpdateChecker.Name, result, BalloonIcon.Info);
         }
 
@@ -1153,17 +1151,32 @@ namespace Shadowsocks.Controller
 
         private void UpdatePACFromCNWhiteListItem_Click(object sender, RoutedEventArgs e)
         {
-            controller.UpdatePACFromChnDomainsAndIP(ChnDomainsAndIPUpdater.Templates.ss_white);
+            //域名白名单
+            controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white.pac");
         }
 
         private void UpdatePACFromCNOnlyListItem_Click(object sender, RoutedEventArgs e)
         {
-            controller.UpdatePACFromChnDomainsAndIP(ChnDomainsAndIPUpdater.Templates.ss_white_r);
+            //回国
+            controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white_r.pac");
         }
 
-        private void UpdatePACFromCNIPListItem_Click(object sender, RoutedEventArgs e)
+        private void UpdatePACFromCNOnlyListFireFoxItem_Click(object sender, RoutedEventArgs e)
         {
-            controller.UpdatePACFromChnDomainsAndIP(ChnDomainsAndIPUpdater.Templates.ss_cnip);
+            //回国
+            controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white_r_Firefox.pac");
+        }
+
+        private void UpdatePACFromCnWhiteListIpItem_Click(object sender, RoutedEventArgs e)
+        {
+            //域名白名单+国内IP
+            controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_cnall.pac");
+        }
+
+        private void UpdatePACFromChnIpItem_Click(object sender, RoutedEventArgs e)
+        {
+            //国内IP
+            controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_cnip.pac");
         }
 
         private void EditUserRuleFileForGFWListItem_Click(object sender, RoutedEventArgs e)

@@ -2,19 +2,19 @@
 {
     public class EncryptorInfo
     {
-        public int key_size;
-        public int iv_size;
-        public bool display;
-        public int type;
-        public string name;
+        public int KeySize;
+        public int IvSize;
+        public bool Display;
+        public int Type;
+        public string InnerLibName;
 
-        public EncryptorInfo(int key, int iv, bool display, int type, string name = "")
+        public EncryptorInfo(int key, int iv, int type, string innerLibName = @"", bool display = true)
         {
-            key_size = key;
-            iv_size = iv;
-            this.display = display;
-            this.type = type;
-            this.name = name;
+            KeySize = key;
+            IvSize = iv;
+            Display = display;
+            Type = type;
+            InnerLibName = innerLibName;
         }
     }
 }

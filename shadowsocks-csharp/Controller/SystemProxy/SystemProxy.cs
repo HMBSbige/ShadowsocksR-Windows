@@ -1,6 +1,7 @@
-﻿using System;
-using Shadowsocks.Controller.Service;
+﻿using Shadowsocks.Controller.Service;
+using Shadowsocks.Enums;
 using Shadowsocks.Model;
+using System;
 
 namespace Shadowsocks.Controller.SystemProxy
 {

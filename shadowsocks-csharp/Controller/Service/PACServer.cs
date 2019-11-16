@@ -1,4 +1,5 @@
-﻿using Shadowsocks.Model;
+﻿using Shadowsocks.Controller.HttpRequest;
+using Shadowsocks.Model;
 using Shadowsocks.Util;
 using System;
 using System.Net;
@@ -158,8 +159,9 @@ namespace Shadowsocks.Controller.Service
 
                 pac = pac.Replace(@"__PROXY__", $@"{proxy}DIRECT;");
 
-                var text = $@"HTTP/1.1 200 OK
-Server: ShadowsocksR
+                var text =
+$@"HTTP/1.1 200 OK
+Server: {UpdateChecker.Name}/{UpdateChecker.Version}
 Content-Type: application/x-ns-proxy-autoconfig
 Content-Length: {Encoding.UTF8.GetBytes(pac).Length}
 Connection: Close

@@ -1,5 +1,6 @@
 ﻿using Shadowsocks.Controller;
 using Shadowsocks.Controller.Service;
+using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Model.Transfer;
 using Shadowsocks.Obfs;
@@ -767,7 +768,7 @@ namespace Shadowsocks.Proxy
             if (cfg.TargetHost != null)
             {
                 var host = cfg.TargetHost;
-
+                //TODO
                 if (!IPAddress.TryParse(host, out var ipAddress))
                 {
                     ipAddress = DnsUtil.DnsBuffer.Get(host) ?? DnsUtil.QueryDns(host, host.IndexOf('.') >= 0 ? cfg.DnsServers : null);

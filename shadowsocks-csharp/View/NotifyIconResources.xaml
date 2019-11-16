@@ -12,18 +12,16 @@
             <MenuItem x:Name="NoProxy" />
         </MenuItem>
         <MenuItem x:Name="ProxySetting">
-            <MenuItem x:Name="Pac">
+            <MenuItem x:Name="UpdatePac">
                 <MenuItem x:Name="UpdateLanPac" />
                 <Separator />
                 <MenuItem x:Name="UpdateChnDomainPac" />
                 <MenuItem x:Name="UpdateChnDomainIpPac" />
+                <MenuItem x:Name="UpdateChnIpPac" />
                 <MenuItem x:Name="UpdateGfwList" />
                 <Separator />
                 <MenuItem x:Name="UpdateChnOnlyPac" />
-                <Separator />
-                <MenuItem x:Name="CopyPacUrl" />
-                <MenuItem x:Name="EditPacFile" />
-                <MenuItem x:Name="EditGfwListUserRule" />
+                <MenuItem x:Name="UpdateChnOnlyPacFireFox" />
             </MenuItem>
             <MenuItem x:Name="ProxyRule">
                 <MenuItem x:Name="BypassLan" />
@@ -33,6 +31,10 @@
                 <Separator />
                 <MenuItem x:Name="DisableBypass" />
             </MenuItem>
+            <Separator />
+            <MenuItem x:Name="CopyPacUrl" />
+            <MenuItem x:Name="EditPacFile" />
+            <MenuItem x:Name="EditGfwListUserRule" />
         </MenuItem>
         <Separator />
         <MenuItem x:Name="Servers">
