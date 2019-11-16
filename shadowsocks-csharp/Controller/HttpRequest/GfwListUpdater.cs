@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Shadowsocks.Controller.Service;
+using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
 using Shadowsocks.Util;
@@ -7,18 +8,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 
 namespace Shadowsocks.Controller.HttpRequest
 {
-    public class GFWListUpdater : HttpRequest
+    public class GfwListUpdater : HttpRequest
     {
-        private const string GFWLIST_URL = @"https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt";
+        private const string GfwlistUrl = @"https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt";
 
-        private const string USER_AGENT = DefaultUserAgent;
-
-        public int UpdateType;
+        #region event
 
         public event EventHandler<ResultEventArgs> UpdateCompleted;
 
@@ -27,21 +25,31 @@ namespace Shadowsocks.Controller.HttpRequest
         public class ResultEventArgs : EventArgs
         {
             public readonly bool Success;
+            public readonly PacType PacType;
 
-            public ResultEventArgs(bool success)
+            public ResultEventArgs(bool success, PacType pacType)
             {
                 Success = success;
+                PacType = pacType;
             }
         }
 
-        private void http_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
+        #endregion
+
+        #region GfwList
+
+        public async void UpdatePacFromGfwList(Configuration config)
         {
+            Logging.Info($@"Checking GFWList from {GfwlistUrl}");
             try
             {
-                File.WriteAllText(Utils.GetTempPath(PACServer.gfwlist_FILE), e.Result, Encoding.UTF8);
-                var pacFileChanged = MergeAndWritePACFile(e.Result);
-                UpdateType = 0;
-                UpdateCompleted?.Invoke(this, new ResultEventArgs(pacFileChanged));
+                var userAgent = config.proxyUserAgent;
+                var proxy = CreateProxy(config);
+
+                var content = await AutoGetAsync(GfwlistUrl, proxy, userAgent, config.connectTimeout * 1000, TimeSpan.FromMinutes(1).TotalMilliseconds);
+                File.WriteAllText(Utils.GetTempPath(PACServer.gfwlist_FILE), content, Encoding.UTF8);
+                var pacFileChanged = MergeAndWritePacFile(content);
+                UpdateCompleted?.Invoke(this, new ResultEventArgs(pacFileChanged, PacType.GfwList));
             }
             catch (Exception ex)
             {
@@ -49,9 +57,9 @@ namespace Shadowsocks.Controller.HttpRequest
             }
         }
 
-        public static bool MergeAndWritePACFile(string gfwListResult)
+        public static bool MergeAndWritePacFile(string gfwListResult)
         {
-            var abpContent = MergePACFile(gfwListResult);
+            var abpContent = MergePacFile(gfwListResult);
             if (File.Exists(PACDaemon.PAC_FILE))
             {
                 var original = FileManager.NonExclusiveReadAllText(PACDaemon.PAC_FILE, Encoding.UTF8);
@@ -65,86 +73,23 @@ namespace Shadowsocks.Controller.HttpRequest
             return true;
         }
 
-        private static string MergePACFile(string gfwListResult)
+        private static string MergePacFile(string gfwListResult)
         {
-            var abpContent = File.Exists(PACDaemon.USER_ABP_FILE) ? FileManager.NonExclusiveReadAllText(PACDaemon.USER_ABP_FILE, Encoding.UTF8) : Resources.abp;
+            var abpContent = File.Exists(PACDaemon.USER_ABP_FILE) ? FileManager.NonExclusiveReadAllText(PACDaemon.USER_ABP_FILE) : Resources.abp;
 
             var userRuleLines = new List<string>();
             if (File.Exists(PACDaemon.USER_RULE_FILE))
             {
-                var userRulesString = FileManager.NonExclusiveReadAllText(PACDaemon.USER_RULE_FILE, Encoding.UTF8);
+                var userRulesString = FileManager.NonExclusiveReadAllText(PACDaemon.USER_RULE_FILE);
                 userRuleLines = ParseToValidList(userRulesString);
             }
 
             var gfwLines = ParseBase64ToValidList(gfwListResult);
 
-            abpContent = abpContent.Replace("__USERRULES__", JsonConvert.SerializeObject(userRuleLines, Formatting.Indented))
-                    .Replace("__RULES__", JsonConvert.SerializeObject(gfwLines, Formatting.Indented));
+            abpContent = abpContent.Replace(@"__USERRULES__", JsonConvert.SerializeObject(userRuleLines, Formatting.Indented))
+                    .Replace(@"__RULES__", JsonConvert.SerializeObject(gfwLines, Formatting.Indented));
             return abpContent;
         }
-
-        public void UpdatePACFromGFWList(Configuration config)
-        {
-            Logging.Info($@"Checking GFWList from {GFWLIST_URL}");
-            var http = new WebClient();
-            http.Headers.Add("User-Agent", string.IsNullOrEmpty(config.proxyUserAgent) ? USER_AGENT : config.proxyUserAgent);
-            var proxy = new WebProxy(Configuration.LocalHost, config.localPort);
-            if (!string.IsNullOrEmpty(config.authPass))
-            {
-                proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);
-            }
-            http.Proxy = proxy;
-            http.BaseAddress = GFWLIST_URL;
-            http.DownloadStringCompleted += http_DownloadStringCompleted;
-            http.DownloadStringAsync(new Uri($@"{GFWLIST_URL}?rnd={Rng.RandUInt32()}"));
-        }
-
-        #region OnlinePAC
-
-        private void http_DownloadOnlinePACCompleted(object sender, DownloadStringCompletedEventArgs e)
-        {
-            try
-            {
-                var content = e.Result;
-                if (File.Exists(PACDaemon.PAC_FILE))
-                {
-                    var original = File.ReadAllText(PACDaemon.PAC_FILE, Encoding.UTF8);
-                    if (original == content)
-                    {
-                        UpdateType = 1;
-                        UpdateCompleted?.Invoke(this, new ResultEventArgs(false));
-                        return;
-                    }
-                }
-
-                File.WriteAllText(PACDaemon.PAC_FILE, content, Encoding.UTF8);
-                if (UpdateCompleted != null)
-                {
-                    UpdateType = 1;
-                    UpdateCompleted(this, new ResultEventArgs(true));
-                }
-            }
-            catch (Exception ex)
-            {
-                Error?.Invoke(this, new ErrorEventArgs(ex));
-            }
-        }
-
-        public void UpdateOnlinePAC(Configuration config, string url)
-        {
-            var http = new WebClient();
-            http.Headers.Add(@"User-Agent", string.IsNullOrEmpty(config.proxyUserAgent) ? USER_AGENT : config.proxyUserAgent);
-            var proxy = new WebProxy(Configuration.LocalHost, config.localPort);
-            if (!string.IsNullOrEmpty(config.authPass))
-            {
-                proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);
-            }
-            http.Proxy = proxy;
-            http.DownloadStringCompleted += http_DownloadOnlinePACCompleted;
-            http.DownloadStringAsync(new Uri($@"{url}?rnd={Rng.RandUInt32()}"));
-        }
-
-        #endregion
 
         private static List<string> ParseBase64ToValidList(string response)
         {
@@ -155,10 +100,44 @@ namespace Shadowsocks.Controller.HttpRequest
 
         private static List<string> ParseToValidList(string content)
         {
-            var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            var lines = content.GetLines().ToArray();
             var validLines = new List<string>(lines.Length);
-            validLines.AddRange(lines.Where(line => !line.StartsWith("!") && !line.StartsWith("[")));
+            validLines.AddRange(lines.Where(line => !line.StartsWith(@"!") && !line.StartsWith(@"[")));
             return validLines;
         }
+
+        #endregion
+
+        #region OnlinePAC
+
+        public async void UpdateOnlinePac(Configuration config, string url)
+        {
+            try
+            {
+                var userAgent = config.proxyUserAgent;
+                var proxy = CreateProxy(config);
+
+                var content = await AutoGetAsync(url, proxy, userAgent, config.connectTimeout * 1000, TimeSpan.FromMinutes(1).TotalMilliseconds);
+                if (File.Exists(PACDaemon.PAC_FILE))
+                {
+                    var original = FileManager.NonExclusiveReadAllText(PACDaemon.PAC_FILE);
+                    if (original == content)
+                    {
+                        UpdateCompleted?.Invoke(this, new ResultEventArgs(false, PacType.Online));
+                        return;
+                    }
+                }
+
+                File.WriteAllText(PACDaemon.PAC_FILE, content);
+                UpdateCompleted?.Invoke(this, new ResultEventArgs(true, PacType.Online));
+            }
+            catch (Exception ex)
+            {
+                Error?.Invoke(this, new ErrorEventArgs(ex));
+            }
+        }
+
+        #endregion
+
     }
 }

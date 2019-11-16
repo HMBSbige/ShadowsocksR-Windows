@@ -31,7 +31,7 @@ namespace Shadowsocks.Controller
         private HostDaemon _hostDaemon;
         private IPRangeSet _chnRangeSet;
         private HttpProxyRunner privoxyRunner;
-        private GFWListUpdater gfwListUpdater;
+        private GfwListUpdater gfwListUpdater;
         private bool stopped;
 
         public class PathEventArgs : EventArgs
@@ -50,7 +50,7 @@ namespace Shadowsocks.Controller
         public event EventHandler<PathEventArgs> PACFileReadyToOpen;
         public event EventHandler<PathEventArgs> UserRuleFileReadyToOpen;
 
-        public event EventHandler<GFWListUpdater.ResultEventArgs> UpdatePACFromGFWListCompleted;
+        public event EventHandler<GfwListUpdater.ResultEventArgs> UpdatePACFromGFWListCompleted;
 
         public event ErrorEventHandler UpdatePACFromGFWListError;
 
@@ -350,12 +350,12 @@ namespace Shadowsocks.Controller
 
         public void UpdatePACFromGFWList()
         {
-            gfwListUpdater?.UpdatePACFromGFWList(_config);
+            gfwListUpdater?.UpdatePacFromGfwList(_config);
         }
 
         public void UpdatePACFromOnlinePac(string url)
         {
-            gfwListUpdater?.UpdateOnlinePAC(_config, url);
+            gfwListUpdater?.UpdateOnlinePac(_config, url);
         }
 
         public void Reload()
@@ -402,7 +402,7 @@ namespace Shadowsocks.Controller
             _pacServer.UpdatePacUrl(_config);
             if (gfwListUpdater == null)
             {
-                gfwListUpdater = new GFWListUpdater();
+                gfwListUpdater = new GfwListUpdater();
                 gfwListUpdater.UpdateCompleted += (o, args) => UpdatePACFromGFWListCompleted?.Invoke(o, args);
                 gfwListUpdater.Error += (o, args) => UpdatePACFromGFWListError?.Invoke(o, args);
             }
@@ -508,7 +508,7 @@ namespace Shadowsocks.Controller
             }
             else
             {
-                GFWListUpdater.MergeAndWritePACFile(FileManager.NonExclusiveReadAllText(Utils.GetTempPath(PACServer.gfwlist_FILE)));
+                GfwListUpdater.MergeAndWritePacFile(FileManager.NonExclusiveReadAllText(Utils.GetTempPath(PACServer.gfwlist_FILE)));
             }
 
             UpdateSystemProxy();

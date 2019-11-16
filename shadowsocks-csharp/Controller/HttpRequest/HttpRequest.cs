@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shadowsocks.Model;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -13,11 +14,11 @@ namespace Shadowsocks.Controller.HttpRequest
 
         private static async Task<string> GetAsync(string url, IWebProxy proxy, string userAgent = @"", double timeout = DefaultGetTimeout)
         {
-            var httpClientHandler = new HttpClientHandler
+            var httpClientHandler = new HttpClientHandler();
+            if (proxy != null)
             {
-                Proxy = proxy,
-                UseProxy = proxy != null
-            };
+                httpClientHandler.Proxy = proxy;
+            }
             var httpClient = new HttpClient(httpClientHandler)
             {
                 Timeout = TimeSpan.FromMilliseconds(timeout)
@@ -75,12 +76,21 @@ namespace Shadowsocks.Controller.HttpRequest
                     res = null;
                 }
             }
-            if (res == null)
-            {
-                Logging.Info($@"GET request directly: {url}");
-                res = await GetAsync(url, null, userAgent, getTimeout);
-            }
+            if (res != null) return res;
+            Logging.Info($@"GET request by default: {url}");
+            res = await GetAsync(url, null, userAgent, getTimeout);
             return res;
+        }
+
+        public static IWebProxy CreateProxy(Configuration config)
+        {
+            var proxy = new WebProxy(Configuration.LocalHost, config.localPort);
+            if (!string.IsNullOrEmpty(config.authPass))
+            {
+                proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);
+            }
+
+            return proxy;
         }
     }
 }

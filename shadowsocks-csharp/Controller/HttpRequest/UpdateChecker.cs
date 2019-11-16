@@ -3,7 +3,6 @@ using Shadowsocks.GitHubRelease;
 using Shadowsocks.Model;
 using System;
 using System.Collections.Generic;
-using System.Net;
 
 namespace Shadowsocks.Controller.HttpRequest
 {
@@ -46,15 +45,6 @@ namespace Shadowsocks.Controller.HttpRequest
 #else
         "";
 #endif
-        public static IWebProxy CreateProxy(Configuration config)
-        {
-            var proxy = new WebProxy(Configuration.LocalHost, config.localPort);
-            if (!string.IsNullOrEmpty(config.authPass))
-            {
-                proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);
-            }
-            return proxy;
-        }
 
         public async void Check(Configuration config, bool notifyNoFound)
         {

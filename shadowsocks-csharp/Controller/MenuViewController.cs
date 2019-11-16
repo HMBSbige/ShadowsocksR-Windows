@@ -389,11 +389,11 @@ namespace Shadowsocks.Controller
             Logging.LogUsefulException(e.GetException());
         }
 
-        private void controller_UpdatePACFromGFWListCompleted(object sender, GFWListUpdater.ResultEventArgs e)
+        private void controller_UpdatePACFromGFWListCompleted(object sender, GfwListUpdater.ResultEventArgs e)
         {
-            var updater = (GFWListUpdater)sender;
             var result = e.Success ?
-                updater.UpdateType < 1 ? I18NUtil.GetAppStringValue(@"GfwListPacUpdated") : I18NUtil.GetAppStringValue(@"PacUpdated")
+                    e.PacType == PacType.GfwList ?
+                    I18NUtil.GetAppStringValue(@"GfwListPacUpdated") : I18NUtil.GetAppStringValue(@"PacUpdated")
                 : I18NUtil.GetAppStringValue(@"GfwListPacNotFound");
             _notifyIcon.ShowBalloonTip(UpdateChecker.Name, result, BalloonIcon.Info);
         }
