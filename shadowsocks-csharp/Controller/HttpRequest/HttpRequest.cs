@@ -14,11 +14,11 @@ namespace Shadowsocks.Controller.HttpRequest
 
         private static async Task<string> GetAsync(string url, IWebProxy proxy, string userAgent = @"", double timeout = DefaultGetTimeout)
         {
-            var httpClientHandler = new HttpClientHandler();
-            if (proxy != null)
+            var httpClientHandler = new HttpClientHandler
             {
-                httpClientHandler.Proxy = proxy;
-            }
+                Proxy = proxy,
+                UseProxy = proxy != null
+            };
             var httpClient = new HttpClient(httpClientHandler)
             {
                 Timeout = TimeSpan.FromMilliseconds(timeout)
