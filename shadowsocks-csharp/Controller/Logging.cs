@@ -2,23 +2,25 @@
 using Shadowsocks.Obfs;
 using Shadowsocks.Util;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Text;
 
 namespace Shadowsocks.Controller
 {
-    public class Logging
+    public static class Logging
     {
         public static string LogFile;
         public static string LogFileName;
-        protected static string date;
+        private static string _date;
 
         private static FileStream _logFileStream;
         private static StreamWriterWithTimestamp _logStreamWriter;
-        private static readonly object _lock = new object();
-        public static bool save_to_file = true;
+        private static readonly object Lock = new object();
+        public static bool SaveToFile = true;
         public static TextWriter DefaultOut;
         public static TextWriter DefaultError;
 
@@ -28,7 +30,7 @@ namespace Shadowsocks.Controller
             {
                 CloseLogFile();
 
-                if (save_to_file)
+                if (SaveToFile)
                 {
                     var newDate = DateTime.Now.ToString("yyyy-MM");
                     LogFileName = $@"shadowsocks_{newDate}.log";
@@ -40,7 +42,7 @@ namespace Shadowsocks.Controller
                     };
                     Console.SetOut(_logStreamWriter);
                     Console.SetError(_logStreamWriter);
-                    date = newDate;
+                    _date = newDate;
                     CompressOldLogFile();
                 }
                 else
@@ -88,7 +90,7 @@ namespace Shadowsocks.Controller
         public static void Info(object o)
         {
             Log(LogLevel.Info, o);
-            System.Diagnostics.Debug.WriteLine($@"[{DateTime.Now}] INFO  {o}");
+            System.Diagnostics.Debug.WriteLine($@"[{DateTime.Now}] INFO {o}");
         }
 
         [Conditional("DEBUG")]
@@ -98,7 +100,7 @@ namespace Shadowsocks.Controller
             System.Diagnostics.Debug.WriteLine($@"[{DateTime.Now}] DEBUG {o}");
         }
 
-        private static string ToString(StackFrame[] stacks)
+        private static string ToString(IEnumerable<StackFrame> stacks)
         {
             return stacks.Aggregate(string.Empty, (current, stack) => current + $@"{stack.GetMethod()}{Environment.NewLine}");
         }
@@ -121,13 +123,13 @@ namespace Shadowsocks.Controller
             }
         }
 
-        protected static void UpdateLogFile()
+        private static void UpdateLogFile()
         {
-            if (DateTime.Now.ToString("yyyy-MM") != date)
+            if (DateTime.Now.ToString("yyyy-MM") != _date)
             {
-                lock (_lock)
+                lock (Lock)
                 {
-                    if (DateTime.Now.ToString("yyyy-MM") != date)
+                    if (DateTime.Now.ToString("yyyy-MM") != _date)
                     {
                         OpenLogFile();
                     }
@@ -141,36 +143,38 @@ namespace Shadowsocks.Controller
             // just log useful exceptions, not all of them
             if (e is SocketException se)
             {
-                if (se.SocketErrorCode == SocketError.ConnectionAborted)
+                switch (se.SocketErrorCode)
                 {
-                    // closed by browser when sending
-                    // normally happens when download is canceled or a tab is closed before page is loaded
-                }
-                else if (se.SocketErrorCode == SocketError.ConnectionReset)
-                {
-                    // received rst
-                }
-                else if (se.SocketErrorCode == SocketError.NotConnected)
-                {
-                    // close when not connected
-                }
-                else if ((uint)se.SocketErrorCode == 0x80004005)
-                {
-                    // already closed
-                }
-                else if (se.SocketErrorCode == SocketError.Shutdown)
-                {
-                    // ignore
-                }
-                else if (se.SocketErrorCode == SocketError.Interrupted)
-                {
-                    // ignore
-                }
-                else
-                {
-                    Error(e);
+                    case SocketError.ConnectionAborted:
+                        // closed by browser when sending
+                        // normally happens when download is canceled or a tab is closed before page is loaded
+                        break;
+                    case SocketError.ConnectionReset:
+                        // received rst
+                        break;
+                    case SocketError.NotConnected:
+                        // close when not connected
+                        break;
+                    case SocketError.Shutdown:
+                        // ignore
+                        break;
+                    case SocketError.Interrupted:
+                        // ignore
+                        break;
+                    default:
+                    {
+                        if ((uint)se.SocketErrorCode == 0x80004005)
+                        {
+                            // already closed
+                        }
+                        else
+                        {
+                            Error(e);
 
-                    Debug(ToString(new StackTrace().GetFrames()));
+                            Debug(ToString(new StackTrace().GetFrames()));
+                        }
+                        break;
+                    }
                 }
             }
             else
@@ -184,106 +188,63 @@ namespace Shadowsocks.Controller
         public static bool LogSocketException(string remarks, string server, Exception e)
         {
             UpdateLogFile();
-            // just log useful exceptions, not all of them
-            if (e is ObfsException oe)
+            switch (e)
             {
-                Error("Proxy server [" + remarks + "(" + server + ")] "
-                    + oe.Message);
-                return true;
-            }
-
-            if (e is NullReferenceException)
-            {
-                return true;
-            }
-
-            if (e is ObjectDisposedException)
-            {
-                // ignore
-                return true;
-            }
-
-            if (e is SocketException se)
-            {
-                if ((uint)se.SocketErrorCode == 0x80004005)
-                {
+                // just log useful exceptions, not all of them
+                case ObfsException oe:
+                    Error($@"Proxy server [{remarks}({server})] {oe.Message}");
+                    return true;
+                case NullReferenceException _:
+                case ObjectDisposedException _:
+                    return true;
+                case SocketException se when se.ErrorCode == 11004:
+                    Log(LogLevel.Warn, $@"Proxy server [{remarks}({server})] DNS lookup failed");
+                    return true;
+                case SocketException se when (uint)se.SocketErrorCode == 0x80004005:
                     // already closed
                     return true;
-                }
+                case SocketException se:
+                    switch (se.SocketErrorCode)
+                    {
+                        case SocketError.HostNotFound:
+                            Log(LogLevel.Warn, $@"Proxy server [{remarks}({server})] Host not found");
+                            return true;
+                        case SocketError.ConnectionRefused:
+                            Log(LogLevel.Warn, $@"Proxy server [{remarks}({server})] connection refused");
+                            return true;
+                        case SocketError.NetworkUnreachable:
+                            Log(LogLevel.Warn, $@"Proxy server [{remarks}({server})] network unreachable");
+                            return true;
+                        case SocketError.TimedOut:
+                        case SocketError.Shutdown:
+                            return true;
+                    }
 
-                if (se.ErrorCode == 11004)
-                {
-                    Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
-                                       + "DNS lookup failed");
+                    Log(LogLevel.Info, $@"Proxy server [{remarks}({server})] {Convert.ToString(se.SocketErrorCode)}:{se.Message}");
+
+                    Debug(ToString(new StackTrace().GetFrames()));
                     return true;
-                }
-
-                if (se.SocketErrorCode == SocketError.HostNotFound)
-                {
-                    Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
-                                       + "Host not found");
-                    return true;
-                }
-
-                if (se.SocketErrorCode == SocketError.ConnectionRefused)
-                {
-                    Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
-                                       + "connection refused");
-                    return true;
-                }
-
-                if (se.SocketErrorCode == SocketError.NetworkUnreachable)
-                {
-                    Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
-                                       + "network unreachable");
-                    return true;
-                }
-
-                if (se.SocketErrorCode == SocketError.TimedOut)
-                {
-                    //Logging.Log(LogLevel.Warn, "Proxy server [" + remarks + "(" + server + ")] "
-                    //    + "connection timeout");
-                    return true;
-                }
-
-                if (se.SocketErrorCode == SocketError.Shutdown)
-                {
-                    return true;
-                }
-
-                Log(LogLevel.Info, "Proxy server [" + remarks + "(" + server + ")] "
-                                   + Convert.ToString(se.SocketErrorCode) + ":" + se.Message);
-
-                Debug(ToString(new StackTrace().GetFrames()));
-
-                return true;
+                default:
+                    return false;
             }
-            return false;
         }
 
         public static void Log(LogLevel level, object s)
         {
             UpdateLogFile();
-            var strMap = new[]{
-                "Debug",
-                "Info",
-                "Warn",
-                "Error",
-                "Assert"
-            };
-            Console.WriteLine($@"[{strMap[(int)level]}] {s}");
+            Console.WriteLine($@"[{level}] {s}");
         }
 
         [Conditional("DEBUG")]
         public static void LogBin(LogLevel level, string info, byte[] data, int length)
         {
-            //string s = "";
-            //for (int i = 0; i < length; ++i)
-            //{
-            //    string fs = "0" + Convert.ToString(data[i], 16);
-            //    s += " " + fs.Substring(fs.Length - 2, 2);
-            //}
-            //Log(level, info + s);
+            var s = new StringBuilder();
+            for (var i = 0; i < length; ++i)
+            {
+                var fs = $@"0{Convert.ToString(data[i], 16)}";
+                s.Append($@" {fs.Substring(fs.Length - 2, 2)}");
+            }
+            Log(level, $@"{info}{s}");
         }
 
     }
@@ -295,19 +256,33 @@ namespace Shadowsocks.Controller
         {
         }
 
-        private string GetTimestamp()
+        private static string GetTimestamp()
         {
-            return "[" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "] ";
+            return $@"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] ";
         }
 
         public override void WriteLine(string value)
         {
-            base.WriteLine(GetTimestamp() + value);
+            try
+            {
+                base.WriteLine(GetTimestamp() + value);
+            }
+            catch (ObjectDisposedException)
+            {
+
+            }
         }
 
         public override void Write(string value)
         {
-            base.Write(GetTimestamp() + value);
+            try
+            {
+                base.Write(GetTimestamp() + value);
+            }
+            catch (ObjectDisposedException)
+            {
+
+            }
         }
     }
 

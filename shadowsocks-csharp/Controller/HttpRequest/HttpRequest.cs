@@ -77,7 +77,7 @@ namespace Shadowsocks.Controller.HttpRequest
                 }
             }
             if (res != null) return res;
-            Logging.Info($@"GET request by default: {url}");
+            Logging.Info($@"GET request directly: {url}");
             res = await GetAsync(url, null, userAgent, getTimeout);
             return res;
         }
