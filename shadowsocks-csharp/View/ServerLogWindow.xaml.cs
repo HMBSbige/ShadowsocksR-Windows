@@ -73,13 +73,13 @@ namespace Shadowsocks.View
             ServerLogViewModel.ReadConfig(_controller);
             ServerDataGrid.View?.EndInit();
 
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() =>
+            Dispatcher.CurrentDispatcher.InvokeAsync(() =>
             {
                 if (isFirstLoad && ServerLogViewModel.SelectedServer != null)
                 {
                     ServerDataGrid.ScrollInView(new RowColumnIndex(ServerLogViewModel.SelectedServer.Index, 2));
                 }
-            }));
+            }, DispatcherPriority.Input);
         }
 
         private void controller_ConfigChanged(object sender, EventArgs e)

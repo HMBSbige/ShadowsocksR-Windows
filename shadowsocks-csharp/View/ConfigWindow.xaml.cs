@@ -156,14 +156,14 @@ namespace Shadowsocks.View
 
         public void MoveToSelectedItem(int index)
         {
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Input, new Action(() =>
+            Dispatcher.CurrentDispatcher.InvokeAsync(() =>
             {
                 if (index >= 0 && index < _modifiedConfiguration.configs.Count)
                 {
                     var server = _modifiedConfiguration.configs[index];
                     MoveToSelectedItem(server.Id);
                 }
-            }));
+            }, DispatcherPriority.Input);
         }
 
         private void MoveToSelectedItem(string id)
@@ -185,23 +185,21 @@ namespace Shadowsocks.View
                 parent = parent.Parent;
             }
 
-            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
+            Dispatcher.CurrentDispatcher.InvokeAsync(() =>
             {
                 var treeViewItem = ServersTreeView.GetContainerFromItem(serverTreeViewModel);
-                if (treeViewItem != null)
+                if (treeViewItem == null) return;
+                ServersTreeView.BringIntoView(treeViewItem);
+                if (ServersTreeView.SelectedItems.Count == 1 && ReferenceEquals(ServersTreeView.SelectedItem, treeViewItem.Header))
                 {
-                    ServersTreeView.BringIntoView(treeViewItem);
-                    if (ServersTreeView.SelectedItems.Count == 1 && ReferenceEquals(ServersTreeView.SelectedItem, treeViewItem.Header))
-                    {
-                        //Fix a weird selection action
-                    }
-                    else
-                    {
-                        ServersTreeView.ClearSelection();
-                        serverTreeViewModel.IsSelected = true;
-                    }
+                    //Fix a weird selection action
                 }
-            }));
+                else
+                {
+                    ServersTreeView.ClearSelection();
+                    serverTreeViewModel.IsSelected = true;
+                }
+            }, DispatcherPriority.Render);
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -424,7 +422,7 @@ namespace Shadowsocks.View
             if (e.ChangedButton == MouseButton.Left)
             {
                 var textBox = (TextBox)sender;
-                textBox.Dispatcher?.BeginInvoke(new Action(() => { textBox.SelectAll(); }));
+                textBox.Dispatcher?.InvokeAsync(() => { textBox.SelectAll(); });
             }
         }
 
