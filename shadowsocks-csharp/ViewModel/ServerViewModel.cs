@@ -20,10 +20,8 @@ namespace Shadowsocks.ViewModel
             get => _serverTreeViewCollection;
             set
             {
-                if (_serverTreeViewCollection != value)
+                if (SetField(ref _serverTreeViewCollection, value))
                 {
-                    _serverTreeViewCollection = value;
-                    OnPropertyChanged();
                     ServersChanged?.Invoke(this, new EventArgs());
                 }
             }

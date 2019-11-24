@@ -2,7 +2,7 @@
 {
     internal static class Constants
     {
-        public const string ParameterSetautorun = @"--setautorun";
-        public const string ParameterMultiplyInstance = @"--show";
+        public const string ParameterSetAutoRun = @"-setautorun";
+        public const string ParameterMultiplyInstance = @"-show";
     }
 }

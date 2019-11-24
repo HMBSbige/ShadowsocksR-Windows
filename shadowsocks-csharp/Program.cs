@@ -24,7 +24,7 @@ namespace Shadowsocks
         private static void Main(string[] args)
         {
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Utils.GetExecutablePath()) ?? throw new InvalidOperationException());
-            if (args.Contains(Constants.ParameterSetautorun))
+            if (args.Contains(Constants.ParameterSetAutoRun))
             {
                 if (!AutoStartup.Switch())
                 {
@@ -95,10 +95,10 @@ namespace Shadowsocks
                     }
                 }
             }
-#if !DEBUG
+
             Reg.SetUrlProtocol(@"ssr");
             Reg.SetUrlProtocol(@"sub");
-#endif
+
             singleInstance.ListenForArgumentsFromSuccessiveInstances();
             app.Run();
         }
@@ -112,10 +112,8 @@ namespace Shadowsocks
 
         private static void App_Exit(object sender, ExitEventArgs e)
         {
-#if !DEBUG
             Reg.RemoveUrlProtocol(@"ssr");
             Reg.RemoveUrlProtocol(@"sub");
-#endif
             StopController();
         }
 
@@ -178,7 +176,7 @@ namespace Shadowsocks
                                 I18NUtil.GetAppStringValue(@"SuccessiveInstancesMessage2"),
                         I18NUtil.GetAppStringValue(@"SuccessiveInstancesCaption"), MessageBoxButton.OK, MessageBoxImage.Information);
             }
-            Application.Current.Dispatcher?.Invoke(() =>
+            Application.Current.Dispatcher?.InvokeAsync(() =>
             {
                 _viewController.ImportAddress(string.Join(Environment.NewLine, e.Args));
             });

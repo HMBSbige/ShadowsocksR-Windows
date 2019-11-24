@@ -1,8 +1,11 @@
-﻿namespace Shadowsocks.Util
+﻿using System.Diagnostics;
+
+namespace Shadowsocks.Util
 {
     public static class Reg
     {
-        public static bool SetUrlProtocol(string link)
+        [Conditional("RELEASE")]
+        public static void SetUrlProtocol(string link)
         {
             try
             {
@@ -14,31 +17,26 @@
                     ssr.SetValue(null, @"URL:ShadowsocksR Link");
                     ssr.SetValue(@"URL Protocol", @"");
                     using var command = ssr.CreateSubKey(@"Shell\Open\Command");
-                    if (command != null)
-                    {
-                        command.SetValue(null, $@"""{path}"" ""%1""");
-                        return true;
-                    }
+                    command?.SetValue(null, $@"""{path}"" ""%1""");
                 }
-                return false;
             }
             catch
             {
-                return false;
+                // ignored
             }
         }
 
-        public static bool RemoveUrlProtocol(string link)
+        [Conditional("RELEASE")]
+        public static void RemoveUrlProtocol(string link)
         {
             try
             {
                 using var runKey = Utils.OpenRegKey(@"Software\Classes", true);
                 runKey?.DeleteSubKeyTree(link);
-                return true;
             }
             catch
             {
-                return false;
+                // ignored
             }
         }
     }

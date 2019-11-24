@@ -120,7 +120,7 @@ namespace Shadowsocks.Controller
         {
             if (servers != null)
             {
-                Application.Current.Dispatcher?.Invoke(() =>
+                Application.Current.Dispatcher?.InvokeAsync(() =>
                 {
                     foreach (var server in servers)
                     {
@@ -260,14 +260,14 @@ namespace Shadowsocks.Controller
         {
             _config.sysProxyMode = mode;
             Save();
-            Application.Current.Dispatcher?.Invoke(() => { ToggleModeChanged?.Invoke(this, new EventArgs()); });
+            Application.Current.Dispatcher?.InvokeAsync(() => { ToggleModeChanged?.Invoke(this, new EventArgs()); });
         }
 
         public void ToggleRuleMode(ProxyRuleMode mode)
         {
             _config.proxyRuleMode = mode;
             Save();
-            Application.Current.Dispatcher?.Invoke(() => { ToggleRuleModeChanged?.Invoke(this, new EventArgs()); });
+            Application.Current.Dispatcher?.InvokeAsync(() => { ToggleRuleModeChanged?.Invoke(this, new EventArgs()); });
         }
 
         public void ToggleSelectRandom(bool enabled)
@@ -454,7 +454,7 @@ namespace Shadowsocks.Controller
                 }
             }
 
-            Application.Current.Dispatcher?.Invoke(() => { ConfigChanged?.Invoke(this, new EventArgs()); });
+            Application.Current.Dispatcher?.InvokeAsync(() => { ConfigChanged?.Invoke(this, new EventArgs()); });
 
             UpdateSystemProxy();
             Utils.ReleaseMemory();

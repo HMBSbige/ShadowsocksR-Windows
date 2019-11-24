@@ -1,11 +1,11 @@
-﻿using Shadowsocks.Util;
+﻿using Shadowsocks.Enums;
+using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
 using Syncfusion.Windows.Tools.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Shadowsocks.Enums;
 
 namespace Shadowsocks.Model
 {
@@ -50,42 +50,21 @@ namespace Shadowsocks.Model
                 }
                 return _name;
             }
-            set
-            {
-                if (_name != value)
-                {
-                    _name = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref _name, value);
         }
 
         private ObservableCollection<ServerTreeViewModel> _nodes;
         public ObservableCollection<ServerTreeViewModel> Nodes
         {
             get => _nodes;
-            set
-            {
-                if (_nodes != value)
-                {
-                    _nodes = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref _nodes, value);
         }
 
         private ServerTreeViewType _type;
         public ServerTreeViewType Type
         {
             get => _type;
-            set
-            {
-                if (_type != value)
-                {
-                    _type = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref _type, value);
         }
 
         private Server _server;
@@ -94,10 +73,8 @@ namespace Shadowsocks.Model
             get => _server;
             set
             {
-                if (_server != value)
+                if (SetField(ref _server, value))
                 {
-                    _server = value;
-                    OnPropertyChanged();
                     _server.ServerChanged += Server_ServerChanged;
                     OnPropertyChanged(nameof(Name));
                 }
@@ -163,28 +140,14 @@ namespace Shadowsocks.Model
         public bool IsExpanded
         {
             get => _isExpanded;
-            set
-            {
-                if (_isExpanded != value)
-                {
-                    _isExpanded = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref _isExpanded, value);
         }
 
         private bool _isSelected;
         public bool IsSelected
         {
             get => _isSelected;
-            set
-            {
-                if (_isSelected != value)
-                {
-                    _isSelected = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref _isSelected, value);
         }
 
         public IVirtualTree Parent { get; set; }

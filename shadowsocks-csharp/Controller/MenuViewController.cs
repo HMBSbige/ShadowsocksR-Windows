@@ -9,7 +9,6 @@ using Shadowsocks.Util;
 using Shadowsocks.View;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -570,7 +569,7 @@ namespace Shadowsocks.Controller
 
         private void updateChecker_NewVersionFound(object sender, EventArgs e)
         {
-            Application.Current.Dispatcher?.Invoke(() =>
+            Application.Current.Dispatcher?.InvokeAsync(() =>
             {
                 if (updateChecker.Found)
                 {
@@ -1261,7 +1260,6 @@ namespace Shadowsocks.Controller
 
         #region QRCode
 
-        [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
         private void ScanQRCodeItem_Click(object sender, RoutedEventArgs e)
         {
             Task.Run(() =>
@@ -1270,7 +1268,7 @@ namespace Shadowsocks.Controller
                 var h = (int)SystemParameters.VirtualScreenHeight;
                 var x = (int)SystemParameters.VirtualScreenLeft;
                 var y = (int)SystemParameters.VirtualScreenTop;
-                using var fullImage = new Bitmap(w, h);
+                var fullImage = new Bitmap(w, h);
                 using (var g = Graphics.FromImage(fullImage))
                 {
                     g.CopyFromScreen(x, y,
@@ -1302,7 +1300,7 @@ namespace Shadowsocks.Controller
                     {
                         var success = controller.AddServerBySsUrl(result.Text);
                         var successSub = controller.AddSubscribeUrl(result.Text);
-                        Application.Current.Dispatcher?.Invoke(() =>
+                        Application.Current.Dispatcher?.InvokeAsync(() =>
                         {
                             var splash = new QRCodeSplashWindow();
                             if (successSub)
@@ -1344,6 +1342,7 @@ namespace Shadowsocks.Controller
                                     (int)maxY - (int)minY);
                             splash.Width = fullImage.Width;
                             splash.Height = fullImage.Height;
+                            fullImage.Dispose();
                             splash.Show();
                         });
                         return;

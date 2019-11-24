@@ -50,28 +50,14 @@ namespace Shadowsocks.Model
         public int Index
         {
             get => _index;
-            set
-            {
-                if (_index != value)
-                {
-                    _index = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref _index, value);
         }
 
         [JsonIgnore]
         public bool IsSelected
         {
             get => _isSelected;
-            set
-            {
-                if (_isSelected != value)
-                {
-                    _isSelected = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref _isSelected, value);
         }
 
         [JsonIgnore]
@@ -100,10 +86,10 @@ namespace Shadowsocks.Model
             }
             set
             {
-                var @new = Base64.EncodeUrlSafeBase64(value);
-                if (@new != Remarks_Base64)
+                var newValue = Base64.EncodeUrlSafeBase64(value);
+                if (newValue != Remarks_Base64)
                 {
-                    Remarks_Base64 = @new;
+                    Remarks_Base64 = newValue;
                 }
             }
         }
@@ -145,55 +131,27 @@ namespace Shadowsocks.Model
         public object Protocoldata
         {
             get => protocoldata;
-            set
-            {
-                if (protocoldata != value)
-                {
-                    protocoldata = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => protocoldata = value;
         }
 
         [JsonIgnore]
         public object Obfsdata
         {
             get => obfsdata;
-            set
-            {
-                if (obfsdata != value)
-                {
-                    obfsdata = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => obfsdata = value;
         }
 
         [JsonIgnore]
         public ServerSpeedLog SpeedLog
         {
             get => serverSpeedLog;
-            set
-            {
-                if (serverSpeedLog != value)
-                {
-                    serverSpeedLog = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref serverSpeedLog, value);
         }
 
         public string Id
         {
             get => id;
-            set
-            {
-                if (id != value)
-                {
-                    id = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref id, value);
         }
 
         public string server
@@ -201,10 +159,8 @@ namespace Shadowsocks.Model
             get => _server;
             set
             {
-                if (_server != value)
+                if (SetField(ref _server, value))
                 {
-                    _server = value;
-                    OnPropertyChanged();
                     OnPropertyChanged(nameof(FriendlyName));
                 }
             }
@@ -215,10 +171,8 @@ namespace Shadowsocks.Model
             get => server_port;
             set
             {
-                if (server_port != value)
+                if (SetField(ref server_port, value))
                 {
-                    server_port = value;
-                    OnPropertyChanged();
                     OnPropertyChanged(nameof(FriendlyName));
                 }
             }
@@ -229,11 +183,9 @@ namespace Shadowsocks.Model
             get => server_udp_port;
             set
             {
-                if (server_udp_port != value)
+                if (SetField(ref server_udp_port, value))
                 {
-                    server_udp_port = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(ShowAdvSetting));
+                    OnPropertyChanged(nameof(FriendlyName));
                 }
             }
         }
@@ -241,79 +193,37 @@ namespace Shadowsocks.Model
         public string Password
         {
             get => password;
-            set
-            {
-                if (password != value)
-                {
-                    password = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref password, value);
         }
 
         public string Method
         {
             get => string.IsNullOrWhiteSpace(method) ? @"aes-256-cfb" : method;
-            set
-            {
-                if (method != value)
-                {
-                    method = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref method, value);
         }
 
         public string Protocol
         {
             get => string.IsNullOrWhiteSpace(protocol) ? @"origin" : protocol;
-            set
-            {
-                if (protocol != value)
-                {
-                    protocol = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref protocol, value);
         }
 
         public string ProtocolParam
         {
             get => protocolparam ?? string.Empty;
-            set
-            {
-                if (protocolparam != value)
-                {
-                    protocolparam = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref protocolparam, value);
         }
 
         public string obfs
         {
             get => string.IsNullOrWhiteSpace(_obfs) ? @"plain" : _obfs;
-            set
-            {
-                if (_obfs != value)
-                {
-                    _obfs = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref _obfs, value);
         }
 
         public string ObfsParam
         {
             get => obfsparam ?? string.Empty;
-            set
-            {
-                if (obfsparam != value)
-                {
-                    obfsparam = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref obfsparam, value);
         }
 
         public string Group
@@ -321,10 +231,8 @@ namespace Shadowsocks.Model
             get => group;
             set
             {
-                if (group != value)
+                if (SetField(ref group, value))
                 {
-                    group = value;
-                    OnPropertyChanged();
                     OnPropertyChanged(nameof(GroupName));
                 }
             }
@@ -333,14 +241,7 @@ namespace Shadowsocks.Model
         public string SubTag
         {
             get => subTag;
-            set
-            {
-                if (subTag != value)
-                {
-                    subTag = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref subTag, value);
         }
 
         public string Remarks_Base64
@@ -348,10 +249,8 @@ namespace Shadowsocks.Model
             get => remarks_base64;
             set
             {
-                if (remarks_base64 != value)
+                if (SetField(ref remarks_base64, value))
                 {
-                    remarks_base64 = value;
-                    OnPropertyChanged();
                     OnPropertyChanged(nameof(Remarks));
                     OnPropertyChanged(nameof(FriendlyName));
                 }
@@ -361,14 +260,7 @@ namespace Shadowsocks.Model
         public bool Enable
         {
             get => enable;
-            set
-            {
-                if (enable != value)
-                {
-                    enable = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref enable, value);
         }
 
         public bool UdpOverTcp
@@ -376,10 +268,8 @@ namespace Shadowsocks.Model
             get => udp_over_tcp;
             set
             {
-                if (udp_over_tcp != value)
+                if (SetField(ref udp_over_tcp, value))
                 {
-                    udp_over_tcp = value;
-                    OnPropertyChanged();
                     OnPropertyChanged(nameof(ShowAdvSetting));
                 }
             }
@@ -650,15 +540,16 @@ namespace Shadowsocks.Model
 
         public event EventHandler ServerChanged;
 
-        protected override void OnPropertyChanged(string propertyName = null)
+        protected override bool SetField<T>(ref T field, T value, string propertyName = @"")
         {
-            base.OnPropertyChanged(propertyName);
-            if (propertyName == null)
+            if (base.SetField(ref field, value, propertyName))
             {
-                base.OnPropertyChanged(nameof(SsLink));
-                base.OnPropertyChanged(nameof(SsrLink));
+                OnPropertyChanged(nameof(SsLink));
+                OnPropertyChanged(nameof(SsrLink));
                 ServerChanged?.Invoke(this, new EventArgs());
+                return true;
             }
+            return false;
         }
     }
 }

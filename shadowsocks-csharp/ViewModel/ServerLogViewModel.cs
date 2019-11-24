@@ -15,28 +15,14 @@ namespace Shadowsocks.ViewModel
         public ObservableCollection<Server> ServersCollection
         {
             get => _serversCollection;
-            set
-            {
-                if (_serversCollection != value)
-                {
-                    _serversCollection = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref _serversCollection, value);
         }
 
         private Server _selectedServer;
         public Server SelectedServer
         {
             get => _selectedServer;
-            private set
-            {
-                if (_selectedServer != value)
-                {
-                    _selectedServer = value;
-                    OnPropertyChanged();
-                }
-            }
+            private set => SetField(ref _selectedServer, value);
         }
 
         public void ReadConfig(ShadowsocksController controller)
