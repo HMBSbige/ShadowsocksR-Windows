@@ -813,13 +813,13 @@ namespace Shadowsocks.Proxy
                 {
                     if (server.SpeedLog.ErrorContinuousTimes > 10)
                     {
-                        server.DnsBuffer().force_expired = true;
+                        server.DnsBuffer.force_expired = true;
                     }
 
-                    if (server.DnsBuffer().isExpired(serverHost))
+                    if (server.DnsBuffer.isExpired(serverHost))
                     {
                         var dnsOk = false;
-                        var buf = server.DnsBuffer();
+                        var buf = server.DnsBuffer;
                         if (Monitor.TryEnter(buf, buf.Ip != null ? 100 : 1000000))
                         {
                             if (buf.isExpired(serverHost))
@@ -851,9 +851,9 @@ namespace Shadowsocks.Proxy
 
                         if (!dnsOk)
                         {
-                            if (server.DnsBuffer().Ip != null)
+                            if (server.DnsBuffer.Ip != null)
                             {
-                                ipAddress = server.DnsBuffer().Ip;
+                                ipAddress = server.DnsBuffer.Ip;
                             }
                             else
                             {
@@ -866,7 +866,7 @@ namespace Shadowsocks.Proxy
                     }
                     else
                     {
-                        ipAddress = server.DnsBuffer().Ip;
+                        ipAddress = server.DnsBuffer.Ip;
                     }
                 }
                 BeginConnect(ipAddress, serverPort);
@@ -880,7 +880,7 @@ namespace Shadowsocks.Proxy
 
         private void ConnectCallback(IAsyncResult ar)
         {
-            if (ar != null && ar.AsyncState != null)
+            if (ar?.AsyncState != null)
             {
                 ((CallbackStatus)ar.AsyncState).SetIfEqu(1, 0);
                 if (((CallbackStatus)ar.AsyncState).Status != 1)

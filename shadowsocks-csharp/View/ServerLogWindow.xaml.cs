@@ -115,13 +115,13 @@ namespace Shadowsocks.View
 
         private void DisconnectDirectMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            Server.GetForwardServerRef().Connections.CloseAll();
+            Server.ForwardServer.Connections.CloseAll();
         }
 
         private void DisconnectAllMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
             _controller.DisconnectAllConnections();
-            Server.GetForwardServerRef().Connections.CloseAll();
+            Server.ForwardServer.Connections.CloseAll();
         }
 
         private void ClearMaxMenuItem_OnClick(object sender, RoutedEventArgs e)

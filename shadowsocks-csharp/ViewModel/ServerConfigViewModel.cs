@@ -7,9 +7,9 @@ using System.Linq;
 
 namespace Shadowsocks.ViewModel
 {
-    public class ServerViewModel : ViewModelBase
+    public class ServerConfigViewModel : ViewModelBase
     {
-        public ServerViewModel()
+        public ServerConfigViewModel()
         {
             ServersTreeViewCollection = new ObservableCollection<ServerTreeViewModel>();
         }

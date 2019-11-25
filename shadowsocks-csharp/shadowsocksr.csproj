@@ -34,7 +34,6 @@
     <None Remove="Controls\MaskedTextBox.xaml" />
     <None Remove="Controls\NumberUpDown.xaml" />
     <None Remove="Resources\ssw128.png" />
-    <None Remove="View\ConfigWindow.xaml" />
     <None Remove="View\LogWindow.xaml" />
     <None Remove="View\PortSettingsWindow.xaml" />
     <None Remove="View\QRCodeSplashWindow.xaml" />

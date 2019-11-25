@@ -16,9 +16,9 @@ using System.Windows.Threading;
 
 namespace Shadowsocks.View
 {
-    public partial class ConfigWindow
+    public partial class ServerConfigWindow
     {
-        public ConfigWindow(ShadowsocksController controller, int focusIndex)
+        public ServerConfigWindow(ShadowsocksController controller, int focusIndex)
         {
             InitializeComponent();
             I18NUtil.SetLanguage(Resources, @"ConfigWindow");
@@ -27,7 +27,7 @@ namespace Shadowsocks.View
             Closed += (o, e) =>
             {
                 _controller.ConfigChanged -= controller_ConfigChanged;
-                ServerViewModel.ServersChanged -= ServerViewModel_ServersChanged;
+                ServerConfigViewModel.ServersChanged -= ServerViewModel_ServersChanged;
             };
 
             _controller = controller;
@@ -45,7 +45,7 @@ namespace Shadowsocks.View
             }
 
             _controller.ConfigChanged += controller_ConfigChanged;
-            ServerViewModel.ServersChanged += ServerViewModel_ServersChanged;
+            ServerConfigViewModel.ServersChanged += ServerViewModel_ServersChanged;
             _focusIndex = focusIndex;
             ServerGroupBox.Visibility = ServersTreeView.SelectedValue == null ? Visibility.Hidden : Visibility.Visible;
         }
@@ -85,7 +85,7 @@ namespace Shadowsocks.View
         private Configuration _modifiedConfiguration;
         private int _focusIndex;
 
-        public ServerViewModel ServerViewModel { get; set; } = new ServerViewModel();
+        public ServerConfigViewModel ServerConfigViewModel { get; set; } = new ServerConfigViewModel();
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -131,7 +131,7 @@ namespace Shadowsocks.View
         private void LoadCurrentConfiguration(bool scrollToSelectedItem)
         {
             _modifiedConfiguration = _controller.GetConfiguration();
-            ServerViewModel.ReadServers(_modifiedConfiguration.configs);
+            ServerConfigViewModel.ReadServers(_modifiedConfiguration.configs);
 
             if (scrollToSelectedItem)
             {
@@ -145,7 +145,7 @@ namespace Shadowsocks.View
 
         private void ExpandTree(bool expand)
         {
-            foreach (var node in ServerTreeViewModel.GetNodes(ServerViewModel.ServersTreeViewCollection))
+            foreach (var node in ServerTreeViewModel.GetNodes(ServerConfigViewModel.ServersTreeViewCollection))
             {
                 if (node.Type != ServerTreeViewType.Server)
                 {
@@ -168,7 +168,7 @@ namespace Shadowsocks.View
 
         private void MoveToSelectedItem(string id)
         {
-            var serverTreeViewModel = ServerTreeViewModel.FindNode(ServerViewModel.ServersTreeViewCollection, id);
+            var serverTreeViewModel = ServerTreeViewModel.FindNode(ServerConfigViewModel.ServersTreeViewCollection, id);
             if (serverTreeViewModel != null)
             {
                 MoveToSelectedItem(serverTreeViewModel);
@@ -244,7 +244,7 @@ namespace Shadowsocks.View
                 }
             }
             var newServer = new Server();
-            ServerViewModel.ReadServers(new List<Server> { newServer });
+            ServerConfigViewModel.ReadServers(new List<Server> { newServer });
             MoveToSelectedItem(newServer.Id);
         }
 
@@ -255,7 +255,7 @@ namespace Shadowsocks.View
             {
                 if (selectedItem is ServerTreeViewModel st)
                 {
-                    ServerTreeViewModel.Remove(ServerViewModel.ServersTreeViewCollection, st);
+                    ServerTreeViewModel.Remove(ServerConfigViewModel.ServersTreeViewCollection, st);
                 }
             }
             //Fix weird selections
@@ -455,7 +455,7 @@ namespace Shadowsocks.View
                 oldServerId = _modifiedConfiguration.configs[_modifiedConfiguration.index].Id;
             }
             _modifiedConfiguration.configs.Clear();
-            _modifiedConfiguration.configs.AddRange(ServerViewModel.ServerTreeViewModelToList(ServerViewModel.ServersTreeViewCollection));
+            _modifiedConfiguration.configs.AddRange(ServerConfigViewModel.ServerTreeViewModelToList(ServerConfigViewModel.ServersTreeViewCollection));
             if (oldServerId != null)
             {
                 var currentIndex = _modifiedConfiguration.configs.FindIndex(server => server.Id == oldServerId);

@@ -449,7 +449,7 @@ namespace Shadowsocks.Controller.Service
                 }
                 try
                 {
-                    Server.GetForwardServerRef().Connections.AddRef(this);
+                    Server.ForwardServer.Connections.AddRef(this);
                     _remote.BeginReceive(remoteRecvBuffer, RecvSize, SocketFlags.None, PipeRemoteReceiveCallback, null);
                     _local.BeginReceive(connetionRecvBuffer, RecvSize, SocketFlags.None, PipeConnectionReceiveCallback, null);
 
@@ -619,7 +619,7 @@ namespace Shadowsocks.Controller.Service
                 Thread.Sleep(100);
                 CloseSocket(_remote);
                 CloseSocket(_local);
-                Server.GetForwardServerRef().Connections.DecRef(this);
+                Server.ForwardServer.Connections.DecRef(this);
             }
 
             public override void Shutdown()

@@ -68,7 +68,7 @@ namespace Shadowsocks.Controller
         private MenuItem UpdateItem;
         private MenuItem AutoCheckUpdateItem;
         private MenuItem AllowPreReleaseItem;
-        private ConfigWindow _configWindow;
+        private ServerConfigWindow _serverConfigWindow;
         private SettingsWindow _settingsWindow;
 
         #region ServerLogWindow
@@ -538,7 +538,7 @@ namespace Shadowsocks.Controller
                         {
                             serverSubscribe.LastUpdateTime = (ulong)Math.Floor(DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
                         }
-                        config.configs.RemoveAll(server => server.IsMatchServer(Server.GetDefaultServer()));
+                        config.configs.RemoveAll(server => server.IsMatchServer(new Server()));
                     }
                     controller.SaveServersConfig(config);
                 }
@@ -739,34 +739,34 @@ namespace Shadowsocks.Controller
 
         private void ShowConfigForm(bool addNode)
         {
-            if (_configWindow != null)
+            if (_serverConfigWindow != null)
             {
-                _configWindow.Activate();
-                _configWindow.UpdateLayout();
-                if (_configWindow.WindowState == WindowState.Minimized)
+                _serverConfigWindow.Activate();
+                _serverConfigWindow.UpdateLayout();
+                if (_serverConfigWindow.WindowState == WindowState.Minimized)
                 {
-                    _configWindow.WindowState = WindowState.Normal;
+                    _serverConfigWindow.WindowState = WindowState.Normal;
                 }
                 if (addNode)
                 {
                     var cfg = controller.GetCurrentConfiguration();
-                    _configWindow.MoveToSelectedItem(cfg.index + 1);
+                    _serverConfigWindow.MoveToSelectedItem(cfg.index + 1);
                 }
             }
             else
             {
                 configFrom_open = true;
-                _configWindow = new ConfigWindow(controller, addNode ? -1 : -2);
-                _configWindow.Show();
-                _configWindow.Activate();
-                _configWindow.BringToFront();
-                _configWindow.Closed += ConfigWindow_Closed;
+                _serverConfigWindow = new ServerConfigWindow(controller, addNode ? -1 : -2);
+                _serverConfigWindow.Show();
+                _serverConfigWindow.Activate();
+                _serverConfigWindow.BringToFront();
+                _serverConfigWindow.Closed += ServerConfigWindowClosed;
             }
         }
 
-        private void ConfigWindow_Closed(object sender, EventArgs e)
+        private void ServerConfigWindowClosed(object sender, EventArgs e)
         {
-            _configWindow = null;
+            _serverConfigWindow = null;
             configFrom_open = false;
             Utils.ReleaseMemory();
             if (eventList.Count > 0)
@@ -782,25 +782,25 @@ namespace Shadowsocks.Controller
 
         private void ShowConfigForm(int index)
         {
-            if (_configWindow != null)
+            if (_serverConfigWindow != null)
             {
-                _configWindow.Activate();
-                _configWindow.UpdateLayout();
-                if (_configWindow.WindowState == WindowState.Minimized)
+                _serverConfigWindow.Activate();
+                _serverConfigWindow.UpdateLayout();
+                if (_serverConfigWindow.WindowState == WindowState.Minimized)
                 {
-                    _configWindow.WindowState = WindowState.Normal;
+                    _serverConfigWindow.WindowState = WindowState.Normal;
                 }
-                _configWindow.Topmost = true;
-                _configWindow.MoveToSelectedItem(index);
+                _serverConfigWindow.Topmost = true;
+                _serverConfigWindow.MoveToSelectedItem(index);
             }
             else
             {
                 configFrom_open = true;
-                _configWindow = new ConfigWindow(controller, index);
-                _configWindow.Show();
-                _configWindow.Activate();
-                _configWindow.Topmost = true;
-                _configWindow.Closed += ConfigWindow_Closed;
+                _serverConfigWindow = new ServerConfigWindow(controller, index);
+                _serverConfigWindow.Show();
+                _serverConfigWindow.Activate();
+                _serverConfigWindow.Topmost = true;
+                _serverConfigWindow.Closed += ServerConfigWindowClosed;
             }
         }
 
@@ -974,10 +974,10 @@ namespace Shadowsocks.Controller
         public void Quit_Click(object sender, EventArgs e)
         {
             controller.Stop();
-            if (_configWindow != null)
+            if (_serverConfigWindow != null)
             {
-                _configWindow.Close();
-                _configWindow = null;
+                _serverConfigWindow.Close();
+                _serverConfigWindow = null;
             }
             if (_serverLogWindow != null)
             {
