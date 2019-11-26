@@ -18,7 +18,7 @@ namespace Shadowsocks.View
 {
     public partial class ServerLogWindow
     {
-        public ServerLogWindow(ShadowsocksController controller, WindowStatus status)
+        public ServerLogWindow(MainController controller, WindowStatus status)
         {
             InitializeComponent();
             I18NUtil.SetLanguage(Resources, @"ServerLogWindow");
@@ -70,7 +70,7 @@ namespace Shadowsocks.View
         {
             UpdateTitle();
             ServerDataGrid.View?.BeginInit();
-            ServerLogViewModel.ReadConfig(_controller);
+            ServerLogViewModel.ReadConfig();
             ServerDataGrid.View?.EndInit();
 
             Dispatcher.CurrentDispatcher.InvokeAsync(() =>
@@ -87,12 +87,12 @@ namespace Shadowsocks.View
             LoadConfig(false);
         }
 
-        private readonly ShadowsocksController _controller;
+        private readonly MainController _controller;
         public ServerLogViewModel ServerLogViewModel { get; set; } = new ServerLogViewModel();
 
         private void UpdateTitle()
         {
-            Title = $@"{this.GetWindowStringValue(@"Title")}({(_controller.GetCurrentConfiguration().shareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{_controller.GetCurrentConfiguration().localPort} {this.GetWindowStringValue(@"Version")}{UpdateChecker.FullVersion})";
+            Title = $@"{this.GetWindowStringValue(@"Title")}({(Global.GuiConfig.ShareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{Global.GuiConfig.LocalPort} {this.GetWindowStringValue(@"Version")}{UpdateChecker.FullVersion})";
         }
 
         private void AlwaysTopMenuItem_OnClick(object sender, RoutedEventArgs e)
@@ -126,8 +126,8 @@ namespace Shadowsocks.View
 
         private void ClearMaxMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            var config = _controller.GetCurrentConfiguration();
-            foreach (var server in config.configs)
+            var config = Global.GuiConfig;
+            foreach (var server in config.Configs)
             {
                 server.SpeedLog.ClearMaxSpeed();
             }
@@ -135,8 +135,8 @@ namespace Shadowsocks.View
 
         private void ClearAllMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            var config = _controller.GetCurrentConfiguration();
-            foreach (var server in config.configs)
+            var config = Global.GuiConfig;
+            foreach (var server in config.Configs)
             {
                 server.SpeedLog.Clear();
             }
@@ -144,12 +144,12 @@ namespace Shadowsocks.View
 
         private void ClearSelectedTotalMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            var config = _controller.GetCurrentConfiguration();
-            if (config.index >= 0 && config.index < config.configs.Count)
+            var config = Global.GuiConfig;
+            if (config.Index >= 0 && config.Index < config.Configs.Count)
             {
                 try
                 {
-                    _controller.ClearTransferTotal(config.configs[config.index].Id);
+                    _controller.ClearTransferTotal(config.Configs[config.Index].Id);
                 }
                 catch
                 {
@@ -160,8 +160,8 @@ namespace Shadowsocks.View
 
         private void ClearTotalMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            var config = _controller.GetCurrentConfiguration();
-            foreach (var server in config.configs)
+            var config = Global.GuiConfig;
+            foreach (var server in config.Configs)
             {
                 _controller.ClearTransferTotal(server.Id);
             }
@@ -169,36 +169,36 @@ namespace Shadowsocks.View
 
         private void CopyCurrentLinkMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            var config = _controller.GetCurrentConfiguration();
-            if (config.index >= 0 && config.index < config.configs.Count)
+            var config = Global.GuiConfig;
+            if (config.Index >= 0 && config.Index < config.Configs.Count)
             {
-                var link = config.configs[config.index].SsrLink;
+                var link = config.Configs[config.Index].SsrLink;
                 Clipboard.SetDataObject(link);
             }
         }
 
         private void CopyCurrentGroupLinksMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            var config = _controller.GetCurrentConfiguration();
-            if (config.index >= 0 && config.index < config.configs.Count)
+            var config = Global.GuiConfig;
+            if (config.Index >= 0 && config.Index < config.Configs.Count)
             {
-                var group = config.configs[config.index].Group;
-                var link = config.configs.Where(t => t.Group == group).Aggregate(string.Empty, (current, t) => current + $@"{t.SsrLink}{Environment.NewLine}");
+                var group = config.Configs[config.Index].Group;
+                var link = config.Configs.Where(t => t.Group == group).Aggregate(string.Empty, (current, t) => current + $@"{t.SsrLink}{Environment.NewLine}");
                 Clipboard.SetDataObject(link);
             }
         }
 
         private void CopyAllEnableLinksMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            var config = _controller.GetCurrentConfiguration();
-            var link = config.configs.Where(t => t.Enable).Aggregate(string.Empty, (current, t) => current + $@"{t.SsrLink}{Environment.NewLine}");
+            var config = Global.GuiConfig;
+            var link = config.Configs.Where(t => t.Enable).Aggregate(string.Empty, (current, t) => current + $@"{t.SsrLink}{Environment.NewLine}");
             Clipboard.SetDataObject(link);
         }
 
         private void CopyAllLinksMenuItem_OnClick(object sender, RoutedEventArgs e)
         {
-            var config = _controller.GetCurrentConfiguration();
-            var link = config.configs.Aggregate(string.Empty, (current, t) => current + $@"{t.SsrLink}{Environment.NewLine}");
+            var config = Global.GuiConfig;
+            var link = config.Configs.Aggregate(string.Empty, (current, t) => current + $@"{t.SsrLink}{Environment.NewLine}");
             Clipboard.SetDataObject(link);
         }
 
@@ -231,9 +231,15 @@ namespace Shadowsocks.View
                                 sameGroupServer.Enable = enable;
                             }
                         }
-                        _controller.Save();
+                        Global.Save(Global.GuiConfig);
                     }
                 }
+                else
+                {
+                    return;
+                }
+                ServerDataGrid.ClearSelections(false);
+                ServerDataGrid.SelectCell(server, ServerDataGrid.Columns[0]);
             }
         }
 
@@ -334,7 +340,7 @@ namespace Shadowsocks.View
                 if (entry.IsRecords && entry is RecordEntry recordEntry && recordEntry.Data is Server server)
                 {
                     server.Enable = !server.Enable;
-                    _controller.Save();
+                    Global.Save(Global.GuiConfig);
                 }
             }
         }

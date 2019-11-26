@@ -38,6 +38,11 @@ namespace Shadowsocks.View
 
             try
             {
+                if (!File.Exists(newLogFile))
+                {
+                    Title = $@"{this.GetWindowStringValue(@"Title")}";
+                    return;
+                }
                 using var reader = new StreamReader(new FileStream(newLogFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
                 if (_currentOffset == 0)
                 {

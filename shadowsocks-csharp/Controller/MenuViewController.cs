@@ -40,7 +40,7 @@ namespace Shadowsocks.Controller
         // when config form is closed, it moves away from RAM
         // and it should just do anything related to the config form
 
-        private readonly ShadowsocksController controller;
+        private readonly MainController controller;
         private readonly UpdateChecker updateChecker;
         private readonly UpdateNode _updateNodeChecker;
         private readonly UpdateSubscribeManager updateSubscribeManager;
@@ -87,14 +87,12 @@ namespace Shadowsocks.Controller
         private bool configFrom_open;
         private readonly List<EventParams> eventList = new List<EventParams>();
 
-        public MenuViewController(ShadowsocksController controller)
+        public MenuViewController(MainController controller)
         {
             this.controller = controller;
 
             LoadMenu();
 
-            controller.ToggleModeChanged += controller_ToggleModeChanged;
-            controller.ToggleRuleModeChanged += controller_ToggleRuleModeChanged;
             controller.ConfigChanged += controller_ConfigChanged;
             controller.PACFileReadyToOpen += controller_FileReadyToOpen;
             controller.UserRuleFileReadyToOpen += controller_FileReadyToOpen;
@@ -134,7 +132,7 @@ namespace Shadowsocks.Controller
         {
             timerDelayCheckUpdate.Interval = 1000.0 * 60 * 60 * 1;// 1 hour
 
-            var cfg = controller.GetCurrentConfiguration();
+            var cfg = Global.GuiConfig;
             if (cfg.AutoCheckUpdate)
             {
                 updateChecker.Check(cfg, false);
@@ -150,10 +148,10 @@ namespace Shadowsocks.Controller
 
         private void UpdateTrayIcon()
         {
-            var config = controller.GetCurrentConfiguration();
-            var enabled = config.sysProxyMode != ProxyMode.NoModify && config.sysProxyMode != ProxyMode.Direct;
-            var global = config.sysProxyMode == ProxyMode.Global;
-            var random = config.random;
+            var config = Global.GuiConfig;
+            var enabled = config.SysProxyMode != ProxyMode.NoModify && config.SysProxyMode != ProxyMode.Direct;
+            var global = config.SysProxyMode == ProxyMode.Global;
+            var random = config.Random;
 
             var colorMask = ViewUtils.SelectColorMask(enabled, global);
             var icon = ViewUtils.ChangeBitmapColor(Resources.ss128, colorMask, random);
@@ -172,23 +170,23 @@ namespace Shadowsocks.Controller
             var line4 = string.Empty;
             if (random)
             {
-                strServer = $@"{I18NUtil.GetAppStringValue(@"LoadBalance")}{I18NUtil.GetAppStringValue(@"Colon")}{I18NUtil.GetAppStringValue(config.balanceAlgorithm)}";
-                if (config.randomInGroup)
+                strServer = $@"{I18NUtil.GetAppStringValue(@"LoadBalance")}{I18NUtil.GetAppStringValue(@"Colon")}{I18NUtil.GetAppStringValue(config.BalanceAlgorithm)}";
+                if (config.RandomInGroup)
                 {
                     line3 = $@"{I18NUtil.GetAppStringValue(@"BalanceInGroup")}{Environment.NewLine}";
                 }
 
-                if (config.autoBan)
+                if (config.AutoBan)
                 {
                     line4 = $@"{I18NUtil.GetAppStringValue(@"AutoBan")}{Environment.NewLine}";
                 }
             }
             else
             {
-                if (config.index >= 0 && config.index < config.configs.Count)
+                if (config.Index >= 0 && config.Index < config.Configs.Count)
                 {
-                    var groupName = config.configs[config.index].Group;
-                    var serverName = config.configs[config.index].Remarks;
+                    var groupName = config.Configs[config.Index].Group;
+                    var serverName = config.Configs[config.Index].Remarks;
                     if (string.IsNullOrWhiteSpace(groupName))
                     {
                         strServer = string.IsNullOrWhiteSpace(serverName) ? null : serverName;
@@ -205,7 +203,7 @@ namespace Shadowsocks.Controller
             }
 
             string line1;
-            switch (config.sysProxyMode)
+            switch (config.SysProxyMode)
             {
                 case ProxyMode.NoModify:
                 {
@@ -234,7 +232,7 @@ namespace Shadowsocks.Controller
                 }
             }
             var line2 = string.IsNullOrWhiteSpace(strServer) ? null : $@"{strServer}{Environment.NewLine}";
-            var line5 = string.Format(I18NUtil.GetAppStringValue(@"RunningPort"), config.localPort); // this feedback is very important because they need to know Shadowsocks is running
+            var line5 = string.Format(I18NUtil.GetAppStringValue(@"RunningPort"), config.LocalPort); // this feedback is very important because they need to know Shadowsocks is running
 
             var text = $@"{line1}{line2}{line3}{line4}{line5}";
             _notifyIcon.ToolTipText = text;
@@ -365,19 +363,7 @@ namespace Shadowsocks.Controller
             UpdateTrayIcon();
         }
 
-        private void controller_ToggleModeChanged(object sender, EventArgs e)
-        {
-            var config = controller.GetCurrentConfiguration();
-            UpdateSysProxyMode(config);
-        }
-
-        private void controller_ToggleRuleModeChanged(object sender, EventArgs e)
-        {
-            var config = controller.GetCurrentConfiguration();
-            UpdateProxyRule(config);
-        }
-
-        private void controller_FileReadyToOpen(object sender, ShadowsocksController.PathEventArgs e)
+        private void controller_FileReadyToOpen(object sender, MainController.PathEventArgs e)
         {
             Utils.OpenURL(e.Path);
         }
@@ -410,8 +396,8 @@ namespace Shadowsocks.Controller
             {
                 var urls = new List<string>();
                 _updateNodeChecker.FreeNodeResult = _updateNodeChecker.FreeNodeResult.TrimEnd('\r', '\n', ' ');
-                var config = controller.GetCurrentConfiguration();
-                var selectedServer = config.configs.ElementAtOrDefault(config.index);
+                var config = Global.GuiConfig;
+                var selectedServer = config.Configs.ElementAtOrDefault(config.Index);
                 try
                 {
                     _updateNodeChecker.FreeNodeResult = Base64.DecodeBase64(_updateNodeChecker.FreeNodeResult);
@@ -436,12 +422,12 @@ namespace Shadowsocks.Controller
                                 var server = new Server(url, null);
                                 if (!string.IsNullOrEmpty(server.Group))
                                 {
-                                    if (config.serverSubscribes.Any(subscribe => subscribe.Tag == server.Group))
+                                    if (config.ServerSubscribes.Any(subscribe => subscribe.Tag == server.Group))
                                     {
                                         continue;
                                     }
 
-                                    var serverSubscribe = config.serverSubscribes.Find(sub =>
+                                    var serverSubscribe = config.ServerSubscribes.Find(sub =>
                                     sub.Url == updateSubscribeManager.CurrentServerSubscribe.Url
                                     && string.IsNullOrEmpty(sub.OriginTag));
 
@@ -465,9 +451,9 @@ namespace Shadowsocks.Controller
                     }
 
                     //Find old servers
-                    var firstInsertIndex = config.configs.Count;
-                    var oldServers = config.configs.FindAll(server => server.SubTag == lastGroup);
-                    var index = config.configs.FindIndex(server => server.SubTag == lastGroup);
+                    var firstInsertIndex = config.Configs.Count;
+                    var oldServers = config.Configs.FindAll(server => server.SubTag == lastGroup);
+                    var index = config.Configs.FindIndex(server => server.SubTag == lastGroup);
                     if (index >= 0)
                     {
                         firstInsertIndex = index;
@@ -497,48 +483,45 @@ namespace Shadowsocks.Controller
                     foreach (var server in removeServers)
                     {
                         server.Connections.CloseAll();
-                        config.configs.Remove(server);
+                        config.Configs.Remove(server);
                     }
 
                     //Add servers
                     foreach (var server in addServers)
                     {
-                        if (server.Index > config.configs.Count)
+                        if (server.Index > config.Configs.Count)
                         {
-                            server.Index = config.configs.Count;
+                            server.Index = config.Configs.Count;
                         }
-                        config.configs.Insert(server.Index, server);
+                        config.Configs.Insert(server.Index, server);
                     }
 
-                    controller.SaveServersConfig(config);
-
                     //Set SelectedServer
-                    config = controller.GetCurrentConfiguration();
                     var selectedIndex = -1;
                     if (selectedServer != null)
                     {
-                        selectedIndex = config.configs.FindIndex(server =>
+                        selectedIndex = config.Configs.FindIndex(server =>
                           server.Id == selectedServer.Id
                           || server.SubTag == selectedServer.SubTag && server.IsMatchServer(selectedServer));
                     }
 
                     if (selectedServer == null || selectedIndex == -1)
                     {
-                        config.index = config.configs.Count - 1;
+                        config.Index = config.Configs.Count - 1;
                     }
                     else
                     {
-                        config.index = selectedIndex;
+                        config.Index = selectedIndex;
                     }
 
                     //If Update Success
                     if (count > 0)
                     {
-                        foreach (var serverSubscribe in config.serverSubscribes.Where(serverSubscribe => serverSubscribe.Url == _updateNodeChecker.SubscribeTask.Url))
+                        foreach (var serverSubscribe in config.ServerSubscribes.Where(serverSubscribe => serverSubscribe.Url == _updateNodeChecker.SubscribeTask.Url))
                         {
                             serverSubscribe.LastUpdateTime = (ulong)Math.Floor(DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
                         }
-                        config.configs.RemoveAll(server => server.IsMatchServer(new Server()));
+                        config.Configs.RemoveAll(server => server.IsMatchServer(new Server()));
                     }
                     controller.SaveServersConfig(config);
                 }
@@ -619,33 +602,33 @@ namespace Shadowsocks.Controller
 
         private void UpdateSysProxyMode(Configuration config)
         {
-            noModifyItem.IsChecked = config.sysProxyMode == ProxyMode.NoModify;
-            enableItem.IsChecked = config.sysProxyMode == ProxyMode.Direct;
-            PACModeItem.IsChecked = config.sysProxyMode == ProxyMode.Pac;
-            globalModeItem.IsChecked = config.sysProxyMode == ProxyMode.Global;
+            noModifyItem.IsChecked = config.SysProxyMode == ProxyMode.NoModify;
+            enableItem.IsChecked = config.SysProxyMode == ProxyMode.Direct;
+            PACModeItem.IsChecked = config.SysProxyMode == ProxyMode.Pac;
+            globalModeItem.IsChecked = config.SysProxyMode == ProxyMode.Global;
         }
 
         private void UpdateProxyRule(Configuration config)
         {
-            ruleDisableBypass.IsChecked = config.proxyRuleMode == ProxyRuleMode.Disable;
-            ruleBypassLan.IsChecked = config.proxyRuleMode == ProxyRuleMode.BypassLan;
-            ruleBypassChina.IsChecked = config.proxyRuleMode == ProxyRuleMode.BypassLanAndChina;
-            ruleBypassNotChina.IsChecked = config.proxyRuleMode == ProxyRuleMode.BypassLanAndNotChina;
-            ruleUser.IsChecked = config.proxyRuleMode == ProxyRuleMode.UserCustom;
+            ruleDisableBypass.IsChecked = config.ProxyRuleMode == ProxyRuleMode.Disable;
+            ruleBypassLan.IsChecked = config.ProxyRuleMode == ProxyRuleMode.BypassLan;
+            ruleBypassChina.IsChecked = config.ProxyRuleMode == ProxyRuleMode.BypassLanAndChina;
+            ruleBypassNotChina.IsChecked = config.ProxyRuleMode == ProxyRuleMode.BypassLanAndNotChina;
+            ruleUser.IsChecked = config.ProxyRuleMode == ProxyRuleMode.UserCustom;
         }
 
         private void LoadCurrentConfiguration()
         {
-            var config = controller.GetCurrentConfiguration();
+            var config = Global.GuiConfig;
             UpdateServersMenu();
             UpdateSysProxyMode(config);
 
             UpdateProxyRule(config);
 
-            SelectRandomItem.IsChecked = config.random;
-            sameHostForSameTargetItem.IsChecked = config.sameHostForSameTarget;
+            SelectRandomItem.IsChecked = config.Random;
+            sameHostForSameTargetItem.IsChecked = config.SameHostForSameTarget;
             AutoCheckUpdateItem.IsChecked = config.AutoCheckUpdate;
-            AllowPreReleaseItem.IsChecked = config.isPreRelease;
+            AllowPreReleaseItem.IsChecked = config.IsPreRelease;
         }
 
         private static Grid CreateSelectedIcon()
@@ -668,13 +651,13 @@ namespace Shadowsocks.Controller
                 items.RemoveAt(0);
             }
 
-            var configuration = controller.GetCurrentConfiguration();
-            for (var i = 0; i < configuration.configs.Count;)
+            var configuration = Global.GuiConfig;
+            for (var i = 0; i < configuration.Configs.Count;)
             {
-                configuration.configs[i].Index = ++i;
+                configuration.Configs[i].Index = ++i;
             }
             var sub = new List<MenuItem>();
-            var subTags = new HashSet<string>(configuration.configs.Select(server => server.SubTag));
+            var subTags = new HashSet<string>(configuration.Configs.Select(server => server.SubTag));
             foreach (var subTag in subTags)
             {
                 var isSelected = false;
@@ -682,7 +665,7 @@ namespace Shadowsocks.Controller
                 {
                     Header = string.IsNullOrEmpty(subTag) ? I18NUtil.GetAppStringValue(@"EmptySubtag") : subTag
                 };
-                var servers = configuration.configs.Where(server => server.SubTag == subTag).ToArray();
+                var servers = configuration.Configs.Where(server => server.SubTag == subTag).ToArray();
                 var groups = new HashSet<string>(servers.Select(server => server.Group));
                 foreach (var group in groups)
                 {
@@ -699,7 +682,7 @@ namespace Shadowsocks.Controller
                             Tag = server.Index - 1
                         };
                         item.Click += AServerItem_Click;
-                        if (configuration.index == Convert.ToInt32(item.Tag))
+                        if (configuration.Index == Convert.ToInt32(item.Tag))
                         {
                             item.IsChecked = true;
                             isSelected = true;
@@ -749,8 +732,8 @@ namespace Shadowsocks.Controller
                 }
                 if (addNode)
                 {
-                    var cfg = controller.GetCurrentConfiguration();
-                    _serverConfigWindow.MoveToSelectedItem(cfg.index + 1);
+                    var cfg = Global.GuiConfig;
+                    _serverConfigWindow.MoveToSelectedItem(cfg.Index + 1);
                 }
             }
             else
@@ -953,7 +936,7 @@ namespace Shadowsocks.Controller
                 if (dlg.ShowDialog() == true)
                 {
                     var name = dlg.FileName;
-                    var cfg = Configuration.LoadFile(name);
+                    var cfg = Global.LoadFile(name);
                     if (cfg.IsDefaultConfig())
                     {
                         MessageBox.Show(I18NUtil.GetAppStringValue(@"ImportConfigFailed"), UpdateChecker.Name);
@@ -1196,12 +1179,12 @@ namespace Shadowsocks.Controller
 
         private void CheckUpdate_Click(object sender, RoutedEventArgs e)
         {
-            updateChecker.Check(controller.GetCurrentConfiguration(), true);
+            updateChecker.Check(Global.GuiConfig, true);
         }
 
         private void CheckNodeUpdate_Click(object sender, RoutedEventArgs e)
         {
-            updateSubscribeManager.CreateTask(controller.GetCurrentConfiguration(), _updateNodeChecker, true);
+            updateSubscribeManager.CreateTask(Global.GuiConfig, _updateNodeChecker, true);
         }
 
         private void ShowLogItem_Click(object sender, RoutedEventArgs e)

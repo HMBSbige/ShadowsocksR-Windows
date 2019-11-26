@@ -1,5 +1,4 @@
-﻿using Shadowsocks.Controller;
-using Shadowsocks.Model;
+﻿using Shadowsocks.Model;
 using System.Collections.ObjectModel;
 
 namespace Shadowsocks.ViewModel
@@ -25,15 +24,15 @@ namespace Shadowsocks.ViewModel
             private set => SetField(ref _selectedServer, value);
         }
 
-        public void ReadConfig(ShadowsocksController controller)
+        public void ReadConfig()
         {
-            var config = controller.GetCurrentConfiguration();
+            var config = Global.GuiConfig;
             ServersCollection.Clear();
             var index = 1;
-            foreach (var server in config.configs)
+            foreach (var server in config.Configs)
             {
                 server.Index = index++;
-                if (config.index == server.Index - 1)
+                if (config.Index == server.Index - 1)
                 {
                     server.IsSelected = true;
                     SelectedServer = server;

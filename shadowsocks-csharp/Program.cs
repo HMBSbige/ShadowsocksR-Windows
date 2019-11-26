@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using Shadowsocks.Controller;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Enums;
@@ -9,6 +9,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,9 +18,6 @@ namespace Shadowsocks
 {
     internal static class Program
     {
-        private static ShadowsocksController _controller;
-        private static MenuViewController _viewController;
-
         [STAThread]
         private static void Main(string[] args)
         {
@@ -56,10 +54,12 @@ namespace Shadowsocks
 
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(@"##SyncfusionLicense##");
 
-            I18NUtil.SetLanguage(Configuration.Load().LangName);
+            Global.LoadConfig();
+
+            I18NUtil.SetLanguage(Global.GuiConfig.LangName);
             ViewUtils.SetResource(app.Resources, @"../View/NotifyIconResources.xaml", 1);
 
-            _controller = new ShadowsocksController();
+            Global.Controller = new MainController();
 
             // Logging
             Logging.DefaultOut = Console.Out;
@@ -67,11 +67,12 @@ namespace Shadowsocks
 
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
 
-            _viewController = new MenuViewController(_controller);
-            SystemEvents.SessionEnding += _viewController.Quit_Click;
+            Global.ViewController = new MenuViewController(Global.Controller);
+            SystemEvents.SessionEnding += Global.ViewController.Quit_Click;
 
-            _controller.Reload();
-            if (_controller.IsDefaultConfig())
+            Global.OSSupportsLocalIPv6 = Socket.OSSupportsIPv6;
+            Global.Controller.Reload();
+            if (Global.GuiConfig.IsDefaultConfig())
             {
                 var res = MessageBox.Show(
                 $@"{I18NUtil.GetAppStringValue(@"DefaultConfigMessage")}{Environment.NewLine}{I18NUtil.GetAppStringValue(@"DefaultConfigQuestion")}",
@@ -80,12 +81,12 @@ namespace Shadowsocks
                 {
                     case MessageBoxResult.Yes:
                     {
-                        _controller.ShowConfigForm();
+                        Global.Controller.ShowConfigForm();
                         break;
                     }
                     case MessageBoxResult.No:
                     {
-                        _controller.ShowSubscribeWindow();
+                        Global.Controller.ShowSubscribeWindow();
                         break;
                     }
                     default:
@@ -105,9 +106,9 @@ namespace Shadowsocks
 
         private static void StopController()
         {
-            _viewController?.Quit_Click(default, default);
-            _controller?.Stop();
-            _controller = null;
+            Global.ViewController?.Quit_Click(default, default);
+            Global.Controller?.Stop();
+            Global.Controller = null;
         }
 
         private static void App_Exit(object sender, ExitEventArgs e)
@@ -124,14 +125,14 @@ namespace Shadowsocks
                 case PowerModes.Resume:
                 {
                     Logging.Info("os wake up");
-                    if (_controller != null)
+                    if (Global.Controller != null)
                     {
                         Task.Run(() =>
                         {
                             Thread.Sleep(10 * 1000);
                             try
                             {
-                                _controller.Reload();
+                                Global.Controller.Reload();
                                 Logging.Info("controller started");
                             }
                             catch (Exception ex)
@@ -144,9 +145,9 @@ namespace Shadowsocks
                 }
                 case PowerModes.Suspend:
                 {
-                    if (_controller != null)
+                    if (Global.Controller != null)
                     {
-                        _controller.Stop();
+                        Global.Controller.Stop();
                         Logging.Info("controller stopped");
                     }
                     Logging.Info("os suspend");
@@ -178,7 +179,7 @@ namespace Shadowsocks
             }
             Application.Current.Dispatcher?.InvokeAsync(() =>
             {
-                _viewController.ImportAddress(string.Join(Environment.NewLine, e.Args));
+                Global.ViewController.ImportAddress(string.Join(Environment.NewLine, e.Args));
             });
         }
     }

@@ -14,7 +14,7 @@ namespace Shadowsocks.ViewModel
         public void ReadConfig(Configuration config)
         {
             SubscribeCollection.Clear();
-            foreach (var serverSubscribe in config.serverSubscribes)
+            foreach (var serverSubscribe in config.ServerSubscribes)
             {
                 SubscribeCollection.Add(serverSubscribe);
             }

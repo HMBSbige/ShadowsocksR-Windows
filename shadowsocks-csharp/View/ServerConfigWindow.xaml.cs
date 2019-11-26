@@ -18,7 +18,7 @@ namespace Shadowsocks.View
 {
     public partial class ServerConfigWindow
     {
-        public ServerConfigWindow(ShadowsocksController controller, int focusIndex)
+        public ServerConfigWindow(MainController controller, int focusIndex)
         {
             InitializeComponent();
             I18NUtil.SetLanguage(Resources, @"ConfigWindow");
@@ -80,7 +80,7 @@ namespace Shadowsocks.View
                 "tls1.2_ticket_fastauth"
         };
 
-        private readonly ShadowsocksController _controller;
+        private readonly MainController _controller;
 
         private Configuration _modifiedConfiguration;
         private int _focusIndex;
@@ -95,23 +95,23 @@ namespace Shadowsocks.View
             {
                 case -1:
                 {
-                    var index = _modifiedConfiguration.index + 1;
-                    if (index < 0 || index > _modifiedConfiguration.configs.Count)
-                        index = _modifiedConfiguration.configs.Count;
+                    var index = _modifiedConfiguration.Index + 1;
+                    if (index < 0 || index > _modifiedConfiguration.Configs.Count)
+                        index = _modifiedConfiguration.Configs.Count;
                     _focusIndex = index;
                     break;
                 }
                 case -2:
                 {
-                    var index = _modifiedConfiguration.index;
-                    if (index < 0 || index > _modifiedConfiguration.configs.Count)
-                        index = _modifiedConfiguration.configs.Count;
+                    var index = _modifiedConfiguration.Index;
+                    if (index < 0 || index > _modifiedConfiguration.Configs.Count)
+                        index = _modifiedConfiguration.Configs.Count;
                     _focusIndex = index;
                     break;
                 }
             }
 
-            if (_focusIndex >= 0 && _focusIndex < _modifiedConfiguration.configs.Count)
+            if (_focusIndex >= 0 && _focusIndex < _modifiedConfiguration.Configs.Count)
             {
                 MoveToSelectedItem(_focusIndex);
             }
@@ -119,7 +119,7 @@ namespace Shadowsocks.View
 
         private void UpdateTitle()
         {
-            Title = $@"{this.GetWindowStringValue(@"Title")}({(_controller.GetCurrentConfiguration().shareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{_controller.GetCurrentConfiguration().localPort} {this.GetWindowStringValue(@"Version")}:{UpdateChecker.FullVersion})";
+            Title = $@"{this.GetWindowStringValue(@"Title")}({(Global.GuiConfig.ShareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{Global.GuiConfig.LocalPort} {this.GetWindowStringValue(@"Version")}:{UpdateChecker.FullVersion})";
         }
 
         private void controller_ConfigChanged(object sender, EventArgs e)
@@ -130,12 +130,12 @@ namespace Shadowsocks.View
 
         private void LoadCurrentConfiguration(bool scrollToSelectedItem)
         {
-            _modifiedConfiguration = _controller.GetConfiguration();
-            ServerConfigViewModel.ReadServers(_modifiedConfiguration.configs);
+            _modifiedConfiguration = Global.Load();
+            ServerConfigViewModel.ReadServers(_modifiedConfiguration.Configs);
 
             if (scrollToSelectedItem)
             {
-                MoveToSelectedItem(_modifiedConfiguration.index);
+                MoveToSelectedItem(_modifiedConfiguration.Index);
             }
 
             ApplyButton.IsEnabled = false;
@@ -158,9 +158,9 @@ namespace Shadowsocks.View
         {
             Dispatcher.CurrentDispatcher.InvokeAsync(() =>
             {
-                if (index >= 0 && index < _modifiedConfiguration.configs.Count)
+                if (index >= 0 && index < _modifiedConfiguration.Configs.Count)
                 {
-                    var server = _modifiedConfiguration.configs[index];
+                    var server = _modifiedConfiguration.Configs[index];
                     MoveToSelectedItem(server.Id);
                 }
             }, DispatcherPriority.Input);
@@ -450,22 +450,22 @@ namespace Shadowsocks.View
         private bool SaveConfig()
         {
             string oldServerId = null;
-            if (_modifiedConfiguration.index >= 0 && _modifiedConfiguration.index < _modifiedConfiguration.configs.Count)
+            if (_modifiedConfiguration.Index >= 0 && _modifiedConfiguration.Index < _modifiedConfiguration.Configs.Count)
             {
-                oldServerId = _modifiedConfiguration.configs[_modifiedConfiguration.index].Id;
+                oldServerId = _modifiedConfiguration.Configs[_modifiedConfiguration.Index].Id;
             }
-            _modifiedConfiguration.configs.Clear();
-            _modifiedConfiguration.configs.AddRange(ServerConfigViewModel.ServerTreeViewModelToList(ServerConfigViewModel.ServersTreeViewCollection));
+            _modifiedConfiguration.Configs.Clear();
+            _modifiedConfiguration.Configs.AddRange(ServerConfigViewModel.ServerTreeViewModelToList(ServerConfigViewModel.ServersTreeViewCollection));
             if (oldServerId != null)
             {
-                var currentIndex = _modifiedConfiguration.configs.FindIndex(server => server.Id == oldServerId);
+                var currentIndex = _modifiedConfiguration.Configs.FindIndex(server => server.Id == oldServerId);
                 if (currentIndex != -1)
                 {
-                    _modifiedConfiguration.index = currentIndex;
+                    _modifiedConfiguration.Index = currentIndex;
                 }
             }
 
-            if (_modifiedConfiguration.configs.Count == 0)
+            if (_modifiedConfiguration.Configs.Count == 0)
             {
                 MessageBox.Show(this.GetWindowStringValue(@"NoServer"));
                 return false;
