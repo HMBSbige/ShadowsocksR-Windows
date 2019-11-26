@@ -7,11 +7,12 @@ set version=%version:~32,-2%
 
 echo Version: %version%
 
-echo package .NET Core
-7z a -mx9 ShadowsocksR-netcore-%version%.7z %~dp0\shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\ShadowsocksR.exe %~dp0\shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\ShadowsocksR.dll %~dp0\shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\ShadowsocksR.runtimeconfig.json
-
 echo package .NET Framework
 7z a -mx9 ShadowsocksR-net48-%version%.7z %~dp0\shadowsocks-csharp\bin\Release\net48\ShadowsocksR.exe %~dp0\shadowsocks-csharp\bin\Release\net48\ShadowsocksR.exe.config
+
+echo package .NET Core
+7z a -mx9 ShadowsocksR-netcore-%version%.7z %~dp0\shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\
+7z rn ShadowsocksR-netcore-%version%.7z publish ShadowsocksR
 
 echo package .NET Core SelfContained x86
 7z a -mx9 ShadowsocksR-Portable-Win32-%version%.7z %~dp0\shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x86\publish\

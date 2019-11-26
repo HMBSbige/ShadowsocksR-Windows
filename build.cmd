@@ -23,11 +23,9 @@ cd %mainDir%\shadowsocks-csharp
 echo Building .NET Framework x86 and x64
 msbuild -v:m -r -t:Build -p:Configuration=%configuration% -p:TargetFramework=%net_tfm% || goto :error
 
-echo Building .NET Core
-msbuild -v:m -r -t:Publish -p:Configuration=%configuration% -p:TargetFramework=%netcore_tfm% || goto :error
-
-call:Build-NetCore x86
-call:Build-NetCore x64
+call:Build-NetCore
+call:Build-NetCoreSelfContained x86
+call:Build-NetCoreSelfContained x64
 
 cd %mainDir%
 goto :EOF
@@ -37,13 +35,36 @@ cd %mainDir%
 exit /b %errorlevel%
 
 :Build-NetCore
+echo Building .NET Core
+
+set outdir=%net_baseoutput%\%netcore_tfm%
+set publishDir=%outdir%\publish
+
+rd /S /Q %publishDir%
+
+msbuild -v:m -r -t:Publish -p:Configuration=%configuration% -p:TargetFramework=%netcore_tfm% || goto :error
+
+set tmpbin=tmpbin
+ren %publishDir% %tmpbin%
+md %publishDir%
+move %outdir%\%tmpbin% %publishDir%
+ren %publishDir%\%tmpbin% bin
+move %publishDir%\bin\ShadowsocksR.exe %publishDir%
+
+echo Patching .NET Core
+%apphostpatcherDir%\bin\%configuration%\%netcore_tfm%\AppHostPatcher.exe %publishDir%\ShadowsocksR.exe -d bin || goto :error
+echo Build .NET Core completed
+
+goto :EOF
+
+:Build-NetCoreSelfContained
 echo Building .NET Core SelfContained %1
 
 set rid=win-%1
 set outdir=%net_baseoutput%\%netcore_tfm%\%rid%
 set publishDir=%outdir%\publish
 
-rd /S /Q %outdir%\publish
+rd /S /Q %publishDir%
 
 msbuild -v:m -r -t:Publish -p:Configuration=%configuration% -p:TargetFramework=%netcore_tfm% -p:RuntimeIdentifier=%rid% -p:SelfContained=True -p:PublishReadyToRun=True || goto :error
 

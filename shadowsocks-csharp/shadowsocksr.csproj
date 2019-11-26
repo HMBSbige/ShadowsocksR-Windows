@@ -48,9 +48,9 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Costura.Fody" Version="4.1.0" Condition=" '$(SelfContained)' != 'true' " />
+    <PackageReference Include="Costura.Fody" Version="4.1.0" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' " />
     <PackageReference Include="DnsClient" Version="1.2.0" />
-    <PackageReference Include="Fody" Version="6.0.4" Condition=" '$(SelfContained)' != 'true' ">
+    <PackageReference Include="Fody" Version="6.0.4" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' ">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
