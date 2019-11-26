@@ -15,14 +15,10 @@ set net_baseoutput=%mainDir%\shadowsocks-csharp\bin\%configuration%
 set apphostpatcherDir=%mainDir%\AppHostPatcher
 
 cd %apphostpatcherDir%
-echo Building AppHostPatcher
-msbuild -v:m -r -t:Publish -p:Configuration=%configuration% -p:TargetFramework=%netcore_tfm% || goto :error
+call:Build-AppHostPatcher
 
 cd %mainDir%\shadowsocks-csharp
-
-echo Building .NET Framework x86 and x64
-msbuild -v:m -r -t:Build -p:Configuration=%configuration% -p:TargetFramework=%net_tfm% || goto :error
-
+call:Build-NetFramework
 call:Build-NetCore
 call:Build-NetCoreSelfContained x86
 call:Build-NetCoreSelfContained x64
@@ -33,6 +29,27 @@ goto :EOF
 :error
 cd %mainDir%
 exit /b %errorlevel%
+
+:Build-AppHostPatcher
+echo Building AppHostPatcher
+
+set outdir=%apphostpatcherDir%\bin\%configuration%\%netcore_tfm%
+set publishDir=%outdir%\publish
+
+rd /S /Q %publishDir%
+
+msbuild -v:m -r -t:Publish -p:Configuration=%configuration% -p:TargetFramework=%netcore_tfm% || goto :error
+
+goto :EOF
+
+:Build-NetFramework
+echo Building .NET Framework x86 and x64
+
+set outdir=%net_baseoutput%\%net_tfm%
+
+msbuild -v:m -r -t:Build -p:Configuration=%configuration% -p:TargetFramework=%net_tfm% || goto :error
+
+goto :EOF
 
 :Build-NetCore
 echo Building .NET Core
