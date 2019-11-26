@@ -51,8 +51,8 @@ namespace Shadowsocks.Controller.Service
                 privoxyConfig = privoxyConfig.Replace(@"__SOCKS_PORT__", configuration.localPort.ToString());
                 privoxyConfig = privoxyConfig.Replace(@"__PRIVOXY_BIND_PORT__", RunningPort.ToString());
                 privoxyConfig = privoxyConfig.Replace(@"__PRIVOXY_BIND_IP__",
-                configuration.shareOverLan ? Configuration.AnyHost : Configuration.LocalHost)
-                .Replace(@"__SOCKS_HOST__", Configuration.LocalHost);
+                configuration.shareOverLan ? GlobalConfiguration.AnyHost : GlobalConfiguration.LocalHost)
+                .Replace(@"__SOCKS_HOST__", GlobalConfiguration.LocalHost);
                 FileManager.ByteArrayToFile(Utils.GetTempPath(UNIQUE_CONFIG_FILE), Encoding.UTF8.GetBytes(privoxyConfig));
 
                 _process = new Process

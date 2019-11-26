@@ -65,16 +65,8 @@ namespace Shadowsocks.Model
         private Dictionary<int, PortMapConfigCache> portMapCache = new Dictionary<int, PortMapConfigCache>();
         private LRUCache<string, UriVisitTime> uricache = new LRUCache<string, UriVisitTime>(180);
 
-        private const string CONFIG_FILE = @"gui-config.json";
-        private const string CONFIG_FILE_BACKUP = @"gui-config.json.backup";
-
-        [JsonIgnore]
-        public static string LocalHost => GlobalConfiguration.OSSupportsLocalIPv6
-                ? $@"[{IPAddress.IPv6Loopback}]"
-                : $@"{IPAddress.Loopback}";
-
-        [JsonIgnore]
-        public static string AnyHost => GlobalConfiguration.OSSupportsLocalIPv6 ? $@"[{IPAddress.IPv6Any}]" : $@"{IPAddress.Any}";
+        private const string ConfigFile = @"gui-config.json";
+        private const string ConfigFileBackup = @"gui-config.json.backup";
 
         public bool KeepCurrentServer(int port, string targetAddr, string id)
         {
@@ -406,7 +398,7 @@ namespace Shadowsocks.Model
 
         public static Configuration Load()
         {
-            return LoadFile(CONFIG_FILE);
+            return LoadFile(ConfigFile);
         }
 
         public static void Save(Configuration config)
@@ -422,24 +414,24 @@ namespace Shadowsocks.Model
             try
             {
                 var jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
-                using (var sw = new StreamWriter(File.Open(CONFIG_FILE, FileMode.Create)))
+                using (var sw = new StreamWriter(File.Open(ConfigFile, FileMode.Create)))
                 {
                     sw.Write(jsonString);
                     sw.Flush();
                 }
 
-                if (File.Exists(CONFIG_FILE_BACKUP))
+                if (File.Exists(ConfigFileBackup))
                 {
-                    var dt = File.GetLastWriteTimeUtc(CONFIG_FILE_BACKUP);
+                    var dt = File.GetLastWriteTimeUtc(ConfigFileBackup);
                     var now = DateTime.Now;
                     if ((now - dt).TotalHours > 4)
                     {
-                        File.Copy(CONFIG_FILE, CONFIG_FILE_BACKUP, true);
+                        File.Copy(ConfigFile, ConfigFileBackup, true);
                     }
                 }
                 else
                 {
-                    File.Copy(CONFIG_FILE, CONFIG_FILE_BACKUP, true);
+                    File.Copy(ConfigFile, ConfigFileBackup, true);
                 }
             }
             catch (IOException e)
