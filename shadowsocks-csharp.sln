@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shadowsocksr", "shadowsocks-csharp\shadowsocksr.csproj", "{0F2A0C8A-6C06-485B-AA13-AEEC19CA9637}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "shadowsocksr", "shadowsocks-csharp\shadowsocksr.csproj", "{0F2A0C8A-6C06-485B-AA13-AEEC19CA9637}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{C4B1E5EC-C6BE-4726-B8CA-B4C84D4852B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTest", "UnitTest\UnitTest.csproj", "{C4B1E5EC-C6BE-4726-B8CA-B4C84D4852B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppHostPatcher", "AppHostPatcher\AppHostPatcher.csproj", "{AD574411-06A5-40EC-9278-B246A8DB7E75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{C4B1E5EC-C6BE-4726-B8CA-B4C84D4852B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4B1E5EC-C6BE-4726-B8CA-B4C84D4852B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4B1E5EC-C6BE-4726-B8CA-B4C84D4852B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD574411-06A5-40EC-9278-B246A8DB7E75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD574411-06A5-40EC-9278-B246A8DB7E75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD574411-06A5-40EC-9278-B246A8DB7E75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD574411-06A5-40EC-9278-B246A8DB7E75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -15,8 +15,8 @@ echo package .NET Framework
 
 echo package .NET Core SelfContained x86
 7z a -mx9 ShadowsocksR-Portable-Win32-%version%.7z %~dp0\shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x86\publish\
-7z rn ShadowsocksR-Portable-Win32-%version%.7z publish\ ShadowsocksR\
+7z rn ShadowsocksR-Portable-Win32-%version%.7z publish ShadowsocksR
 
 echo package .NET Core SelfContained x64
 7z a -mx9 ShadowsocksR-Portable-Win64-%version%.7z %~dp0\shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x64\publish\
-7z rn ShadowsocksR-Portable-Win64-%version%.7z publish\ ShadowsocksR\
+7z rn ShadowsocksR-Portable-Win64-%version%.7z publish ShadowsocksR

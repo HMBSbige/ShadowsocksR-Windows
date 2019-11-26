@@ -7,23 +7,55 @@ REM dotnet build -c Release -f net48
 REM dotnet publish -c Release -f netcoreapp3.0 -r win-x86 --self-contained
 REM dotnet publish -c Release -f netcoreapp3.0 -r win-x64 --self-contained
 
-cd shadowsocks-csharp
+set netcore_tfm=netcoreapp3.0
+set net_tfm=net48
+set configuration=Release
+set mainDir=%cd%
+set net_baseoutput=%mainDir%\shadowsocks-csharp\bin\%configuration%
+set apphostpatcherDir=%mainDir%\AppHostPatcher
 
-echo Building .NET Core
-msbuild -v:m -r -t:Publish -p:Configuration=Release -p:TargetFramework=netcoreapp3.0 || goto :error
+cd %apphostpatcherDir%
+echo Building AppHostPatcher
+msbuild -v:m -r -t:Publish -p:Configuration=%configuration% -p:TargetFramework=%netcore_tfm% || goto :error
+
+cd %mainDir%\shadowsocks-csharp
 
 echo Building .NET Framework x86 and x64
-msbuild -v:m -r -t:Build -p:Configuration=Release -p:TargetFramework=net48 || goto :error
+msbuild -v:m -r -t:Build -p:Configuration=%configuration% -p:TargetFramework=%net_tfm% || goto :error
 
-echo Building .NET Core SelfContained x86
-msbuild -v:m -r -t:Publish -p:Configuration=Release -p:TargetFramework=netcoreapp3.0 -p:RuntimeIdentifier=win-x86 -p:SelfContained=True -p:PublishReadyToRun=True|| goto :error
+echo Building .NET Core
+msbuild -v:m -r -t:Publish -p:Configuration=%configuration% -p:TargetFramework=%netcore_tfm% || goto :error
 
-echo Building .NET Core SelfContained x64
-msbuild -v:m -r -t:Publish -p:Configuration=Release -p:TargetFramework=netcoreapp3.0 -p:RuntimeIdentifier=win-x64 -p:SelfContained=True -p:PublishReadyToRun=True|| goto :error
+call:Build-NetCore x86
+call:Build-NetCore x64
 
-cd..
+cd %mainDir%
 goto :EOF
 
 :error
-cd..
+cd %mainDir%
 exit /b %errorlevel%
+
+:Build-NetCore
+echo Building .NET Core SelfContained %1
+
+set rid=win-%1
+set outdir=%net_baseoutput%\%netcore_tfm%\%rid%
+set publishDir=%outdir%\publish
+
+rd /S /Q %outdir%\publish
+
+msbuild -v:m -r -t:Publish -p:Configuration=%configuration% -p:TargetFramework=%netcore_tfm% -p:RuntimeIdentifier=%rid% -p:SelfContained=True -p:PublishReadyToRun=True || goto :error
+
+set tmpbin=tmpbin
+ren %publishDir% %tmpbin%
+md %publishDir%
+move %outdir%\%tmpbin% %publishDir%
+ren %publishDir%\%tmpbin% bin
+move %publishDir%\bin\ShadowsocksR.exe %publishDir%
+
+echo Patching .NET Core SelfContained %1
+%apphostpatcherDir%\bin\%configuration%\%netcore_tfm%\AppHostPatcher.exe %publishDir%\ShadowsocksR.exe -d bin || goto :error
+echo Build .NET Core SelfContained %1 completed
+
+goto :EOF
