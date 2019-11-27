@@ -26,10 +26,9 @@ namespace Shadowsocks.Model
             get => url;
             set
             {
-                if (url != value)
+                if (SetField(ref url, value))
                 {
-                    url = value;
-                    OnPropertyChanged();
+                    SubscribeChanged?.Invoke(this, new EventArgs());
                 }
             }
         }
@@ -47,13 +46,11 @@ namespace Shadowsocks.Model
             {
                 if (UrlMd5 == value)
                 {
-                    tag = string.Empty;
-                    OnPropertyChanged();
+                    value = string.Empty;
                 }
-                else if (tag != value)
+                if (SetField(ref tag, value))
                 {
-                    tag = value;
-                    OnPropertyChanged();
+                    SubscribeChanged?.Invoke(this, new EventArgs());
                 }
             }
         }
@@ -63,10 +60,9 @@ namespace Shadowsocks.Model
             get => lastUpdateTime;
             set
             {
-                if (lastUpdateTime != value)
+                if (SetField(ref lastUpdateTime, value))
                 {
-                    lastUpdateTime = value;
-                    OnPropertyChanged();
+                    SubscribeChanged?.Invoke(this, new EventArgs());
                 }
             }
         }
@@ -76,20 +72,13 @@ namespace Shadowsocks.Model
             get => autoCheckUpdate;
             set
             {
-                if (autoCheckUpdate != value)
+                if (SetField(ref autoCheckUpdate, value))
                 {
-                    autoCheckUpdate = value;
-                    OnPropertyChanged();
+                    SubscribeChanged?.Invoke(this, new EventArgs());
                 }
             }
         }
 
         public event EventHandler SubscribeChanged;
-
-        protected override void OnPropertyChanged(string propertyName = null)
-        {
-            base.OnPropertyChanged(propertyName);
-            SubscribeChanged?.Invoke(this, new EventArgs());
-        }
     }
 }

@@ -50,7 +50,7 @@ namespace Shadowsocks.Proxy
             _connection = socket;
             socket.NoDelay = true;
 
-            if (_config.GetPortMapCache().ContainsKey(local_port) && _config.GetPortMapCache()[local_port].type == PortMapType.Forward)
+            if (_config.PortMapCache.ContainsKey(local_port) && _config.PortMapCache[local_port].type == PortMapType.Forward)
             {
                 Connect();
             }
@@ -99,11 +99,11 @@ namespace Shadowsocks.Proxy
 
         private bool AuthConnection(string authUser, string authPass)
         {
-            if ((_config.authUser ?? string.Empty).Length == 0)
+            if ((_config.AuthUser ?? string.Empty).Length == 0)
             {
                 return true;
             }
-            if (_config.authUser == authUser && (_config.authPass ?? "") == authPass)
+            if (_config.AuthUser == authUser && (_config.AuthPass ?? "") == authPass)
             {
                 return true;
             }
@@ -118,7 +118,7 @@ namespace Shadowsocks.Proxy
 
                 if (bytesRead > 1)
                 {
-                    if ((!string.IsNullOrEmpty(_config.authUser) || IPSubnet.IsLoopBack(((IPEndPoint)_connection.RemoteEndPoint).Address))
+                    if ((!string.IsNullOrEmpty(_config.AuthUser) || IPSubnet.IsLoopBack(((IPEndPoint)_connection.RemoteEndPoint).Address))
                         && _firstPacket[0] == 4 && _firstPacketLength >= 9)
                     {
                         RspSocks4aHandshakeReceive();
@@ -225,7 +225,7 @@ namespace Shadowsocks.Proxy
                 response[1] = 2;
                 _connection.BeginSend(response, 0, response.Length, SocketFlags.None, HandshakeAuthSendCallback, null);
             }
-            else if (string.IsNullOrEmpty(_config.authUser)
+            else if (string.IsNullOrEmpty(_config.AuthUser)
                      || IPSubnet.IsLoopBack(((IPEndPoint)_connection.RemoteEndPoint).Address))
             {
                 _connection.BeginSend(response, 0, response.Length, SocketFlags.None, HandshakeSendCallback, null);
@@ -448,8 +448,8 @@ namespace Shadowsocks.Proxy
             }
             else
             {
-                httpProxyState.httpAuthUser = _config.authUser;
-                httpProxyState.httpAuthPass = _config.authPass;
+                httpProxyState.httpAuthUser = _config.AuthUser;
+                httpProxyState.httpAuthPass = _config.AuthPass;
             }
             for (var i = 1; ; ++i)
             {
@@ -536,36 +536,36 @@ namespace Shadowsocks.Proxy
                 connectionUDP = _connectionUDP,
                 cfg =
                     {
-                            ReconnectTimesRemain = _config.reconnectTimes,
-                            Random = _config.random,
-                            ForceRandom = _config.random
+                            ReconnectTimesRemain = _config.ReconnectTimes,
+                            Random = _config.Random,
+                            ForceRandom = _config.Random
                     }
             };
 
             handler.setServerTransferTotal(_transfer);
-            if (_config.proxyEnable)
+            if (_config.ProxyEnable)
             {
-                handler.cfg.ProxyType = _config.proxyType;
-                handler.cfg.Socks5RemoteHost = _config.proxyHost;
-                handler.cfg.Socks5RemotePort = _config.proxyPort;
-                handler.cfg.Socks5RemoteUsername = _config.proxyAuthUser;
-                handler.cfg.Socks5RemotePassword = _config.proxyAuthPass;
-                handler.cfg.ProxyUserAgent = _config.proxyUserAgent;
+                handler.cfg.ProxyType = _config.ProxyType;
+                handler.cfg.Socks5RemoteHost = _config.ProxyHost;
+                handler.cfg.Socks5RemotePort = _config.ProxyPort;
+                handler.cfg.Socks5RemoteUsername = _config.ProxyAuthUser;
+                handler.cfg.Socks5RemotePassword = _config.ProxyAuthPass;
+                handler.cfg.ProxyUserAgent = _config.ProxyUserAgent;
             }
-            handler.cfg.Ttl = _config.TTL;
-            handler.cfg.ConnectTimeout = _config.connectTimeout;
-            handler.cfg.AutoSwitchOff = _config.autoBan;
-            if (!string.IsNullOrEmpty(_config.localDnsServer))
+            handler.cfg.Ttl = _config.Ttl;
+            handler.cfg.ConnectTimeout = _config.ConnectTimeout;
+            handler.cfg.AutoSwitchOff = _config.AutoBan;
+            if (!string.IsNullOrEmpty(_config.LocalDnsServer))
             {
-                handler.cfg.LocalDnsServers = _config.localDnsServer;
+                handler.cfg.LocalDnsServers = _config.LocalDnsServer;
             }
-            if (!string.IsNullOrEmpty(_config.dnsServer))
+            if (!string.IsNullOrEmpty(_config.DnsServer))
             {
-                handler.cfg.DnsServers = _config.dnsServer;
+                handler.cfg.DnsServers = _config.DnsServer;
             }
-            if (_config.GetPortMapCache().ContainsKey(local_port))
+            if (_config.PortMapCache.ContainsKey(local_port))
             {
-                var cfg = _config.GetPortMapCache()[local_port];
+                var cfg = _config.PortMapCache[local_port];
                 if (cfg.server == null || cfg.id == cfg.server.Id)
                 {
                     if (cfg.server != null)

@@ -48,11 +48,11 @@ namespace Shadowsocks.Controller.Service
                 }
                 var privoxyConfig = Resources.privoxy_conf;
                 RunningPort = GetFreePort();
-                privoxyConfig = privoxyConfig.Replace(@"__SOCKS_PORT__", configuration.localPort.ToString());
+                privoxyConfig = privoxyConfig.Replace(@"__SOCKS_PORT__", configuration.LocalPort.ToString());
                 privoxyConfig = privoxyConfig.Replace(@"__PRIVOXY_BIND_PORT__", RunningPort.ToString());
                 privoxyConfig = privoxyConfig.Replace(@"__PRIVOXY_BIND_IP__",
-                configuration.shareOverLan ? Configuration.AnyHost : Configuration.LocalHost)
-                .Replace(@"__SOCKS_HOST__", Configuration.LocalHost);
+                configuration.ShareOverLan ? Global.AnyHost : Global.LocalHost)
+                .Replace(@"__SOCKS_HOST__", Global.LocalHost);
                 FileManager.ByteArrayToFile(Utils.GetTempPath(UNIQUE_CONFIG_FILE), Encoding.UTF8.GetBytes(privoxyConfig));
 
                 _process = new Process
@@ -133,7 +133,7 @@ namespace Shadowsocks.Controller.Service
             try
             {
                 // TCP stack please do me a favor
-                var l = new TcpListener(GlobalConfiguration.OSSupportsLocalIPv6
+                var l = new TcpListener(Global.OSSupportsLocalIPv6
                         ? IPAddress.IPv6Loopback
                         : IPAddress.Loopback, 0);
                 l.Start();

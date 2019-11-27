@@ -22,7 +22,7 @@ namespace Shadowsocks.Controller.HttpRequest
                 var proxy = CreateProxy(config);
                 SubscribeTask = subscribeTask;
                 var url = subscribeTask.Url ?? DefaultUpdateUrl;
-                Update(proxy, config.connectTimeout * 1000, url, config.proxyUserAgent);
+                Update(proxy, config.ConnectTimeout * 1000, url, config.ProxyUserAgent);
             }
             catch (Exception e)
             {

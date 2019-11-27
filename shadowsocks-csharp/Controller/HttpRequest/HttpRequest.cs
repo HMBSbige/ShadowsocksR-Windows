@@ -84,10 +84,10 @@ namespace Shadowsocks.Controller.HttpRequest
 
         public static IWebProxy CreateProxy(Configuration config)
         {
-            var proxy = new WebProxy(Configuration.LocalHost, config.localPort);
-            if (!string.IsNullOrEmpty(config.authPass))
+            var proxy = new WebProxy(Global.LocalHost, config.LocalPort);
+            if (!string.IsNullOrEmpty(config.AuthPass))
             {
-                proxy.Credentials = new NetworkCredential(config.authUser, config.authPass);
+                proxy.Credentials = new NetworkCredential(config.AuthUser, config.AuthPass);
             }
 
             return proxy;

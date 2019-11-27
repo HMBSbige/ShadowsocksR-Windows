@@ -52,13 +52,13 @@ namespace Shadowsocks.Controller.HttpRequest
             {
                 var updater = new GitHubRelease.GitHubRelease(Owner, Repo);
                 var url = updater.AllReleaseUrl;
-                var userAgent = config.proxyUserAgent;
+                var userAgent = config.ProxyUserAgent;
                 var proxy = CreateProxy(config);
 
-                var json = await AutoGetAsync(url, proxy, userAgent, config.connectTimeout * 1000);
+                var json = await AutoGetAsync(url, proxy, userAgent, config.ConnectTimeout * 1000);
 
                 var releases = JsonConvert.DeserializeObject<List<Release>>(json);
-                var latestRelease = VersionUtil.GetLatestRelease(releases, config.isPreRelease);
+                var latestRelease = VersionUtil.GetLatestRelease(releases, config.IsPreRelease);
                 if (VersionUtil.CompareVersion(latestRelease.tag_name, Version) > 0)
                 {
                     LatestVersionNumber = latestRelease.tag_name;

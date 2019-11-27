@@ -1,105 +1,261 @@
 ﻿using Newtonsoft.Json;
 using Shadowsocks.Enums;
 using Shadowsocks.Util;
+using Shadowsocks.ViewModel;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 
 namespace Shadowsocks.Model
 {
     [Serializable]
-    public class Configuration
+    public class Configuration : ViewModelBase
     {
-        #region Data
+        #region private
 
-        public List<Server> configs;
-        public int index;
-        public bool random;
-        public ProxyMode sysProxyMode;
-        public bool shareOverLan;
-        public int localPort;
-
-        public string localDnsServer;
-        public string dnsServer;
-        public int reconnectTimes;
-        public string balanceAlgorithm;
-        public bool randomInGroup;
-        public int TTL;
-        public int connectTimeout;
-
-        public ProxyRuleMode proxyRuleMode;
-
-        public bool proxyEnable;
-        public bool pacDirectGoProxy;
-        public int proxyType;
-        public string proxyHost;
-        public int proxyPort;
-        public string proxyAuthUser;
-        public string proxyAuthPass;
-        public string proxyUserAgent;
-
-        public string authUser;
-        public string authPass;
-
-        public bool autoBan;
-        public bool checkSwitchAutoCloseAll;
-        public bool logEnable;
-        public bool sameHostForSameTarget;
-
-        public int keepVisitTime;
-
-        public bool isPreRelease;
-        public bool AutoCheckUpdate;
-
-        public string LangName;
-
-        public List<ServerSubscribe> serverSubscribes;
-
-        public Dictionary<string, PortMapConfig> portMap = new Dictionary<string, PortMapConfig>();
+        private List<Server> _configs;
+        private int _index;
+        private bool _random;
+        private ProxyMode _sysProxyMode;
+        private bool _shareOverLan;
+        private int _localPort;
+        private string _localDnsServer;
+        private string _dnsServer;
+        private int _reconnectTimes;
+        private string _balanceAlgorithm;
+        private bool _randomInGroup;
+        private int _ttl;
+        private int _connectTimeout;
+        private ProxyRuleMode _proxyRuleMode;
+        private bool _proxyEnable;
+        private bool _pacDirectGoProxy;
+        private int _proxyType;
+        private string _proxyHost;
+        private int _proxyPort;
+        private string _proxyAuthUser;
+        private string _proxyAuthPass;
+        private string _proxyUserAgent;
+        private string _authUser;
+        private string _authPass;
+        private bool _autoBan;
+        private bool _checkSwitchAutoCloseAll;
+        private bool _logEnable;
+        private bool _sameHostForSameTarget;
+        private bool _isPreRelease;
+        private bool _autoCheckUpdate;
+        private string _langName;
+        private List<ServerSubscribe> _serverSubscribes;
+        private Dictionary<string, PortMapConfig> _portMap;
 
         #endregion
 
-        private Dictionary<int, ServerSelectStrategy> serverStrategyMap = new Dictionary<int, ServerSelectStrategy>();
-        private Dictionary<int, PortMapConfigCache> portMapCache = new Dictionary<int, PortMapConfigCache>();
-        private LRUCache<string, UriVisitTime> uricache = new LRUCache<string, UriVisitTime>(180);
+        #region Public
 
-        private const string CONFIG_FILE = @"gui-config.json";
-        private const string CONFIG_FILE_BACKUP = @"gui-config.json.backup";
+        /// <summary>
+        /// 服务器列表
+        /// </summary>
+        public List<Server> Configs { get => _configs; set => SetField(ref _configs, value); }
+
+        /// <summary>
+        /// 选中的服务器在列表的位置
+        /// </summary>
+        public int Index { get => _index; set => SetField(ref _index, value); }
+
+        /// <summary>
+        /// 是否启用负载均衡
+        /// </summary>
+        public bool Random { get => _random; set => SetField(ref _random, value); }
+
+        /// <summary>
+        /// 系统代理模式
+        /// </summary>
+        public ProxyMode SysProxyMode { get => _sysProxyMode; set => SetField(ref _sysProxyMode, value); }
+
+        /// <summary>
+        /// 是否监听所有网卡
+        /// </summary>
+        public bool ShareOverLan { get => _shareOverLan; set => SetField(ref _shareOverLan, value); }
+
+        /// <summary>
+        /// 监听端口
+        /// </summary>
+        public int LocalPort { get => _localPort; set => SetField(ref _localPort, value); }
+
+        /// <summary>
+        /// 用于解析服务器地址的 DNS 服务器
+        /// </summary>
+        public string LocalDnsServer { get => _localDnsServer; set => SetField(ref _localDnsServer, value); }
+
+        /// <summary>
+        /// 用于解析访问网站的 DNS 服务器
+        /// </summary>
+        public string DnsServer { get => _dnsServer; set => SetField(ref _dnsServer, value); }
+
+        /// <summary>
+        /// 重连次数
+        /// </summary>
+        public int ReconnectTimes { get => _reconnectTimes; set => SetField(ref _reconnectTimes, value); }
+
+        /// <summary>
+        /// 负载均衡使用的算法
+        /// </summary>
+        public string BalanceAlgorithm { get => _balanceAlgorithm; set => SetField(ref _balanceAlgorithm, value); }
+
+        /// <summary>
+        /// 负载均衡是否只在所选组切换
+        /// </summary>
+        public bool RandomInGroup { get => _randomInGroup; set => SetField(ref _randomInGroup, value); }
+
+        /// <summary>
+        /// 空闲断开间隔（单位：秒）
+        /// </summary>
+        public int Ttl { get => _ttl; set => SetField(ref _ttl, value); }
+
+        /// <summary>
+        /// 连接超时（单位：秒）
+        /// </summary>
+        public int ConnectTimeout { get => _connectTimeout; set => SetField(ref _connectTimeout, value); }
+
+        /// <summary>
+        /// 代理规则模式
+        /// </summary>
+        public ProxyRuleMode ProxyRuleMode { get => _proxyRuleMode; set => SetField(ref _proxyRuleMode, value); }
+
+        /// <summary>
+        /// 是否开启二级代理
+        /// </summary>
+        public bool ProxyEnable { get => _proxyEnable; set => SetField(ref _proxyEnable, value); }
+
+        /// <summary>
+        /// PAC 的直连使用二级代理
+        /// </summary>
+        public bool PacDirectGoProxy { get => _pacDirectGoProxy; set => SetField(ref _pacDirectGoProxy, value); }
+
+        /// <summary>
+        /// 二级代理类型
+        /// </summary>
+        public int ProxyType { get => _proxyType; set => SetField(ref _proxyType, value); }
+
+        /// <summary>
+        /// 二级代理服务器地址
+        /// </summary>
+        public string ProxyHost { get => _proxyHost; set => SetField(ref _proxyHost, value); }
+
+        /// <summary>
+        /// 二级代理服务器端口
+        /// </summary>
+        public int ProxyPort { get => _proxyPort; set => SetField(ref _proxyPort, value); }
+
+        /// <summary>
+        /// 二级代理用户名
+        /// </summary>
+        public string ProxyAuthUser { get => _proxyAuthUser; set => SetField(ref _proxyAuthUser, value); }
+
+        /// <summary>
+        /// 二级代理密码
+        /// </summary>
+        public string ProxyAuthPass { get => _proxyAuthPass; set => SetField(ref _proxyAuthPass, value); }
+
+        /// <summary>
+        /// Http 请求所用的 UserAgent
+        /// </summary>
+        public string ProxyUserAgent { get => _proxyUserAgent; set => SetField(ref _proxyUserAgent, value); }
+
+        /// <summary>
+        /// 本地代理的用户名
+        /// </summary>
+        public string AuthUser { get => _authUser; set => SetField(ref _authUser, value); }
+
+        /// <summary>
+        /// 本地代理的密码
+        /// </summary>
+        public string AuthPass { get => _authPass; set => SetField(ref _authPass, value); }
+
+        /// <summary>
+        /// 自动禁用出错服务器
+        /// </summary>
+        public bool AutoBan { get => _autoBan; set => SetField(ref _autoBan, value); }
+
+        /// <summary>
+        /// 切换服务器前断开所有连接
+        /// </summary>
+        public bool CheckSwitchAutoCloseAll { get => _checkSwitchAutoCloseAll; set => SetField(ref _checkSwitchAutoCloseAll, value); }
+
+        /// <summary>
+        /// 是否开启日志
+        /// </summary>
+        public bool LogEnable { get => _logEnable; set => SetField(ref _logEnable, value); }
+
+        /// <summary>
+        /// 负载均衡优先使用同一个服务器访问同一地址
+        /// </summary>
+        public bool SameHostForSameTarget { get => _sameHostForSameTarget; set => SetField(ref _sameHostForSameTarget, value); }
+
+        /// <summary>
+        /// 检查更新是否包括测试版更新
+        /// </summary>
+        public bool IsPreRelease { get => _isPreRelease; set => SetField(ref _isPreRelease, value); }
+
+        /// <summary>
+        /// 自动检查更新
+        /// </summary>
+        public bool AutoCheckUpdate { get => _autoCheckUpdate; set => SetField(ref _autoCheckUpdate, value); }
+
+        /// <summary>
+        /// 所选的语言
+        /// </summary>
+        public string LangName { get => _langName; set => SetField(ref _langName, value); }
+
+        /// <summary>
+        /// 订阅列表
+        /// </summary>
+        public List<ServerSubscribe> ServerSubscribes { get => _serverSubscribes; set => SetField(ref _serverSubscribes, value); }
+
+        /// <summary>
+        /// 端口设置列表
+        /// </summary>
+        public Dictionary<string, PortMapConfig> PortMap { get => _portMap; set => SetField(ref _portMap, value); }
+
+        #endregion
+
+        #region NotConfig
+
+        private const int KeepVisitTime = 1800;
+
+        private readonly Dictionary<int, ServerSelectStrategy> _serverStrategyMap = new Dictionary<int, ServerSelectStrategy>();
 
         [JsonIgnore]
-        public static string LocalHost => GlobalConfiguration.OSSupportsLocalIPv6
-                ? $@"[{IPAddress.IPv6Loopback}]"
-                : $@"{IPAddress.Loopback}";
+        public Dictionary<int, PortMapConfigCache> PortMapCache { get; private set; } = new Dictionary<int, PortMapConfigCache>();
 
-        [JsonIgnore]
-        public static string AnyHost => GlobalConfiguration.OSSupportsLocalIPv6 ? $@"[{IPAddress.IPv6Any}]" : $@"{IPAddress.Any}";
+        private readonly LRUCache<string, UriVisitTime> _uriCache = new LRUCache<string, UriVisitTime>(180);
+
+        #endregion
 
         public bool KeepCurrentServer(int port, string targetAddr, string id)
         {
-            if (sameHostForSameTarget && targetAddr != null)
+            if (SameHostForSameTarget && targetAddr != null)
             {
-                lock (serverStrategyMap)
+                lock (_serverStrategyMap)
                 {
-                    if (!serverStrategyMap.ContainsKey(port))
-                        serverStrategyMap[port] = new ServerSelectStrategy();
+                    if (!_serverStrategyMap.ContainsKey(port))
+                        _serverStrategyMap[port] = new ServerSelectStrategy();
 
-                    if (uricache.ContainsKey(targetAddr))
+                    if (_uriCache.ContainsKey(targetAddr))
                     {
-                        var visit = uricache.Get(targetAddr);
+                        var visit = _uriCache.Get(targetAddr);
                         var j = -1;
-                        for (var i = 0; i < configs.Count; ++i)
+                        for (var i = 0; i < Configs.Count; ++i)
                         {
-                            if (configs[i].Id == id)
+                            if (Configs[i].Id == id)
                             {
                                 j = i;
                                 break;
                             }
                         }
-                        if (j >= 0 && visit.index == j && configs[j].Enable)
+                        if (j >= 0 && visit.index == j && Configs[j].Enable)
                         {
-                            uricache.Del(targetAddr);
+                            _uriCache.Del(targetAddr);
                             return true;
                         }
                     }
@@ -110,29 +266,29 @@ namespace Shadowsocks.Model
 
         public Server GetCurrentServer(int port, ServerSelectStrategy.FilterFunc filter, string targetAddr = null, bool cfgRandom = false, bool usingRandom = false, bool forceRandom = false)
         {
-            lock (serverStrategyMap)
+            lock (_serverStrategyMap)
             {
-                if (!serverStrategyMap.ContainsKey(port))
-                    serverStrategyMap[port] = new ServerSelectStrategy();
-                var serverStrategy = serverStrategyMap[port];
+                if (!_serverStrategyMap.ContainsKey(port))
+                    _serverStrategyMap[port] = new ServerSelectStrategy();
+                var serverStrategy = _serverStrategyMap[port];
 
-                uricache.SetTimeout(keepVisitTime);
-                uricache.Sweep();
-                if (sameHostForSameTarget && !forceRandom && targetAddr != null && uricache.ContainsKey(targetAddr))
+                _uriCache.SetTimeout(KeepVisitTime);
+                _uriCache.Sweep();
+                if (SameHostForSameTarget && !forceRandom && targetAddr != null && _uriCache.ContainsKey(targetAddr))
                 {
-                    var visit = uricache.Get(targetAddr);
-                    if (visit.index < configs.Count && configs[visit.index].Enable && configs[visit.index].SpeedLog.ErrorContinuousTimes == 0)
+                    var visit = _uriCache.Get(targetAddr);
+                    if (visit.index < Configs.Count && Configs[visit.index].Enable && Configs[visit.index].SpeedLog.ErrorContinuousTimes == 0)
                     {
-                        uricache.Del(targetAddr);
-                        return configs[visit.index];
+                        _uriCache.Del(targetAddr);
+                        return Configs[visit.index];
                     }
                 }
                 if (forceRandom)
                 {
                     int i;
-                    if (filter == null && randomInGroup)
+                    if (filter == null && RandomInGroup)
                     {
-                        i = serverStrategy.Select(configs, index, balanceAlgorithm, delegate (Server server, Server selServer)
+                        i = serverStrategy.Select(Configs, Index, BalanceAlgorithm, delegate (Server server, Server selServer)
                         {
                             if (selServer != null)
                                 return selServer.Group == server.Group;
@@ -141,17 +297,17 @@ namespace Shadowsocks.Model
                     }
                     else
                     {
-                        i = serverStrategy.Select(configs, index, balanceAlgorithm, filter, true);
+                        i = serverStrategy.Select(Configs, Index, BalanceAlgorithm, filter, true);
                     }
-                    return i == -1 ? GetErrorServer() : configs[i];
+                    return i == -1 ? GetErrorServer() : Configs[i];
                 }
 
                 if (usingRandom && cfgRandom)
                 {
                     int i;
-                    if (filter == null && randomInGroup)
+                    if (filter == null && RandomInGroup)
                     {
-                        i = serverStrategy.Select(configs, index, balanceAlgorithm, delegate (Server server, Server selServer)
+                        i = serverStrategy.Select(Configs, Index, BalanceAlgorithm, delegate (Server server, Server selServer)
                         {
                             if (selServer != null)
                                 return selServer.Group == server.Group;
@@ -160,7 +316,7 @@ namespace Shadowsocks.Model
                     }
                     else
                     {
-                        i = serverStrategy.Select(configs, index, balanceAlgorithm, filter);
+                        i = serverStrategy.Select(Configs, Index, BalanceAlgorithm, filter);
                     }
                     if (i == -1) return GetErrorServer();
                     if (targetAddr != null)
@@ -171,24 +327,24 @@ namespace Shadowsocks.Model
                             index = i,
                             visitTime = DateTime.Now
                         };
-                        uricache.Set(targetAddr, visit);
+                        _uriCache.Set(targetAddr, visit);
                     }
-                    return configs[i];
+                    return Configs[i];
                 }
 
-                if (index >= 0 && index < configs.Count)
+                if (Index >= 0 && Index < Configs.Count)
                 {
-                    var selIndex = index;
+                    var selIndex = Index;
                     if (usingRandom)
                     {
-                        foreach (var unused in configs)
+                        foreach (var unused in Configs)
                         {
-                            if (configs[selIndex].Enable)
+                            if (Configs[selIndex].Enable)
                             {
                                 break;
                             }
 
-                            selIndex = (selIndex + 1) % configs.Count;
+                            selIndex = (selIndex + 1) % Configs.Count;
                         }
                     }
 
@@ -200,9 +356,9 @@ namespace Shadowsocks.Model
                             index = selIndex,
                             visitTime = DateTime.Now
                         };
-                        uricache.Set(targetAddr, visit);
+                        _uriCache.Set(targetAddr, visit);
                     }
-                    return configs[selIndex];
+                    return Configs[selIndex];
                 }
 
                 return GetErrorServer();
@@ -211,10 +367,10 @@ namespace Shadowsocks.Model
 
         public void FlushPortMapCache()
         {
-            portMapCache = new Dictionary<int, PortMapConfigCache>();
+            PortMapCache = new Dictionary<int, PortMapConfigCache>();
             var id2server = new Dictionary<string, Server>();
             var server_group = new Dictionary<string, int>();
-            foreach (var s in configs)
+            foreach (var s in Configs)
             {
                 id2server[s.Id] = s;
                 if (!string.IsNullOrEmpty(s.Group))
@@ -222,13 +378,13 @@ namespace Shadowsocks.Model
                     server_group[s.Group] = 1;
                 }
             }
-            foreach (var pair in portMap)
+            foreach (var pair in PortMap)
             {
                 int key;
                 var pm = pair.Value;
-                if (!pm.enable)
+                if (!pm.Enable)
                     continue;
-                if (id2server.ContainsKey(pm.id) || server_group.ContainsKey(pm.id) || pm.id == null || pm.id.Length == 0)
+                if (id2server.ContainsKey(pm.Id) || server_group.ContainsKey(pm.Id) || pm.Id == null || pm.Id.Length == 0)
                 { }
                 else
                     continue;
@@ -240,136 +396,135 @@ namespace Shadowsocks.Model
                 {
                     continue;
                 }
-                portMapCache[key] = new PortMapConfigCache
+                PortMapCache[key] = new PortMapConfigCache
                 {
-                    type = pm.type,
-                    id = pm.id,
-                    server = id2server.ContainsKey(pm.id) ? id2server[pm.id] : null,
-                    server_addr = pm.server_addr,
-                    server_port = pm.server_port
+                    type = pm.Type,
+                    id = pm.Id,
+                    server = id2server.ContainsKey(pm.Id) ? id2server[pm.Id] : null,
+                    server_addr = pm.Server_addr,
+                    server_port = pm.Server_port
                 };
             }
-            lock (serverStrategyMap)
+            lock (_serverStrategyMap)
             {
                 var remove_ports = new List<int>();
-                foreach (var pair in serverStrategyMap)
+                foreach (var pair in _serverStrategyMap)
                 {
-                    if (portMapCache.ContainsKey(pair.Key)) continue;
+                    if (PortMapCache.ContainsKey(pair.Key)) continue;
                     remove_ports.Add(pair.Key);
                 }
                 foreach (var port in remove_ports)
                 {
-                    serverStrategyMap.Remove(port);
+                    _serverStrategyMap.Remove(port);
                 }
-                if (!portMapCache.ContainsKey(localPort))
-                    serverStrategyMap.Remove(localPort);
+                if (!PortMapCache.ContainsKey(LocalPort))
+                    _serverStrategyMap.Remove(LocalPort);
             }
 
-            uricache.Clear();
-        }
-
-        public Dictionary<int, PortMapConfigCache> GetPortMapCache()
-        {
-            return portMapCache;
+            _uriCache.Clear();
         }
 
         public Configuration()
         {
-            index = 0;
-            localPort = 1080;
-
-            reconnectTimes = 2;
-            keepVisitTime = 180;
-            connectTimeout = 5;
-            dnsServer = string.Empty;
-            localDnsServer = string.Empty;
-
-            balanceAlgorithm = LoadBalance.LowException.ToString();
-            random = false;
-            sysProxyMode = ProxyMode.NoModify;
-            proxyRuleMode = ProxyRuleMode.Disable;
-
-            checkSwitchAutoCloseAll = true;
-            logEnable = true;
-
+            Configs = new List<Server>();
+            Index = 0;
+            Random = false;
+            SysProxyMode = ProxyMode.NoModify;
+            ShareOverLan = false;
+            LocalPort = 1080;
+            LocalDnsServer = string.Empty;
+            DnsServer = string.Empty;
+            ReconnectTimes = 2;
+            BalanceAlgorithm = LoadBalance.LowException.ToString();
+            RandomInGroup = true;
+            Ttl = 180;
+            ConnectTimeout = 5;
+            ProxyRuleMode = ProxyRuleMode.Disable;
+            ProxyEnable = false;
+            PacDirectGoProxy = false;
+            ProxyType = 0;
+            ProxyHost = string.Empty;
+            ProxyPort = 1;
+            ProxyAuthUser = string.Empty;
+            ProxyAuthPass = string.Empty;
+            ProxyUserAgent = string.Empty;
+            AuthUser = string.Empty;
+            AuthPass = string.Empty;
+            AutoBan = false;
+            CheckSwitchAutoCloseAll = true;
+            LogEnable = true;
+            SameHostForSameTarget = true;
+            IsPreRelease = false;
             AutoCheckUpdate = true;
-            isPreRelease = true;
-
             LangName = string.Empty;
-
-            serverSubscribes = new List<ServerSubscribe>();
-
-            configs = new List<Server>();
+            ServerSubscribes = new List<ServerSubscribe>();
+            PortMap = new Dictionary<string, PortMapConfig>();
         }
 
         public void CopyFrom(Configuration config)
         {
-            configs = config.configs;
-            index = config.index;
-            random = config.random;
-            sysProxyMode = config.sysProxyMode;
-            shareOverLan = config.shareOverLan;
-            localPort = config.localPort;
-            reconnectTimes = config.reconnectTimes;
-            balanceAlgorithm = config.balanceAlgorithm;
-            randomInGroup = config.randomInGroup;
-            TTL = config.TTL;
-            connectTimeout = config.connectTimeout;
-            dnsServer = config.dnsServer;
-            localDnsServer = config.localDnsServer;
-            proxyEnable = config.proxyEnable;
-            pacDirectGoProxy = config.pacDirectGoProxy;
-            proxyType = config.proxyType;
-            proxyHost = config.proxyHost;
-            proxyPort = config.proxyPort;
-            proxyAuthUser = config.proxyAuthUser;
-            proxyAuthPass = config.proxyAuthPass;
-            proxyUserAgent = config.proxyUserAgent;
-            authUser = config.authUser;
-            authPass = config.authPass;
-            autoBan = config.autoBan;
-            checkSwitchAutoCloseAll = config.checkSwitchAutoCloseAll;
-            logEnable = config.logEnable;
-            sameHostForSameTarget = config.sameHostForSameTarget;
-            keepVisitTime = config.keepVisitTime;
+            Configs = config.Configs;
+            Index = config.Index;
+            Random = config.Random;
+            SysProxyMode = config.SysProxyMode;
+            ShareOverLan = config.ShareOverLan;
+            LocalPort = config.LocalPort;
+            LocalDnsServer = config.LocalDnsServer;
+            DnsServer = config.DnsServer;
+            ReconnectTimes = config.ReconnectTimes;
+            BalanceAlgorithm = config.BalanceAlgorithm;
+            RandomInGroup = config.RandomInGroup;
+            Ttl = config.Ttl;
+            ConnectTimeout = config.ConnectTimeout;
+            ProxyRuleMode = config.ProxyRuleMode;
+            ProxyEnable = config.ProxyEnable;
+            PacDirectGoProxy = config.PacDirectGoProxy;
+            ProxyType = config.ProxyType;
+            ProxyHost = config.ProxyHost;
+            ProxyPort = config.ProxyPort;
+            ProxyAuthUser = config.ProxyAuthUser;
+            ProxyAuthPass = config.ProxyAuthPass;
+            ProxyUserAgent = config.ProxyUserAgent;
+            AuthUser = config.AuthUser;
+            AuthPass = config.AuthPass;
+            AutoBan = config.AutoBan;
+            CheckSwitchAutoCloseAll = config.CheckSwitchAutoCloseAll;
+            LogEnable = config.LogEnable;
+            SameHostForSameTarget = config.SameHostForSameTarget;
+            IsPreRelease = config.IsPreRelease;
             AutoCheckUpdate = config.AutoCheckUpdate;
-            isPreRelease = config.isPreRelease;
-            serverSubscribes = config.serverSubscribes;
             LangName = config.LangName;
+            ServerSubscribes = config.ServerSubscribes;
+            //PortMap = config.PortMap;
         }
 
-        private void FixConfiguration()
+        public void FixConfiguration()
         {
-            if (!IsPort(localPort))
+            if (!IsPort(LocalPort))
             {
-                localPort = 1080;
+                LocalPort = 1080;
             }
-            if (keepVisitTime == 0)
+            if (PortMap == null)
             {
-                keepVisitTime = 180;
+                PortMap = new Dictionary<string, PortMapConfig>();
             }
-            if (portMap == null)
+            if (ConnectTimeout == 0)
             {
-                portMap = new Dictionary<string, PortMapConfig>();
+                ConnectTimeout = 5;
+                ReconnectTimes = 2;
+                Ttl = 180;
             }
-            if (connectTimeout == 0)
+            if (Index < 0 || Index >= Configs.Count)
             {
-                connectTimeout = 10;
-                reconnectTimes = 2;
-                TTL = 180;
-                keepVisitTime = 180;
+                Index = 0;
             }
-            if (index < 0 || index >= configs.Count)
+            if (Configs.Count == 0)
             {
-                index = 0;
-            }
-            if (configs.Count == 0)
-            {
-                configs.Add(GetDefaultServer());
+                Configs.Add(new Server());
             }
 
             var id = new HashSet<string>();
-            foreach (var server in configs)
+            foreach (var server in Configs)
             {
                 while (id.Contains(server.Id))
                 {
@@ -379,97 +534,9 @@ namespace Shadowsocks.Model
             }
         }
 
-        public static Configuration LoadFile(string filename)
-        {
-            Configuration config;
-            try
-            {
-                if (File.Exists(filename))
-                {
-                    var configContent = File.ReadAllText(filename);
-                    config = Load(configContent);
-                    if (config != null)
-                    {
-                        return config;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-
-            config = new Configuration();
-            config.FixConfiguration();
-            return config;
-        }
-
-        public static Configuration Load()
-        {
-            return LoadFile(CONFIG_FILE);
-        }
-
-        public static void Save(Configuration config)
-        {
-            if (config.index >= config.configs.Count)
-            {
-                config.index = config.configs.Count - 1;
-            }
-            if (config.index < 0)
-            {
-                config.index = 0;
-            }
-            try
-            {
-                var jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
-                using (var sw = new StreamWriter(File.Open(CONFIG_FILE, FileMode.Create)))
-                {
-                    sw.Write(jsonString);
-                    sw.Flush();
-                }
-
-                if (File.Exists(CONFIG_FILE_BACKUP))
-                {
-                    var dt = File.GetLastWriteTimeUtc(CONFIG_FILE_BACKUP);
-                    var now = DateTime.Now;
-                    if ((now - dt).TotalHours > 4)
-                    {
-                        File.Copy(CONFIG_FILE, CONFIG_FILE_BACKUP, true);
-                    }
-                }
-                else
-                {
-                    File.Copy(CONFIG_FILE, CONFIG_FILE_BACKUP, true);
-                }
-            }
-            catch (IOException e)
-            {
-                Console.Error.WriteLine(e);
-            }
-        }
-
-        public static Configuration Load(string config_str)
-        {
-            try
-            {
-                var config = JsonConvert.DeserializeObject<Configuration>(config_str);
-                config.FixConfiguration();
-                return config;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        private static Server GetDefaultServer()
-        {
-            return new Server();
-        }
-
         public bool IsDefaultConfig()
         {
-            return configs.All(server => server.server == GetDefaultServer().server);
+            return Configs.All(server => server.server == new Server().server);
         }
 
         private static Server GetErrorServer()

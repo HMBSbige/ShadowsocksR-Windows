@@ -32,7 +32,7 @@ namespace Shadowsocks.Controller.Service
         {
             _config = config;
             //Lots of software do not support ipv6 pac url yet
-            PacUrl = $@"http://{IPAddress.Loopback}:{config.localPort}/{ResourceName}?t={Utils.GetTimestamp(DateTime.Now)}";
+            PacUrl = $@"http://{IPAddress.Loopback}:{config.LocalPort}/{ResourceName}?t={Utils.GetTimestamp(DateTime.Now)}";
         }
 
         public override bool Handle(byte[] firstPacket, int length, Socket socket)
@@ -141,15 +141,15 @@ namespace Shadowsocks.Controller.Service
                     socksType == 4 ? $@"SOCKS {setProxy}" :
                     $@"PROXY {setProxy}";
 
-                if (_config.pacDirectGoProxy && _config.proxyEnable)
+                if (_config.PacDirectGoProxy && _config.ProxyEnable)
                 {
-                    if (_config.proxyType == 0)
+                    if (_config.ProxyType == 0)
                     {
-                        pac = pac.Replace(@"__DIRECT__", $@"SOCKS5 {_config.proxyHost}:{_config.proxyPort};DIRECT;");
+                        pac = pac.Replace(@"__DIRECT__", $@"SOCKS5 {_config.ProxyHost}:{_config.ProxyPort};DIRECT;");
                     }
-                    else if (_config.proxyType == 1)
+                    else if (_config.ProxyType == 1)
                     {
-                        pac = pac.Replace(@"__DIRECT__", $@"PROXY {_config.proxyHost}:{_config.proxyPort};DIRECT;");
+                        pac = pac.Replace(@"__DIRECT__", $@"PROXY {_config.ProxyHost}:{_config.ProxyPort};DIRECT;");
                     }
                 }
                 else
@@ -200,9 +200,9 @@ Connection: Close
                     : $@"{localEndPoint.Address}";
             return socksType switch
             {
-                5 => $@"SOCKS5 {localhost}:{_config.localPort};",
-                4 => $@"SOCKS {localhost}:{_config.localPort};",
-                _ => $@"PROXY {localhost}:{_config.localPort};"
+                5 => $@"SOCKS5 {localhost}:{_config.LocalPort};",
+                4 => $@"SOCKS {localhost}:{_config.LocalPort};",
+                _ => $@"PROXY {localhost}:{_config.LocalPort};"
             };
         }
     }

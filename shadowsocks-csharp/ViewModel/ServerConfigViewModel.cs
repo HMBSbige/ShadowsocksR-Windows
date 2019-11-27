@@ -7,9 +7,9 @@ using System.Linq;
 
 namespace Shadowsocks.ViewModel
 {
-    public class ServerViewModel : ViewModelBase
+    public class ServerConfigViewModel : ViewModelBase
     {
-        public ServerViewModel()
+        public ServerConfigViewModel()
         {
             ServersTreeViewCollection = new ObservableCollection<ServerTreeViewModel>();
         }
@@ -20,10 +20,8 @@ namespace Shadowsocks.ViewModel
             get => _serverTreeViewCollection;
             set
             {
-                if (_serverTreeViewCollection != value)
+                if (SetField(ref _serverTreeViewCollection, value))
                 {
-                    _serverTreeViewCollection = value;
-                    OnPropertyChanged();
                     ServersChanged?.Invoke(this, new EventArgs());
                 }
             }

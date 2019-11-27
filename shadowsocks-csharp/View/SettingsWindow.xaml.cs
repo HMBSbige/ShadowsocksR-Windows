@@ -13,7 +13,7 @@ namespace Shadowsocks.View
 {
     public partial class SettingsWindow
     {
-        public SettingsWindow(ShadowsocksController controller)
+        public SettingsWindow(MainController controller)
         {
             InitializeComponent();
             I18NUtil.SetLanguage(Resources, @"SettingsWindow");
@@ -63,13 +63,13 @@ namespace Shadowsocks.View
             ApplyButton.IsEnabled = false;
         }
 
-        private readonly ShadowsocksController _controller;
+        private readonly MainController _controller;
         private Configuration _modifiedConfiguration;
         private readonly List<string> _balanceIndexMap = new List<string>();
 
         private void UpdateTitle()
         {
-            Title = $@"{this.GetWindowStringValue(@"Title")}({(_controller.GetCurrentConfiguration().shareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{_controller.GetCurrentConfiguration().localPort} {this.GetWindowStringValue(@"Version")}:{UpdateChecker.FullVersion})";
+            Title = $@"{this.GetWindowStringValue(@"Title")}({(Global.GuiConfig.ShareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{Global.GuiConfig.LocalPort} {this.GetWindowStringValue(@"Version")}:{UpdateChecker.FullVersion})";
         }
 
         private void LoadItems()
@@ -90,39 +90,39 @@ namespace Shadowsocks.View
             try
             {
                 Configuration.CheckPort(ProxyPortNumber.NumValue);
-                _modifiedConfiguration.shareOverLan = ShareOverLanCheckBox.IsChecked.GetValueOrDefault();
-                _modifiedConfiguration.localPort = ProxyPortNumber.NumValue;
-                _modifiedConfiguration.reconnectTimes = ReconnectNumber.NumValue;
+                _modifiedConfiguration.ShareOverLan = ShareOverLanCheckBox.IsChecked.GetValueOrDefault();
+                _modifiedConfiguration.LocalPort = ProxyPortNumber.NumValue;
+                _modifiedConfiguration.ReconnectTimes = ReconnectNumber.NumValue;
 
                 if (AutoStartupCheckBox.IsChecked != AutoStartup.Check() && !AutoStartup.Set(AutoStartupCheckBox.IsChecked.GetValueOrDefault()))
                 {
                     MessageBox.Show(this.GetWindowStringValue(@"FailAutoStartUp"));
                 }
 
-                _modifiedConfiguration.random = BalanceCheckBox.IsChecked.GetValueOrDefault();
-                _modifiedConfiguration.balanceAlgorithm = BalanceComboBox.SelectedIndex >= 0 &&
+                _modifiedConfiguration.Random = BalanceCheckBox.IsChecked.GetValueOrDefault();
+                _modifiedConfiguration.BalanceAlgorithm = BalanceComboBox.SelectedIndex >= 0 &&
                                                           BalanceComboBox.SelectedIndex < _balanceIndexMap.Count
                         ? _balanceIndexMap[BalanceComboBox.SelectedIndex]
                         : LoadBalance.LowException.ToString();
-                _modifiedConfiguration.randomInGroup = BalanceInGroupCheckBox.IsChecked.GetValueOrDefault();
-                _modifiedConfiguration.TTL = TtlNumber.NumValue;
-                _modifiedConfiguration.connectTimeout = TimeoutNumber.NumValue;
-                _modifiedConfiguration.dnsServer = DnsTextBox.Text;
-                _modifiedConfiguration.localDnsServer = LocalDnsTextBox.Text;
-                _modifiedConfiguration.proxyEnable = SocksProxyCheckBox.IsChecked.GetValueOrDefault();
-                _modifiedConfiguration.pacDirectGoProxy = PacProxyCheckBox.IsChecked.GetValueOrDefault();
-                _modifiedConfiguration.proxyType = ProxyTypeComboBox.SelectedIndex;
-                _modifiedConfiguration.proxyHost = SocksServerTextBox.Text;
-                _modifiedConfiguration.proxyPort = SocksPortTextBox.NumValue;
-                _modifiedConfiguration.proxyAuthUser = SocksUserTextBox.Text;
-                _modifiedConfiguration.proxyAuthPass = SocksPassPasswordBox.Password;
-                _modifiedConfiguration.proxyUserAgent = SocksUserAgentTextBox.Text;
-                _modifiedConfiguration.authUser = AuthUserTextBox.Text;
-                _modifiedConfiguration.authPass = AuthPassPasswordBox.Password;
+                _modifiedConfiguration.RandomInGroup = BalanceInGroupCheckBox.IsChecked.GetValueOrDefault();
+                _modifiedConfiguration.Ttl = TtlNumber.NumValue;
+                _modifiedConfiguration.ConnectTimeout = TimeoutNumber.NumValue;
+                _modifiedConfiguration.DnsServer = DnsTextBox.Text;
+                _modifiedConfiguration.LocalDnsServer = LocalDnsTextBox.Text;
+                _modifiedConfiguration.ProxyEnable = SocksProxyCheckBox.IsChecked.GetValueOrDefault();
+                _modifiedConfiguration.PacDirectGoProxy = PacProxyCheckBox.IsChecked.GetValueOrDefault();
+                _modifiedConfiguration.ProxyType = ProxyTypeComboBox.SelectedIndex;
+                _modifiedConfiguration.ProxyHost = SocksServerTextBox.Text;
+                _modifiedConfiguration.ProxyPort = SocksPortTextBox.NumValue;
+                _modifiedConfiguration.ProxyAuthUser = SocksUserTextBox.Text;
+                _modifiedConfiguration.ProxyAuthPass = SocksPassPasswordBox.Password;
+                _modifiedConfiguration.ProxyUserAgent = SocksUserAgentTextBox.Text;
+                _modifiedConfiguration.AuthUser = AuthUserTextBox.Text;
+                _modifiedConfiguration.AuthPass = AuthPassPasswordBox.Password;
 
-                _modifiedConfiguration.autoBan = AutoBanCheckBox.IsChecked.GetValueOrDefault();
-                _modifiedConfiguration.checkSwitchAutoCloseAll = SwitchAutoCloseAllCheckBox.IsChecked.GetValueOrDefault();
-                _modifiedConfiguration.logEnable = LogEnableCheckBox.IsChecked.GetValueOrDefault();
+                _modifiedConfiguration.AutoBan = AutoBanCheckBox.IsChecked.GetValueOrDefault();
+                _modifiedConfiguration.CheckSwitchAutoCloseAll = SwitchAutoCloseAllCheckBox.IsChecked.GetValueOrDefault();
+                _modifiedConfiguration.LogEnable = LogEnableCheckBox.IsChecked.GetValueOrDefault();
 
                 return true;
             }
@@ -135,47 +135,47 @@ namespace Shadowsocks.View
 
         private void LoadSettings()
         {
-            ShareOverLanCheckBox.IsChecked = _modifiedConfiguration.shareOverLan;
-            ProxyPortNumber.NumValue = _modifiedConfiguration.localPort;
-            AuthUserTextBox.Text = _modifiedConfiguration.authUser;
-            AuthPassPasswordBox.Password = _modifiedConfiguration.authPass;
+            ShareOverLanCheckBox.IsChecked = _modifiedConfiguration.ShareOverLan;
+            ProxyPortNumber.NumValue = _modifiedConfiguration.LocalPort;
+            AuthUserTextBox.Text = _modifiedConfiguration.AuthUser;
+            AuthPassPasswordBox.Password = _modifiedConfiguration.AuthPass;
 
             AutoStartupCheckBox.IsChecked = AutoStartup.Check();
-            SwitchAutoCloseAllCheckBox.IsChecked = _modifiedConfiguration.checkSwitchAutoCloseAll;
-            BalanceCheckBox.IsChecked = _modifiedConfiguration.random;
+            SwitchAutoCloseAllCheckBox.IsChecked = _modifiedConfiguration.CheckSwitchAutoCloseAll;
+            BalanceCheckBox.IsChecked = _modifiedConfiguration.Random;
             var selectedIndex = 0;
             for (var i = 0; i < _balanceIndexMap.Count; ++i)
             {
-                if (_modifiedConfiguration.balanceAlgorithm == _balanceIndexMap[i])
+                if (_modifiedConfiguration.BalanceAlgorithm == _balanceIndexMap[i])
                 {
                     selectedIndex = i;
                     break;
                 }
             }
             BalanceComboBox.SelectedIndex = selectedIndex;
-            BalanceInGroupCheckBox.IsChecked = _modifiedConfiguration.randomInGroup;
-            AutoBanCheckBox.IsChecked = _modifiedConfiguration.autoBan;
-            LogEnableCheckBox.IsChecked = _modifiedConfiguration.logEnable;
+            BalanceInGroupCheckBox.IsChecked = _modifiedConfiguration.RandomInGroup;
+            AutoBanCheckBox.IsChecked = _modifiedConfiguration.AutoBan;
+            LogEnableCheckBox.IsChecked = _modifiedConfiguration.LogEnable;
 
-            DnsTextBox.Text = _modifiedConfiguration.dnsServer;
-            LocalDnsTextBox.Text = _modifiedConfiguration.localDnsServer;
-            ReconnectNumber.NumValue = _modifiedConfiguration.reconnectTimes;
-            TimeoutNumber.NumValue = _modifiedConfiguration.connectTimeout;
-            TtlNumber.NumValue = _modifiedConfiguration.TTL;
+            DnsTextBox.Text = _modifiedConfiguration.DnsServer;
+            LocalDnsTextBox.Text = _modifiedConfiguration.LocalDnsServer;
+            ReconnectNumber.NumValue = _modifiedConfiguration.ReconnectTimes;
+            TimeoutNumber.NumValue = _modifiedConfiguration.ConnectTimeout;
+            TtlNumber.NumValue = _modifiedConfiguration.Ttl;
 
-            SocksProxyCheckBox.IsChecked = _modifiedConfiguration.proxyEnable;
-            PacProxyCheckBox.IsChecked = _modifiedConfiguration.pacDirectGoProxy;
-            ProxyTypeComboBox.SelectedIndex = _modifiedConfiguration.proxyType;
-            SocksServerTextBox.Text = _modifiedConfiguration.proxyHost;
-            SocksPortTextBox.NumValue = _modifiedConfiguration.proxyPort;
-            SocksUserTextBox.Text = _modifiedConfiguration.proxyAuthUser;
-            SocksPassPasswordBox.Password = _modifiedConfiguration.proxyAuthPass;
-            SocksUserAgentTextBox.Text = _modifiedConfiguration.proxyUserAgent;
+            SocksProxyCheckBox.IsChecked = _modifiedConfiguration.ProxyEnable;
+            PacProxyCheckBox.IsChecked = _modifiedConfiguration.PacDirectGoProxy;
+            ProxyTypeComboBox.SelectedIndex = _modifiedConfiguration.ProxyType;
+            SocksServerTextBox.Text = _modifiedConfiguration.ProxyHost;
+            SocksPortTextBox.NumValue = _modifiedConfiguration.ProxyPort;
+            SocksUserTextBox.Text = _modifiedConfiguration.ProxyAuthUser;
+            SocksPassPasswordBox.Password = _modifiedConfiguration.ProxyAuthPass;
+            SocksUserAgentTextBox.Text = _modifiedConfiguration.ProxyUserAgent;
         }
 
         private void LoadCurrentConfiguration()
         {
-            _modifiedConfiguration = _controller.GetConfiguration();
+            _modifiedConfiguration = Global.Load();
             LoadSettings();
         }
 

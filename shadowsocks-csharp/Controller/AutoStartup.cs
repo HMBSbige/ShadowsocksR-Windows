@@ -16,7 +16,7 @@ namespace Shadowsocks.Controller
             RegistryKey runKey = null;
             try
             {
-                var path = Utils.GetExecutablePath();
+                var path = $@"""{Utils.GetExecutablePath()}""";
                 runKey = Utils.OpenRegKey(RegistryRunPath, true);
                 if (enabled)
                 {
@@ -32,7 +32,7 @@ namespace Shadowsocks.Controller
             catch //(Exception e)
             {
                 //Logging.LogUsefulException(e);
-                return Utils.RunAsAdmin(Constants.ParameterSetautorun) == 0;
+                return Utils.RunAsAdmin(Constants.ParameterSetAutoRun) == 0;
             }
             finally
             {

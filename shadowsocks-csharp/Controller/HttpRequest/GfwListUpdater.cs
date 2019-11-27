@@ -43,10 +43,10 @@ namespace Shadowsocks.Controller.HttpRequest
             Logging.Info($@"Checking GFWList from {GfwlistUrl}");
             try
             {
-                var userAgent = config.proxyUserAgent;
+                var userAgent = config.ProxyUserAgent;
                 var proxy = CreateProxy(config);
 
-                var content = await AutoGetAsync(GfwlistUrl, proxy, userAgent, config.connectTimeout * 1000, TimeSpan.FromMinutes(1).TotalMilliseconds);
+                var content = await AutoGetAsync(GfwlistUrl, proxy, userAgent, config.ConnectTimeout * 1000, TimeSpan.FromMinutes(1).TotalMilliseconds);
                 File.WriteAllText(Utils.GetTempPath(PACServer.gfwlist_FILE), content, Encoding.UTF8);
                 var pacFileChanged = MergeAndWritePacFile(content);
                 UpdateCompleted?.Invoke(this, new ResultEventArgs(pacFileChanged, PacType.GfwList));
@@ -114,10 +114,10 @@ namespace Shadowsocks.Controller.HttpRequest
         {
             try
             {
-                var userAgent = config.proxyUserAgent;
+                var userAgent = config.ProxyUserAgent;
                 var proxy = CreateProxy(config);
 
-                var content = await AutoGetAsync(url, proxy, userAgent, config.connectTimeout * 1000, TimeSpan.FromMinutes(1).TotalMilliseconds);
+                var content = await AutoGetAsync(url, proxy, userAgent, config.ConnectTimeout * 1000, TimeSpan.FromMinutes(1).TotalMilliseconds);
                 if (File.Exists(PACDaemon.PAC_FILE))
                 {
                     var original = FileManager.NonExclusiveReadAllText(PACDaemon.PAC_FILE);

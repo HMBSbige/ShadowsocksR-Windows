@@ -14,64 +14,173 @@ namespace Shadowsocks.Model
     {
         #region private
 
-        private string id;
+        private string _id;
         private string _server;
-        private ushort server_port;
-        private ushort server_udp_port;
-        private string password;
-        private string method;
-        private string protocol;
-        private string protocolparam;
+        private ushort _serverPort;
+        private ushort _serverUdpPort;
+        private string _password;
+        private string _method;
+        private string _protocol;
+        private string _protocolParam;
         private string _obfs;
-        private string obfsparam;
-        private string remarks_base64;
-        private string group;
-        private string subTag;
-        private bool enable;
-        private bool udp_over_tcp;
-
-        private object protocoldata;
-        private object obfsdata;
-
-        private ServerSpeedLog serverSpeedLog;
-        private DnsBuffer dnsBuffer = new DnsBuffer();
-        [JsonIgnore]
-        public Connections Connections { get; private set; } = new Connections();
-        private static readonly Server ForwardServer = new Server();
-
-        private int _index;
-        private bool _isSelected;
+        private string _obfsParam;
+        private string _remarksBase64;
+        private string _group;
+        private string _subTag;
+        private bool _enable;
+        private bool _udpOverTcp;
 
         #endregion
 
         #region Public
 
+        public string Id
+        {
+            get => _id;
+            set => SetField(ref _id, value);
+        }
+
+        public string server
+        {
+            get => _server;
+            set
+            {
+                if (SetField(ref _server, value))
+                {
+                    OnPropertyChanged(nameof(FriendlyName));
+                }
+            }
+        }
+
+        public ushort Server_Port
+        {
+            get => _serverPort;
+            set
+            {
+                if (SetField(ref _serverPort, value))
+                {
+                    OnPropertyChanged(nameof(FriendlyName));
+                }
+            }
+        }
+
+        public ushort Server_Udp_Port
+        {
+            get => _serverUdpPort;
+            set
+            {
+                if (SetField(ref _serverUdpPort, value))
+                {
+                    OnPropertyChanged(nameof(FriendlyName));
+                }
+            }
+        }
+
+        public string Password
+        {
+            get => _password;
+            set => SetField(ref _password, value);
+        }
+
+        public string Method
+        {
+            get => string.IsNullOrWhiteSpace(_method) ? @"aes-256-cfb" : _method;
+            set => SetField(ref _method, value);
+        }
+
+        public string Protocol
+        {
+            get => string.IsNullOrWhiteSpace(_protocol) ? @"origin" : _protocol;
+            set => SetField(ref _protocol, value);
+        }
+
+        public string ProtocolParam
+        {
+            get => _protocolParam ?? string.Empty;
+            set => SetField(ref _protocolParam, value);
+        }
+
+        public string obfs
+        {
+            get => string.IsNullOrWhiteSpace(_obfs) ? @"plain" : _obfs;
+            set => SetField(ref _obfs, value);
+        }
+
+        public string ObfsParam
+        {
+            get => _obfsParam ?? string.Empty;
+            set => SetField(ref _obfsParam, value);
+        }
+
+        public string Remarks_Base64
+        {
+            get => _remarksBase64;
+            set
+            {
+                if (SetField(ref _remarksBase64, value))
+                {
+                    OnPropertyChanged(nameof(Remarks));
+                    OnPropertyChanged(nameof(FriendlyName));
+                }
+            }
+        }
+
+        public string Group
+        {
+            get => _group;
+            set
+            {
+                if (SetField(ref _group, value))
+                {
+                    OnPropertyChanged(nameof(GroupName));
+                }
+            }
+        }
+
+        public string SubTag
+        {
+            get => _subTag;
+            set => SetField(ref _subTag, value);
+        }
+
+        public bool Enable
+        {
+            get => _enable;
+            set => SetField(ref _enable, value);
+        }
+
+        public bool UdpOverTcp
+        {
+            get => _udpOverTcp;
+            set
+            {
+                if (SetField(ref _udpOverTcp, value))
+                {
+                    OnPropertyChanged(nameof(ShowAdvSetting));
+                }
+            }
+        }
+
+        #endregion
+
+        #region NotConfig
+
+        private int _index;
+        private bool _isSelected;
+        private ServerSpeedLog _serverSpeedLog;
+
         [JsonIgnore]
         public int Index
         {
             get => _index;
-            set
-            {
-                if (_index != value)
-                {
-                    _index = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref _index, value);
         }
 
         [JsonIgnore]
         public bool IsSelected
         {
             get => _isSelected;
-            set
-            {
-                if (_isSelected != value)
-                {
-                    _isSelected = value;
-                    OnPropertyChanged();
-                }
-            }
+            set => SetField(ref _isSelected, value);
         }
 
         [JsonIgnore]
@@ -100,10 +209,10 @@ namespace Shadowsocks.Model
             }
             set
             {
-                var @new = Base64.EncodeUrlSafeBase64(value);
-                if (@new != Remarks_Base64)
+                var newValue = Base64.EncodeUrlSafeBase64(value);
+                if (newValue != Remarks_Base64)
                 {
-                    Remarks_Base64 = @new;
+                    Remarks_Base64 = newValue;
                 }
             }
         }
@@ -133,283 +242,88 @@ namespace Shadowsocks.Model
         }
 
         [JsonIgnore]
-        public string SsLink => GetSsLink();
+        public string SsLink
+        {
+            get
+            {
+                var parts = $@"{Method}:{Password}@{server}:{Server_Port}";
+                var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(parts)).Replace(@"=", string.Empty);
+                return $@"ss://{base64}";
+            }
+        }
 
         [JsonIgnore]
-        public string SsrLink => GetSsrLink();
+        public string SsrLink
+        {
+            get
+            {
+                var mainPart = $@"{server}:{Server_Port}:{Protocol}:{Method}:{obfs}:{Base64.EncodeUrlSafeBase64(Password)}";
+                var paramStr = $@"obfsparam={Base64.EncodeUrlSafeBase64(ObfsParam)}";
+                if (!string.IsNullOrEmpty(ProtocolParam))
+                {
+                    paramStr += $@"&protoparam={Base64.EncodeUrlSafeBase64(ProtocolParam)}";
+                }
+
+                if (!string.IsNullOrEmpty(Remarks))
+                {
+                    paramStr += $@"&remarks={Base64.EncodeUrlSafeBase64(Remarks)}";
+                }
+
+                if (!string.IsNullOrEmpty(Group))
+                {
+                    paramStr += $@"&group={Base64.EncodeUrlSafeBase64(Group)}";
+                }
+
+                if (UdpOverTcp)
+                {
+                    paramStr += @"&uot=1";
+                }
+
+                if (Server_Udp_Port > 0)
+                {
+                    paramStr += $@"&udpport={Server_Udp_Port}";
+                }
+
+                var base64 = Base64.EncodeUrlSafeBase64($@"{mainPart}/?{paramStr}");
+                return $@"ssr://{base64}";
+            }
+        }
 
         [JsonIgnore]
         public bool ShowAdvSetting => UdpOverTcp || Server_Udp_Port != 0;
 
         [JsonIgnore]
-        public object Protocoldata
-        {
-            get => protocoldata;
-            set
-            {
-                if (protocoldata != value)
-                {
-                    protocoldata = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        public object ProtocolData { get; set; }
 
         [JsonIgnore]
-        public object Obfsdata
-        {
-            get => obfsdata;
-            set
-            {
-                if (obfsdata != value)
-                {
-                    obfsdata = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        public object ObfsData { get; set; }
 
         [JsonIgnore]
         public ServerSpeedLog SpeedLog
         {
-            get => serverSpeedLog;
-            set
-            {
-                if (serverSpeedLog != value)
-                {
-                    serverSpeedLog = value;
-                    OnPropertyChanged();
-                }
-            }
+            get => _serverSpeedLog;
+            set => SetField(ref _serverSpeedLog, value);
         }
 
-        public string Id
-        {
-            get => id;
-            set
-            {
-                if (id != value)
-                {
-                    id = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        [JsonIgnore]
+        public Connections Connections { get; private set; } = new Connections();
 
-        public string server
-        {
-            get => _server;
-            set
-            {
-                if (_server != value)
-                {
-                    _server = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(FriendlyName));
-                }
-            }
-        }
+        [JsonIgnore]
+        public DnsBuffer DnsBuffer { get; private set; } = new DnsBuffer();
 
-        public ushort Server_Port
-        {
-            get => server_port;
-            set
-            {
-                if (server_port != value)
-                {
-                    server_port = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(FriendlyName));
-                }
-            }
-        }
-
-        public ushort Server_Udp_Port
-        {
-            get => server_udp_port;
-            set
-            {
-                if (server_udp_port != value)
-                {
-                    server_udp_port = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(ShowAdvSetting));
-                }
-            }
-        }
-
-        public string Password
-        {
-            get => password;
-            set
-            {
-                if (password != value)
-                {
-                    password = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public string Method
-        {
-            get => string.IsNullOrWhiteSpace(method) ? @"aes-256-cfb" : method;
-            set
-            {
-                if (method != value)
-                {
-                    method = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public string Protocol
-        {
-            get => string.IsNullOrWhiteSpace(protocol) ? @"origin" : protocol;
-            set
-            {
-                if (protocol != value)
-                {
-                    protocol = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public string ProtocolParam
-        {
-            get => protocolparam ?? string.Empty;
-            set
-            {
-                if (protocolparam != value)
-                {
-                    protocolparam = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public string obfs
-        {
-            get => string.IsNullOrWhiteSpace(_obfs) ? @"plain" : _obfs;
-            set
-            {
-                if (_obfs != value)
-                {
-                    _obfs = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public string ObfsParam
-        {
-            get => obfsparam ?? string.Empty;
-            set
-            {
-                if (obfsparam != value)
-                {
-                    obfsparam = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public string Group
-        {
-            get => group;
-            set
-            {
-                if (group != value)
-                {
-                    group = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(GroupName));
-                }
-            }
-        }
-
-        public string SubTag
-        {
-            get => subTag;
-            set
-            {
-                if (subTag != value)
-                {
-                    subTag = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public string Remarks_Base64
-        {
-            get => remarks_base64;
-            set
-            {
-                if (remarks_base64 != value)
-                {
-                    remarks_base64 = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(Remarks));
-                    OnPropertyChanged(nameof(FriendlyName));
-                }
-            }
-        }
-
-        public bool Enable
-        {
-            get => enable;
-            set
-            {
-                if (enable != value)
-                {
-                    enable = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public bool UdpOverTcp
-        {
-            get => udp_over_tcp;
-            set
-            {
-                if (udp_over_tcp != value)
-                {
-                    udp_over_tcp = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(ShowAdvSetting));
-                }
-            }
-        }
+        [JsonIgnore]
+        public static Server ForwardServer { get; } = new Server();
 
         #endregion
 
-        public static Server GetDefaultServer()
-        {
-            return new Server();
-        }
-
         public void CopyServer(Server oldServer)
         {
-            Protocoldata = oldServer.Protocoldata;
-            Obfsdata = oldServer.Obfsdata;
+            ProtocolData = oldServer.ProtocolData;
+            ObfsData = oldServer.ObfsData;
             SpeedLog = oldServer.SpeedLog;
-            dnsBuffer = oldServer.dnsBuffer;
+            DnsBuffer = oldServer.DnsBuffer;
             Connections = oldServer.Connections;
             Enable = oldServer.Enable;
-        }
-
-        public static Server GetForwardServerRef()
-        {
-            return ForwardServer;
-        }
-
-        public DnsBuffer DnsBuffer()
-        {
-            return dnsBuffer;
         }
 
         public object Clone()
@@ -429,8 +343,8 @@ namespace Shadowsocks.Model
                 UdpOverTcp = UdpOverTcp,
 
                 Id = Id,
-                Protocoldata = Protocoldata,
-                Obfsdata = Obfsdata
+                ProtocolData = ProtocolData,
+                ObfsData = ObfsData
             };
         }
 
@@ -608,57 +522,18 @@ namespace Shadowsocks.Model
                    && Group == serverObject.Group;
         }
 
-        private string GetSsLink()
-        {
-            var parts = $@"{Method}:{Password}@{server}:{Server_Port}";
-            var base64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(parts)).Replace(@"=", string.Empty);
-            return $@"ss://{base64}";
-        }
-
-        private string GetSsrLink()
-        {
-            var mainPart = $@"{server}:{Server_Port}:{Protocol}:{Method}:{obfs}:{Base64.EncodeUrlSafeBase64(Password)}";
-            var paramStr = $@"obfsparam={Base64.EncodeUrlSafeBase64(ObfsParam)}";
-            if (!string.IsNullOrEmpty(ProtocolParam))
-            {
-                paramStr += $@"&protoparam={Base64.EncodeUrlSafeBase64(ProtocolParam)}";
-            }
-
-            if (!string.IsNullOrEmpty(Remarks))
-            {
-                paramStr += $@"&remarks={Base64.EncodeUrlSafeBase64(Remarks)}";
-            }
-
-            if (!string.IsNullOrEmpty(Group))
-            {
-                paramStr += $@"&group={Base64.EncodeUrlSafeBase64(Group)}";
-            }
-
-            if (UdpOverTcp)
-            {
-                paramStr += @"&uot=1";
-            }
-
-            if (Server_Udp_Port > 0)
-            {
-                paramStr += $@"&udpport={Server_Udp_Port}";
-            }
-
-            var base64 = Base64.EncodeUrlSafeBase64($@"{mainPart}/?{paramStr}");
-            return $@"ssr://{base64}";
-        }
-
         public event EventHandler ServerChanged;
 
-        protected override void OnPropertyChanged(string propertyName = null)
+        protected override bool SetField<T>(ref T field, T value, string propertyName = @"")
         {
-            base.OnPropertyChanged(propertyName);
-            if (propertyName == null)
+            if (base.SetField(ref field, value, propertyName))
             {
-                base.OnPropertyChanged(nameof(SsLink));
-                base.OnPropertyChanged(nameof(SsrLink));
+                OnPropertyChanged(nameof(SsLink));
+                OnPropertyChanged(nameof(SsrLink));
                 ServerChanged?.Invoke(this, new EventArgs());
+                return true;
             }
+            return false;
         }
     }
 }

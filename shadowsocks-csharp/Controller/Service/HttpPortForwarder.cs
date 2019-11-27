@@ -55,7 +55,7 @@ namespace Shadowsocks.Controller.Service
                 _firstPacketLength = length;
                 _local = socket;
                 _targetPort = targetPort;
-                if ((_config.authUser ?? string.Empty).Length == 0
+                if ((_config.AuthUser ?? string.Empty).Length == 0
                 || IPSubnet.IsLoopBack(((IPEndPoint)_local.RemoteEndPoint).Address))
                 {
                     Connect();
@@ -72,8 +72,8 @@ namespace Shadowsocks.Controller.Service
                 {
                     _httpProxyState = new HttpParser(true);
                 }
-                _httpProxyState.httpAuthUser = _config.authUser;
-                _httpProxyState.httpAuthPass = _config.authPass;
+                _httpProxyState.httpAuthUser = _config.AuthUser;
+                _httpProxyState.httpAuthPass = _config.AuthPass;
                 var err = _httpProxyState.HandshakeReceive(_firstPacket, _firstPacketLength, out _);
                 if (err == 1)
                 {
@@ -174,7 +174,7 @@ namespace Shadowsocks.Controller.Service
             {
                 try
                 {
-                    var ipAddress = GlobalConfiguration.OSSupportsLocalIPv6 ? IPAddress.IPv6Loopback : IPAddress.Loopback;
+                    var ipAddress = Global.OSSupportsLocalIPv6 ? IPAddress.IPv6Loopback : IPAddress.Loopback;
                     var remoteEp = new IPEndPoint(ipAddress, _targetPort);
 
                     _remote = new WrappedSocket();

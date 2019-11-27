@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Shadowsocks.Model;
+using System;
 using System.Collections.ObjectModel;
-using Shadowsocks.Model;
 
 namespace Shadowsocks.ViewModel
 {
@@ -14,7 +14,7 @@ namespace Shadowsocks.ViewModel
         public void ReadConfig(Configuration config)
         {
             SubscribeCollection.Clear();
-            foreach (var serverSubscribe in config.serverSubscribes)
+            foreach (var serverSubscribe in config.ServerSubscribes)
             {
                 SubscribeCollection.Add(serverSubscribe);
             }
@@ -36,10 +36,8 @@ namespace Shadowsocks.ViewModel
             get => _subscribeCollection;
             set
             {
-                if (_subscribeCollection != value)
+                if (SetField(ref _subscribeCollection, value))
                 {
-                    _subscribeCollection = value;
-                    OnPropertyChanged();
                     SubscribesChanged?.Invoke(this, new EventArgs());
                 }
             }
@@ -51,10 +49,8 @@ namespace Shadowsocks.ViewModel
             get => _selectedServer;
             set
             {
-                if (_selectedServer != value)
+                if (SetField(ref _selectedServer, value))
                 {
-                    _selectedServer = value;
-                    OnPropertyChanged();
                     if (_selectedServer != null)
                     {
                         _selectedServer.SubscribeChanged -= _selectedServer_SubscribeChanged;
