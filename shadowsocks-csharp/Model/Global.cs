@@ -11,7 +11,6 @@ namespace Shadowsocks.Model
     public static class Global
     {
         private const string ConfigFile = @"gui-config.json";
-        private const string ConfigFileBackup = @"gui-config.json.backup";
 
         private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
 
@@ -98,20 +97,6 @@ namespace Shadowsocks.Model
                 finally
                 {
                     Lock.ExitWriteLock();
-                }
-
-                if (File.Exists(ConfigFileBackup))
-                {
-                    var dt = File.GetLastWriteTimeUtc(ConfigFileBackup);
-                    var now = DateTime.Now;
-                    if ((now - dt).TotalHours > 4)
-                    {
-                        File.Copy(ConfigFile, ConfigFileBackup, true);
-                    }
-                }
-                else
-                {
-                    File.Copy(ConfigFile, ConfigFileBackup, true);
                 }
             }
             catch (IOException e)
