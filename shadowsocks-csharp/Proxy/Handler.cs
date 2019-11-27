@@ -765,10 +765,9 @@ namespace Shadowsocks.Proxy
             Logging.Info($@"Connect {cfg.TargetHost}:{cfg.TargetPort.ToString()} via {server.server}:{server.Server_Port}");
 
             ResetTimeout(cfg.Ttl);
-            if (cfg.TargetHost != null)
+            if (Global.GuiConfig.ProxyRuleMode != ProxyRuleMode.Disable && cfg.TargetHost != null)
             {
                 var host = cfg.TargetHost;
-                //TODO
                 if (!IPAddress.TryParse(host, out var ipAddress))
                 {
                     ipAddress = DnsUtil.DnsBuffer.Get(host) ?? DnsUtil.QueryDns(host, host.IndexOf('.') >= 0 ? cfg.DnsServers : null);

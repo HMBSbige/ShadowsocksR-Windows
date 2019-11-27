@@ -292,13 +292,13 @@ namespace Shadowsocks.Controller
         public void ToggleSelectAutoCheckUpdate(bool enabled)
         {
             Global.GuiConfig.AutoCheckUpdate = enabled;
-            Global.Save(Global.GuiConfig);
+            Global.SaveConfig();
         }
 
         public void ToggleSelectAllowPreRelease(bool enabled)
         {
             Global.GuiConfig.IsPreRelease = enabled;
-            Global.Save(Global.GuiConfig);
+            Global.SaveConfig();
         }
 
         /// <summary>
@@ -306,7 +306,7 @@ namespace Shadowsocks.Controller
         /// </summary>
         private void SaveAndNotifyChanged()
         {
-            Global.Save(Global.GuiConfig);
+            Global.SaveConfig();
             Application.Current.Dispatcher?.InvokeAsync(() => { ConfigChanged?.Invoke(this, new EventArgs()); });
         }
 
@@ -315,7 +315,7 @@ namespace Shadowsocks.Controller
         /// </summary>
         public void SaveAndReload()
         {
-            Global.Save(Global.GuiConfig);
+            Global.SaveConfig();
             Reload();
         }
 

@@ -231,7 +231,7 @@ namespace Shadowsocks.View
                                 sameGroupServer.Enable = enable;
                             }
                         }
-                        Global.Save(Global.GuiConfig);
+                        Global.SaveConfig();
                     }
                 }
                 else
@@ -340,7 +340,7 @@ namespace Shadowsocks.View
                 if (entry.IsRecords && entry is RecordEntry recordEntry && recordEntry.Data is Server server)
                 {
                     server.Enable = !server.Enable;
-                    Global.Save(Global.GuiConfig);
+                    Global.SaveConfig();
                 }
             }
         }

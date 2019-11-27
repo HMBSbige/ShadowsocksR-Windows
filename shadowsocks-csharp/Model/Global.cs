@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Shadowsocks.Controller;
+using Shadowsocks.Util;
 using System;
 using System.IO;
 using System.Net;
+using System.Threading;
 
 namespace Shadowsocks.Model
 {
@@ -10,6 +12,8 @@ namespace Shadowsocks.Model
     {
         private const string ConfigFile = @"gui-config.json";
         private const string ConfigFileBackup = @"gui-config.json.backup";
+
+        private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
 
         public static bool OSSupportsLocalIPv6 = false;
 
@@ -72,22 +76,29 @@ namespace Shadowsocks.Model
             GuiConfig = Load();
         }
 
-        public static void Save(Configuration config)
+        public static void SaveConfig()
         {
-            if (config.Index >= config.Configs.Count)
+            if (GuiConfig.Index >= GuiConfig.Configs.Count)
             {
-                config.Index = config.Configs.Count - 1;
+                GuiConfig.Index = GuiConfig.Configs.Count - 1;
             }
-
-            if (config.Index < 0)
+            else if (GuiConfig.Index < 0)
             {
-                config.Index = 0;
+                GuiConfig.Index = 0;
             }
 
             try
             {
-                var jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
-                File.WriteAllText(ConfigFile, jsonString);
+                var jsonString = JsonConvert.SerializeObject(GuiConfig, Formatting.Indented);
+                Lock.EnterWriteLock();
+                try
+                {
+                    Utils.WriteAllTextAsync(ConfigFile, jsonString);
+                }
+                finally
+                {
+                    Lock.ExitWriteLock();
+                }
 
                 if (File.Exists(ConfigFileBackup))
                 {
