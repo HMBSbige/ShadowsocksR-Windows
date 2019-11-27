@@ -22,7 +22,7 @@ namespace Shadowsocks.Controller.HttpRequest
 
         public const string Name = @"ShadowsocksR";
         public const string Copyright = @"Copyright © HMBSbige 2019 & BreakWa11 2017. Fork from Shadowsocks by clowwindy";
-        public const string Version = @"5.1.7.1";
+        public const string Version = @"5.1.7.2";
 
         public const string FullVersion = Version +
 #if IsDotNetCore
@@ -31,19 +31,16 @@ namespace Shadowsocks.Controller.HttpRequest
         @"" +
 #endif
 #if IsSelfContainedDotNetCore
-        @" SelfContained" +
 #if Is64Bit
             @" x64" +
 #else
             @"" +
 #endif
-#else
-        @"" +
 #endif
 #if DEBUG
         @" Debug";
 #else
-        "";
+        @"";
 #endif
 
         public async void Check(Configuration config, bool notifyNoFound)
