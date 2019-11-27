@@ -1,18 +1,14 @@
 ﻿using Newtonsoft.Json;
 using Shadowsocks.Controller;
-using Shadowsocks.Util;
 using System;
 using System.IO;
 using System.Net;
-using System.Threading;
 
 namespace Shadowsocks.Model
 {
     public static class Global
     {
         private const string ConfigFile = @"gui-config.json";
-
-        private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
 
         public static bool OSSupportsLocalIPv6 = false;
 
@@ -89,15 +85,7 @@ namespace Shadowsocks.Model
             try
             {
                 var jsonString = JsonConvert.SerializeObject(GuiConfig, Formatting.Indented);
-                Lock.EnterWriteLock();
-                try
-                {
-                    Utils.WriteAllTextAsync(ConfigFile, jsonString);
-                }
-                finally
-                {
-                    Lock.ExitWriteLock();
-                }
+                File.WriteAllText(ConfigFile, jsonString);
             }
             catch (IOException e)
             {
