@@ -269,7 +269,6 @@ namespace Shadowsocks.Controller
         public void ToggleRuleMode(ProxyRuleMode mode)
         {
             Global.GuiConfig.ProxyRuleMode = mode;
-            ReloadProxyRule();
             SaveAndNotifyChanged();
         }
 
@@ -302,7 +301,7 @@ namespace Shadowsocks.Controller
         }
 
         /// <summary>
-        /// 保存配置文件并重载
+        /// 保存配置文件并通知配置改变
         /// </summary>
         private void SaveAndNotifyChanged()
         {
@@ -313,7 +312,7 @@ namespace Shadowsocks.Controller
         /// <summary>
         /// 保存配置文件并重载
         /// </summary>
-        public void SaveAndReload()
+        private void SaveAndReload()
         {
             Global.SaveConfig();
             Reload();
