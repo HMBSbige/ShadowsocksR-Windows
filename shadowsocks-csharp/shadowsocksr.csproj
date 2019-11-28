@@ -71,11 +71,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controller\SystemProxy\" />
-    <Folder Include="Util\SingleInstance\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
