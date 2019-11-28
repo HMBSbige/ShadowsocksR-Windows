@@ -31,8 +31,8 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <None Remove="Controls\MaskedTextBox.xaml" />
-    <None Remove="Controls\NumberUpDown.xaml" />
+    <None Remove="View\Controls\MaskedTextBox.xaml" />
+    <None Remove="View\Controls\NumberUpDown.xaml" />
     <None Remove="Resources\ssw128.png" />
     <None Remove="View\LogWindow.xaml" />
     <None Remove="View\PortSettingsWindow.xaml" />

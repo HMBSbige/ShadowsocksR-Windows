@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Shadowsocks.GitHubRelease
+namespace Shadowsocks.Util.GitHubRelease
 {
     public static class VersionUtil
     {

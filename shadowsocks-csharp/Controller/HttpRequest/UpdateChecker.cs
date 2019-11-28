@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
-using Shadowsocks.GitHubRelease;
 using Shadowsocks.Model;
 using System;
 using System.Collections.Generic;
+using Shadowsocks.Util.GitHubRelease;
 
 namespace Shadowsocks.Controller.HttpRequest
 {
@@ -50,7 +50,7 @@ namespace Shadowsocks.Controller.HttpRequest
         {
             try
             {
-                var updater = new GitHubRelease.GitHubRelease(Owner, Repo);
+                var updater = new GitHubRelease(Owner, Repo);
                 var url = updater.AllReleaseUrl;
                 var userAgent = config.ProxyUserAgent;
                 var proxy = CreateProxy(config);

@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Shadowsocks.Controls
+namespace Shadowsocks.View.Controls
 {
     public partial class NumberUpDown
     {

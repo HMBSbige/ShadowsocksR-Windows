@@ -4,7 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
-        xmlns:controls="clr-namespace:Shadowsocks.Controls"
+        xmlns:valueConverter="clr-namespace:Shadowsocks.View.ValueConverter"
+        xmlns:controls="clr-namespace:Shadowsocks.View.Controls"
         mc:Ignorable="d"
         x:Name="Cw" 
         Title="ConfigWindow" Height="560" Width="800" WindowStartupLocation="CenterScreen"
@@ -29,7 +30,7 @@
                 </Style.Triggers>
             </Style>
             <BooleanToVisibilityConverter x:Key="Bool2Visibility" />
-            <controls:ServerTreeTypeToFontConverter x:Key="ServerTreeTypeToFontConverter" />
+            <valueConverter:ServerTreeTypeToFontConverter x:Key="ServerTreeTypeToFontConverter" />
         </ResourceDictionary>
     </Window.Resources>
 

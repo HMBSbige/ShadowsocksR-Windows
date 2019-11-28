@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Shadowsocks.View.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="clr-namespace:Shadowsocks.Controls"
+        xmlns:controls="clr-namespace:Shadowsocks.View.Controls"
         Title="SettingsWindow"
         Height="500" Width="750" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" ResizeMode="NoResize"
         Loaded="Window_Loaded">

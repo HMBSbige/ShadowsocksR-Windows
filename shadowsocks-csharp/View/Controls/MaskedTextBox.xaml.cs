@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 
-namespace Shadowsocks.Controls
+namespace Shadowsocks.View.Controls
 {
     public partial class MaskedTextBox
     {

@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace Shadowsocks.Controls
+namespace Shadowsocks.View.ValueConverter
 {
     public class ProxyTypeConverter : IValueConverter
     {

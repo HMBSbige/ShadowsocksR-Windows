@@ -1,18 +1,18 @@
-﻿using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using Shadowsocks.Util;
 
-namespace Shadowsocks.Controls
+namespace Shadowsocks.View.ValueConverter
 {
-    public class LatencyToBrushConverter : IValueConverter
+    public class ConnectErrorToBrushConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if (value is long bytes && bytes > 0)
             {
-                return new SolidColorBrush(ColorConvert.GetLatencyColor(bytes));
+                return new SolidColorBrush(ColorConvert.GetConnectErrorColor(bytes));
             }
 
             return DependencyProperty.UnsetValue;

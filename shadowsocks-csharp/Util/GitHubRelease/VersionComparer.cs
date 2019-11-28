@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Shadowsocks.GitHubRelease
+namespace Shadowsocks.Util.GitHubRelease
 {
     public class VersionComparer : IComparer<object>
     {

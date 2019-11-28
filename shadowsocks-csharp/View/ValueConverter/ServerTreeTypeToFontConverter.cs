@@ -1,11 +1,11 @@
-﻿using Shadowsocks.Enums;
-using System;
+﻿using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using Shadowsocks.Enums;
 
-namespace Shadowsocks.Controls
+namespace Shadowsocks.View.ValueConverter
 {
     public class ServerTreeTypeToFontConverter : IValueConverter
     {

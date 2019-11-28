@@ -1,22 +1,23 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
+using Shadowsocks.Util;
 
-namespace Shadowsocks.Controls
+namespace Shadowsocks.View.ValueConverter
 {
-    public class UlongToDateTimeString : IValueConverter
+    public class BooleanToEnabledConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is ulong lastUpdateTime && targetType == typeof(string))
+            if (value is bool enable)
             {
-                if (lastUpdateTime != 0)
+                if (targetType == typeof(Brush))
                 {
-                    var now = new DateTime(1970, 1, 1, 0, 0, 0);
-                    now = now.AddSeconds(lastUpdateTime);
-                    return $@"{now.ToLongDateString()} {now.ToLongTimeString()}";
+                    return enable ? ColorConvert.EnableBrush : ColorConvert.DisableBrush;
                 }
             }
-            return @"(｀・ω・´)";
+            return DependencyProperty.UnsetValue;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

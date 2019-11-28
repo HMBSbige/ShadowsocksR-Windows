@@ -1,18 +1,18 @@
-﻿using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using Shadowsocks.Util;
 
-namespace Shadowsocks.Controls
+namespace Shadowsocks.View.ValueConverter
 {
-    public class ConnectEmptyToBrushConverter : IValueConverter
+    public class ErrorPercentToBrushConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is long bytes && bytes > 0)
+            if (value is double percent && percent > 0)
             {
-                return new SolidColorBrush(ColorConvert.GetConnectEmptyColor(bytes));
+                return new SolidColorBrush(ColorConvert.GetErrorPercentColor(percent));
             }
 
             return DependencyProperty.UnsetValue;

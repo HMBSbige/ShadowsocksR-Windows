@@ -1,4 +1,4 @@
-﻿namespace Shadowsocks.GitHubRelease
+﻿namespace Shadowsocks.Util.GitHubRelease
 {
     public class GitHubUser
     {

@@ -1,6 +1,5 @@
 ﻿using Shadowsocks.Controller;
 using Shadowsocks.Controller.HttpRequest;
-using Shadowsocks.Controls;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
@@ -8,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using Shadowsocks.View.Controls;
 
 namespace Shadowsocks.View
 {

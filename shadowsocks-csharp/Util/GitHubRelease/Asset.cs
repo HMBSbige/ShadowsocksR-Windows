@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shadowsocks.GitHubRelease
+namespace Shadowsocks.Util.GitHubRelease
 {
     public class Asset
     {

@@ -1,13 +1,13 @@
-﻿using Shadowsocks.Util;
-using System;
+﻿using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using Shadowsocks.Util;
 
-namespace Shadowsocks.Controls
+namespace Shadowsocks.View.ValueConverter
 {
-    public class TotalUploadBackgroundBrushConvert : IValueConverter
+    public class TotalDownloadRawBackgroundBrushConvert : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -15,7 +15,7 @@ namespace Shadowsocks.Controls
             {
                 if (targetType == typeof(Brush))
                 {
-                    return System.Convert.ToBoolean(index & 1) ? ColorConvert.TotalUploadBrush1 : ColorConvert.TotalUploadBrush2;
+                    return System.Convert.ToBoolean(index & 1) ? ColorConvert.TotalDownloadRawBrush1 : ColorConvert.TotalDownloadRawBrush2;
                 }
             }
             return DependencyProperty.UnsetValue;

@@ -4,8 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:model="clr-namespace:Shadowsocks.Model"
-        xmlns:controls="clr-namespace:Shadowsocks.Controls"
         xmlns:enums="clr-namespace:Shadowsocks.Enums"
+        xmlns:valueConverter="clr-namespace:Shadowsocks.View.ValueConverter"
         mc:Ignorable="d"
         x:Name="Sw"
         Title="{DynamicResource Title}"
@@ -39,8 +39,8 @@
                     </DockPanel>
                 </StackPanel>
             </DataTemplate>
-            <controls:UlongToDateTimeString x:Key="UlongToDateTimeString" />
-            <controls:ProxyTypeConverter x:Key="ProxyTypeConverter" />
+            <valueConverter:UlongToDateTimeString x:Key="UlongToDateTimeString" />
+            <valueConverter:ProxyTypeConverter x:Key="ProxyTypeConverter" />
         </ResourceDictionary>
     </Window.Resources>
 
