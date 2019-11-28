@@ -1,4 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿#if IsDotNetCore
+using System.Text.Json.Serialization;
+#else
+using Newtonsoft.Json;
+#endif
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Encryption;
 using Shadowsocks.Enums;

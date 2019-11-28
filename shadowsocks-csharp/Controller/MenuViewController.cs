@@ -572,7 +572,9 @@ namespace Shadowsocks.Controller
 
         private void updateChecker_NewVersionNotFound(object sender, EventArgs e)
         {
-            _notifyIcon.ShowBalloonTip($@"{UpdateChecker.Name} {UpdateChecker.FullVersion}", I18NUtil.GetAppStringValue(@"NewVersionNotFound"), BalloonIcon.Info);
+            _notifyIcon.ShowBalloonTip($@"{UpdateChecker.Name} {UpdateChecker.FullVersion}",
+            $@"{I18NUtil.GetAppStringValue(@"NewVersionNotFound")}{Environment.NewLine}{UpdateChecker.Version}≥{updateChecker.LatestVersionNumber}",
+            BalloonIcon.Info);
         }
 
         private void UpdateChecker_NewVersionFoundFailed(object sender, EventArgs e)

@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Shadowsocks.Controller.Service;
+﻿using Shadowsocks.Controller.Service;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
@@ -86,8 +85,8 @@ namespace Shadowsocks.Controller.HttpRequest
 
             var gfwLines = ParseBase64ToValidList(gfwListResult);
 
-            abpContent = abpContent.Replace(@"__USERRULES__", JsonConvert.SerializeObject(userRuleLines, Formatting.Indented))
-                    .Replace(@"__RULES__", JsonConvert.SerializeObject(gfwLines, Formatting.Indented));
+            abpContent = abpContent.Replace(@"__USERRULES__", JsonUtils.Serialize(userRuleLines, false))
+                    .Replace(@"__RULES__", JsonUtils.Serialize(gfwLines, false));
             return abpContent;
         }
 
