@@ -146,7 +146,7 @@ namespace Shadowsocks.Controller
             SaveAndReload();
         }
 
-        public void SaveServersConfig(Configuration config)
+        public void SaveServersConfig(Configuration config, bool reload)
         {
             var missingServers = MergeConfiguration(Global.GuiConfig, config.Configs);
             Global.GuiConfig.CopyFrom(config);
@@ -154,7 +154,15 @@ namespace Shadowsocks.Controller
             {
                 s.Connections.CloseAll();
             }
-            SaveAndReload();
+
+            if (reload)
+            {
+                SaveAndReload();
+            }
+            else
+            {
+                SaveAndNotifyChanged();
+            }
         }
 
         public void SaveServersPortMap(Configuration config)

@@ -190,7 +190,7 @@ namespace Shadowsocks.View
         {
             if (SaveSettings())
             {
-                _controller.SaveServersConfig(_modifiedConfiguration);
+                _controller.SaveServersConfig(_modifiedConfiguration, true);
                 return true;
             }
             return false;

@@ -43,6 +43,8 @@ namespace Shadowsocks.View
 
         public SubscribeWindowViewModel SubscribeWindowViewModel { get; set; } = new SubscribeWindowViewModel();
 
+        private bool _isDeleteServer;
+
         private void Window_Loaded(object sender, RoutedEventArgs _)
         {
             InfoGrid.Visibility = ServerSubscribeListBox.SelectedIndex == -1 ? Visibility.Hidden : Visibility.Visible;
@@ -71,6 +73,7 @@ namespace Shadowsocks.View
             _modifiedConfiguration.Configs.RemoveAll(server =>
                     !string.IsNullOrEmpty(server.SubTag)
                     && _modifiedConfiguration.ServerSubscribes.All(subscribe => subscribe.Tag != server.SubTag));
+            _isDeleteServer = true;
         }
 
         private bool SaveConfig()
@@ -98,25 +101,21 @@ namespace Shadowsocks.View
                     DeleteUnusedServer();
                 }
             }
-            _controller.SaveServersConfig(_modifiedConfiguration);
+            _controller.SaveServersConfig(_modifiedConfiguration, _isDeleteServer);
             return true;
         }
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ApplyButton.IsEnabled)
+            if (!ApplyButton.IsEnabled || SaveConfig())
             {
-                if (SaveConfig())
-                {
-                    Close();
-                }
-                else
-                {
-                    SaveError();
-                    return;
-                }
+                _updateSubscribeManager.CreateTask(_modifiedConfiguration, _updateNodeChecker, true);
+                Close();
             }
-            Close();
+            else
+            {
+                SaveError();
+            }
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -145,20 +144,12 @@ namespace Shadowsocks.View
             var index = ServerSubscribeListBox.SelectedIndex;
             if (ServerSubscribeListBox.SelectedItem is ServerSubscribe serverSubscribe)
             {
-                SubscribeWindowViewModel.SubscribeCollection.Remove(serverSubscribe);
-            }
-            SetServerListSelectedIndex(index);
-        }
-
-        private void DeleteAllButton_Click(object sender, RoutedEventArgs e)
-        {
-            var index = ServerSubscribeListBox.SelectedIndex;
-            if (ServerSubscribeListBox.SelectedItem is ServerSubscribe serverSubscribe)
-            {
                 var tag = serverSubscribe.Tag;
-                _modifiedConfiguration.Configs = _modifiedConfiguration.Configs.Where(server => server.SubTag != tag).ToList();
+                _modifiedConfiguration.Configs.RemoveAll(server => server.SubTag == tag);
+                _isDeleteServer = true;
                 SubscribeWindowViewModel.SubscribeCollection.Remove(serverSubscribe);
             }
+
             SetServerListSelectedIndex(index);
         }
 

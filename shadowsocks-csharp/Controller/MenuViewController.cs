@@ -523,7 +523,7 @@ namespace Shadowsocks.Controller
                         }
                         config.Configs.RemoveAll(server => server.IsMatchServer(new Server()));
                     }
-                    controller.SaveServersConfig(config);
+                    controller.SaveServersConfig(config, true);
                 }
             }
 
