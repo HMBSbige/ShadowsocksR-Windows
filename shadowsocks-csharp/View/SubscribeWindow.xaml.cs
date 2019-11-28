@@ -102,9 +102,9 @@ namespace Shadowsocks.View
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!ApplyButton.IsEnabled || SaveConfig())
+            if (Save())
             {
-                Global.UpdateSubscribeManager.CreateTask(_modifiedConfiguration, Global.UpdateNodeChecker, true);
+                Global.UpdateSubscribeManager.CreateTask(Global.GuiConfig, Global.UpdateNodeChecker, true);
                 Close();
             }
             else
@@ -122,7 +122,6 @@ namespace Shadowsocks.View
         {
             if (SaveConfig())
             {
-                ApplyButton.IsEnabled = false;
                 return;
             }
             SaveError();
@@ -172,11 +171,7 @@ namespace Shadowsocks.View
 
         private bool Save()
         {
-            if (ApplyButton.IsEnabled)
-            {
-                return SaveConfig();
-            }
-            return true;
+            return !ApplyButton.IsEnabled || SaveConfig();
         }
 
         private void SaveError()
@@ -190,8 +185,7 @@ namespace Shadowsocks.View
             {
                 if (Save())
                 {
-                    ApplyButton.IsEnabled = false;
-                    Global.UpdateSubscribeManager.CreateTask(_modifiedConfiguration, Global.UpdateNodeChecker, true, new List<ServerSubscribe> { serverSubscribe });
+                    Global.UpdateSubscribeManager.CreateTask(Global.GuiConfig, Global.UpdateNodeChecker, true, new List<ServerSubscribe> { serverSubscribe });
                 }
                 else
                 {

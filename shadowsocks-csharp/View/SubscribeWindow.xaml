@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:model="clr-namespace:Shadowsocks.Model"
         xmlns:controls="clr-namespace:Shadowsocks.Controls"
+        xmlns:enums="clr-namespace:Shadowsocks.Enums"
         mc:Ignorable="d"
         x:Name="Sw"
         Title="{DynamicResource Title}"
@@ -39,6 +40,7 @@
                 </StackPanel>
             </DataTemplate>
             <controls:UlongToDateTimeString x:Key="UlongToDateTimeString" />
+            <controls:ProxyTypeConverter x:Key="ProxyTypeConverter" />
         </ResourceDictionary>
     </Window.Resources>
 
@@ -73,6 +75,7 @@
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -89,7 +92,15 @@
                 Text="{Binding SelectedServer.LastUpdateTime,Converter={StaticResource UlongToDateTimeString},Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
                 <CheckBox Grid.Row="3" Grid.Column="1" Content="{DynamicResource AutoUpdate}" VerticalAlignment="Center" Margin="0,10,0,0" 
                 IsChecked="{Binding SelectedServer.AutoCheckUpdate,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
-                <Button Grid.Row="4" Grid.Column="1" Content="{DynamicResource Update}" Margin="0,10,0,0" Click="UpdateButton_OnClick"/>
+                <GroupBox Grid.Row="4" Grid.Column="1" Header="{DynamicResource ProxyType}" Margin="0,10,0,0">
+                    <StackPanel>
+                        <RadioButton Content="{DynamicResource Auto}" IsChecked="{Binding Path=SelectedServer.ProxyType, Converter={StaticResource ProxyTypeConverter}, ConverterParameter={x:Static enums:HttpRequestProxyType.Auto}}" />
+                        <RadioButton Content="{DynamicResource Direct}" IsChecked="{Binding Path=SelectedServer.ProxyType, Converter={StaticResource ProxyTypeConverter}, ConverterParameter={x:Static enums:HttpRequestProxyType.Direct}}" />
+                        <RadioButton Content="{DynamicResource Proxy}" IsChecked="{Binding Path=SelectedServer.ProxyType, Converter={StaticResource ProxyTypeConverter}, ConverterParameter={x:Static enums:HttpRequestProxyType.Proxy}}" />
+                        <RadioButton Content="{DynamicResource SystemSetting}" IsChecked="{Binding Path=SelectedServer.ProxyType, Converter={StaticResource ProxyTypeConverter}, ConverterParameter={x:Static enums:HttpRequestProxyType.SystemSetting}}" />
+                    </StackPanel>
+                </GroupBox>
+                <Button Grid.Row="5" Grid.Column="1" Content="{DynamicResource Update}" Margin="0,10,0,0" Click="UpdateButton_OnClick" />
             </Grid>
         </StackPanel>
         <Grid Grid.Row="1" Grid.Column="0" Margin="0,10,0,10">

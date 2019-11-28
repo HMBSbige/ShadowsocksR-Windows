@@ -19,6 +19,12 @@
     <sys:String x:Key="Update">Update current subscription</sys:String>
     <sys:String x:Key="SaveError">Subscription remarks cannot have the same</sys:String>
 
+    <sys:String x:Key="ProxyType">Proxy type</sys:String>
+    <sys:String x:Key="Auto">Auto</sys:String>
+    <sys:String x:Key="Direct">Direct</sys:String>
+    <sys:String x:Key="Proxy">Proxy</sys:String>
+    <sys:String x:Key="SystemSetting">System Setting</sys:String>
+
     <sys:String x:Key="SaveQuestion" xml:space="preserve">Some subscription servers that are not on the subscription list were found.&#13;Do you want to delete these servers？</sys:String>
 
 </ResourceDictionary>
