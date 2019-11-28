@@ -1,6 +1,5 @@
 ﻿using Shadowsocks.Controller;
 using Shadowsocks.Controller.HttpRequest;
-using Shadowsocks.Controller.Service;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
@@ -14,7 +13,7 @@ namespace Shadowsocks.View
 {
     public partial class SubscribeWindow
     {
-        public SubscribeWindow(MainController controller, UpdateSubscribeManager updateSubscribeManager, UpdateNode updateNodeChecker)
+        public SubscribeWindow(MainController controller)
         {
             InitializeComponent();
             I18NUtil.SetLanguage(Resources, @"SubscribeWindow");
@@ -24,8 +23,6 @@ namespace Shadowsocks.View
                 SubscribeWindowViewModel.SubscribesChanged -= SubscribeWindowViewModel_SubscribesChanged;
             };
             _controller = controller;
-            _updateSubscribeManager = updateSubscribeManager;
-            _updateNodeChecker = updateNodeChecker;
             _controller.ConfigChanged += controller_ConfigChanged;
             LoadCurrentConfiguration();
             SubscribeWindowViewModel.SubscribesChanged += SubscribeWindowViewModel_SubscribesChanged;
@@ -37,8 +34,6 @@ namespace Shadowsocks.View
         }
 
         private readonly MainController _controller;
-        private readonly UpdateNode _updateNodeChecker;
-        private readonly UpdateSubscribeManager _updateSubscribeManager;
         private Configuration _modifiedConfiguration;
 
         public SubscribeWindowViewModel SubscribeWindowViewModel { get; set; } = new SubscribeWindowViewModel();
@@ -109,7 +104,7 @@ namespace Shadowsocks.View
         {
             if (!ApplyButton.IsEnabled || SaveConfig())
             {
-                _updateSubscribeManager.CreateTask(_modifiedConfiguration, _updateNodeChecker, true);
+                Global.UpdateSubscribeManager.CreateTask(_modifiedConfiguration, Global.UpdateNodeChecker, true);
                 Close();
             }
             else
@@ -196,7 +191,7 @@ namespace Shadowsocks.View
                 if (Save())
                 {
                     ApplyButton.IsEnabled = false;
-                    _updateSubscribeManager.CreateTask(_modifiedConfiguration, _updateNodeChecker, true, serverSubscribe);
+                    Global.UpdateSubscribeManager.CreateTask(_modifiedConfiguration, Global.UpdateNodeChecker, true, new List<ServerSubscribe> { serverSubscribe });
                 }
                 else
                 {

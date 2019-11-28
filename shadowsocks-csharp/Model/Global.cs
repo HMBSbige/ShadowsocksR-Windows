@@ -3,6 +3,8 @@ using Shadowsocks.Controller;
 using System;
 using System.IO;
 using System.Net;
+using Shadowsocks.Controller.HttpRequest;
+using Shadowsocks.Controller.Service;
 
 namespace Shadowsocks.Model
 {
@@ -21,6 +23,10 @@ namespace Shadowsocks.Model
         public static MainController Controller;
 
         public static MenuViewController ViewController;
+
+        public static UpdateNode UpdateNodeChecker;
+
+        public static UpdateSubscribeManager UpdateSubscribeManager;
 
         public static Configuration LoadFile(string filename)
         {

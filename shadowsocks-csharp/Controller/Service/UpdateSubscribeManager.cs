@@ -12,19 +12,19 @@ namespace Shadowsocks.Controller.Service
         private UpdateNode _updater;
         private bool _notify;
 
-        public void CreateTask(Configuration config, UpdateNode updater, bool updateManually, ServerSubscribe serverSubscribe = null)
+        public void CreateTask(Configuration config, UpdateNode updater, bool updateManually, List<ServerSubscribe> serverSubscribe = null)
         {
             if (_config != null) return;
             _config = config;
             _updater = updater;
             _notify = updateManually;
-            _serverSubscribes = new Queue<ServerSubscribe>();
-            if (serverSubscribe != null)
+            if (serverSubscribe?.Count > 0)
             {
-                _serverSubscribes.Enqueue(serverSubscribe);
+                _serverSubscribes = new Queue<ServerSubscribe>(serverSubscribe);
             }
             else
             {
+                _serverSubscribes = new Queue<ServerSubscribe>();
                 if (updateManually)
                 {
                     config.ServerSubscribes.ForEach(sub => _serverSubscribes.Enqueue(sub));

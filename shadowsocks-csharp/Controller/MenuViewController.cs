@@ -42,8 +42,6 @@ namespace Shadowsocks.Controller
 
         private readonly MainController controller;
         private readonly UpdateChecker updateChecker;
-        private readonly UpdateNode _updateNodeChecker;
-        private readonly UpdateSubscribeManager updateSubscribeManager;
 
         private readonly TaskbarIcon _notifyIcon;
         private ContextMenu _contextMenu;
@@ -116,10 +114,10 @@ namespace Shadowsocks.Controller
             updateChecker.NewVersionNotFound += updateChecker_NewVersionNotFound;
             updateChecker.NewVersionFoundFailed += UpdateChecker_NewVersionFoundFailed;
 
-            _updateNodeChecker = new UpdateNode();
-            _updateNodeChecker.NewFreeNodeFound += UpdateNodeCheckerNewNodeFound;
+            Global.UpdateNodeChecker = new UpdateNode();
+            Global.UpdateNodeChecker.NewFreeNodeFound += UpdateNodeCheckerNewNodeFound;
 
-            updateSubscribeManager = new UpdateSubscribeManager();
+            Global.UpdateSubscribeManager = new UpdateSubscribeManager();
 
             LoadCurrentConfiguration();
 
@@ -138,7 +136,7 @@ namespace Shadowsocks.Controller
                 updateChecker.Check(cfg, false);
             }
 
-            updateSubscribeManager.CreateTask(cfg, _updateNodeChecker, false);
+            Global.UpdateSubscribeManager.CreateTask(cfg, Global.UpdateNodeChecker, false);
         }
 
         private static void ControllerError(object sender, ErrorEventArgs e)
@@ -392,27 +390,27 @@ namespace Shadowsocks.Controller
             }
             string lastGroup = null;
             var count = 0;
-            if (!string.IsNullOrWhiteSpace(_updateNodeChecker.FreeNodeResult))
+            if (!string.IsNullOrWhiteSpace(Global.UpdateNodeChecker.FreeNodeResult))
             {
                 var urls = new List<string>();
-                _updateNodeChecker.FreeNodeResult = _updateNodeChecker.FreeNodeResult.TrimEnd('\r', '\n', ' ');
+                Global.UpdateNodeChecker.FreeNodeResult = Global.UpdateNodeChecker.FreeNodeResult.TrimEnd('\r', '\n', ' ');
                 var config = Global.GuiConfig;
                 var selectedServer = config.Configs.ElementAtOrDefault(config.Index);
                 try
                 {
-                    _updateNodeChecker.FreeNodeResult = Base64.DecodeBase64(_updateNodeChecker.FreeNodeResult);
+                    Global.UpdateNodeChecker.FreeNodeResult = Base64.DecodeBase64(Global.UpdateNodeChecker.FreeNodeResult);
                 }
                 catch
                 {
-                    _updateNodeChecker.FreeNodeResult = string.Empty;
+                    Global.UpdateNodeChecker.FreeNodeResult = string.Empty;
                 }
-                Utils.URL_Split(_updateNodeChecker.FreeNodeResult, ref urls);
+                Utils.URL_Split(Global.UpdateNodeChecker.FreeNodeResult, ref urls);
                 urls.RemoveAll(url => !url.StartsWith(@"ssr://"));
                 if (urls.Count > 0)
                 {
                     urls.Reverse();
 
-                    lastGroup = updateSubscribeManager.CurrentServerSubscribe.OriginTag;
+                    lastGroup = Global.UpdateSubscribeManager.CurrentServerSubscribe.OriginTag;
                     if (string.IsNullOrEmpty(lastGroup))
                     {
                         foreach (var url in urls)
@@ -428,7 +426,7 @@ namespace Shadowsocks.Controller
                                     }
 
                                     var serverSubscribe = config.ServerSubscribes.Find(sub =>
-                                    sub.Url == updateSubscribeManager.CurrentServerSubscribe.Url
+                                    sub.Url == Global.UpdateSubscribeManager.CurrentServerSubscribe.Url
                                     && string.IsNullOrEmpty(sub.OriginTag));
 
                                     if (serverSubscribe != null)
@@ -447,7 +445,7 @@ namespace Shadowsocks.Controller
                     }
                     if (string.IsNullOrEmpty(lastGroup))
                     {
-                        lastGroup = updateSubscribeManager.CurrentServerSubscribe.UrlMd5;
+                        lastGroup = Global.UpdateSubscribeManager.CurrentServerSubscribe.UrlMd5;
                     }
 
                     //Find old servers
@@ -517,7 +515,7 @@ namespace Shadowsocks.Controller
                     //If Update Success
                     if (count > 0)
                     {
-                        foreach (var serverSubscribe in config.ServerSubscribes.Where(serverSubscribe => serverSubscribe.Url == _updateNodeChecker.SubscribeTask.Url))
+                        foreach (var serverSubscribe in config.ServerSubscribes.Where(serverSubscribe => serverSubscribe.Url == Global.UpdateNodeChecker.SubscribeTask.Url))
                         {
                             serverSubscribe.LastUpdateTime = (ulong)Math.Floor(DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
                         }
@@ -529,7 +527,7 @@ namespace Shadowsocks.Controller
 
             if (count > 0)
             {
-                if (_updateNodeChecker.Notify)
+                if (Global.UpdateNodeChecker.Notify)
                 {
                     _notifyIcon.ShowBalloonTip(I18NUtil.GetAppStringValue(@"Success"), string.Format(I18NUtil.GetAppStringValue(@"UpdateSubscribeSuccess"), lastGroup), BalloonIcon.Info);
                 }
@@ -538,16 +536,16 @@ namespace Shadowsocks.Controller
             {
                 if (string.IsNullOrEmpty(lastGroup))
                 {
-                    lastGroup = _updateNodeChecker.SubscribeTask.Tag;
+                    lastGroup = Global.UpdateNodeChecker.SubscribeTask.Tag;
                 }
 
-                if (_updateNodeChecker.Notify)
+                if (Global.UpdateNodeChecker.Notify)
                 {
                     _notifyIcon.ShowBalloonTip(I18NUtil.GetAppStringValue(@"Error"), string.Format(I18NUtil.GetAppStringValue(@"UpdateSubscribeFailure"), lastGroup), BalloonIcon.Info);
                 }
             }
 
-            updateSubscribeManager.Next();
+            Global.UpdateSubscribeManager.Next();
         }
 
         private void updateChecker_NewVersionFound(object sender, EventArgs e)
@@ -896,7 +894,7 @@ namespace Shadowsocks.Controller
             }
             else
             {
-                _subScribeWindow = new SubscribeWindow(controller, updateSubscribeManager, _updateNodeChecker);
+                _subScribeWindow = new SubscribeWindow(controller);
                 _subScribeWindow.Show();
                 _subScribeWindow.Activate();
                 _subScribeWindow.BringToFront();
@@ -1184,7 +1182,7 @@ namespace Shadowsocks.Controller
 
         private void CheckNodeUpdate_Click(object sender, RoutedEventArgs e)
         {
-            updateSubscribeManager.CreateTask(Global.GuiConfig, _updateNodeChecker, true);
+            Global.UpdateSubscribeManager.CreateTask(Global.GuiConfig, Global.UpdateNodeChecker, true);
         }
 
         private void ShowLogItem_Click(object sender, RoutedEventArgs e)
@@ -1214,11 +1212,21 @@ namespace Shadowsocks.Controller
 
         public void ImportAddress(string text)
         {
+            ImportSsrUrl(text);
+
+            ImportSubUrl(text);
+        }
+
+        private void ImportSsrUrl(string text)
+        {
             if (controller.AddServerBySsUrl(text))
             {
                 ShowConfigForm(true);
             }
+        }
 
+        private void ImportSubUrl(string text)
+        {
             if (controller.AddSubscribeUrl(text))
             {
                 ShowSubscribeSettingForm();

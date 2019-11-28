@@ -230,8 +230,9 @@ namespace Shadowsocks.Controller
         {
             try
             {
-                var urls = str.Split(new[] { "\r\n", "\r", "\n", " " }, StringSplitOptions.RemoveEmptyEntries);
-                var i = 0;
+                var urls = str.GetLines();
+                var newSubscribes = new List<ServerSubscribe>();
+                var existSubscribes = new List<ServerSubscribe>();
                 foreach (var url in urls.Where(url => url.StartsWith(@"sub://", StringComparison.OrdinalIgnoreCase)))
                 {
                     var sub = Regex.Match(url, "sub://([A-Za-z0-9_-]+)", RegexOptions.IgnoreCase);
@@ -240,15 +241,26 @@ namespace Shadowsocks.Controller
                         var res = Base64.DecodeUrlSafeBase64(sub.Groups[1].Value);
                         if (Global.GuiConfig.ServerSubscribes.All(serverSubscribe => serverSubscribe.Url != res))
                         {
-                            Global.GuiConfig.ServerSubscribes.Add(new ServerSubscribe { Url = res });
-                            ++i;
+                            var newSub = new ServerSubscribe { Url = res };
+                            newSubscribes.Add(newSub);
+                            Global.GuiConfig.ServerSubscribes.Add(newSub);
+                        }
+                        else
+                        {
+                            existSubscribes.Add(Global.GuiConfig.ServerSubscribes.Find(serverSubscribe => serverSubscribe.Url == res));
                         }
                     }
                 }
-                if (i > 0)
+                if (newSubscribes.Count > 0)
                 {
                     SaveAndNotifyChanged();
+                    Global.UpdateSubscribeManager.CreateTask(Global.GuiConfig, Global.UpdateNodeChecker, true, newSubscribes);
                     return true;
+                }
+                if (existSubscribes.Count > 0)
+                {
+                    Global.UpdateSubscribeManager.CreateTask(Global.GuiConfig, Global.UpdateNodeChecker, true, existSubscribes);
+                    return false;
                 }
             }
             catch (Exception e)
