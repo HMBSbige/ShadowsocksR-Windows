@@ -27,14 +27,14 @@ namespace Shadowsocks.Model
         private string _localDnsServer;
         private string _dnsServer;
         private int _reconnectTimes;
-        private string _balanceAlgorithm;
+        private BalanceType _balanceType;
         private bool _randomInGroup;
         private int _ttl;
         private int _connectTimeout;
         private ProxyRuleMode _proxyRuleMode;
         private bool _proxyEnable;
         private bool _pacDirectGoProxy;
-        private int _proxyType;
+        private ProxyType _proxyType;
         private string _proxyHost;
         private int _proxyPort;
         private string _proxyAuthUser;
@@ -104,7 +104,7 @@ namespace Shadowsocks.Model
         /// <summary>
         /// 负载均衡使用的算法
         /// </summary>
-        public string BalanceAlgorithm { get => _balanceAlgorithm; set => SetField(ref _balanceAlgorithm, value); }
+        public BalanceType BalanceType { get => _balanceType; set => SetField(ref _balanceType, value); }
 
         /// <summary>
         /// 负载均衡是否只在所选组切换
@@ -139,7 +139,7 @@ namespace Shadowsocks.Model
         /// <summary>
         /// 二级代理类型
         /// </summary>
-        public int ProxyType { get => _proxyType; set => SetField(ref _proxyType, value); }
+        public ProxyType ProxyType { get => _proxyType; set => SetField(ref _proxyType, value); }
 
         /// <summary>
         /// 二级代理服务器地址
@@ -292,7 +292,7 @@ namespace Shadowsocks.Model
                     int i;
                     if (filter == null && RandomInGroup)
                     {
-                        i = serverStrategy.Select(Configs, Index, BalanceAlgorithm, delegate (Server server, Server selServer)
+                        i = serverStrategy.Select(Configs, Index, BalanceType, delegate (Server server, Server selServer)
                         {
                             if (selServer != null)
                                 return selServer.Group == server.Group;
@@ -301,7 +301,7 @@ namespace Shadowsocks.Model
                     }
                     else
                     {
-                        i = serverStrategy.Select(Configs, Index, BalanceAlgorithm, filter, true);
+                        i = serverStrategy.Select(Configs, Index, BalanceType, filter, true);
                     }
                     return i == -1 ? GetErrorServer() : Configs[i];
                 }
@@ -311,7 +311,7 @@ namespace Shadowsocks.Model
                     int i;
                     if (filter == null && RandomInGroup)
                     {
-                        i = serverStrategy.Select(Configs, Index, BalanceAlgorithm, delegate (Server server, Server selServer)
+                        i = serverStrategy.Select(Configs, Index, BalanceType, delegate (Server server, Server selServer)
                         {
                             if (selServer != null)
                                 return selServer.Group == server.Group;
@@ -320,7 +320,7 @@ namespace Shadowsocks.Model
                     }
                     else
                     {
-                        i = serverStrategy.Select(Configs, Index, BalanceAlgorithm, filter);
+                        i = serverStrategy.Select(Configs, Index, BalanceType, filter);
                     }
                     if (i == -1) return GetErrorServer();
                     if (targetAddr != null)
@@ -439,14 +439,14 @@ namespace Shadowsocks.Model
             LocalDnsServer = string.Empty;
             DnsServer = string.Empty;
             ReconnectTimes = 2;
-            BalanceAlgorithm = LoadBalance.LowException.ToString();
+            BalanceType = BalanceType.LowException;
             RandomInGroup = true;
-            Ttl = 180;
+            Ttl = 60;
             ConnectTimeout = 5;
             ProxyRuleMode = ProxyRuleMode.Disable;
             ProxyEnable = false;
             PacDirectGoProxy = false;
-            ProxyType = 0;
+            ProxyType = ProxyType.Socks5;
             ProxyHost = string.Empty;
             ProxyPort = 1;
             ProxyAuthUser = string.Empty;
@@ -476,7 +476,7 @@ namespace Shadowsocks.Model
             LocalDnsServer = config.LocalDnsServer;
             DnsServer = config.DnsServer;
             ReconnectTimes = config.ReconnectTimes;
-            BalanceAlgorithm = config.BalanceAlgorithm;
+            BalanceType = config.BalanceType;
             RandomInGroup = config.RandomInGroup;
             Ttl = config.Ttl;
             ConnectTimeout = config.ConnectTimeout;
@@ -516,7 +516,7 @@ namespace Shadowsocks.Model
             {
                 ConnectTimeout = 5;
                 ReconnectTimes = 2;
-                Ttl = 180;
+                Ttl = 60;
             }
             if (Index < 0 || Index >= Configs.Count)
             {

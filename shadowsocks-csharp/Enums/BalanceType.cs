@@ -1,6 +1,6 @@
 ﻿namespace Shadowsocks.Enums
 {
-    public enum LoadBalance
+    public enum BalanceType
     {
         OneByOne,
         Random,

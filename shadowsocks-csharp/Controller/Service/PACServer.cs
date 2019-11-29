@@ -5,6 +5,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Shadowsocks.Enums;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -143,11 +144,11 @@ namespace Shadowsocks.Controller.Service
 
                 if (_config.PacDirectGoProxy && _config.ProxyEnable)
                 {
-                    if (_config.ProxyType == 0)
+                    if (_config.ProxyType == ProxyType.Socks5)
                     {
                         pac = pac.Replace(@"__DIRECT__", $@"SOCKS5 {_config.ProxyHost}:{_config.ProxyPort};DIRECT;");
                     }
-                    else if (_config.ProxyType == 1)
+                    else if (_config.ProxyType == ProxyType.Http)
                     {
                         pac = pac.Replace(@"__DIRECT__", $@"PROXY {_config.ProxyHost}:{_config.ProxyPort};DIRECT;");
                     }

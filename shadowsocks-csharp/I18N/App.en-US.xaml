@@ -4,10 +4,10 @@
     <sys:String x:Key="ResourceDictionaryName">en-US</sys:String>
 
     <sys:String x:Key="Mode">Mode</sys:String>
-    <sys:String x:Key="DisableProxy">Disable system proxy</sys:String>
+    <sys:String x:Key="DisableProxy">Disable</sys:String>
     <sys:String x:Key="PacProxy">PAC</sys:String>
     <sys:String x:Key="GlobalProxy">Global</sys:String>
-    <sys:String x:Key="NoProxy">No modify system proxy</sys:String>
+    <sys:String x:Key="NoProxy">No modify</sys:String>
 
     <sys:String x:Key="UpdatePac">Update PAC</sys:String>
     <sys:String x:Key="UpdateLanPac">Lan IP list</sys:String>
@@ -114,4 +114,8 @@
     <sys:String x:Key="ImportConfigFailed">Import servers failed</sys:String>
     <sys:String x:Key="DefaultConfigMessage">Default configuration detected</sys:String>
     <sys:String x:Key="DefaultConfigQuestion">Tap ‘Yes’ to open config window or ‘No’ to open subscription window</sys:String>
+
+    <sys:String x:Key="Socks5">Socks5(support UDP)</sys:String>
+    <sys:String x:Key="Http">Http tunnel</sys:String>
+    <sys:String x:Key="TcpPortTunnel">TCP Port tunnel</sys:String>
 </ResourceDictionary>

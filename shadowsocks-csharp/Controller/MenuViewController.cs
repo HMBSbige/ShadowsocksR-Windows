@@ -168,7 +168,7 @@ namespace Shadowsocks.Controller
             var line4 = string.Empty;
             if (random)
             {
-                strServer = $@"{I18NUtil.GetAppStringValue(@"LoadBalance")}{I18NUtil.GetAppStringValue(@"Colon")}{I18NUtil.GetAppStringValue(config.BalanceAlgorithm)}";
+                strServer = $@"{I18NUtil.GetAppStringValue(@"LoadBalance")}{I18NUtil.GetAppStringValue(@"Colon")}{I18NUtil.GetAppStringValue(config.BalanceType.ToString())}";
                 if (config.RandomInGroup)
                 {
                     line3 = $@"{I18NUtil.GetAppStringValue(@"BalanceInGroup")}{Environment.NewLine}";

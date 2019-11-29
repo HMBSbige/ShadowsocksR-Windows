@@ -706,7 +706,7 @@ namespace Shadowsocks.Proxy
 
         private bool ConnectProxyServer(string strRemoteHost, int iRemotePort)
         {
-            if (cfg.ProxyType == 0)
+            if (cfg.ProxyType == ProxyType.Socks5)
             {
                 var ret = remote.ConnectSocks5ProxyServer(strRemoteHost, iRemotePort, connectionUDP != null && !server.UdpOverTcp, cfg.Socks5RemoteUsername, cfg.Socks5RemotePassword);
                 remote.SetTcpServer(server.server, server.Server_Port);
@@ -720,7 +720,7 @@ namespace Shadowsocks.Proxy
                 return ret;
             }
 
-            if (cfg.ProxyType == 1)
+            if (cfg.ProxyType == ProxyType.Http)
             {
                 var ret = remote.ConnectHttpProxyServer(strRemoteHost, iRemotePort, cfg.Socks5RemoteUsername, cfg.Socks5RemotePassword, cfg.ProxyUserAgent);
                 remote.SetTcpServer(server.server, server.Server_Port);

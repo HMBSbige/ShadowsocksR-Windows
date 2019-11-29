@@ -348,13 +348,13 @@ namespace Shadowsocks.Controller.Service
 
             private bool ConnectProxyServer(string strRemoteHost, int iRemotePort)
             {
-                if (_config.ProxyType == 0)
+                if (_config.ProxyType == ProxyType.Socks5)
                 {
                     var ret = _remote.ConnectSocks5ProxyServer(strRemoteHost, iRemotePort, false, _config.ProxyAuthUser, _config.ProxyAuthPass);
                     return ret;
                 }
 
-                if (_config.ProxyType == 1)
+                if (_config.ProxyType == ProxyType.Http)
                 {
                     var ret = _remote.ConnectHttpProxyServer(strRemoteHost, iRemotePort, _config.ProxyAuthUser, _config.ProxyAuthPass, _config.ProxyUserAgent);
                     return ret;

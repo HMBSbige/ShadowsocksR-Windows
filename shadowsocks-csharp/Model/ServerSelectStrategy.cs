@@ -110,7 +110,7 @@ namespace Shadowsocks.Model
             return chance;
         }
 
-        protected int SubSelect(IList<Server> configs, int curIndex, string algorithm, FilterFunc filter, bool forceChange)
+        protected int SubSelect(IList<Server> configs, int curIndex, BalanceType algorithm, FilterFunc filter, bool forceChange)
         {
             if (randomGennarator == null)
             {
@@ -148,7 +148,7 @@ namespace Shadowsocks.Model
             }
             if (lastUserSelectIndex != curIndex)
             {
-                if (configs.Count > curIndex && curIndex >= 0 && algorithm != LoadBalance.Timer.ToString())
+                if (configs.Count > curIndex && curIndex >= 0 && algorithm != BalanceType.Timer)
                 {
                     lastSelectIndex = curIndex;
                 }
@@ -185,7 +185,7 @@ namespace Shadowsocks.Model
                         serverList.Add(new ServerIndex(i, configs[i]));
                     }
                 }
-                if (forceChange && serverList.Count > 1 && algorithm != LoadBalance.OneByOne.ToString())
+                if (forceChange && serverList.Count > 1 && algorithm != BalanceType.OneByOne)
                 {
                     for (var i = 0; i < serverList.Count; ++i)
                     {
@@ -205,7 +205,7 @@ namespace Shadowsocks.Model
                 var serverListIndex = -1;
                 if (serverList.Count > 0)
                 {
-                    if (algorithm == LoadBalance.OneByOne.ToString())
+                    if (algorithm == BalanceType.OneByOne)
                     {
                         var selIndex = -1;
                         for (var i = 0; i < serverList.Count; ++i)
@@ -218,16 +218,16 @@ namespace Shadowsocks.Model
                         }
                         serverListIndex = serverList[(selIndex + 1) % serverList.Count].index;
                     }
-                    else if (algorithm == LoadBalance.Random.ToString())
+                    else if (algorithm == BalanceType.Random)
                     {
                         serverListIndex = randomGennarator.Next(serverList.Count);
                         serverListIndex = serverList[serverListIndex].index;
                     }
-                    else if (algorithm == LoadBalance.LowException.ToString()
-                        || algorithm == LoadBalance.Timer.ToString()
-                        || algorithm == LoadBalance.FastDownloadSpeed.ToString())
+                    else if (algorithm == BalanceType.LowException
+                        || algorithm == BalanceType.Timer
+                        || algorithm == BalanceType.FastDownloadSpeed)
                     {
-                        if (algorithm == LoadBalance.Timer.ToString())
+                        if (algorithm == BalanceType.Timer)
                         {
                             if ((DateTime.Now - lastSelectTime).TotalSeconds > 60 * 5)
                             {
@@ -243,7 +243,7 @@ namespace Shadowsocks.Model
                         }
                         var chances = new List<double>();
                         double lastBeginVal = 0;
-                        if (algorithm == LoadBalance.FastDownloadSpeed.ToString())
+                        if (algorithm == BalanceType.FastDownloadSpeed)
                         {
                             long avg_speed = 1024 * 64;
                             long sum_speed = 0;
@@ -309,7 +309,7 @@ namespace Shadowsocks.Model
                                 lastBeginVal += chance;
                             }
                         }
-                        if (algorithm == LoadBalance.SelectedFirst.ToString()
+                        if (algorithm == BalanceType.SelectedFirst
                             && randomGennarator.Next(3) == 0
                             && configs[curIndex].Enable)
                         {
@@ -335,7 +335,7 @@ namespace Shadowsocks.Model
             return -1;
         }
 
-        public int Select(IList<Server> configs, int curIndex, string algorithm, FilterFunc filter, bool forceChange = false)
+        public int Select(IList<Server> configs, int curIndex, BalanceType algorithm, FilterFunc filter, bool forceChange = false)
         {
             lastSelectIndex = SubSelect(configs, curIndex, algorithm, filter, forceChange);
             if (lastSelectIndex >= 0 && lastSelectIndex < configs.Count)

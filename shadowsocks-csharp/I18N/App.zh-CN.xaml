@@ -114,4 +114,8 @@
     <sys:String x:Key="ImportConfigFailed">导入服务器失败</sys:String>
     <sys:String x:Key="DefaultConfigMessage">检测到是默认服务器</sys:String>
     <sys:String x:Key="DefaultConfigQuestion">“是”打开服务器设置，“否”打开订阅设置</sys:String>
+
+    <sys:String x:Key="Socks5">Socks5(支持UDP)</sys:String>
+    <sys:String x:Key="Http">HTTP 隧道</sys:String>
+    <sys:String x:Key="TcpPortTunnel">TCP 端口转发</sys:String>
 </ResourceDictionary>
