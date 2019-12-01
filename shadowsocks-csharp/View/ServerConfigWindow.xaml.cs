@@ -471,7 +471,7 @@ namespace Shadowsocks.View
                 return false;
             }
 
-            _controller.SaveServersConfig(_modifiedConfiguration);
+            _controller.SaveServersConfig(_modifiedConfiguration, true);
             return true;
         }
 

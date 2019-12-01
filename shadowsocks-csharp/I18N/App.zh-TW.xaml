@@ -48,6 +48,7 @@
 
     <sys:String x:Key="More">更多</sys:String>
     <sys:String x:Key="GlobalSettings">選項設定...</sys:String>
+    <sys:String x:Key="DnsSettings">DNS 設定...</sys:String>
     <sys:String x:Key="PortSettings">通訊埠設定...</sys:String>
     <sys:String x:Key="OpenWiki">打開Wiki文件...</sys:String>
     <sys:String x:Key="Feedback">問題回饋...</sys:String>
@@ -114,4 +115,8 @@
     <sys:String x:Key="ImportConfigFailed">匯入伺服器失敗</sys:String>
     <sys:String x:Key="DefaultConfigMessage">檢測到是默認伺服器</sys:String>
     <sys:String x:Key="DefaultConfigQuestion">「是」開啟伺服器設定，「否」開啟訂閱設定</sys:String>
+
+    <sys:String x:Key="Socks5">Socks5(支援UDP)</sys:String>
+    <sys:String x:Key="Http">Http隧道</sys:String>
+    <sys:String x:Key="TcpPortTunnel">TCP通訊埠轉發</sys:String>
 </ResourceDictionary>

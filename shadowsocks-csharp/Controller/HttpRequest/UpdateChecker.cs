@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using Shadowsocks.GitHubRelease;
-using Shadowsocks.Model;
+﻿using Shadowsocks.Model;
+using Shadowsocks.Util;
+using Shadowsocks.Util.GitHubRelease;
 using System;
 using System.Collections.Generic;
 
@@ -47,14 +47,14 @@ namespace Shadowsocks.Controller.HttpRequest
         {
             try
             {
-                var updater = new GitHubRelease.GitHubRelease(Owner, Repo);
+                var updater = new GitHubRelease(Owner, Repo);
                 var url = updater.AllReleaseUrl;
                 var userAgent = config.ProxyUserAgent;
                 var proxy = CreateProxy(config);
 
                 var json = await AutoGetAsync(url, proxy, userAgent, config.ConnectTimeout * 1000);
 
-                var releases = JsonConvert.DeserializeObject<List<Release>>(json);
+                var releases = JsonUtils.Deserialize<List<Release>>(json);
                 var latestRelease = VersionUtil.GetLatestRelease(releases, config.IsPreRelease);
                 if (VersionUtil.CompareVersion(latestRelease.tag_name, Version) > 0)
                 {

@@ -5,20 +5,25 @@
 
     <sys:String x:Key="Title">訂閱設定</sys:String>
 
-    <sys:String x:Key="Ok">確定</sys:String>
+    <sys:String x:Key="Ok">確定並更新</sys:String>
     <sys:String x:Key="Cancel">取消</sys:String>
     <sys:String x:Key="Apply">套用</sys:String>
 
     <sys:String x:Key="Add">新增</sys:String>
     <sys:String x:Key="Delete">刪除</sys:String>
-    <sys:String x:Key="DeleteAll">與伺服器一起刪除</sys:String>
 
     <sys:String x:Key="Url">網址</sys:String>
     <sys:String x:Key="GroupName">訂閱備註</sys:String>
     <sys:String x:Key="LastUpdate">最近更新</sys:String>
     <sys:String x:Key="AutoUpdate">自動更新</sys:String>
-    <sys:String x:Key="Update">儲存並更新</sys:String>
+    <sys:String x:Key="Update">更新當前訂閱</sys:String>
     <sys:String x:Key="SaveError">訂閱備註不能一樣</sys:String>
+
+    <sys:String x:Key="ProxyType">更新訂閱使用的代理類型</sys:String>
+    <sys:String x:Key="Auto">自動</sys:String>
+    <sys:String x:Key="Direct">直接連線</sys:String>
+    <sys:String x:Key="Proxy">代理</sys:String>
+    <sys:String x:Key="SystemSetting">系統設定</sys:String>
 
     <sys:String x:Key="SaveQuestion" xml:space="preserve">發現不在訂閱列表的訂閱服務器&#13;是否刪除？</sys:String>
 

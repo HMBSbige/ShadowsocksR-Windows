@@ -1,7 +1,7 @@
 ﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="clr-namespace:Shadowsocks.Controls"
+        xmlns:controls="clr-namespace:Shadowsocks.View.Controls"
         x:Class="Shadowsocks.View.PortSettingsWindow"
         Title="{DynamicResource Title}"
         Height="500" Width="730" WindowStartupLocation="CenterScreen"

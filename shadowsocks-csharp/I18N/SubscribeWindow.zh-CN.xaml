@@ -5,20 +5,25 @@
 
     <sys:String x:Key="Title">订阅设置</sys:String>
 
-    <sys:String x:Key="Ok">确定</sys:String>
+    <sys:String x:Key="Ok">确定并更新</sys:String>
     <sys:String x:Key="Cancel">取消</sys:String>
     <sys:String x:Key="Apply">应用</sys:String>
 
     <sys:String x:Key="Add">添加</sys:String>
     <sys:String x:Key="Delete">删除</sys:String>
-    <sys:String x:Key="DeleteAll">与服务器一起删除</sys:String>
 
-    <sys:String x:Key="Url">网址</sys:String>
+    <sys:String x:Key="Url">订阅地址</sys:String>
     <sys:String x:Key="GroupName">订阅备注</sys:String>
     <sys:String x:Key="LastUpdate">最近更新</sys:String>
     <sys:String x:Key="AutoUpdate">自动更新</sys:String>
-    <sys:String x:Key="Update">保存并更新</sys:String>
+    <sys:String x:Key="Update">更新当前订阅</sys:String>
     <sys:String x:Key="SaveError">订阅备注不能一样</sys:String>
+
+    <sys:String x:Key="ProxyType">更新订阅使用的代理类型</sys:String>
+    <sys:String x:Key="Auto">自动</sys:String>
+    <sys:String x:Key="Direct">直连</sys:String>
+    <sys:String x:Key="Proxy">代理</sys:String>
+    <sys:String x:Key="SystemSetting">系统设置</sys:String>
 
     <sys:String x:Key="SaveQuestion" xml:space="preserve">发现不在订阅列表的订阅服务器&#13;是否删除？</sys:String>
 

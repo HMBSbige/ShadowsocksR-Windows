@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Shadowsocks.Enums;
+using System;
 
 namespace Shadowsocks.Proxy
 {
@@ -10,11 +11,9 @@ namespace Shadowsocks.Proxy
         public double Ttl; // Second
         public double ConnectTimeout;
         public int TryKeepAlive;
-        public string LocalDnsServers;
-        public string DnsServers;
         public bool ForceLocalDnsQuery;
         // Server proxy
-        public int ProxyType;
+        public ProxyType ProxyType;
         public string Socks5RemoteHost;
         public int Socks5RemotePort;
         public string Socks5RemoteUsername;
@@ -32,25 +31,23 @@ namespace Shadowsocks.Proxy
         {
             var obj = new HandlerConfig
             {
-                    TargetHost = TargetHost,
-                    TargetPort = TargetPort,
-                    Ttl = Ttl,
-                    ConnectTimeout = ConnectTimeout,
-                    TryKeepAlive = TryKeepAlive,
-                    LocalDnsServers = LocalDnsServers,
-                    DnsServers = DnsServers,
-                    ForceLocalDnsQuery = ForceLocalDnsQuery,
-                    ProxyType = ProxyType,
-                    Socks5RemoteHost = Socks5RemoteHost,
-                    Socks5RemotePort = Socks5RemotePort,
-                    Socks5RemoteUsername = Socks5RemoteUsername,
-                    Socks5RemotePassword = Socks5RemotePassword,
-                    ProxyUserAgent = ProxyUserAgent,
-                    AutoSwitchOff = AutoSwitchOff,
-                    ReconnectTimesRemain = ReconnectTimesRemain,
-                    ReconnectTimes = ReconnectTimes,
-                    Random = Random,
-                    ForceRandom = ForceRandom
+                TargetHost = TargetHost,
+                TargetPort = TargetPort,
+                Ttl = Ttl,
+                ConnectTimeout = ConnectTimeout,
+                TryKeepAlive = TryKeepAlive,
+                ForceLocalDnsQuery = ForceLocalDnsQuery,
+                ProxyType = ProxyType,
+                Socks5RemoteHost = Socks5RemoteHost,
+                Socks5RemotePort = Socks5RemotePort,
+                Socks5RemoteUsername = Socks5RemoteUsername,
+                Socks5RemotePassword = Socks5RemotePassword,
+                ProxyUserAgent = ProxyUserAgent,
+                AutoSwitchOff = AutoSwitchOff,
+                ReconnectTimesRemain = ReconnectTimesRemain,
+                ReconnectTimes = ReconnectTimes,
+                Random = Random,
+                ForceRandom = ForceRandom
             };
             return obj;
         }

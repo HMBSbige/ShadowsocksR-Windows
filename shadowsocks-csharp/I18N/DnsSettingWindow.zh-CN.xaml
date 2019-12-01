@@ -1,0 +1,30 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <sys:String x:Key="ResourceDictionaryName">zh-CN</sys:String>
+
+    <sys:String x:Key="Title">DNS 设置</sys:String>
+
+    <sys:String x:Key="Ok">确定</sys:String>
+    <sys:String x:Key="Cancel">取消</sys:String>
+    <sys:String x:Key="Apply">应用</sys:String>
+
+    <sys:String x:Key="Add">添加</sys:String>
+    <sys:String x:Key="Delete">删除</sys:String>
+
+    <sys:String x:Key="Enable">启用</sys:String>
+    <sys:String x:Key="DnsDefault">默认</sys:String>
+    <sys:String x:Key="DnsOverTls">DNS over TLS</sys:String>
+    <sys:String x:Key="Ipv6">IPv6 优先</sys:String>
+    <sys:String x:Key="Tcp">TCP</sys:String>
+    <sys:String x:Key="Udp">UDP</sys:String>
+    <sys:String x:Key="Address">服务器</sys:String>
+    <sys:String x:Key="Port">端口</sys:String>
+    <sys:String x:Key="Timeout">超时</sys:String>
+    <sys:String x:Key="EDns">EDNS</sys:String>
+    <sys:String x:Key="Ip">IP</sys:String>
+    <sys:String x:Key="SourceNetmask">Source netmask</sys:String>
+    <sys:String x:Key="ScopeNetmask">Scope netmask</sys:String>
+    <sys:String x:Key="Test">测试</sys:String>
+    <sys:String x:Key="Domain">域名</sys:String>
+</ResourceDictionary>

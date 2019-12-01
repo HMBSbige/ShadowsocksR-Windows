@@ -1,10 +1,10 @@
 ﻿<Window x:Class="Shadowsocks.View.ServerLogWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="clr-namespace:Shadowsocks.Controls"
         xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
         xmlns:model="clr-namespace:Shadowsocks.Model"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:valueConverter="clr-namespace:Shadowsocks.View.ValueConverter"
         x:Name="Slw" >
 
     <Window.Resources>
@@ -31,16 +31,16 @@
             <system:String x:Key="ErrorContinuousTimesMappingName">SpeedLog.ErrorContinuousTimes</system:String>
             <system:String x:Key="ErrorPercentMappingName">SpeedLog.ErrorPercent</system:String>
 
-            <controls:SpeedToBrushConverter x:Key="SpeedToBrushConverter" />
-            <controls:ConnectNumberToBrushConverter x:Key="ConnectNumberToBrushConverter" />
-            <controls:LatencyToBrushConverter x:Key="LatencyToBrushConverter" />
-            <controls:ConnectErrorToBrushConverter x:Key="ConnectErrorToBrushConverter" />
-            <controls:ConnectEmptyToBrushConverter x:Key="ConnectEmptyToBrushConverter" />
-            <controls:ErrorPercentToBrushConverter x:Key="ErrorPercentToBrushConverter" />
-            <controls:BooleanToEnabledConverter x:Key="BooleanToEnabledConverter" />
-            <controls:TotalDownloadBackgroundBrushConvert x:Key="TotalDownloadBackgroundBrushConvert" />
-            <controls:TotalUploadBackgroundBrushConvert x:Key="TotalUploadBackgroundBrushConvert" />
-            <controls:TotalDownloadRawBackgroundBrushConvert x:Key="TotalDownloadRawBackgroundBrushConvert" />
+            <valueConverter:SpeedToBrushConverter x:Key="SpeedToBrushConverter" />
+            <valueConverter:ConnectNumberToBrushConverter x:Key="ConnectNumberToBrushConverter" />
+            <valueConverter:LatencyToBrushConverter x:Key="LatencyToBrushConverter" />
+            <valueConverter:ConnectErrorToBrushConverter x:Key="ConnectErrorToBrushConverter" />
+            <valueConverter:ConnectEmptyToBrushConverter x:Key="ConnectEmptyToBrushConverter" />
+            <valueConverter:ErrorPercentToBrushConverter x:Key="ErrorPercentToBrushConverter" />
+            <valueConverter:BooleanToEnabledConverter x:Key="BooleanToEnabledConverter" />
+            <valueConverter:TotalDownloadBackgroundBrushConvert x:Key="TotalDownloadBackgroundBrushConvert" />
+            <valueConverter:TotalUploadBackgroundBrushConvert x:Key="TotalUploadBackgroundBrushConvert" />
+            <valueConverter:TotalDownloadRawBackgroundBrushConvert x:Key="TotalDownloadRawBackgroundBrushConvert" />
             <SolidColorBrush x:Key="BorderBrush">#E5E5E5</SolidColorBrush>
             <Style TargetType="syncfusion:GridHeaderCellControl">
                 <Setter Property="Foreground" Value="Black" />

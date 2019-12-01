@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -31,8 +31,8 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <None Remove="Controls\MaskedTextBox.xaml" />
-    <None Remove="Controls\NumberUpDown.xaml" />
+    <None Remove="View\Controls\MaskedTextBox.xaml" />
+    <None Remove="View\Controls\NumberUpDown.xaml" />
     <None Remove="Resources\ssw128.png" />
     <None Remove="View\LogWindow.xaml" />
     <None Remove="View\PortSettingsWindow.xaml" />
@@ -48,19 +48,18 @@
   
   <ItemGroup>
     <PackageReference Include="Costura.Fody" Version="4.1.0" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' " />
-    <PackageReference Include="DnsClient" Version="1.2.0" />
     <PackageReference Include="Fody" Version="6.0.4" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' ">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' " />
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.0.8" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="Syncfusion.Licensing" Version="17.3.0.26" />
-    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="17.3.0.26" />
-    <PackageReference Include="Syncfusion.Shared.WPF" Version="17.3.0.26" />
-    <PackageReference Include="Syncfusion.Tools.WPF" Version="17.3.0.26" />
+    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="17.3.0.29" />
+    <PackageReference Include="Syncfusion.Tools.WPF" Version="17.3.0.29" />
+    <PackageReference Include="ARSoft.Tools.Net" Version="2.3.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="WpfColorFontDialog" Version="1.0.6" />
+    <PackageReference Include="System.Reactive" Version="4.2.0" />
+    <PackageReference Include="WpfColorFontDialog" Version="1.0.7" />
     <PackageReference Include="ZXing.Net" Version="0.16.5" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' " />
     <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.6" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' == 'true' " />
   </ItemGroup>
@@ -68,11 +67,6 @@
   <ItemGroup Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' ">
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.IO.Compression" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controller\SystemProxy\" />
-    <Folder Include="Util\SingleInstance\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -125,6 +119,15 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="I18N\LogWindow.zh-TW.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\DnsSettingWindow.en-US.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\DnsSettingWindow.zh-CN.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\DnsSettingWindow.zh-TW.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="I18N\SubscribeWindow.en-US.xaml">

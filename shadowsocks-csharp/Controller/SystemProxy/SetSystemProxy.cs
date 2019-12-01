@@ -44,7 +44,7 @@ namespace Shadowsocks.Controller.SystemProxy
         public bool Pac(string url)
         {
             Initialize(ref _options, ProxyType.Pac, url);
-            return Apply_connect(ref _options, null);
+            return Apply();
         }
 
         public bool Global(string url, string bypass = @"")
@@ -54,13 +54,13 @@ namespace Shadowsocks.Controller.SystemProxy
             var realBypassList = customBypassList.Distinct().ToArray();
             var realBypassString = string.Join(",", realBypassList);
             Initialize(ref _options, ProxyType.Global, url, realBypassString);
-            return Apply_connect(ref _options, null);
+            return Apply();
         }
 
         public bool Direct()
         {
             Initialize(ref _options, ProxyType.Direct);
-            return Apply_connect(ref _options, null);
+            return Apply();
         }
 
         private static void Initialize(ref INTERNET_PER_CONN_OPTION_LIST options, ProxyType type, string url = null, string bypass = @"<local>")
@@ -170,6 +170,52 @@ namespace Shadowsocks.Controller.SystemProxy
             }
 
             return true;
+        }
+
+        private static IEnumerable<string> GetRasEntryNames()
+        {
+            var cb = Marshal.SizeOf(typeof(RASENTRYNAME));
+            var entries = 0;
+            var lpRasEntryName = new RASENTRYNAME[1];
+            lpRasEntryName[0].Size = Marshal.SizeOf(typeof(RASENTRYNAME));
+
+            NativeMethods.RasEnumEntries(IntPtr.Zero, IntPtr.Zero, lpRasEntryName, ref cb, ref entries);
+
+            if (entries == 0) return new string[0];
+
+            var entryNames = new string[entries];
+
+            lpRasEntryName = new RASENTRYNAME[entries];
+            for (var i = 0; i < entries; ++i)
+            {
+                lpRasEntryName[i].Size = Marshal.SizeOf(typeof(RASENTRYNAME));
+            }
+
+            NativeMethods.RasEnumEntries(IntPtr.Zero, IntPtr.Zero, lpRasEntryName, ref cb, ref entries);
+
+            for (var i = 0; i < entries; ++i)
+            {
+                entryNames[i] = lpRasEntryName[i].EntryName;
+            }
+
+            return entryNames;
+        }
+
+        private bool Apply()
+        {
+            var res = true;
+            foreach (var name in GetRasEntryNames())
+            {
+                if (!Apply_connect(ref _options, name))
+                {
+                    res = false;
+                }
+            }
+            if (!Apply_connect(ref _options, null))
+            {
+                res = false;
+            }
+            return res;
         }
 
         #region IDisposable Support

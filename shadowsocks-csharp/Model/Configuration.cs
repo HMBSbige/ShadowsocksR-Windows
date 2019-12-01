@@ -1,4 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿#if IsDotNetCore
+using System.Text.Json.Serialization;
+#else
+using Newtonsoft.Json;
+#endif
 using Shadowsocks.Enums;
 using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
@@ -20,17 +24,15 @@ namespace Shadowsocks.Model
         private ProxyMode _sysProxyMode;
         private bool _shareOverLan;
         private int _localPort;
-        private string _localDnsServer;
-        private string _dnsServer;
         private int _reconnectTimes;
-        private string _balanceAlgorithm;
+        private BalanceType _balanceType;
         private bool _randomInGroup;
         private int _ttl;
         private int _connectTimeout;
         private ProxyRuleMode _proxyRuleMode;
         private bool _proxyEnable;
         private bool _pacDirectGoProxy;
-        private int _proxyType;
+        private ProxyType _proxyType;
         private string _proxyHost;
         private int _proxyPort;
         private string _proxyAuthUser;
@@ -45,6 +47,7 @@ namespace Shadowsocks.Model
         private bool _isPreRelease;
         private bool _autoCheckUpdate;
         private string _langName;
+        private List<DnsClient> _dnsClients;
         private List<ServerSubscribe> _serverSubscribes;
         private Dictionary<string, PortMapConfig> _portMap;
 
@@ -83,16 +86,6 @@ namespace Shadowsocks.Model
         public int LocalPort { get => _localPort; set => SetField(ref _localPort, value); }
 
         /// <summary>
-        /// 用于解析服务器地址的 DNS 服务器
-        /// </summary>
-        public string LocalDnsServer { get => _localDnsServer; set => SetField(ref _localDnsServer, value); }
-
-        /// <summary>
-        /// 用于解析访问网站的 DNS 服务器
-        /// </summary>
-        public string DnsServer { get => _dnsServer; set => SetField(ref _dnsServer, value); }
-
-        /// <summary>
         /// 重连次数
         /// </summary>
         public int ReconnectTimes { get => _reconnectTimes; set => SetField(ref _reconnectTimes, value); }
@@ -100,7 +93,7 @@ namespace Shadowsocks.Model
         /// <summary>
         /// 负载均衡使用的算法
         /// </summary>
-        public string BalanceAlgorithm { get => _balanceAlgorithm; set => SetField(ref _balanceAlgorithm, value); }
+        public BalanceType BalanceType { get => _balanceType; set => SetField(ref _balanceType, value); }
 
         /// <summary>
         /// 负载均衡是否只在所选组切换
@@ -135,7 +128,7 @@ namespace Shadowsocks.Model
         /// <summary>
         /// 二级代理类型
         /// </summary>
-        public int ProxyType { get => _proxyType; set => SetField(ref _proxyType, value); }
+        public ProxyType ProxyType { get => _proxyType; set => SetField(ref _proxyType, value); }
 
         /// <summary>
         /// 二级代理服务器地址
@@ -206,6 +199,11 @@ namespace Shadowsocks.Model
         /// 所选的语言
         /// </summary>
         public string LangName { get => _langName; set => SetField(ref _langName, value); }
+
+        /// <summary>
+        /// 自定义的 DNS
+        /// </summary>
+        public List<DnsClient> DnsClients { get => _dnsClients; set => SetField(ref _dnsClients, value); }
 
         /// <summary>
         /// 订阅列表
@@ -288,7 +286,7 @@ namespace Shadowsocks.Model
                     int i;
                     if (filter == null && RandomInGroup)
                     {
-                        i = serverStrategy.Select(Configs, Index, BalanceAlgorithm, delegate (Server server, Server selServer)
+                        i = serverStrategy.Select(Configs, Index, BalanceType, delegate (Server server, Server selServer)
                         {
                             if (selServer != null)
                                 return selServer.Group == server.Group;
@@ -297,7 +295,7 @@ namespace Shadowsocks.Model
                     }
                     else
                     {
-                        i = serverStrategy.Select(Configs, Index, BalanceAlgorithm, filter, true);
+                        i = serverStrategy.Select(Configs, Index, BalanceType, filter, true);
                     }
                     return i == -1 ? GetErrorServer() : Configs[i];
                 }
@@ -307,7 +305,7 @@ namespace Shadowsocks.Model
                     int i;
                     if (filter == null && RandomInGroup)
                     {
-                        i = serverStrategy.Select(Configs, Index, BalanceAlgorithm, delegate (Server server, Server selServer)
+                        i = serverStrategy.Select(Configs, Index, BalanceType, delegate (Server server, Server selServer)
                         {
                             if (selServer != null)
                                 return selServer.Group == server.Group;
@@ -316,7 +314,7 @@ namespace Shadowsocks.Model
                     }
                     else
                     {
-                        i = serverStrategy.Select(Configs, Index, BalanceAlgorithm, filter);
+                        i = serverStrategy.Select(Configs, Index, BalanceType, filter);
                     }
                     if (i == -1) return GetErrorServer();
                     if (targetAddr != null)
@@ -432,17 +430,15 @@ namespace Shadowsocks.Model
             SysProxyMode = ProxyMode.NoModify;
             ShareOverLan = false;
             LocalPort = 1080;
-            LocalDnsServer = string.Empty;
-            DnsServer = string.Empty;
             ReconnectTimes = 2;
-            BalanceAlgorithm = LoadBalance.LowException.ToString();
+            BalanceType = BalanceType.LowException;
             RandomInGroup = true;
-            Ttl = 180;
+            Ttl = 60;
             ConnectTimeout = 5;
             ProxyRuleMode = ProxyRuleMode.Disable;
             ProxyEnable = false;
             PacDirectGoProxy = false;
-            ProxyType = 0;
+            ProxyType = ProxyType.Socks5;
             ProxyHost = string.Empty;
             ProxyPort = 1;
             ProxyAuthUser = string.Empty;
@@ -457,6 +453,7 @@ namespace Shadowsocks.Model
             IsPreRelease = false;
             AutoCheckUpdate = true;
             LangName = string.Empty;
+            DnsClients = new List<DnsClient>();
             ServerSubscribes = new List<ServerSubscribe>();
             PortMap = new Dictionary<string, PortMapConfig>();
         }
@@ -469,10 +466,8 @@ namespace Shadowsocks.Model
             SysProxyMode = config.SysProxyMode;
             ShareOverLan = config.ShareOverLan;
             LocalPort = config.LocalPort;
-            LocalDnsServer = config.LocalDnsServer;
-            DnsServer = config.DnsServer;
             ReconnectTimes = config.ReconnectTimes;
-            BalanceAlgorithm = config.BalanceAlgorithm;
+            BalanceType = config.BalanceType;
             RandomInGroup = config.RandomInGroup;
             Ttl = config.Ttl;
             ConnectTimeout = config.ConnectTimeout;
@@ -494,6 +489,7 @@ namespace Shadowsocks.Model
             IsPreRelease = config.IsPreRelease;
             AutoCheckUpdate = config.AutoCheckUpdate;
             LangName = config.LangName;
+            DnsClients = config.DnsClients;
             ServerSubscribes = config.ServerSubscribes;
             //PortMap = config.PortMap;
         }
@@ -512,7 +508,7 @@ namespace Shadowsocks.Model
             {
                 ConnectTimeout = 5;
                 ReconnectTimes = 2;
-                Ttl = 180;
+                Ttl = 60;
             }
             if (Index < 0 || Index >= Configs.Count)
             {
@@ -543,14 +539,6 @@ namespace Shadowsocks.Model
         {
             var server = new Server { server = @"invalid" };
             return server;
-        }
-
-        public static void CheckPort(int port)
-        {
-            if (!IsPort(port))
-            {
-                throw new ConfigurationException(I18NUtil.GetAppStringValue(@"PortOutOfRange"));
-            }
         }
 
         private static bool IsPort(int port)

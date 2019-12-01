@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json;
-using Shadowsocks.Controller;
+﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller.HttpRequest;
+using Shadowsocks.Controller.Service;
+using Shadowsocks.Util;
 using System;
 using System.IO;
 using System.Net;
@@ -21,6 +23,10 @@ namespace Shadowsocks.Model
         public static MainController Controller;
 
         public static MenuViewController ViewController;
+
+        public static UpdateNode UpdateNodeChecker;
+
+        public static UpdateSubscribeManager UpdateSubscribeManager;
 
         public static Configuration LoadFile(string filename)
         {
@@ -56,7 +62,7 @@ namespace Shadowsocks.Model
         {
             try
             {
-                var config = JsonConvert.DeserializeObject<Configuration>(configStr);
+                var config = JsonUtils.Deserialize<Configuration>(configStr);
                 config.FixConfiguration();
                 return config;
             }
@@ -84,7 +90,7 @@ namespace Shadowsocks.Model
 
             try
             {
-                var jsonString = JsonConvert.SerializeObject(GuiConfig, Formatting.Indented);
+                var jsonString = JsonUtils.Serialize(GuiConfig, true);
                 File.WriteAllText(ConfigFile, jsonString);
             }
             catch (IOException e)

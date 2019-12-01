@@ -59,6 +59,7 @@
         <Separator />
         <MenuItem x:Name="More">
             <MenuItem x:Name="GlobalSettings" />
+            <MenuItem x:Name="DnsSettings" />
             <MenuItem x:Name="PortSettings" />
             <MenuItem x:Name="GenQrCode" />
             <Separator />

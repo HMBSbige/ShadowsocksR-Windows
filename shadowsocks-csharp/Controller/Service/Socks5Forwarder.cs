@@ -119,7 +119,7 @@ namespace Shadowsocks.Controller.Service
                                 }
                                 if (ipAddress == null)
                                 {
-                                    ipAddress = DnsUtil.QueryDns(host, host.IndexOf('.') >= 0 ? _config.DnsServer : null);
+                                    ipAddress = DnsUtil.QueryDns(host);
                                     if (ipAddress != null)
                                     {
                                         DnsUtil.DnsBuffer.Set(host, new IPAddress(ipAddress.GetAddressBytes()));
@@ -296,7 +296,7 @@ namespace Shadowsocks.Controller.Service
                                 }
                                 if (ipAddress == null)
                                 {
-                                    ipAddress = DnsUtil.QueryDns(_remote_host, _remote_host.IndexOf('.') >= 0 ? _config.LocalDnsServer : null);
+                                    ipAddress = DnsUtil.QueryDns(_remote_host);
                                 }
                                 if (ipAddress != null)
                                 {
@@ -348,13 +348,13 @@ namespace Shadowsocks.Controller.Service
 
             private bool ConnectProxyServer(string strRemoteHost, int iRemotePort)
             {
-                if (_config.ProxyType == 0)
+                if (_config.ProxyType == ProxyType.Socks5)
                 {
                     var ret = _remote.ConnectSocks5ProxyServer(strRemoteHost, iRemotePort, false, _config.ProxyAuthUser, _config.ProxyAuthPass);
                     return ret;
                 }
 
-                if (_config.ProxyType == 1)
+                if (_config.ProxyType == ProxyType.Http)
                 {
                     var ret = _remote.ConnectHttpProxyServer(strRemoteHost, iRemotePort, _config.ProxyAuthUser, _config.ProxyAuthPass, _config.ProxyUserAgent);
                     return ret;

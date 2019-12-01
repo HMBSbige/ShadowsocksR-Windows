@@ -706,7 +706,7 @@ namespace Shadowsocks.Proxy
 
         private bool ConnectProxyServer(string strRemoteHost, int iRemotePort)
         {
-            if (cfg.ProxyType == 0)
+            if (cfg.ProxyType == ProxyType.Socks5)
             {
                 var ret = remote.ConnectSocks5ProxyServer(strRemoteHost, iRemotePort, connectionUDP != null && !server.UdpOverTcp, cfg.Socks5RemoteUsername, cfg.Socks5RemotePassword);
                 remote.SetTcpServer(server.server, server.Server_Port);
@@ -720,7 +720,7 @@ namespace Shadowsocks.Proxy
                 return ret;
             }
 
-            if (cfg.ProxyType == 1)
+            if (cfg.ProxyType == ProxyType.Http)
             {
                 var ret = remote.ConnectHttpProxyServer(strRemoteHost, iRemotePort, cfg.Socks5RemoteUsername, cfg.Socks5RemotePassword, cfg.ProxyUserAgent);
                 remote.SetTcpServer(server.server, server.Server_Port);
@@ -770,7 +770,7 @@ namespace Shadowsocks.Proxy
                 var host = cfg.TargetHost;
                 if (!IPAddress.TryParse(host, out var ipAddress))
                 {
-                    ipAddress = DnsUtil.DnsBuffer.Get(host) ?? DnsUtil.QueryDns(host, host.IndexOf('.') >= 0 ? cfg.DnsServers : null);
+                    ipAddress = DnsUtil.DnsBuffer.Get(host) ?? DnsUtil.QueryDns(host);
                     if (ipAddress != null)
                     {
                         Logging.Info($@"DNS nolock query {host} answer {ipAddress}");
@@ -815,15 +815,15 @@ namespace Shadowsocks.Proxy
                         server.DnsBuffer.force_expired = true;
                     }
 
-                    if (server.DnsBuffer.isExpired(serverHost))
+                    if (server.DnsBuffer.IsExpired(serverHost))
                     {
                         var dnsOk = false;
                         var buf = server.DnsBuffer;
                         if (Monitor.TryEnter(buf, buf.Ip != null ? 100 : 1000000))
                         {
-                            if (buf.isExpired(serverHost))
+                            if (buf.IsExpired(serverHost))
                             {
-                                ipAddress = DnsUtil.QueryDns(serverHost, serverHost.IndexOf('.') >= 0 ? cfg.LocalDnsServers : null);
+                                ipAddress = DnsUtil.QueryDns(serverHost);
 
                                 if (ipAddress != null)
                                 {

@@ -8,15 +8,12 @@
     <sys:String x:Key="Local">Local</sys:String>
     <sys:String x:Key="Version">Version</sys:String>
 
-    <sys:String x:Key="Ok">OK</sys:String>
+    <sys:String x:Key="Ok">&#160;&#160;OK&#160;&#160;</sys:String>
     <sys:String x:Key="Cancel">Cancel</sys:String>
     <sys:String x:Key="Apply">Apply</sys:String>
 
-    <sys:String x:Key="Socks5">Socks5(support UDP)</sys:String>
-    <sys:String x:Key="Http">Http tunnel</sys:String>
-    <sys:String x:Key="TcpPortTunnel">TCP Port tunnel</sys:String>
-
     <sys:String x:Key="FailAutoStartUp">Failed to update registry</sys:String>
+    <sys:String x:Key="RestartRequired">Restart required</sys:String>
 
     <sys:String x:Key="RemoteProxy">Remote proxy</sys:String>
     <sys:String x:Key="ProxyOn">Proxy On</sys:String>
@@ -35,6 +32,7 @@
     <sys:String x:Key="Misc">Misc</sys:String>
     <sys:String x:Key="Balance">Balance</sys:String>
     <sys:String x:Key="Logging">Logging</sys:String>
+    <sys:String x:Key="Language">Language</sys:String>
     <sys:String x:Key="StartOnBoot">Start on Boot</sys:String>
     <sys:String x:Key="SwitchAutoCloseTcpLinks">Switch auto close TCP links</sys:String>
     <sys:String x:Key="LoadBalance">Load balance</sys:String>
@@ -43,8 +41,6 @@
     <sys:String x:Key="EnableLog">Enable Log</sys:String>
 
     <sys:String x:Key="SetDefault">Set Default</sys:String>
-    <sys:String x:Key="Dns">DNS</sys:String>
-    <sys:String x:Key="LocalDns">Local Dns</sys:String>
     <sys:String x:Key="ReconnectTimes">Reconnect Times</sys:String>
     <sys:String x:Key="ConnectTimeout">Connect Timeout</sys:String>
     <sys:String x:Key="Ttl">TTL</sys:String>

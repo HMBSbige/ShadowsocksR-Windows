@@ -5,20 +5,25 @@
 
     <sys:String x:Key="Title">Subscribe Settings</sys:String>
 
-    <sys:String x:Key="Ok">OK</sys:String>
+    <sys:String x:Key="Ok">Confirm &amp; update</sys:String>
     <sys:String x:Key="Cancel">Cancel</sys:String>
     <sys:String x:Key="Apply">Apply</sys:String>
 
     <sys:String x:Key="Add">Add</sys:String>
     <sys:String x:Key="Delete">Delete</sys:String>
-    <sys:String x:Key="DeleteAll">Delete with servers</sys:String>
 
     <sys:String x:Key="Url">URL</sys:String>
     <sys:String x:Key="GroupName">Subscription remark</sys:String>
     <sys:String x:Key="LastUpdate">Last Update</sys:String>
     <sys:String x:Key="AutoUpdate">Auto update</sys:String>
-    <sys:String x:Key="Update">Save and Update</sys:String>
+    <sys:String x:Key="Update">Update current subscription</sys:String>
     <sys:String x:Key="SaveError">Subscription remarks cannot have the same</sys:String>
+
+    <sys:String x:Key="ProxyType">Proxy type</sys:String>
+    <sys:String x:Key="Auto">Auto</sys:String>
+    <sys:String x:Key="Direct">Direct</sys:String>
+    <sys:String x:Key="Proxy">Proxy</sys:String>
+    <sys:String x:Key="SystemSetting">System Setting</sys:String>
 
     <sys:String x:Key="SaveQuestion" xml:space="preserve">Some subscription servers that are not on the subscription list were found.&#13;Do you want to delete these servers？</sys:String>
 

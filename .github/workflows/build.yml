@@ -1,0 +1,29 @@
+name: GitHub CI
+on: [push]
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: Setup Nuget.exe
+      uses: warrenbuckley/Setup-Nuget@v1
+
+    - name: Setup NuGet Private Sources
+      run: nuget sources add -Name "GitHub-HMBSbige" -Source "https://nuget.pkg.github.com/HMBSbige/index.json" -UserName HMBSbige -Password "${{ secrets.NUGET_TOKEN }}"
+      shell: cmd
+
+    - name: Setup MSBuild.exe
+      uses: warrenbuckley/Setup-MSBuild@v1
+
+    - name: Build .NET Core 3.0
+      working-directory: shadowsocks-csharp
+      run: msbuild -v:m -r -t:Build -p:Configuration=Release -p:TargetFramework=netcoreapp3.0
+
+    - name: Build .NET 4.8
+      working-directory: shadowsocks-csharp
+      run: msbuild -v:m -r -t:Build -p:Configuration=Release -p:TargetFramework=net48

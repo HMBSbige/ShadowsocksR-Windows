@@ -1,8 +1,8 @@
 ﻿using Shadowsocks.Controller;
-using Shadowsocks.Controls;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
+using Shadowsocks.View.Controls;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -10,6 +10,7 @@ using System.Windows.Controls;
 
 namespace Shadowsocks.View
 {
+    //TODO:MVVM
     public partial class PortSettingsWindow
     {
         private readonly MainController _controller;

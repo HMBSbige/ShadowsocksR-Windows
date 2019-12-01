@@ -12,11 +12,8 @@
     <sys:String x:Key="Cancel">取消</sys:String>
     <sys:String x:Key="Apply">应用</sys:String>
 
-    <sys:String x:Key="Socks5">Socks5(支持UDP)</sys:String>
-    <sys:String x:Key="Http">HTTP 隧道</sys:String>
-    <sys:String x:Key="TcpPortTunnel">TCP 端口转发</sys:String>
-
     <sys:String x:Key="FailAutoStartUp">无法修改注册表</sys:String>
+    <sys:String x:Key="RestartRequired">需要重启</sys:String>
 
     <sys:String x:Key="RemoteProxy">二级（前置）代理</sys:String>
     <sys:String x:Key="ProxyOn">开启代理</sys:String>
@@ -35,6 +32,7 @@
     <sys:String x:Key="Misc">杂项</sys:String>
     <sys:String x:Key="Balance">负载均衡</sys:String>
     <sys:String x:Key="Logging">日志记录</sys:String>
+    <sys:String x:Key="Language">选择语言</sys:String>
     <sys:String x:Key="StartOnBoot">开机启动</sys:String>
     <sys:String x:Key="SwitchAutoCloseTcpLinks">切换服务器前断开所有连接</sys:String>
     <sys:String x:Key="LoadBalance">服务器负载均衡</sys:String>
@@ -43,8 +41,6 @@
     <sys:String x:Key="EnableLog">开启日志</sys:String>
 
     <sys:String x:Key="SetDefault">重置默认值</sys:String>
-    <sys:String x:Key="Dns">DNS</sys:String>
-    <sys:String x:Key="LocalDns">递归 DNS</sys:String>
     <sys:String x:Key="ReconnectTimes">重连次数</sys:String>
     <sys:String x:Key="ConnectTimeout">连接超时</sys:String>
     <sys:String x:Key="Ttl">空闲断开秒数</sys:String>
