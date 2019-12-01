@@ -323,7 +323,7 @@ namespace Shadowsocks.Controller
         /// <summary>
         /// 保存配置文件并通知配置改变
         /// </summary>
-        private void SaveAndNotifyChanged()
+        public void SaveAndNotifyChanged()
         {
             Global.SaveConfig();
             Application.Current.Dispatcher?.InvokeAsync(() => { ConfigChanged?.Invoke(this, new EventArgs()); });

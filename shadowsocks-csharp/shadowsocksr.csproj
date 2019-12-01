@@ -53,14 +53,12 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' " />
-    <PackageReference Include="DnsClient" Version="1.2.0" />
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.0.8" />
-    <PackageReference Include="Syncfusion.Licensing" Version="17.3.0.29" />
     <PackageReference Include="Syncfusion.SfGrid.WPF" Version="17.3.0.29" />
-    <PackageReference Include="Syncfusion.Shared.WPF" Version="17.3.0.29" />
     <PackageReference Include="Syncfusion.Tools.WPF" Version="17.3.0.29" />
     <PackageReference Include="ARSoft.Tools.Net" Version="2.3.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Reactive" Version="4.2.0" />
     <PackageReference Include="WpfColorFontDialog" Version="1.0.7" />
     <PackageReference Include="ZXing.Net" Version="0.16.5" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' " />
     <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.6" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' == 'true' " />
@@ -121,6 +119,15 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="I18N\LogWindow.zh-TW.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\DnsSettingWindow.en-US.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\DnsSettingWindow.zh-CN.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\DnsSettingWindow.zh-TW.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="I18N\SubscribeWindow.en-US.xaml">

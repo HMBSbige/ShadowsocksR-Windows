@@ -555,14 +555,6 @@ namespace Shadowsocks.Proxy
             handler.cfg.Ttl = _config.Ttl;
             handler.cfg.ConnectTimeout = _config.ConnectTimeout;
             handler.cfg.AutoSwitchOff = _config.AutoBan;
-            if (!string.IsNullOrEmpty(_config.LocalDnsServer))
-            {
-                handler.cfg.LocalDnsServers = _config.LocalDnsServer;
-            }
-            if (!string.IsNullOrEmpty(_config.DnsServer))
-            {
-                handler.cfg.DnsServers = _config.DnsServer;
-            }
             if (_config.PortMapCache.ContainsKey(local_port))
             {
                 var cfg = _config.PortMapCache[local_port];

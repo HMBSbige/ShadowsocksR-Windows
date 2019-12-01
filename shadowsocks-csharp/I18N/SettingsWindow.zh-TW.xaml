@@ -41,8 +41,6 @@
     <sys:String x:Key="EnableLog">開啟日誌</sys:String>
 
     <sys:String x:Key="SetDefault">重置預設值</sys:String>
-    <sys:String x:Key="Dns">DNS</sys:String>
-    <sys:String x:Key="LocalDns">遞迴 DNS</sys:String>
     <sys:String x:Key="ReconnectTimes">重連次數</sys:String>
     <sys:String x:Key="ConnectTimeout">連接逾時</sys:String>
     <sys:String x:Key="Ttl">空閒斷開秒數</sys:String>

@@ -41,8 +41,6 @@
     <sys:String x:Key="EnableLog">Enable Log</sys:String>
 
     <sys:String x:Key="SetDefault">Set Default</sys:String>
-    <sys:String x:Key="Dns">DNS</sys:String>
-    <sys:String x:Key="LocalDns">Local Dns</sys:String>
     <sys:String x:Key="ReconnectTimes">Reconnect Times</sys:String>
     <sys:String x:Key="ConnectTimeout">Connect Timeout</sys:String>
     <sys:String x:Key="Ttl">TTL</sys:String>

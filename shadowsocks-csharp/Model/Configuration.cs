@@ -24,8 +24,6 @@ namespace Shadowsocks.Model
         private ProxyMode _sysProxyMode;
         private bool _shareOverLan;
         private int _localPort;
-        private string _localDnsServer;
-        private string _dnsServer;
         private int _reconnectTimes;
         private BalanceType _balanceType;
         private bool _randomInGroup;
@@ -49,6 +47,7 @@ namespace Shadowsocks.Model
         private bool _isPreRelease;
         private bool _autoCheckUpdate;
         private string _langName;
+        private List<DnsClient> _dnsClients;
         private List<ServerSubscribe> _serverSubscribes;
         private Dictionary<string, PortMapConfig> _portMap;
 
@@ -85,16 +84,6 @@ namespace Shadowsocks.Model
         /// 监听端口
         /// </summary>
         public int LocalPort { get => _localPort; set => SetField(ref _localPort, value); }
-
-        /// <summary>
-        /// 用于解析服务器地址的 DNS 服务器
-        /// </summary>
-        public string LocalDnsServer { get => _localDnsServer; set => SetField(ref _localDnsServer, value); }
-
-        /// <summary>
-        /// 用于解析访问网站的 DNS 服务器
-        /// </summary>
-        public string DnsServer { get => _dnsServer; set => SetField(ref _dnsServer, value); }
 
         /// <summary>
         /// 重连次数
@@ -210,6 +199,11 @@ namespace Shadowsocks.Model
         /// 所选的语言
         /// </summary>
         public string LangName { get => _langName; set => SetField(ref _langName, value); }
+
+        /// <summary>
+        /// 自定义的 DNS
+        /// </summary>
+        public List<DnsClient> DnsClients { get => _dnsClients; set => SetField(ref _dnsClients, value); }
 
         /// <summary>
         /// 订阅列表
@@ -436,8 +430,6 @@ namespace Shadowsocks.Model
             SysProxyMode = ProxyMode.NoModify;
             ShareOverLan = false;
             LocalPort = 1080;
-            LocalDnsServer = string.Empty;
-            DnsServer = string.Empty;
             ReconnectTimes = 2;
             BalanceType = BalanceType.LowException;
             RandomInGroup = true;
@@ -461,6 +453,7 @@ namespace Shadowsocks.Model
             IsPreRelease = false;
             AutoCheckUpdate = true;
             LangName = string.Empty;
+            DnsClients = new List<DnsClient>();
             ServerSubscribes = new List<ServerSubscribe>();
             PortMap = new Dictionary<string, PortMapConfig>();
         }
@@ -473,8 +466,6 @@ namespace Shadowsocks.Model
             SysProxyMode = config.SysProxyMode;
             ShareOverLan = config.ShareOverLan;
             LocalPort = config.LocalPort;
-            LocalDnsServer = config.LocalDnsServer;
-            DnsServer = config.DnsServer;
             ReconnectTimes = config.ReconnectTimes;
             BalanceType = config.BalanceType;
             RandomInGroup = config.RandomInGroup;
@@ -498,6 +489,7 @@ namespace Shadowsocks.Model
             IsPreRelease = config.IsPreRelease;
             AutoCheckUpdate = config.AutoCheckUpdate;
             LangName = config.LangName;
+            DnsClients = config.DnsClients;
             ServerSubscribes = config.ServerSubscribes;
             //PortMap = config.PortMap;
         }
@@ -547,14 +539,6 @@ namespace Shadowsocks.Model
         {
             var server = new Server { server = @"invalid" };
             return server;
-        }
-
-        public static void CheckPort(int port)
-        {
-            if (!IsPort(port))
-            {
-                throw new ConfigurationException(I18NUtil.GetAppStringValue(@"PortOutOfRange"));
-            }
         }
 
         private static bool IsPort(int port)

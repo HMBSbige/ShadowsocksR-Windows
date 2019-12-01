@@ -68,6 +68,7 @@ namespace Shadowsocks.Controller
         private MenuItem AllowPreReleaseItem;
         private ServerConfigWindow _serverConfigWindow;
         private SettingsWindow _settingsWindow;
+        private DnsSettingWindow _dnsSettingsWindow;
 
         #region ServerLogWindow
 
@@ -325,12 +326,14 @@ namespace Shadowsocks.Controller
                         {
                             _moreMenu = menuItem;
                             ((MenuItem)_moreMenu.Items[0]).Click += Setting_Click;
-                            ((MenuItem)_moreMenu.Items[1]).Click += ShowPortMapItem_Click;
-                            ((MenuItem)_moreMenu.Items[2]).Click += ShowUrlFromQrCode;
-                            ((MenuItem)_moreMenu.Items[4]).Click += OpenWiki_Click;
-                            ((MenuItem)_moreMenu.Items[5]).Click += FeedbackItem_Click;
+                            ((MenuItem)_moreMenu.Items[1]).Click += DnsSetting_Click;
+                            ((MenuItem)_moreMenu.Items[2]).Click += ShowPortMapItem_Click;
+                            ((MenuItem)_moreMenu.Items[3]).Click += ShowUrlFromQrCode;
+                            ((MenuItem)_moreMenu.Items[5]).Click += OpenWiki_Click;
+                            ((MenuItem)_moreMenu.Items[6]).Click += FeedbackItem_Click;
 
-                            _updateMenu = (MenuItem)_moreMenu.Items[7];
+                            _updateMenu = (MenuItem)_moreMenu.Items[8];
+
                             ((MenuItem)_updateMenu.Items[0]).Click += CheckUpdate_Click;
                             UpdateItem = (MenuItem)_updateMenu.Items[1];
                             AutoCheckUpdateItem = (MenuItem)_updateMenu.Items[3];
@@ -807,6 +810,26 @@ namespace Shadowsocks.Controller
             }
         }
 
+        private void ShowDnsSettingWindow()
+        {
+            if (_dnsSettingsWindow != null)
+            {
+                _dnsSettingsWindow.Activate();
+            }
+            else
+            {
+                _dnsSettingsWindow = new DnsSettingWindow();
+                _dnsSettingsWindow.Show();
+                _dnsSettingsWindow.Activate();
+                _dnsSettingsWindow.BringToFront();
+                _dnsSettingsWindow.Closed += (o, args) =>
+                {
+                    _dnsSettingsWindow = null;
+                    Utils.ReleaseMemory();
+                };
+            }
+        }
+
         private void ShowPortMapForm()
         {
             if (_portMapWindow != null)
@@ -954,6 +977,11 @@ namespace Shadowsocks.Controller
             ShowSettingForm();
         }
 
+        private void DnsSetting_Click(object sender, RoutedEventArgs e)
+        {
+            ShowDnsSettingWindow();
+        }
+
         public void Quit_Click(object sender, EventArgs e)
         {
             controller.Stop();
@@ -1016,6 +1044,9 @@ namespace Shadowsocks.Controller
                     break;
                 case 4:
                     ShowPortMapForm();
+                    break;
+                case 6:
+                    ShowDnsSettingWindow();
                     break;
                 default:
                     ShowConfigForm(false);

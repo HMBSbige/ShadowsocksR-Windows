@@ -48,6 +48,7 @@
 
     <sys:String x:Key="More">More</sys:String>
     <sys:String x:Key="GlobalSettings">Global settings...</sys:String>
+    <sys:String x:Key="DnsSettings">DNS settings...</sys:String>
     <sys:String x:Key="PortSettings">Port settings...</sys:String>
     <sys:String x:Key="OpenWiki">Open wiki...</sys:String>
     <sys:String x:Key="Feedback">Feedback...</sys:String>

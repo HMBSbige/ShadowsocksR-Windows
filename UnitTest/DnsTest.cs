@@ -1,9 +1,10 @@
-﻿using ARSoft.Tools.Net;
-using ARSoft.Tools.Net.Dns;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Shadowsocks.Enums;
+using Shadowsocks.Util.NetUtils;
 using System;
+using System.Collections.Generic;
 using System.Net;
-using System.Security.Authentication;
+using System.Threading.Tasks;
 
 namespace UnitTest
 {
@@ -11,58 +12,56 @@ namespace UnitTest
     public class DnsTest
     {
         [TestMethod]
-        public void Test()
+        public async Task DefaultTest()
         {
-            var ip = IPAddress.Parse(@"101.6.6.6");
-            const int port = 5353;
-            var domain = DomainName.Parse(@"www.google.com");
-            var options = new DnsQueryOptions
-            {
-                IsEDnsEnabled = true,
-                IsRecursionDesired = true,
-                EDnsOptions = new OptRecord { Options = { new ClientSubnetOption(32, ip) } }
-            };
-
-            var dnsClient = new ARSoft.Tools.Net.Dns.DnsClient(ip, 10000, port)
-            {
-                IsTcpEnabled = true,
-                IsUdpEnabled = false
-            };
-
-            var message = dnsClient.Resolve(domain, RecordType.A, RecordClass.INet, options);
-            Assert.IsTrue(message.AnswerRecords.Count > 0);
-            foreach (var answerRecord in message.AnswerRecords)
-            {
-                Console.WriteLine(answerRecord);
-            }
+            var ip1 = await DnsUtil.QueryAsync(@"dns.google");
+            Assert.IsTrue(Equals(ip1, IPAddress.Parse(@"8.8.8.8")) || Equals(ip1, IPAddress.Parse(@"8.8.4.4")));
+            var ip2 = await DnsUtil.QueryAsync(@"dns.google");
+            Assert.IsTrue(Equals(ip2, IPAddress.Parse(@"2001:4860:4860::8888")) || Equals(ip2, IPAddress.Parse(@"2001:4860:4860::8844")));
         }
 
         [TestMethod]
-        public void DnsOverTlsTest()
+        public async Task Test()
         {
-            var ip = IPAddress.Parse(@"8.8.8.8");
-            var tlsServer = new TlsUpstreamServer
+            var client = new Shadowsocks.Model.DnsClient(DnsType.Default)
             {
-                IPAddress = ip,
-                AuthName = @"dns.google",
-                SslProtocols = SslProtocols.Tls13 | SslProtocols.Tls12
+                DnsServer = @"101.6.6.6",
+                Port = 5353,
+                IsTcpEnabled = true,
+                IsUdpEnabled = false
             };
-            var domain = DomainName.Parse(@"www.google.com");
-            var options = new DnsQueryOptions
+            var ip = await client.QueryIpAddress(@"www.google.com", default);
+            Assert.IsNotNull(ip);
+            Console.WriteLine(ip);
+        }
+
+        [TestMethod]
+        public async Task DnsOverTlsTest()
+        {
+            var client = new Shadowsocks.Model.DnsClient(DnsType.DnsOverTls);
+            var ip = await client.QueryIpAddress(@"www.google.com", default);
+            Assert.IsNotNull(ip);
+            Console.WriteLine(ip);
+        }
+
+        [TestMethod]
+        public async Task TestTwoDnsAsync()
+        {
+            const string host = @"www.google.com";
+            var clients = new List<Shadowsocks.Model.DnsClient>
             {
-                IsEDnsEnabled = true,
-                IsRecursionDesired = true,
-                EDnsOptions = new OptRecord { Options = { new ClientSubnetOption(32, ip) } }
+                new Shadowsocks.Model.DnsClient(DnsType.Default)
+                {
+                        DnsServer = @"101.6.6.6",
+                        Port = 5353,
+                        IsTcpEnabled = true,
+                        IsUdpEnabled = false
+                },
+                new Shadowsocks.Model.DnsClient(DnsType.DnsOverTls)
             };
-
-            var dnsClient = new DnsOverTlsClient(tlsServer, 10000);
-
-            var message = dnsClient.Resolve(domain, RecordType.A, RecordClass.INet, options);
-            Assert.IsTrue(message.AnswerRecords.Count > 0);
-            foreach (var answerRecord in message.AnswerRecords)
-            {
-                Console.WriteLine(answerRecord);
-            }
+            var res = await DnsUtil.QueryAsync(host, clients);
+            Assert.IsNotNull(res);
+            Console.WriteLine(res);
         }
     }
 }

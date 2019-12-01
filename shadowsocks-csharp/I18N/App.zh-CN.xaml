@@ -48,6 +48,7 @@
 
     <sys:String x:Key="More">更多</sys:String>
     <sys:String x:Key="GlobalSettings">选项设置</sys:String>
+    <sys:String x:Key="DnsSettings">DNS 设置</sys:String>
     <sys:String x:Key="PortSettings">端口设置</sys:String>
     <sys:String x:Key="OpenWiki">帮助文档</sys:String>
     <sys:String x:Key="Feedback">问题反馈</sys:String>

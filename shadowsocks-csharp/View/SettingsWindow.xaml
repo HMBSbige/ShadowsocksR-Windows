@@ -123,8 +123,6 @@
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -133,8 +131,6 @@
                 <Label Grid.Row="3" Grid.Column="0" Content="{DynamicResource Balance}" VerticalAlignment="Center" Margin="0,0,10,0" />
                 <Label Grid.Row="6" Grid.Column="0" Content="{DynamicResource Logging}" VerticalAlignment="Center" Margin="0,0,10,0" />
                 <Label Grid.Row="7" Grid.Column="0" Content="{DynamicResource Language}" VerticalAlignment="Center" Margin="0,0,10,0" />
-                <Label Grid.Row="8" Grid.Column="0" Content="{DynamicResource Dns}" VerticalAlignment="Center" Margin="0,0,10,0" />
-                <Label Grid.Row="9" Grid.Column="0" Content="{DynamicResource LocalDns}" VerticalAlignment="Center" Margin="0,0,10,0" />
                 <CheckBox x:Name="AutoStartupCheckBox" Grid.Row="0" Grid.Column="1" Content="{DynamicResource StartOnBoot}" VerticalAlignment="Center" Margin="0,0,10,0" />
                 <CheckBox Grid.Row="1" Grid.Column="1" Content="{DynamicResource SwitchAutoCloseTcpLinks}" VerticalAlignment="Center" Margin="0,0,10,0" 
                 IsChecked="{Binding ModifiedConfiguration.CheckSwitchAutoCloseAll,Mode=TwoWay}"/>
@@ -155,17 +151,11 @@
                 IsChecked="{Binding ModifiedConfiguration.AutoBan,Mode=TwoWay}"/>
                 <CheckBox Grid.Row="6" Grid.Column="1" Content="{DynamicResource EnableLog}" VerticalAlignment="Center" Margin="0,0,10,0" 
                 IsChecked="{Binding ModifiedConfiguration.LogEnable,Mode=TwoWay}"/>
-                <ComboBox Grid.Row="7" Grid.Column="1" Text="{Binding ModifiedConfiguration.LangName}">
+                <ComboBox Grid.Row="7" Grid.Column="1" Text="{Binding ModifiedConfiguration.LangName}" Height="23.24">
                     <ComboBoxItem Content="en-US" />
                     <ComboBoxItem Content="zh-CN" />
                     <ComboBoxItem Content="zh-TW" />
                 </ComboBox>
-                <TextBox Grid.Row="8" Grid.Column="1" VerticalAlignment="Center" Height="23.24"
-                         VerticalContentAlignment="Center"
-                         Text="{Binding ModifiedConfiguration.DnsServer,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
-                <TextBox Grid.Row="9" Grid.Column="1" VerticalAlignment="Center" Height="23.24"
-                         VerticalContentAlignment="Center"
-                         Text="{Binding ModifiedConfiguration.LocalDnsServer,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
             </Grid>
         </GroupBox>
         <GroupBox Header="{DynamicResource Misc}" Grid.Row="1" Grid.Column="1" Margin="10,0,10,40" Grid.RowSpan="2">
@@ -193,7 +183,7 @@
                 Value="{Binding ModifiedConfiguration.Ttl,Mode=TwoWay}"/>
             </Grid>
         </GroupBox>
-        <Grid Grid.Row="2" Grid.Column="1" Margin="54,10,0,10" HorizontalAlignment="Left" Width="246">
+        <Grid Grid.Row="2" Grid.Column="1" Margin="54,10,0,10" HorizontalAlignment="Right" Width="246">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />

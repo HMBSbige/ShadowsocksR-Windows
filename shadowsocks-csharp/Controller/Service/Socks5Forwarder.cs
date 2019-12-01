@@ -119,7 +119,7 @@ namespace Shadowsocks.Controller.Service
                                 }
                                 if (ipAddress == null)
                                 {
-                                    ipAddress = DnsUtil.QueryDns(host, host.IndexOf('.') >= 0 ? _config.DnsServer : null);
+                                    ipAddress = DnsUtil.QueryDns(host);
                                     if (ipAddress != null)
                                     {
                                         DnsUtil.DnsBuffer.Set(host, new IPAddress(ipAddress.GetAddressBytes()));
@@ -296,7 +296,7 @@ namespace Shadowsocks.Controller.Service
                                 }
                                 if (ipAddress == null)
                                 {
-                                    ipAddress = DnsUtil.QueryDns(_remote_host, _remote_host.IndexOf('.') >= 0 ? _config.LocalDnsServer : null);
+                                    ipAddress = DnsUtil.QueryDns(_remote_host);
                                 }
                                 if (ipAddress != null)
                                 {

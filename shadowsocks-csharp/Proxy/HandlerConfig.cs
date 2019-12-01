@@ -11,8 +11,6 @@ namespace Shadowsocks.Proxy
         public double Ttl; // Second
         public double ConnectTimeout;
         public int TryKeepAlive;
-        public string LocalDnsServers;
-        public string DnsServers;
         public bool ForceLocalDnsQuery;
         // Server proxy
         public ProxyType ProxyType;
@@ -38,8 +36,6 @@ namespace Shadowsocks.Proxy
                 Ttl = Ttl,
                 ConnectTimeout = ConnectTimeout,
                 TryKeepAlive = TryKeepAlive,
-                LocalDnsServers = LocalDnsServers,
-                DnsServers = DnsServers,
                 ForceLocalDnsQuery = ForceLocalDnsQuery,
                 ProxyType = ProxyType,
                 Socks5RemoteHost = Socks5RemoteHost,
