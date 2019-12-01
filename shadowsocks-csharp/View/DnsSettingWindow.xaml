@@ -141,7 +141,7 @@
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0" Content="{DynamicResource Ok}" Padding="10,0" Margin="10,0" FontSize="14" Click="OkButton_OnClick"/>
             <Button Grid.Column="1" Content="{DynamicResource Cancel}" Padding="10,0" Margin="10,0" FontSize="14" Click="CancelButton_OnClick"/>
-            <Button x:Name="ApplyButton" Grid.Column="2" Content="{DynamicResource Apply}" Padding="10,0" FontSize="14" Click="ApplyButton_OnClick"/>
+            <Button x:Name="ApplyButton" Grid.Column="2" Content="{DynamicResource Apply}" Padding="10,0" Margin="10,0,0,0" FontSize="14" Click="ApplyButton_OnClick"/>
         </Grid>
     </Grid>
 </Window>
