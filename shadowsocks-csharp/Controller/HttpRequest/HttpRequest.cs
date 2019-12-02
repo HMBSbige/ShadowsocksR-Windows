@@ -24,7 +24,7 @@ namespace Shadowsocks.Controller.HttpRequest
             {
                 Timeout = TimeSpan.FromMilliseconds(timeout)
             };
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            var request = new HttpRequestMessage(HttpMethod.Get, url) { Version = new Version(2, 0) };
             request.Headers.Add(@"User-Agent", string.IsNullOrWhiteSpace(userAgent) ? DefaultUserAgent : userAgent);
 
             var response = await httpClient.SendAsync(request);
