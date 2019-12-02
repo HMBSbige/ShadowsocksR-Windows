@@ -54,8 +54,8 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' " />
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.0.8" />
-    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="17.3.0.29" />
-    <PackageReference Include="Syncfusion.Tools.WPF" Version="17.3.0.29" />
+    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="17.3.0.26" />
+    <PackageReference Include="Syncfusion.Tools.WPF" Version="17.3.0.26" />
     <PackageReference Include="ARSoft.Tools.Net" Version="2.3.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Reactive" Version="4.2.0" />
