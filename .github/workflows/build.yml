@@ -6,9 +6,13 @@ jobs:
   build:
     name: Build
     runs-on: windows-latest
-    
+    env: 
+      SyncfusionLicenseKey: ${{ secrets.SyncfusionLicenseKey }}
     steps:
     - uses: actions/checkout@v1
+
+    - name: Get tag name
+      uses: olegtarasov/get-tag@v1
 
     - name: Setup Nuget.exe
       uses: warrenbuckley/Setup-Nuget@v1
@@ -20,10 +24,92 @@ jobs:
     - name: Setup MSBuild.exe
       uses: warrenbuckley/Setup-MSBuild@v1
 
-    - name: Build .NET Core 3.0
-      working-directory: shadowsocks-csharp
-      run: msbuild -v:m -r -t:Build -p:Configuration=Release -p:TargetFramework=netcoreapp3.0
-
     - name: Build .NET 4.8
-      working-directory: shadowsocks-csharp
-      run: msbuild -v:m -r -t:Build -p:Configuration=Release -p:TargetFramework=net48
+      shell: pwsh
+      run: |
+        .\build.ps1 net
+        New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
+        Compress-Archive -Path shadowsocks-csharp\bin\Release\net48\* -DestinationPath C:\builtfiles\ShadowsocksR-net48-${{ env.GITHUB_TAG_NAME }}.zip
+        echo "::set-env name=NET48_SHA256::$(.\getSHA256.ps1 C:\builtfiles\ShadowsocksR-net48-${{ env.GITHUB_TAG_NAME }}.zip)"
+
+    - name: Build .NET Core
+      shell: pwsh
+      run: |
+        .\build.ps1 core
+        New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
+        Compress-Archive -Path shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\* -DestinationPath C:\builtfiles\ShadowsocksR-netcore-${{ env.GITHUB_TAG_NAME }}.zip
+        echo "::set-env name=NETCORE_SHA256::$(.\getSHA256.ps1 C:\builtfiles\ShadowsocksR-netcore-${{ env.GITHUB_TAG_NAME }}.zip)"
+
+    - name: Build .NET Core x86
+      shell: pwsh
+      run: |
+        .\build.ps1 core-x86
+        New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
+        Compress-Archive -Path shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x86\publish\* -DestinationPath C:\builtfiles\ShadowsocksR-Portable-Win32-${{ env.GITHUB_TAG_NAME }}.zip
+        echo "::set-env name=NETCORE86_SHA256::$(.\getSHA256.ps1 C:\builtfiles\ShadowsocksR-Portable-Win32-${{ env.GITHUB_TAG_NAME }}.zip)"
+
+    - name: Build .NET Core x64
+      shell: pwsh
+      run: |
+        .\build.ps1 core-x64
+        New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
+        Compress-Archive -Path shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x64\publish\* -DestinationPath C:\builtfiles\ShadowsocksR-Portable-Win64-${{ env.GITHUB_TAG_NAME }}.zip
+        echo "::set-env name=NETCORE64_SHA256::$(.\getSHA256.ps1 C:\builtfiles\ShadowsocksR-Portable-Win64-${{ env.GITHUB_TAG_NAME }}.zip)"
+
+    - name: Upload .NET 4.8
+      uses: actions/upload-artifact@v1
+      with:
+        name: ShadowsocksR-net48
+        path: shadowsocks-csharp\bin\Release\net48
+
+    - name: Upload .NET Core
+      uses: actions/upload-artifact@v1
+      with:
+        name: ShadowsocksR-netcore
+        path: shadowsocks-csharp\bin\Release\netcoreapp3.0\publish
+
+    - name: Upload .NET Core x86
+      uses: actions/upload-artifact@v1
+      with:
+        name: ShadowsocksR-Portable-Win32
+        path: shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x86\publish
+
+    - name: Upload .NET Core x64
+      uses: actions/upload-artifact@v1
+      with:
+        name: ShadowsocksR-Portable-Win64
+        path: shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x64\publish
+
+    # Create a new release: create a tag, then 'git push origin <tagname>', wait for it to build      
+    - name: Create a new GitHub release if a new tag is pushed
+      uses: softprops/action-gh-release@v1
+      with:
+        name: v${{ env.GITHUB_TAG_NAME }}
+        prerelease: true
+        draft: false
+        files: |
+          C:\builtfiles\ShadowsocksR-net48-${{ env.GITHUB_TAG_NAME }}.zip
+          C:\builtfiles\ShadowsocksR-netcore-${{ env.GITHUB_TAG_NAME }}.zip
+          C:\builtfiles\ShadowsocksR-Portable-Win32-${{ env.GITHUB_TAG_NAME }}.zip
+          C:\builtfiles\ShadowsocksR-Portable-Win64-${{ env.GITHUB_TAG_NAME }}.zip
+        body: |
+          [![](https://img.shields.io/badge/Telegram-Channel-blue)](https://t.me/ShadowsocksR_Windows) [![](https://img.shields.io/badge/Telegram-Group-green)](https://t.me/joinchat/Gn-Aa0-j4HdelXeIIfmnnA)
+          [![](https://img.shields.io/badge/ShadowsocksR-Android-e482a3)](https://github.com/HMBSbige/ShadowsocksR-Android/releases)
+
+          **[版本升级配置文件迁移](https://github.com/HMBSbige/ShadowsocksR-Windows/wiki/%E7%89%88%E6%9C%AC%E5%8D%87%E7%BA%A7%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%BF%81%E7%A7%BB)**
+
+          **[4个 Release 的区别](https://github.com/HMBSbige/ShadowsocksR-Windows/wiki/ShadowsocksR-Windows-%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E#artifacts)**
+
+          ## 更新日志：
+          * 这是 GitHub Action 自动化部署，更新日志应该很快会手动更新
+          
+          ## 文件校验
+          | 文件名 | SHA256 |
+          | :- | :- |
+          | <sub>ShadowsocksR-net48-${{ env.GITHUB_TAG_NAME }}.zip</sub> | <sub>${{ env.NET48_SHA256 }}</sub> |
+          | <sub>ShadowsocksR-netcore-${{ env.GITHUB_TAG_NAME }}.zip</sub> | <sub>${{ env.NETCORE_SHA256 }}</sub> |
+          | <sub>ShadowsocksR-Portable-Win32-${{ env.GITHUB_TAG_NAME }}.zip</sub> | <sub>${{ env.NETCORE86_SHA256 }}</sub> |
+          | <sub>ShadowsocksR-Portable-Win64-${{ env.GITHUB_TAG_NAME }}.zip</sub> | <sub>${{ env.NETCORE64_SHA256 }}</sub> |
+      if: startsWith(github.ref, 'refs/tags/')
+      env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
