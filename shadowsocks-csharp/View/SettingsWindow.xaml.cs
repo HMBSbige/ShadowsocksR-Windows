@@ -48,8 +48,9 @@ namespace Shadowsocks.View
                 MessageBox.Show(this.GetWindowStringValue(@"RestartRequired"), UpdateChecker.Name, MessageBoxButton.OK);
             }
             _controller.SaveServersConfig(SettingViewModel.ModifiedConfiguration, true);
-            if (AutoStartupCheckBox.IsChecked != AutoStartup.Check()
-            && !AutoStartup.Set(AutoStartupCheckBox.IsChecked.GetValueOrDefault()))
+            var isAutoStartup = AutoStartupCheckBox.IsChecked.GetValueOrDefault();
+            if (isAutoStartup != AutoStartup.Check()
+            && !AutoStartup.Set(isAutoStartup))
             {
                 MessageBox.Show(this.GetWindowStringValue(@"FailAutoStartUp"), UpdateChecker.Name, MessageBoxButton.OK);
             }
@@ -79,6 +80,11 @@ namespace Shadowsocks.View
             SettingViewModel.ModifiedConfiguration.ReconnectTimes = 4;
             SettingViewModel.ModifiedConfiguration.ConnectTimeout = SettingViewModel.ModifiedConfiguration.ProxyEnable ? 10 : 5;
             SettingViewModel.ModifiedConfiguration.Ttl = 60;
+        }
+
+        private void AutoStartupCheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            ApplyButton.IsEnabled = true;
         }
     }
 }

@@ -131,7 +131,8 @@
                 <Label Grid.Row="3" Grid.Column="0" Content="{DynamicResource Balance}" VerticalAlignment="Center" Margin="0,0,10,0" />
                 <Label Grid.Row="6" Grid.Column="0" Content="{DynamicResource Logging}" VerticalAlignment="Center" Margin="0,0,10,0" />
                 <Label Grid.Row="7" Grid.Column="0" Content="{DynamicResource Language}" VerticalAlignment="Center" Margin="0,0,10,0" />
-                <CheckBox x:Name="AutoStartupCheckBox" Grid.Row="0" Grid.Column="1" Content="{DynamicResource StartOnBoot}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                <CheckBox x:Name="AutoStartupCheckBox" Grid.Row="0" Grid.Column="1" Content="{DynamicResource StartOnBoot}" VerticalAlignment="Center" Margin="0,0,10,0"
+                Checked="AutoStartupCheckBox_CheckedChanged" Unchecked="AutoStartupCheckBox_CheckedChanged"/>
                 <CheckBox Grid.Row="1" Grid.Column="1" Content="{DynamicResource SwitchAutoCloseTcpLinks}" VerticalAlignment="Center" Margin="0,0,10,0" 
                 IsChecked="{Binding ModifiedConfiguration.CheckSwitchAutoCloseAll,Mode=TwoWay}"/>
                 <CheckBox Grid.Row="2" Grid.Column="1" Content="{DynamicResource LoadBalance}" VerticalAlignment="Center" Margin="0,0,10,0" 
