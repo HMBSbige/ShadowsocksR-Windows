@@ -398,9 +398,9 @@ namespace Shadowsocks.Util
 #if !IsDotNetCore
         public static void Clear<T>(this ConcurrentQueue<T> queue)
         {
-            while (queue.IsEmpty)
+            while (queue.TryDequeue(out _))
             {
-                queue.TryDequeue(out _);
+
             }
         }
 #endif
