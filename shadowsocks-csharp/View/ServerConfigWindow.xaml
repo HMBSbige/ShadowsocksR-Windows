@@ -57,7 +57,6 @@
         <syncfusion:TreeViewAdv x:Name="ServersTreeView"
         Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Margin="10,0,10,10"
         AnimationType="None"
-        syncfusion:SkinStorage.VisualStyle="VS2010"
         DataContext="{Binding Path=ServerConfigViewModel, ElementName=Cw}"
         ItemsSource="{Binding ServersTreeViewCollection}"
         SelectedValuePath="Server"
@@ -69,7 +68,6 @@
         DragEnd="ServersTreeView_OnDragEnd">
             <syncfusion:TreeViewAdv.ItemContainerStyle>
                 <Style TargetType="{x:Type syncfusion:TreeViewItemAdv}">
-                    <Setter Property="FontSize" Value="14" />
                     <Setter Property="IsEditable" Value="False" />
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
                     <Setter Property="IsSelected" Value="{Binding IsSelected}" />
@@ -87,7 +85,6 @@
             <syncfusion:TreeViewAdv.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Nodes}" >
                     <TextBlock Text="{Binding Name}" 
-                    Height="18"
                     Foreground="{Binding Type,Converter={StaticResource ServerTreeTypeToFontConverter}}"
                     FontWeight="{Binding Type,Converter={StaticResource ServerTreeTypeToFontConverter}}" />
                 </HierarchicalDataTemplate>
