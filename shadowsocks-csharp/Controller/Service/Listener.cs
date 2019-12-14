@@ -162,20 +162,22 @@ namespace Shadowsocks.Controller.Service
                         buf
                     };
 
-                    if (!_config.PortMapCache.ContainsKey(localPort) || _config.PortMapCache[localPort].type != PortMapType.Forward)
-                    {
-                        conn.BeginReceive(buf, 0, buf.Length, 0, ReceiveCallback, state);
-                    }
-                    else
+                    if (_config.PortMapCache.TryGetValue(localPort, out var portMap)
+                    && portMap.type == PortMapType.Forward)
                     {
                         if (_services.Any(service => service.Handle(buf, 0, conn)))
                         {
                             return;
                         }
+
                         // no service found for this
                         // shouldn't happen
                         conn.Shutdown(SocketShutdown.Both);
                         conn.Close();
+                    }
+                    else
+                    {
+                        conn.BeginReceive(buf, 0, buf.Length, 0, ReceiveCallback, state);
                     }
                 }
             }
