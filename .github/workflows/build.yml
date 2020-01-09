@@ -37,7 +37,7 @@ jobs:
       run: |
         .\build.ps1 core
         New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
-        Compress-Archive -Path shadowsocks-csharp\bin\Release\netcoreapp3.0\publish\* -DestinationPath C:\builtfiles\ShadowsocksR-netcore-${{ env.GITHUB_TAG_NAME }}.zip
+        Compress-Archive -Path shadowsocks-csharp\bin\Release\netcoreapp3.1\publish\* -DestinationPath C:\builtfiles\ShadowsocksR-netcore-${{ env.GITHUB_TAG_NAME }}.zip
         echo "::set-env name=NETCORE_SHA256::$(.\getSHA256.ps1 C:\builtfiles\ShadowsocksR-netcore-${{ env.GITHUB_TAG_NAME }}.zip)"
 
     - name: Build .NET Core x86
@@ -45,7 +45,7 @@ jobs:
       run: |
         .\build.ps1 core-x86
         New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
-        Compress-Archive -Path shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x86\publish\* -DestinationPath C:\builtfiles\ShadowsocksR-Portable-Win32-${{ env.GITHUB_TAG_NAME }}.zip
+        Compress-Archive -Path shadowsocks-csharp\bin\Release\netcoreapp3.1\win-x86\publish\* -DestinationPath C:\builtfiles\ShadowsocksR-Portable-Win32-${{ env.GITHUB_TAG_NAME }}.zip
         echo "::set-env name=NETCORE86_SHA256::$(.\getSHA256.ps1 C:\builtfiles\ShadowsocksR-Portable-Win32-${{ env.GITHUB_TAG_NAME }}.zip)"
 
     - name: Build .NET Core x64
@@ -53,7 +53,7 @@ jobs:
       run: |
         .\build.ps1 core-x64
         New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
-        Compress-Archive -Path shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x64\publish\* -DestinationPath C:\builtfiles\ShadowsocksR-Portable-Win64-${{ env.GITHUB_TAG_NAME }}.zip
+        Compress-Archive -Path shadowsocks-csharp\bin\Release\netcoreapp3.1\win-x64\publish\* -DestinationPath C:\builtfiles\ShadowsocksR-Portable-Win64-${{ env.GITHUB_TAG_NAME }}.zip
         echo "::set-env name=NETCORE64_SHA256::$(.\getSHA256.ps1 C:\builtfiles\ShadowsocksR-Portable-Win64-${{ env.GITHUB_TAG_NAME }}.zip)"
 
     - name: Upload .NET 4.8
@@ -66,19 +66,19 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: ShadowsocksR-netcore
-        path: shadowsocks-csharp\bin\Release\netcoreapp3.0\publish
+        path: shadowsocks-csharp\bin\Release\netcoreapp3.1\publish
 
     - name: Upload .NET Core x86
       uses: actions/upload-artifact@v1
       with:
         name: ShadowsocksR-Portable-Win32
-        path: shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x86\publish
+        path: shadowsocks-csharp\bin\Release\netcoreapp3.1\win-x86\publish
 
     - name: Upload .NET Core x64
       uses: actions/upload-artifact@v1
       with:
         name: ShadowsocksR-Portable-Win64
-        path: shadowsocks-csharp\bin\Release\netcoreapp3.0\win-x64\publish
+        path: shadowsocks-csharp\bin\Release\netcoreapp3.1\win-x64\publish
 
     # Create a new release: create a tag, then 'git push origin <tagname>', wait for it to build      
     - name: Create a new GitHub release if a new tag is pushed

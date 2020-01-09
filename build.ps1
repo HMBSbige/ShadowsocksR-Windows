@@ -6,7 +6,7 @@ dotnet --version
 
 $exe = 'ShadowsocksR.exe'
 $net_tfm = 'net48'
-$netcore_tfm = 'netcoreapp3.0'
+$netcore_tfm = 'netcoreapp3.1'
 $configuration = 'Release'
 $mainDir = (Get-Item -Path ".\").FullName
 $net_baseoutput = "$mainDir\shadowsocks-csharp\bin\$configuration"
