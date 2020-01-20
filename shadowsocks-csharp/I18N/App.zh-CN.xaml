@@ -16,7 +16,6 @@
     <sys:String x:Key="UpdateChnIpPac">绕过大陆 IP</sys:String>
     <sys:String x:Key="UpdateGfwList">GFWList</sys:String>
     <sys:String x:Key="UpdateChnOnlyPac">仅大陆常见域名（回国）</sys:String>
-    <sys:String x:Key="UpdateChnOnlyPacFireFox">仅大陆常见域名（支持火狐）</sys:String>
     <sys:String x:Key="CopyPacUrl">复制 PAC URL</sys:String>
     <sys:String x:Key="EditPacFile">编辑本地 PAC 文件</sys:String>
     <sys:String x:Key="EditGfwListUserRule">编辑 GFWList 的用户规则</sys:String>

@@ -21,7 +21,6 @@
                 <MenuItem x:Name="UpdateGfwList" />
                 <Separator />
                 <MenuItem x:Name="UpdateChnOnlyPac" />
-                <MenuItem x:Name="UpdateChnOnlyPacFireFox" />
             </MenuItem>
             <MenuItem x:Name="ProxyRule">
                 <MenuItem x:Name="BypassLan" />

@@ -279,7 +279,6 @@ namespace Shadowsocks.Controller
                             ((MenuItem)pacMenuItem.Items[5]).Click += UpdatePACFromGFWListItem_Click;
 
                             ((MenuItem)pacMenuItem.Items[7]).Click += UpdatePACFromCNOnlyListItem_Click;
-                            ((MenuItem)pacMenuItem.Items[8]).Click += UpdatePACFromCNOnlyListFireFoxItem_Click;
 
                             ruleBypassLan = (MenuItem)proxyMenuItem.Items[0];
                             ruleBypassChina = (MenuItem)proxyMenuItem.Items[1];
@@ -1172,12 +1171,6 @@ namespace Shadowsocks.Controller
         {
             //回国
             controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white_r.pac");
-        }
-
-        private void UpdatePACFromCNOnlyListFireFoxItem_Click(object sender, RoutedEventArgs e)
-        {
-            //回国
-            controller.UpdatePACFromOnlinePac(@"https://raw.githubusercontent.com/HMBSbige/Text_Translation/master/ShadowsocksR/ss_white_r_Firefox.pac");
         }
 
         private void UpdatePACFromCnWhiteListIpItem_Click(object sender, RoutedEventArgs e)
