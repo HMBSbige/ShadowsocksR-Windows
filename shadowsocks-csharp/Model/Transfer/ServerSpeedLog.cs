@@ -287,6 +287,7 @@ namespace Shadowsocks.Model.Transfer
 
         public void Clear()
         {
+            ResetConnectTime();
             ClearError();
             ClearMaxSpeed();
             ClearTrans();
@@ -567,6 +568,12 @@ namespace Shadowsocks.Model.Transfer
         {
             Interlocked.Exchange(ref _errorEmptyTimes, 0);
             OnPropertyChanged(nameof(ErrorEmptyTimes));
+        }
+
+        public void ResetConnectTime()
+        {
+            Interlocked.Exchange(ref _avgConnectTime, -1);
+            OnPropertyChanged(nameof(AvgConnectTimeText));
         }
 
         public void AddConnectTime(long millisecond)
