@@ -21,8 +21,8 @@ namespace Shadowsocks.Controller.HttpRequest
         public event EventHandler NewVersionNotFound;
 
         public const string Name = @"ShadowsocksR";
-        public const string Copyright = @"Copyright © HMBSbige 2019 & BreakWa11 2017. Fork from Shadowsocks by clowwindy";
-        public const string Version = @"5.1.8.2";
+        public const string Copyright = @"Copyright © HMBSbige 2019-2020 & BreakWa11 2017. Fork from Shadowsocks by clowwindy";
+        public const string Version = @"5.1.8.3";
 
         public const string FullVersion = Version +
 #if IsDotNetCore
