@@ -93,7 +93,7 @@ jobs:
           C:\builtfiles\ShadowsocksR-Portable-Win32-${{ env.GITHUB_TAG_NAME }}.zip
           C:\builtfiles\ShadowsocksR-Portable-Win64-${{ env.GITHUB_TAG_NAME }}.zip
         body: |
-          [![](https://img.shields.io/badge/Telegram-Channel-blue)](https://t.me/ShadowsocksR_Windows) [![](https://img.shields.io/badge/Telegram-Group-green)](https://t.me/joinchat/Gn-Aa0-j4HdelXeIIfmnnA)
+          [![](https://img.shields.io/badge/Telegram-Channel-blue)](https://t.me/ShadowsocksR_Windows) [![](https://img.shields.io/badge/Telegram-Group-green)](https://t.me/joinchat/Gn-Aa0-j4Hdthl502zlIlQ)
           [![](https://img.shields.io/badge/ShadowsocksR-Android-e482a3)](https://github.com/HMBSbige/ShadowsocksR-Android/releases)
 
           **[版本升级配置文件迁移](https://github.com/HMBSbige/ShadowsocksR-Windows/wiki/%E7%89%88%E6%9C%AC%E5%8D%87%E7%BA%A7%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%BF%81%E7%A7%BB)**
