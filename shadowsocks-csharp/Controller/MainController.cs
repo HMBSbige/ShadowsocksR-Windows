@@ -167,11 +167,11 @@ namespace Shadowsocks.Controller
 
         public void SaveServersPortMap(Configuration config)
         {
-            Global.GuiConfig.PortMap = config.PortMap;
             StopPortMap();
+            Global.GuiConfig.PortMap = config.PortMap;
+            Global.GuiConfig.FlushPortMapCache();
             LoadPortMap();
             SaveAndNotifyChanged();
-            Global.GuiConfig.FlushPortMapCache();
         }
 
         /// <summary>
