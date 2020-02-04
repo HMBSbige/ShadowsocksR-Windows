@@ -703,6 +703,7 @@ namespace Shadowsocks.Controller
                     }
                     else
                     {
+                        groupItem.Header = subItem.Header;
                         sub.Add(groupItem);
                         if (isSelected)
                         {

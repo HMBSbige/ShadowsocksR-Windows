@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Shadowsocks.Controller.Service
 {
-    class Local : Listener.Service
+    public class Local : Listener.Service
     {
         private readonly Configuration _config;
         private readonly ServerTransferTotal _transfer;

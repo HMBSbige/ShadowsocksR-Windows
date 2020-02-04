@@ -97,7 +97,7 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <CheckBox Grid.Row="0" Grid.Column="1" Content="{DynamicResource AllowLan}" VerticalAlignment="Center" Margin="0,10,10,10" 
+                <CheckBox Grid.Row="0" Grid.Column="1" Content="{DynamicResource AllowLan}" VerticalAlignment="Center"
                 IsChecked="{Binding ModifiedConfiguration.ShareOverLan,Mode=TwoWay}"/>
 
                 <Label Grid.Row="1" Grid.Column="0" Content="{DynamicResource LocalPort}" VerticalAlignment="Center" Margin="0,0,10,10" />

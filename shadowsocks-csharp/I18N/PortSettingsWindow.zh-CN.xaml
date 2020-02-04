@@ -15,7 +15,7 @@
     <sys:String x:Key="ServerId">服务器 ID</sys:String>
     <sys:String x:Key="LocalPort">本地端口</sys:String>
     <sys:String x:Key="TargetAddress">目标地址</sys:String>
-    <sys:String x:Key="TargetPort">本地端口</sys:String>
+    <sys:String x:Key="TargetPort">目标端口</sys:String>
     <sys:String x:Key="Remarks">备注</sys:String>
 
     <sys:String x:Key="Add">添加</sys:String>
