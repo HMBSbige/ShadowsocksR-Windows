@@ -31,6 +31,6 @@ Visual Studio Community 2019 is recommended.
 
 GPLv3
 
-Copyright © HMBSbige 2019. Forked from ShadowsocksR by BreakWa11
+Copyright © HMBSbige 2019 - 2020. Forked from ShadowsocksR by BreakWa11
 
 [latest release]: https://github.com/HMBSbige/ShadowsocksR-Windows/releases
