@@ -84,7 +84,7 @@
             </syncfusion:TreeViewAdv.ContextMenu>
             <syncfusion:TreeViewAdv.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Nodes}" >
-                    <TextBlock Text="{Binding Name}" Margin="10,0,0,0"
+                    <TextBlock Text="{Binding Name}" 
                     Foreground="{Binding Type,Converter={StaticResource ServerTreeTypeToFontConverter}}"
                     FontWeight="{Binding Type,Converter={StaticResource ServerTreeTypeToFontConverter}}" />
                 </HierarchicalDataTemplate>
