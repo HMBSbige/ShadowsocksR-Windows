@@ -6,6 +6,7 @@ using Shadowsocks.Model.Transfer;
 using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -462,6 +463,27 @@ namespace Shadowsocks.Controller
             HostMap.Reload();
         }
 
+        private void StartPrivoxy()
+        {
+            const int max = 5;
+            var i = 1;
+            while (true)
+            {
+                try
+                {
+                    _privoxyRunner.Start(Global.GuiConfig);
+                    break;
+                }
+                catch (Win32Exception)
+                {
+                    if (++i > max)
+                    {
+                        throw;
+                    }
+                }
+            }
+        }
+
         public void Reload()
         {
             StopPortMap();
@@ -494,7 +516,7 @@ namespace Shadowsocks.Controller
             // http://stackoverflow.com/questions/10235093/socket-doesnt-close-after-application-exits-if-a-launched-process-is-open
             try
             {
-                _privoxyRunner.Start(Global.GuiConfig);
+                StartPrivoxy();
 
                 var local = new Local(Global.GuiConfig, _transfer, _chnRangeSet);
                 var services = new List<Listener.IService>
