@@ -190,8 +190,7 @@ namespace Shadowsocks.Controller
         {
             try
             {
-                var urls = new List<string>();
-                Utils.URL_Split(ssUrLs, ref urls);
+                var urls = ssUrLs.GetLines();
                 var i = 0;
                 foreach (var url in urls.Where(url => url.StartsWith(@"ss://", StringComparison.OrdinalIgnoreCase) || url.StartsWith(@"ssr://", StringComparison.OrdinalIgnoreCase)))
                 {

@@ -338,34 +338,6 @@ namespace Shadowsocks.Util
             return bytes == 0 ? $@"{bytes}Byte" : $@"{bytes}Bytes";
         }
 
-        public static void URL_Split(string text, ref List<string> outUrls)
-        {
-            while (true)
-            {
-                if (string.IsNullOrEmpty(text))
-                {
-                    return;
-                }
-
-                var ssIndex = text.IndexOf(@"ss://", 1, StringComparison.OrdinalIgnoreCase);
-                var ssrIndex = text.IndexOf(@"ssr://", 1, StringComparison.OrdinalIgnoreCase);
-                var index = ssIndex;
-                if (index == -1 || index > ssrIndex && ssrIndex != -1) index = ssrIndex;
-                if (index == -1)
-                {
-                    outUrls.Insert(0, text);
-                }
-                else
-                {
-                    outUrls.Insert(0, text.Substring(0, index));
-                    text = text.Substring(index);
-                    continue;
-                }
-
-                break;
-            }
-        }
-
         public static IEnumerable<Server> Except(this IEnumerable<Server> x, IList<Server> y)
         {
             return from xi in x let found = y.Any(xi.IsMatchServer) where !found select xi;

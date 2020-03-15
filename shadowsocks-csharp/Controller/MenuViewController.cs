@@ -394,7 +394,6 @@ namespace Shadowsocks.Controller
             var count = 0;
             if (!string.IsNullOrWhiteSpace(Global.UpdateNodeChecker.FreeNodeResult))
             {
-                var urls = new List<string>();
                 Global.UpdateNodeChecker.FreeNodeResult = Global.UpdateNodeChecker.FreeNodeResult.TrimEnd('\r', '\n', ' ');
                 var config = Global.GuiConfig;
                 var selectedServer = config.Configs.ElementAtOrDefault(config.Index);
@@ -406,7 +405,7 @@ namespace Shadowsocks.Controller
                 {
                     Global.UpdateNodeChecker.FreeNodeResult = string.Empty;
                 }
-                Utils.URL_Split(Global.UpdateNodeChecker.FreeNodeResult, ref urls);
+                var urls = Global.UpdateNodeChecker.FreeNodeResult.GetLines().ToList();
                 urls.RemoveAll(url => !url.StartsWith(@"ssr://"));
                 if (urls.Count > 0)
                 {
