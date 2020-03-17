@@ -409,8 +409,6 @@ namespace Shadowsocks.Controller
                 urls.RemoveAll(url => !url.StartsWith(@"ssr://"));
                 if (urls.Count > 0)
                 {
-                    urls.Reverse();
-
                     lastGroup = Global.UpdateSubscribeManager.CurrentServerSubscribe.OriginTag;
                     if (string.IsNullOrEmpty(lastGroup))
                     {
