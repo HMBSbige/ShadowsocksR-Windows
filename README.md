@@ -12,9 +12,9 @@
 
 ## 相关推荐
 
-[**翻墙功夫网 :100:**](https://iplc.store/register?aff=6476)
+[**壁虎翻墙网 :100:**](https://geckoiplc.com/register?aff=z9dkkpHM)
 
-这是我所选择的服务器提供商，IPLC专线翻墙、稳定、速度快、价格便宜。欢迎大家使用我的推广链接前去注册。https://iplc.store/register?aff=6476
+这是我所选择的服务器提供商，IPLC专线翻墙、稳定、速度快、价格便宜。欢迎大家使用我的推广链接前去注册。https://geckoiplc.com/register?aff=z9dkkpHM
 
 ## Download
 
