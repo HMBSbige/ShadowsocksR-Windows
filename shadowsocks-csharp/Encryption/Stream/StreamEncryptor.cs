@@ -19,8 +19,8 @@ namespace Shadowsocks.Encryption.Stream
         protected byte[] _decryptIV;
 
         // Is first packet
-        private bool _decryptIVReceived;
-        private bool _encryptIVSent;
+        protected bool _decryptIVReceived;
+        protected bool _encryptIVSent;
 
         protected string _method;
         protected int _cipher;
@@ -184,6 +184,17 @@ namespace Shadowsocks.Encryption.Stream
             _decCircularBuffer.Skip(_decCircularBuffer.Size);
             outlength = cipher.Length;
             // done the decryption
+        }
+
+        public override void ResetEncrypt()
+        {
+            _encryptIVSent = false;
+            Rng.RandBytes(_iv, ivLen);
+        }
+
+        public override void ResetDecrypt()
+        {
+            _decryptIVReceived = false;
         }
     }
 

@@ -99,6 +99,20 @@ namespace Shadowsocks.Encryption.Stream
             }
         }
 
+        public override void ResetEncrypt()
+        {
+            _encryptIVSent = false;
+            _encryptIC = 0;
+            _encryptBytesRemaining = 0;
+        }
+
+        public override void ResetDecrypt()
+        {
+            _decryptIVReceived = false;
+            _decryptIC = 0;
+            _decryptBytesRemaining = 0;
+        }
+
         private int crypto_stream_chacha20_ietf_xor_ic(byte[] c, byte[] m, ulong mlen, byte[] n, ulong ic, byte[] k)
         {
             return Sodium.crypto_stream_chacha20_ietf_xor_ic(c, m, mlen, n, (uint)ic, k);

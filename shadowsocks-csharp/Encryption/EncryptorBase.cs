@@ -26,6 +26,9 @@
 
         public abstract void Decrypt(byte[] buf, int length, byte[] outbuf, out int outlength);
 
+        public abstract void ResetEncrypt();
+        public abstract void ResetDecrypt();
+
         public abstract void Dispose();
         public abstract byte[] getIV();
         public abstract byte[] getKey();

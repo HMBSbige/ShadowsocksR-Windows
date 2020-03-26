@@ -375,6 +375,7 @@ namespace Shadowsocks.Proxy
                 lock (_decryptionLock)
                 {
                     var decryptBuffer = new byte[RecvSize];
+                    _encryptor.ResetDecrypt();
                     _encryptor.Decrypt(st.buffer, bytesRead, decryptBuffer, out bytesToSend);
                     obfsBuffer = _protocol.ClientUdpPostDecrypt(decryptBuffer, bytesToSend, out bytesToSend);
                     decryptBuffer = ParseUDPHeader(obfsBuffer, ref bytesToSend);
@@ -404,6 +405,7 @@ namespace Shadowsocks.Proxy
             Array.Copy(buffer, bytes_beg, bytesToEncrypt, 0, length);
             lock (_encryptionLock)
             {
+                _encryptor.ResetEncrypt();
                 _protocol.SetServerInfoIV(_encryptor.getIV());
                 var obfsBuffer = _protocol.ClientUdpPreEncrypt(bytesToEncrypt, length, out var obfsSendSize);
                 _encryptor.Encrypt(obfsBuffer, obfsSendSize, connetionSendBuffer, out bytesToSend);
