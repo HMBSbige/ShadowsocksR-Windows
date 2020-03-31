@@ -437,6 +437,10 @@ namespace Shadowsocks.View
         {
             try
             {
+                if (ObfsComboBox.SelectedItem == null)
+                {
+                    return;
+                }
                 var obfs = (Obfs.ObfsBase)Obfs.ObfsFactory.GetObfs(ObfsComboBox.SelectedItem.ToString());
                 var properties = obfs.GetObfs()[ObfsComboBox.SelectedItem.ToString()];
                 ObfsParamTextBox.IsEnabled = properties[2] > 0;
