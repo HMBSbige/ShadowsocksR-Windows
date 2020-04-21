@@ -471,6 +471,12 @@ namespace Shadowsocks.Controller
                         }
                     }
 
+                    //Group name is not empty
+                    foreach (var newServer in newServers.Where(newServer => string.IsNullOrEmpty(newServer.Group)))
+                    {
+                        newServer.Group = lastGroup;
+                    }
+
                     count = newServers.Count;
 
                     var removeServers = oldServers.Except(newServers);
