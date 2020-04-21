@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Net;
 
@@ -179,7 +179,7 @@ namespace Shadowsocks.Model
                     }
                     else if (cmp == 0)
                     {
-                        return list[m];
+                        return list.GetByIndex(m);
                     }
                 }
             }
