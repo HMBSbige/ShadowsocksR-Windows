@@ -455,10 +455,12 @@ namespace Shadowsocks.Model
             LangName = string.Empty;
             DnsClients = new List<DnsClient>
             {
+#if IsDotNetCore
                 new DnsClient(DnsType.DnsOverTls) {DnsServer = @"1.1.1.1"},
                 new DnsClient(DnsType.Default) {DnsServer = @"1.1.1.1"},
                 new DnsClient(DnsType.DnsOverTls),
                 new DnsClient(DnsType.Default)
+#endif
             };
             ServerSubscribes = new List<ServerSubscribe>();
             PortMap = new Dictionary<string, PortMapConfig>();
