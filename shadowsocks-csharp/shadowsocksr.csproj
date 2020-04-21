@@ -54,11 +54,11 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' " />
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.0.8" />
-    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="17.4.0.46" />
-    <PackageReference Include="Syncfusion.Tools.WPF" Version="17.4.0.46" />
+    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="18.1.0.45" />
+    <PackageReference Include="Syncfusion.Tools.WPF" Version="18.1.0.45" />
     <PackageReference Include="ARSoft.Tools.Net" Version="2.3.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="System.Reactive" Version="4.3.2" />
+    <PackageReference Include="System.Reactive" Version="4.4.1" />
     <PackageReference Include="WpfColorFontDialog" Version="1.0.7" />
     <PackageReference Include="ZXing.Net" Version="0.16.5" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' != 'true' " />
     <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.6" Condition=" '$(TargetFramework.StartsWith(netcoreapp))' == 'true' " />
