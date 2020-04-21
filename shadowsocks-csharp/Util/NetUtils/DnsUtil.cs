@@ -12,8 +12,6 @@ namespace Shadowsocks.Util.NetUtils
     {
         public static LRUCache<string, IPAddress> DnsBuffer { get; } = new LRUCache<string, IPAddress>();
 
-        public static LRUCache<string, IPAddress> LocalDnsBuffer => DnsBuffer;
-
         public static IPAddress QueryDns(string host)
         {
             var res = host.Contains('.') && Global.GuiConfig.DnsClients.Any(s => s.Enable)

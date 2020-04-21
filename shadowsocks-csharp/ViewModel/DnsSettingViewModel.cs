@@ -4,6 +4,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using Shadowsocks.Util.NetUtils;
 
 namespace Shadowsocks.ViewModel
 {
@@ -103,6 +104,7 @@ namespace Shadowsocks.ViewModel
             {
                 Global.GuiConfig.DnsClients.Add(client);
             }
+            DnsUtil.DnsBuffer.Clear();
             Global.Controller.SaveAndNotifyChanged();
         }
 
