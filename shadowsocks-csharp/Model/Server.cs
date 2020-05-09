@@ -428,7 +428,7 @@ namespace Shadowsocks.Model
         public void ServerFromSsr(string ssrUrl, string forceGroup)
         {
             // ssr://host:port:protocol:method:obfs:base64pass/?obfsparam=base64&remarks=base64&group=base64&udpport=0&uot=1
-            var ssr = Regex.Match(ssrUrl, "ssr://([A-Za-z0-9_-]+)", RegexOptions.IgnoreCase);
+            var ssr = Regex.Match(ssrUrl, "ssr://([A-Za-z0-9+/=_-]+)", RegexOptions.IgnoreCase);
             if (!ssr.Success)
                 throw new FormatException();
 
