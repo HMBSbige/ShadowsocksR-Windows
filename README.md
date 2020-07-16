@@ -10,6 +10,12 @@
 
 ## [Wiki](https://github.com/HMBSbige/ShadowsocksR-Windows/wiki)
 
+## 相关推荐
+
+[**壁虎翻墙网 :100:**](https://geckoiplc.com/register?aff=z9dkkpHM)
+
+这是我所选择的服务器提供商，IPLC专线翻墙、稳定、速度快、价格便宜。欢迎大家使用我的推广链接前去注册。https://geckoiplc.com/register?aff=z9dkkpHM
+
 ## Download
 
 * [latest release]
