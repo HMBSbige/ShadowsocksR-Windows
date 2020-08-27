@@ -32,7 +32,7 @@ jobs:
       run: |
         .\build.ps1 core
         New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
-        7z a -mx9 "C:\builtfiles\$env:ProjectName-netcore-${{ env.GIT_TAG_NAME }}.7z" ".\$env:ProjectName\bin\$env:Configuration\$env:Netcore_tfm\publish\"
+        7z a -mx9 "C:\builtfiles\$env:ProjectName-netcore-${{ env.GIT_TAG_NAME }}.7z" ".\shadowsocks-csharp\bin\$env:Configuration\$env:Netcore_tfm\publish\"
         7z rn "C:\builtfiles\$env:ProjectName-netcore-${{ env.GIT_TAG_NAME }}.7z" publish $env:ProjectName
         echo "::set-env name=NETCORE_SHA256::$(.\Build\getSHA256.ps1 C:\builtfiles\$env:ProjectName-netcore-${{ env.GIT_TAG_NAME }}.7z)"
 
@@ -41,7 +41,7 @@ jobs:
       run: |
         .\build.ps1 core-x64
         New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
-        7z a -mx9 "C:\builtfiles\$env:ProjectName-Portable-Win64-${{ env.GIT_TAG_NAME }}.7z" ".\$env:ProjectName\bin\$env:Configuration\$env:Netcore_tfm\win-x64\publish\"
+        7z a -mx9 "C:\builtfiles\$env:ProjectName-Portable-Win64-${{ env.GIT_TAG_NAME }}.7z" ".\shadowsocks-csharp\bin\$env:Configuration\$env:Netcore_tfm\win-x64\publish\"
         7z rn "C:\builtfiles\$env:ProjectName-Portable-Win64-${{ env.GIT_TAG_NAME }}.7z" publish $env:ProjectName
         echo "::set-env name=NETCORE64_SHA256::$(.\Build\getSHA256.ps1 C:\builtfiles\$env:ProjectName-Portable-Win64-${{ env.GIT_TAG_NAME }}.7z)"
 
@@ -50,7 +50,7 @@ jobs:
       run: |
         .\build.ps1 core-x86
         New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
-        7z a -mx9 "C:\builtfiles\$env:ProjectName-Portable-Win32-${{ env.GIT_TAG_NAME }}.7z" ".\$env:ProjectName\bin\$env:Configuration\$env:Netcore_tfm\win-x86\publish\"
+        7z a -mx9 "C:\builtfiles\$env:ProjectName-Portable-Win32-${{ env.GIT_TAG_NAME }}.7z" ".\shadowsocks-csharp\bin\$env:Configuration\$env:Netcore_tfm\win-x86\publish\"
         7z rn "C:\builtfiles\$env:ProjectName-Portable-Win32-${{ env.GIT_TAG_NAME }}.7z" publish $env:ProjectName
         echo "::set-env name=NETCORE86_SHA256::$(.\Build\getSHA256.ps1 C:\builtfiles\$env:ProjectName-Portable-Win32-${{ env.GIT_TAG_NAME }}.7z)"
 
@@ -58,19 +58,19 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.ProjectName }}-netcore
-        path: ${{ env.ProjectName }}\bin\${{ env.Configuration }}\${{ env.Netcore_tfm }}\publish\
+        path: shadowsocks-csharp\bin\${{ env.Configuration }}\${{ env.Netcore_tfm }}\publish\
 
     - name: Upload .NET Core x64
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.ProjectName }}-Portable-Win64
-        path: ${{ env.ProjectName }}\bin\${{ env.Configuration }}\${{ env.Netcore_tfm }}\win-x64\publish\
+        path: shadowsocks-csharp\bin\${{ env.Configuration }}\${{ env.Netcore_tfm }}\win-x64\publish\
 
     - name: Upload .NET Core x86
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.ProjectName }}-Portable-Win32
-        path: ${{ env.ProjectName }}\bin\${{ env.Configuration }}\${{ env.Netcore_tfm }}\win-x86\publish\
+        path: shadowsocks-csharp\bin\${{ env.Configuration }}\${{ env.Netcore_tfm }}\win-x86\publish\
 
     # Create a new release: create a tag, then 'git push origin <tagname>', wait for it to build      
     - name: Create a new GitHub release if a new tag is pushed

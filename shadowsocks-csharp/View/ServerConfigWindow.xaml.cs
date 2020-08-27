@@ -442,7 +442,7 @@ namespace Shadowsocks.View
                     return;
                 }
                 var obfs = (Obfs.ObfsBase)Obfs.ObfsFactory.GetObfs(ObfsComboBox.SelectedItem.ToString());
-                var properties = obfs.GetObfs()[ObfsComboBox.SelectedItem.ToString()];
+                var properties = obfs.GetObfs()[$@"{ObfsComboBox.SelectedItem}"];
                 ObfsParamTextBox.IsEnabled = properties[2] > 0;
             }
             catch
