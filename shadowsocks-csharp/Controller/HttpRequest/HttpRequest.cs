@@ -23,9 +23,7 @@ namespace Shadowsocks.Controller.HttpRequest
             var httpClient = new HttpClient(httpClientHandler)
             {
                 Timeout = TimeSpan.FromMilliseconds(timeout),
-#if IsDotNetCore
                 DefaultRequestVersion = new Version(2, 0)
-#endif
             };
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Add(@"User-Agent", string.IsNullOrWhiteSpace(userAgent) ? DefaultUserAgent : userAgent);
@@ -47,9 +45,7 @@ namespace Shadowsocks.Controller.HttpRequest
             var httpClient = new HttpClient(httpClientHandler)
             {
                 Timeout = TimeSpan.FromMilliseconds(timeout),
-#if IsDotNetCore
                 DefaultRequestVersion = new Version(2, 0)
-#endif
             };
 
             HttpResponseMessage response = null;

@@ -31,17 +31,11 @@ namespace Shadowsocks.Util.NetUtils
             if (maskAddress.AddressFamily == AddressFamily.InterNetwork)
             {
                 // Convert the mask address to an unsigned integer.
-#if IsDotNetCore
                 var maskAddressBits = BitConverter.ToUInt32(maskAddress.GetAddressBytes().Reverse().ToArray());
-#else
-                var maskAddressBits = BitConverter.ToUInt32(maskAddress.GetAddressBytes().Reverse().ToArray(), 0);
-#endif
+
                 // And convert the IpAddress to an unsigned integer.
-#if IsDotNetCore
                 var ipAddressBits = BitConverter.ToUInt32(address.GetAddressBytes().Reverse().ToArray());
-#else
-                var ipAddressBits = BitConverter.ToUInt32(address.GetAddressBytes().Reverse().ToArray(), 0);
-#endif
+
                 // Get the mask/network address as unsigned integer.
                 var mask = uint.MaxValue << (32 - maskLength);
 

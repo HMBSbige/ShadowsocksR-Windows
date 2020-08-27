@@ -9,9 +9,7 @@ using ZXing.QrCode;
 using ZXing.QrCode.Internal;
 using Brush = System.Drawing.Brush;
 using Color = System.Drawing.Color;
-#if IsDotNetCore
 using ZXing.Windows.Compatibility;
-#endif
 
 namespace Shadowsocks.Util
 {

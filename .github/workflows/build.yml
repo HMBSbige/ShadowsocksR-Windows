@@ -1,5 +1,5 @@
 name: GitHub CI
-on: [push]
+on: [push, pull_request]
 
 jobs:
 
@@ -8,11 +8,17 @@ jobs:
     runs-on: windows-latest
     env: 
       SyncfusionLicenseKey: ${{ secrets.SyncfusionLicenseKey }}
+      Netcore_tfm: netcoreapp3.1
+      Configuration: Release
+      ProjectName: ShadowsocksR
+
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: true
 
     - name: Get tag name
-      uses: olegtarasov/get-tag@v1
+      uses: olegtarasov/get-tag@v2
 
     - name: Setup Nuget.exe
       uses: warrenbuckley/Setup-Nuget@v1
@@ -21,64 +27,50 @@ jobs:
       run: nuget sources add -Name "GitHub-HMBSbige" -Source "https://nuget.pkg.github.com/HMBSbige/index.json" -UserName HMBSbige -Password "${{ secrets.NUGET_TOKEN }}"
       shell: cmd
 
-    - name: Setup MSBuild.exe
-      uses: warrenbuckley/Setup-MSBuild@v1
-
-    - name: Build .NET 4.8
-      shell: pwsh
-      run: |
-        .\build.ps1 net
-        New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
-        Compress-Archive -Path shadowsocks-csharp\bin\Release\net48\* -DestinationPath C:\builtfiles\ShadowsocksR-net48-${{ env.GITHUB_TAG_NAME }}.zip
-        echo "::set-env name=NET48_SHA256::$(.\getSHA256.ps1 C:\builtfiles\ShadowsocksR-net48-${{ env.GITHUB_TAG_NAME }}.zip)"
-
     - name: Build .NET Core
       shell: pwsh
       run: |
         .\build.ps1 core
         New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
-        Compress-Archive -Path shadowsocks-csharp\bin\Release\netcoreapp3.1\publish\* -DestinationPath C:\builtfiles\ShadowsocksR-netcore-${{ env.GITHUB_TAG_NAME }}.zip
-        echo "::set-env name=NETCORE_SHA256::$(.\getSHA256.ps1 C:\builtfiles\ShadowsocksR-netcore-${{ env.GITHUB_TAG_NAME }}.zip)"
-
-    - name: Build .NET Core x86
-      shell: pwsh
-      run: |
-        .\build.ps1 core-x86
-        New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
-        Compress-Archive -Path shadowsocks-csharp\bin\Release\netcoreapp3.1\win-x86\publish\* -DestinationPath C:\builtfiles\ShadowsocksR-Portable-Win32-${{ env.GITHUB_TAG_NAME }}.zip
-        echo "::set-env name=NETCORE86_SHA256::$(.\getSHA256.ps1 C:\builtfiles\ShadowsocksR-Portable-Win32-${{ env.GITHUB_TAG_NAME }}.zip)"
+        7z a -mx9 "C:\builtfiles\$env:ProjectName-netcore-${{ env.GIT_TAG_NAME }}.7z" ".\$env:ProjectName\bin\$env:Configuration\$env:Netcore_tfm\publish\"
+        7z rn "C:\builtfiles\$env:ProjectName-netcore-${{ env.GIT_TAG_NAME }}.7z" publish $env:ProjectName
+        echo "::set-env name=NETCORE_SHA256::$(.\Build\getSHA256.ps1 C:\builtfiles\$env:ProjectName-netcore-${{ env.GIT_TAG_NAME }}.7z)"
 
     - name: Build .NET Core x64
       shell: pwsh
       run: |
         .\build.ps1 core-x64
         New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
-        Compress-Archive -Path shadowsocks-csharp\bin\Release\netcoreapp3.1\win-x64\publish\* -DestinationPath C:\builtfiles\ShadowsocksR-Portable-Win64-${{ env.GITHUB_TAG_NAME }}.zip
-        echo "::set-env name=NETCORE64_SHA256::$(.\getSHA256.ps1 C:\builtfiles\ShadowsocksR-Portable-Win64-${{ env.GITHUB_TAG_NAME }}.zip)"
+        7z a -mx9 "C:\builtfiles\$env:ProjectName-Portable-Win64-${{ env.GIT_TAG_NAME }}.7z" ".\$env:ProjectName\bin\$env:Configuration\$env:Netcore_tfm\win-x64\publish\"
+        7z rn "C:\builtfiles\$env:ProjectName-Portable-Win64-${{ env.GIT_TAG_NAME }}.7z" publish $env:ProjectName
+        echo "::set-env name=NETCORE64_SHA256::$(.\Build\getSHA256.ps1 C:\builtfiles\$env:ProjectName-Portable-Win64-${{ env.GIT_TAG_NAME }}.7z)"
 
-    - name: Upload .NET 4.8
-      uses: actions/upload-artifact@v1
-      with:
-        name: ShadowsocksR-net48
-        path: shadowsocks-csharp\bin\Release\net48
+    - name: Build .NET Core x86
+      shell: pwsh
+      run: |
+        .\build.ps1 core-x86
+        New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
+        7z a -mx9 "C:\builtfiles\$env:ProjectName-Portable-Win32-${{ env.GIT_TAG_NAME }}.7z" ".\$env:ProjectName\bin\$env:Configuration\$env:Netcore_tfm\win-x86\publish\"
+        7z rn "C:\builtfiles\$env:ProjectName-Portable-Win32-${{ env.GIT_TAG_NAME }}.7z" publish $env:ProjectName
+        echo "::set-env name=NETCORE86_SHA256::$(.\Build\getSHA256.ps1 C:\builtfiles\$env:ProjectName-Portable-Win32-${{ env.GIT_TAG_NAME }}.7z)"
 
     - name: Upload .NET Core
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
-        name: ShadowsocksR-netcore
-        path: shadowsocks-csharp\bin\Release\netcoreapp3.1\publish
-
-    - name: Upload .NET Core x86
-      uses: actions/upload-artifact@v1
-      with:
-        name: ShadowsocksR-Portable-Win32
-        path: shadowsocks-csharp\bin\Release\netcoreapp3.1\win-x86\publish
+        name: ${{ env.ProjectName }}-netcore
+        path: ${{ env.ProjectName }}\bin\${{ env.Configuration }}\${{ env.Netcore_tfm }}\publish\
 
     - name: Upload .NET Core x64
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
-        name: ShadowsocksR-Portable-Win64
-        path: shadowsocks-csharp\bin\Release\netcoreapp3.1\win-x64\publish
+        name: ${{ env.ProjectName }}-Portable-Win64
+        path: ${{ env.ProjectName }}\bin\${{ env.Configuration }}\${{ env.Netcore_tfm }}\win-x64\publish\
+
+    - name: Upload .NET Core x86
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.ProjectName }}-Portable-Win32
+        path: ${{ env.ProjectName }}\bin\${{ env.Configuration }}\${{ env.Netcore_tfm }}\win-x86\publish\
 
     # Create a new release: create a tag, then 'git push origin <tagname>', wait for it to build      
     - name: Create a new GitHub release if a new tag is pushed
@@ -88,12 +80,11 @@ jobs:
         prerelease: true
         draft: false
         files: |
-          C:\builtfiles\ShadowsocksR-net48-${{ env.GITHUB_TAG_NAME }}.zip
-          C:\builtfiles\ShadowsocksR-netcore-${{ env.GITHUB_TAG_NAME }}.zip
-          C:\builtfiles\ShadowsocksR-Portable-Win32-${{ env.GITHUB_TAG_NAME }}.zip
-          C:\builtfiles\ShadowsocksR-Portable-Win64-${{ env.GITHUB_TAG_NAME }}.zip
+          C:\builtfiles\${{ env.ProjectName }}-netcore-${{ env.GIT_TAG_NAME }}.7z
+          C:\builtfiles\${{ env.ProjectName }}-Portable-Win64-${{ env.GIT_TAG_NAME }}.7z
+          C:\builtfiles\${{ env.ProjectName }}-Portable-Win32-${{ env.GIT_TAG_NAME }}.7z
         body: |
-          [![](https://img.shields.io/badge/Telegram-Channel-blue)](https://t.me/ShadowsocksR_Windows) [![](https://img.shields.io/badge/Telegram-Group-green)](https://t.me/joinchat/Gn-Aa0-j4Hdthl502zlIlQ)
+          [![](https://img.shields.io/badge/Telegram-Channel-blue)](https://t.me/ShadowsocksR_Windows) [![](https://img.shields.io/badge/Telegram-Group-green)](https://t.me/joinchat/Gn-Aa0-j4HcpdBaW-Iv8Sw)
           [![](https://img.shields.io/badge/ShadowsocksR-Android-e482a3)](https://github.com/HMBSbige/ShadowsocksR-Android/releases)
 
           **[版本升级配置文件迁移](https://github.com/HMBSbige/ShadowsocksR-Windows/wiki/%E7%89%88%E6%9C%AC%E5%8D%87%E7%BA%A7%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%BF%81%E7%A7%BB)**
@@ -106,10 +97,9 @@ jobs:
           ## 文件校验
           | 文件名 | SHA256 |
           | :- | :- |
-          | <sub>ShadowsocksR-net48-${{ env.GITHUB_TAG_NAME }}.zip</sub> | <sub>${{ env.NET48_SHA256 }}</sub> |
-          | <sub>ShadowsocksR-netcore-${{ env.GITHUB_TAG_NAME }}.zip</sub> | <sub>${{ env.NETCORE_SHA256 }}</sub> |
-          | <sub>ShadowsocksR-Portable-Win32-${{ env.GITHUB_TAG_NAME }}.zip</sub> | <sub>${{ env.NETCORE86_SHA256 }}</sub> |
-          | <sub>ShadowsocksR-Portable-Win64-${{ env.GITHUB_TAG_NAME }}.zip</sub> | <sub>${{ env.NETCORE64_SHA256 }}</sub> |
+          | <sub>${{ env.ProjectName }}-netcore-${{ env.GIT_TAG_NAME }}.7z</sub> | <sub>${{ env.NETCORE_SHA256 }}</sub> |
+          | <sub>${{ env.ProjectName }}-Win64-${{ env.GIT_TAG_NAME }}.7z</sub> | <sub>${{ env.NETCORE64_SHA256 }}</sub> |
+          | <sub>${{ env.ProjectName }}-Win32-${{ env.GIT_TAG_NAME }}.7z</sub> | <sub>${{ env.NETCORE86_SHA256 }}</sub> |
       if: startsWith(github.ref, 'refs/tags/')
       env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

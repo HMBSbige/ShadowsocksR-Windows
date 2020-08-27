@@ -1,8 +1,8 @@
 ﻿using Shadowsocks.Model;
-using Shadowsocks.Util;
 using Shadowsocks.Util.GitHubRelease;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace Shadowsocks.Controller.HttpRequest
 {
@@ -22,14 +22,9 @@ namespace Shadowsocks.Controller.HttpRequest
 
         public const string Name = @"ShadowsocksR";
         public const string Copyright = @"Copyright © HMBSbige 2019 - 2020 & BreakWa11 2017. Fork from Shadowsocks by clowwindy";
-        public const string Version = @"5.1.9";
+        public const string Version = @"5.1.10";
 
         public const string FullVersion = Version +
-#if IsDotNetCore
-        @" .Net Core" +
-#else
-        @"" +
-#endif
 #if IsSelfContainedDotNetCore
 #if Is64Bit
             @" x64" +
@@ -54,7 +49,7 @@ namespace Shadowsocks.Controller.HttpRequest
 
                 var json = await AutoGetAsync(url, proxy, userAgent, config.ConnectTimeout * 1000);
 
-                var releases = JsonUtils.Deserialize<List<Release>>(json);
+                var releases = JsonSerializer.Deserialize<List<Release>>(json);
                 var latestRelease = VersionUtil.GetLatestRelease(releases, config.IsPreRelease);
                 if (VersionUtil.CompareVersion(latestRelease.tag_name, Version) > 0)
                 {
