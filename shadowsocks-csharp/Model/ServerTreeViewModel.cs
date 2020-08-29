@@ -1,7 +1,6 @@
 ﻿using Shadowsocks.Enums;
 using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
-using Syncfusion.Windows.Tools.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,7 +8,7 @@ using System.Linq;
 
 namespace Shadowsocks.Model
 {
-    public class ServerTreeViewModel : ViewModelBase, IVirtualTree
+    public class ServerTreeViewModel : ViewModelBase
     {
         public ServerTreeViewModel()
         {
@@ -17,7 +16,6 @@ namespace Shadowsocks.Model
             _name = string.Empty;
             _server = null;
             _type = ServerTreeViewType.Subtag;
-            Parent = null;
         }
 
         private string _name;
@@ -101,16 +99,25 @@ namespace Shadowsocks.Model
             }
         }
 
-        public static IEnumerable<ServerTreeViewModel> GetNodes(IEnumerable<ServerTreeViewModel> root)
+        public static ServerTreeViewModel FindParentNode(Collection<ServerTreeViewModel> root, ServerTreeViewModel st)
         {
+            var res = root.Where(serverTreeViewModel => serverTreeViewModel.Nodes != null)
+                    .FirstOrDefault(serverTreeViewModel => serverTreeViewModel.Nodes.Contains(st));
+            if (res != null)
+            {
+                return res;
+            }
+
             foreach (var serverTreeViewModel in root)
             {
-                yield return serverTreeViewModel;
-                foreach (var subServerTreeViewModel in GetNodes(serverTreeViewModel.Nodes))
+                res = FindParentNode(serverTreeViewModel.Nodes, st);
+                if (res != null)
                 {
-                    yield return subServerTreeViewModel;
+                    return res;
                 }
             }
+
+            return null;
         }
 
         public static ServerTreeViewModel FindNode(Collection<ServerTreeViewModel> root, string serverId)
@@ -131,29 +138,6 @@ namespace Shadowsocks.Model
             }
             return null;
         }
-
-        #endregion
-
-        #region IVirtualTree
-
-        private bool _isExpanded;
-        public bool IsExpanded
-        {
-            get => _isExpanded;
-            set => SetField(ref _isExpanded, value);
-        }
-
-        private bool _isSelected;
-        public bool IsSelected
-        {
-            get => _isSelected;
-            set => SetField(ref _isSelected, value);
-        }
-
-        public IVirtualTree Parent { get; set; }
-
-        public int ItemsCount { get; set; }
-        public double ExtentHeight { get; set; }
 
         #endregion
     }

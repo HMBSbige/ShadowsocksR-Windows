@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using Shadowsocks.Enums;
 using Shadowsocks.Util;
 
 namespace Shadowsocks.View.ValueConverter
@@ -15,6 +16,13 @@ namespace Shadowsocks.View.ValueConverter
                 if (targetType == typeof(Brush))
                 {
                     return enable ? ColorConvert.EnableBrush : ColorConvert.DisableBrush;
+                }
+            }
+            else if (value is ServerTreeViewType type)
+            {
+                if (targetType == typeof(Visibility))
+                {
+                    return type == ServerTreeViewType.Server ? Visibility.Visible : Visibility.Collapsed;
                 }
             }
             return DependencyProperty.UnsetValue;

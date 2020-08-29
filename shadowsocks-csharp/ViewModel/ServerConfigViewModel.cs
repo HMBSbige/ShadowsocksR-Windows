@@ -46,8 +46,7 @@ namespace Shadowsocks.ViewModel
                     var sub2 = new ServerTreeViewModel
                     {
                         Name = group,
-                        Type = ServerTreeViewType.Group,
-                        Parent = sub1
+                        Type = ServerTreeViewType.Group
                     };
                     var subServers = servers.Where(server => server.Group == group);
                     foreach (var server in subServers)
@@ -58,8 +57,7 @@ namespace Shadowsocks.ViewModel
                         sub2.Nodes.Add(new ServerTreeViewModel
                         {
                             Server = server,
-                            Type = ServerTreeViewType.Server,
-                            Parent = sub2
+                            Type = ServerTreeViewType.Server
                         });
                     }
                     sub1.Nodes.CollectionChanged -= ServerCollection_CollectionChanged;
@@ -71,7 +69,6 @@ namespace Shadowsocks.ViewModel
                 {
                     sub1.Nodes[0].Name = subTag;
                     sub1.Nodes[0].Type = ServerTreeViewType.Subtag;
-                    sub1.Nodes[0].Parent = null;
                     ServersTreeViewCollection.Add(sub1.Nodes[0]);
                 }
                 else

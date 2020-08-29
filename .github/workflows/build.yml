@@ -87,13 +87,9 @@ jobs:
           [![](https://img.shields.io/badge/Telegram-Channel-blue)](https://t.me/ShadowsocksR_Windows) [![](https://img.shields.io/badge/Telegram-Group-green)](https://t.me/joinchat/Gn-Aa0-j4HcpdBaW-Iv8Sw)
           [![](https://img.shields.io/badge/ShadowsocksR-Android-e482a3)](https://github.com/HMBSbige/ShadowsocksR-Android/releases)
 
-          **[版本升级配置文件迁移](https://github.com/HMBSbige/ShadowsocksR-Windows/wiki/%E7%89%88%E6%9C%AC%E5%8D%87%E7%BA%A7%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%BF%81%E7%A7%BB)**
-
-          **[4个 Release 的区别](https://github.com/HMBSbige/ShadowsocksR-Windows/wiki/ShadowsocksR-Windows-%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E#artifacts)**
-
           ## 更新日志：
           * 这是 GitHub Action 自动化部署，更新日志应该很快会手动更新
-          
+
           ## 文件校验
           | 文件名 | SHA256 |
           | :- | :- |

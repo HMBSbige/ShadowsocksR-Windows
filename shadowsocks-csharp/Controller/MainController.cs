@@ -466,7 +466,7 @@ namespace Shadowsocks.Controller
         private void StartPrivoxy()
         {
             const int max = 5;
-            var i = 1;
+            var i = 0;
             while (true)
             {
                 try
@@ -474,12 +474,9 @@ namespace Shadowsocks.Controller
                     _privoxyRunner.Start(Global.GuiConfig);
                     break;
                 }
-                catch (Win32Exception)
+                catch (Win32Exception) when (i < max)
                 {
-                    if (++i > max)
-                    {
-                        throw;
-                    }
+                    ++i;
                 }
             }
         }

@@ -31,6 +31,7 @@
             </Style>
             <BooleanToVisibilityConverter x:Key="Bool2Visibility" />
             <valueConverter:ServerTreeTypeToFontConverter x:Key="ServerTreeTypeToFontConverter" />
+            <valueConverter:BooleanToEnabledConverter x:Key="BooleanToEnabledConverter" />
         </ResourceDictionary>
     </Window.Resources>
 
@@ -54,42 +55,48 @@
                       HorizontalAlignment="Right"
                       VerticalAlignment="Stretch"
                       Width="3" Visibility="Collapsed"/>
-        <syncfusion:TreeViewAdv x:Name="ServersTreeView"
-        Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Margin="10,0,10,10"
-        AnimationType="None"
-        DataContext="{Binding Path=ServerConfigViewModel, ElementName=Cw}"
-        ItemsSource="{Binding ServersTreeViewCollection}"
-        SelectedValuePath="Server"
-        AllowMultiSelect="True"
-        AllowDragDrop="True"
-        ShowRootLines="False"
-        VirtualizationMode="Extended"
-        SelectedItemChanged="ServersTreeView_OnSelectedItemChanged"
-        DragEnd="ServersTreeView_OnDragEnd">
-            <syncfusion:TreeViewAdv.ItemContainerStyle>
-                <Style TargetType="{x:Type syncfusion:TreeViewItemAdv}">
-                    <Setter Property="IsEditable" Value="False" />
-                    <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
-                    <Setter Property="IsSelected" Value="{Binding IsSelected}" />
-                </Style>
-            </syncfusion:TreeViewAdv.ItemContainerStyle>
-            <syncfusion:TreeViewAdv.ContextMenu>
+
+        <syncfusion:SfTreeView x:Name="ServersTreeView"
+                               Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Margin="10,0,10,10"
+                               ChildPropertyName="Nodes"
+                               FullRowSelect="True"
+                               IsAnimationEnabled="False"
+                               SelectionMode="Extended"
+                               ItemTemplateDataContextType="Item"
+                               AutoExpandMode="AllNodes"
+                               DataContext="{Binding Path=ServerConfigViewModel, ElementName=Cw}"
+                               ItemsSource="{Binding ServersTreeViewCollection}"
+                               ExpandActionTrigger="Expander"
+                               AllowDragging="True"
+                               SelectionChanged="ServersTreeView_OnSelectionChanged"
+                               ItemDropping="ServersTreeView_OnItemDropping"
+                               >
+            <syncfusion:SfTreeView.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="{DynamicResource Add}" Click="AddButton_Click" />
                     <MenuItem Header="{DynamicResource Delete}" Click="DeleteButton_Click" />
-                    <Separator />
-                    <MenuItem Header="{DynamicResource Expand}" Click="Expand_OnClick" />
-                    <MenuItem Header="{DynamicResource Collapse}" Click="Collapse_Click" />
                 </ContextMenu>
-            </syncfusion:TreeViewAdv.ContextMenu>
-            <syncfusion:TreeViewAdv.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Nodes}" >
-                    <TextBlock Text="{Binding Name}" 
-                    Foreground="{Binding Type,Converter={StaticResource ServerTreeTypeToFontConverter}}"
-                    FontWeight="{Binding Type,Converter={StaticResource ServerTreeTypeToFontConverter}}" />
-                </HierarchicalDataTemplate>
-            </syncfusion:TreeViewAdv.ItemTemplate>
-        </syncfusion:TreeViewAdv>
+            </syncfusion:SfTreeView.ContextMenu>
+            <syncfusion:SfTreeView.ItemTemplate>
+                <DataTemplate>
+                    <Grid >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox x:Name="CheckBox" FocusVisualStyle="{x:Null}" Margin="0,3,3,0"
+                                  VerticalAlignment="Center" Height="22"
+                                  IsChecked="{Binding Server.Enable, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                  Visibility="{Binding Type,Converter={StaticResource BooleanToEnabledConverter}}" />
+                        <TextBlock Grid.Column="1" Text="{Binding Name}" 
+                                   VerticalAlignment="Stretch" HorizontalAlignment="Stretch" FontSize="14" Height="22"
+                                   Foreground="{Binding Type,Converter={StaticResource ServerTreeTypeToFontConverter}}"
+                                   FontWeight="{Binding Type,Converter={StaticResource ServerTreeTypeToFontConverter}}" />
+                    </Grid>
+                </DataTemplate>
+            </syncfusion:SfTreeView.ItemTemplate>
+
+        </syncfusion:SfTreeView>
         <Button x:Name="ShowQrCodeButton" Grid.Row="1" Grid.Column="1" Margin="10,10,10,0" Content=">>" HorizontalAlignment="Right" Width="40" Click="ShowQrCodeButton_OnClick"/>
         <Grid Grid.Row="2" Grid.Column="1" Margin="5,10,10,10" >
             <Grid.ColumnDefinitions>
@@ -130,12 +137,12 @@
                     <controls:MaskedTextBox x:Name="ServerIpTextBox" Grid.Row="0" Grid.Column="1"
                                             Height="23.24" Margin="0,10,0,0"
                                             PlainMode="False"
-                                            Text="{Binding SelectedValue.server,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                            Text="{Binding SelectedItem.Server.server,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
 
                     <Label Grid.Row="1" Grid.Column="0" Content="{DynamicResource ServerPort}" ContentStringFormat="*{0}" Margin="0,5,0,0" HorizontalAlignment="Right" />
                     <controls:NumberUpDown Grid.Row="1" Grid.Column="1" Height="23.24" Margin="0,5,0,0"
                                            VerticalAlignment="Center" MinNum="0" MaxNum="65535"
-                                           Value="{Binding SelectedValue.Server_Port,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                           Value="{Binding SelectedItem.Server.Server_Port,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
 
                     <CheckBox Grid.Row="2" Grid.Column="0"
                               Content="{DynamicResource Password}" VerticalAlignment="Center"
@@ -144,45 +151,45 @@
                     <controls:MaskedTextBox x:Name="PasswordTextBox" Grid.Row="2" Grid.Column="1"
                                             Height="23.24" Margin="0,5,0,0" 
                                             PlainMode="False"
-                                            Text="{Binding SelectedValue.Password,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                            Text="{Binding SelectedItem.Server.Password,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
 
                     <Label Grid.Row="3" Grid.Column="0" Content="{DynamicResource Encryption}" ContentStringFormat="*{0}"
                            Margin="0,5,0,0" HorizontalAlignment="Right" />
                     <ComboBox x:Name="EncryptionComboBox" Grid.Row="3" Grid.Column="1"
                               Height="23.24" Margin="0,5,0,0" IsEditable="True"
-                              Text="{Binding SelectedValue.Method,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                              Text="{Binding SelectedItem.Server.Method,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
 
                     <Label Grid.Row="4" Grid.Column="0" Content="{DynamicResource Protocol}" ContentStringFormat="*{0}"
                            Margin="0,5,0,0" HorizontalAlignment="Right" Foreground="#FF8000C0" />
                     <ComboBox x:Name="ProtocolComboBox" Grid.Row="4" Grid.Column="1"
                               Height="23.24" Margin="0,5,0,0" IsEditable="True"
-                              Text="{Binding SelectedValue.Protocol,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                              Text="{Binding SelectedItem.Server.Protocol,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
 
                     <Label Grid.Row="5" Grid.Column="0" Content="{DynamicResource ProtocolParam}"
                            Margin="0,5,0,0" HorizontalAlignment="Right" Foreground="#FF8000C0" />
                     <TextBox Grid.Row="5" Grid.Column="1" Height="23.24" Margin="0,5,0,0" 
-                             Text="{Binding SelectedValue.ProtocolParam,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                             Text="{Binding SelectedItem.Server.ProtocolParam,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
 
                     <Label Grid.Row="6" Grid.Column="0" Content="{DynamicResource Obfs}" ContentStringFormat="*{0}"
                            Margin="0,5,0,0" HorizontalAlignment="Right" Foreground="#FF8000C0" />
                     <ComboBox x:Name="ObfsComboBox" Grid.Row="6" Grid.Column="1"
                               Height="23.24" Margin="0,5,0,0" IsEditable="True" SelectionChanged="ObfsComboBox_SelectionChanged"
-                              Text="{Binding SelectedValue.obfs,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                              Text="{Binding SelectedItem.Server.obfs,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
 
                     <Label Grid.Row="7" Grid.Column="0" Content="{DynamicResource ObfsParam}"
                            Margin="0,5,0,0" HorizontalAlignment="Right" Foreground="#FF8000C0" />
                     <TextBox x:Name="ObfsParamTextBox" Grid.Row="7" Grid.Column="1" Height="23.24" Margin="0,5,0,0"
-                             Text="{Binding SelectedValue.ObfsParam,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                             Text="{Binding SelectedItem.Server.ObfsParam,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
 
                     <Label Grid.Row="8" Grid.Column="0" Content="{DynamicResource Remarks}"
                            Margin="0,5,0,0" HorizontalAlignment="Right" />
                     <TextBox Grid.Row="8" Grid.Column="1" Height="23.24" Margin="0,5,0,0" 
-                    Text="{Binding SelectedValue.Remarks,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                    Text="{Binding SelectedItem.Server.Remarks,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
 
                     <Label Grid.Row="9" Grid.Column="0" Content="{DynamicResource Group}"
                            Margin="0,5,0,0" HorizontalAlignment="Right" />
                     <TextBox Grid.Row="9" Grid.Column="1" Height="23.24" Margin="0,5,0,0"
-                             Text="{Binding SelectedValue.Group,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                             Text="{Binding SelectedItem.Server.Group,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
 
                     <CheckBox x:Name="SsrLinkCheckBox" Grid.Row="10" Grid.Column="0"
                               Content="{DynamicResource SsrLink}" VerticalAlignment="Center"
@@ -194,10 +201,10 @@
                     TextChanged="LinkTextBox_TextChanged">
                          <TextBox.Style>
                             <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
-                                <Setter Property="Text" Value="{Binding SelectedValue.SsrLink,ElementName=ServersTreeView,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
+                                <Setter Property="Text" Value="{Binding SelectedItem.Server.SsrLink,ElementName=ServersTreeView,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsChecked,ElementName=SsrLinkCheckBox}" Value="False">
-                                        <Setter Property="Text" Value="{Binding SelectedValue.SsLink,ElementName=ServersTreeView,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
+                                        <Setter Property="Text" Value="{Binding SelectedItem.Server.SsLink,ElementName=ServersTreeView,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" />
                                 </DataTrigger>
                             </Style.Triggers>
                             </Style>
@@ -208,7 +215,7 @@
                               Content="{DynamicResource AdvSetting}" VerticalAlignment="Center"
                               Margin="0,5,5,0"
                               HorizontalAlignment="Right"
-                              IsChecked="{Binding SelectedValue.ShowAdvSetting,ElementName=ServersTreeView,Mode=OneWay}" />
+                              IsChecked="{Binding SelectedItem.Server.ShowAdvSetting,ElementName=ServersTreeView,Mode=OneWay}" />
                     <TextBlock Grid.Row="11" Grid.Column="1" Margin="0,5,0,0" Text="{DynamicResource AdvSettingDescription}"/>
 
                     <Label Grid.Row="12" Grid.Column="0" Content="{DynamicResource UdpPort}"
@@ -217,7 +224,7 @@
                     <controls:NumberUpDown Grid.Row="12" Grid.Column="1" Height="23.24" Margin="0,5,0,0"
                                            VerticalAlignment="Center" MinNum="0" MaxNum="65535"
                                            Visibility="{Binding IsChecked,ElementName=AdvSettingCheckBox,Converter={StaticResource Bool2Visibility}}"
-                                           Value="{Binding SelectedValue.Server_Udp_Port,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                                           Value="{Binding SelectedItem.Server.Server_Udp_Port,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
 
                     <Label Grid.Row="13" Grid.Column="0" Content="{DynamicResource UdpOverTcp}"
                            Margin="0,5,0,0" HorizontalAlignment="Right"
@@ -226,7 +233,7 @@
                               Content="{DynamicResource UdpOverTcpCheckBox}" VerticalAlignment="Center"
                               Margin="0,5,5,0"
                               Visibility="{Binding IsChecked,ElementName=AdvSettingCheckBox,Converter={StaticResource Bool2Visibility}}" 
-                              IsChecked="{Binding SelectedValue.UdpOverTcp,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
+                              IsChecked="{Binding SelectedItem.Server.UdpOverTcp,ElementName=ServersTreeView,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" />
                 </Grid>
             </StackPanel>
         </GroupBox>
