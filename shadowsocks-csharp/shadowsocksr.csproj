@@ -47,12 +47,12 @@
   
   <ItemGroup>
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf.NetCore" Version="1.0.13" />
-    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="18.2.0.55" />
+    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="18.2.0.56" />
     <PackageReference Include="ARSoft.Tools.Net" Version="2.3.0" />
-    <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="18.2.0.55" />
+    <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="18.2.0.56" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Reactive" Version="4.4.1" />
-    <PackageReference Include="WpfColorFontDialog" Version="1.0.7" />
+    <PackageReference Include="WpfColorFontDialog" Version="1.0.8" />
     <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.6" />
   </ItemGroup>
 
