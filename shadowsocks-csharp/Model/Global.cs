@@ -5,6 +5,7 @@ using Shadowsocks.Util;
 using System;
 using System.IO;
 using System.Net;
+using System.Text.Json;
 
 namespace Shadowsocks.Model
 {
@@ -62,7 +63,7 @@ namespace Shadowsocks.Model
         {
             try
             {
-                var config = JsonUtils.Deserialize<Configuration>(configStr);
+                var config = JsonSerializer.Deserialize<Configuration>(configStr);
                 config.FixConfiguration();
                 return config;
             }

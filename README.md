@@ -2,7 +2,7 @@
 =======================
 
 [![](https://img.shields.io/badge/Telegram-Channel-blue)](https://t.me/ShadowsocksR_Windows)
-[![](https://img.shields.io/badge/Telegram-Group-green)](https://t.me/joinchat/Gn-Aa0-j4Hdthl502zlIlQ)
+[![](https://img.shields.io/badge/Telegram-Group-green)](https://t.me/joinchat/Gn-Aa0-j4HcpdBaW-Iv8Sw)
 
 ## Build
 

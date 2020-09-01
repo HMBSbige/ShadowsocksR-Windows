@@ -5,14 +5,14 @@ using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
-using Syncfusion.Windows.Tools.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Threading;
+using Syncfusion.Data.Extensions;
+using Syncfusion.UI.Xaml.TreeView;
 
 namespace Shadowsocks.View
 {
@@ -47,7 +47,7 @@ namespace Shadowsocks.View
             _controller.ConfigChanged += controller_ConfigChanged;
             ServerConfigViewModel.ServersChanged += ServerViewModel_ServersChanged;
             _focusIndex = focusIndex;
-            ServerGroupBox.Visibility = ServersTreeView.SelectedValue == null ? Visibility.Hidden : Visibility.Visible;
+            ServersTreeView_OnSelectionChanged(this, new ItemSelectionChangedEventArgs());
         }
 
         private void ServerViewModel_ServersChanged(object sender, EventArgs e)
@@ -133,6 +133,9 @@ namespace Shadowsocks.View
             _modifiedConfiguration = Global.Load();
             ServerConfigViewModel.ReadServers(_modifiedConfiguration.Configs);
 
+            ServersTreeView.ExpandAll();
+            ServersTreeView.CollapseAll();
+
             if (scrollToSelectedItem)
             {
                 MoveToSelectedItem(_modifiedConfiguration.Index);
@@ -143,27 +146,13 @@ namespace Shadowsocks.View
 
         #region TreeView
 
-        private void ExpandTree(bool expand)
-        {
-            foreach (var node in ServerTreeViewModel.GetNodes(ServerConfigViewModel.ServersTreeViewCollection))
-            {
-                if (node.Type != ServerTreeViewType.Server)
-                {
-                    node.IsExpanded = expand;
-                }
-            }
-        }
-
         public void MoveToSelectedItem(int index)
         {
-            Dispatcher.CurrentDispatcher.InvokeAsync(() =>
+            if (index >= 0 && index < _modifiedConfiguration.Configs.Count)
             {
-                if (index >= 0 && index < _modifiedConfiguration.Configs.Count)
-                {
-                    var server = _modifiedConfiguration.Configs[index];
-                    MoveToSelectedItem(server.Id);
-                }
-            }, DispatcherPriority.Input);
+                var server = _modifiedConfiguration.Configs[index];
+                MoveToSelectedItem(server.Id);
+            }
         }
 
         private void MoveToSelectedItem(string id)
@@ -175,31 +164,12 @@ namespace Shadowsocks.View
             }
         }
 
-        private void MoveToSelectedItem(IVirtualTree serverTreeViewModel)
+        private void MoveToSelectedItem(ServerTreeViewModel serverTreeViewModel)
         {
-            serverTreeViewModel.IsExpanded = true;
-            var parent = serverTreeViewModel.Parent;
-            while (parent != null)
-            {
-                parent.IsExpanded = true;
-                parent = parent.Parent;
-            }
-
-            Dispatcher.CurrentDispatcher.InvokeAsync(() =>
-            {
-                var treeViewItem = ServersTreeView.GetContainerFromItem(serverTreeViewModel);
-                if (treeViewItem == null) return;
-                ServersTreeView.BringIntoView(treeViewItem);
-                if (ServersTreeView.SelectedItems.Count == 1 && ReferenceEquals(ServersTreeView.SelectedItem, treeViewItem.Header))
-                {
-                    //Fix a weird selection action
-                }
-                else
-                {
-                    ServersTreeView.ClearSelection();
-                    serverTreeViewModel.IsSelected = true;
-                }
-            }, DispatcherPriority.Render);
+            ServersTreeView.BringIntoView(serverTreeViewModel, false, true, ScrollToPosition.Center);
+            ServersTreeView.SelectedItems.Clear();
+            ServersTreeView.SelectedItem = serverTreeViewModel;
+            ServersTreeView_OnSelectionChanged(this, new ItemSelectionChangedEventArgs());
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -216,8 +186,7 @@ namespace Shadowsocks.View
                         var item = new ServerTreeViewModel
                         {
                             Type = ServerTreeViewType.Server,
-                            Server = new Server { Group = st.Name },
-                            Parent = st
+                            Server = new Server { Group = st.Name }
                         };
                         st.Nodes.Add(item);
                         MoveToSelectedItem(item);
@@ -225,13 +194,13 @@ namespace Shadowsocks.View
                     }
                     case ServerTreeViewType.Server:
                     {
-                        if (st.Parent is ServerTreeViewModel parent)
+                        var parent = ServerTreeViewModel.FindParentNode(ServerConfigViewModel.ServersTreeViewCollection, st);
+                        if (parent != null)
                         {
                             var item = new ServerTreeViewModel
                             {
                                 Type = ServerTreeViewType.Server,
-                                Server = Server.Clone(st.Server),
-                                Parent = parent
+                                Server = Server.Clone(st.Server)
                             };
                             var index = parent.Nodes.IndexOf(st) + 1;
                             parent.Nodes.Insert(index, item);
@@ -256,156 +225,126 @@ namespace Shadowsocks.View
                 if (selectedItem is ServerTreeViewModel st)
                 {
                     ServerTreeViewModel.Remove(ServerConfigViewModel.ServersTreeViewCollection, st);
+                    ServersTreeView.SelectedItems.Clear();
+                    ServersTreeView_OnSelectionChanged(this, new ItemSelectionChangedEventArgs());
                 }
             }
-            //Fix weird selections
-            ServersTreeView.ClearSelection();
         }
 
-        private void Expand_OnClick(object sender, RoutedEventArgs e)
+        private void ServersTreeView_OnSelectionChanged(object sender, ItemSelectionChangedEventArgs e)
         {
-            ExpandTree(true);
-        }
-
-        private void Collapse_Click(object sender, RoutedEventArgs e)
-        {
-            ExpandTree(false);
-        }
-
-        private void ServersTreeView_OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            ServerGroupBox.Visibility = ServersTreeView.SelectedValue == null ? Visibility.Hidden : Visibility.Visible;
-        }
-
-        private void ServersTreeView_OnDragEnd(object sender, DragTreeViewItemAdvEventArgs e)
-        {
-            //Fix weird selections
-            ServersTreeView.ClearSelection();
-
-            var draggingItems = new List<ServerTreeViewModel>();
-            foreach (var draggingItem in e.DraggingItems)
+            if (ServersTreeView.SelectedItems.Count == 1 &&
+                ServersTreeView.SelectedItem is ServerTreeViewModel node &&
+                node.Type == ServerTreeViewType.Server)
             {
-                if (draggingItem.Header is ServerTreeViewModel st)
-                {
-                    draggingItems.Add(st);
-                }
-                else
+                ServerGroupBox.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                ServerGroupBox.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void ServersTreeView_OnItemDropping(object sender, TreeViewItemDroppingEventArgs e)
+        {
+            if (e.TargetNode.Content is ServerTreeViewModel target)
+            {
+                var source = e.DraggingNodes.Where(n => n.Content is ServerTreeViewModel).Select(n => (ServerTreeViewModel)n.Content).ToArray();
+                if (!source.Any())
                 {
                     goto Skip;
                 }
-            }
-            var types = new HashSet<ServerTreeViewType>(draggingItems.Select(items => items.Type));
-            if (types.Count == 1)
-            {
-                var type = types.First();
-                switch (type)
-                {
-                    case ServerTreeViewType.Subtag:
-                        e.Cancel = !(e.TargetDropItem is TreeViewAdv);
-                        return;
-                    case ServerTreeViewType.Group:
-                        //移到相同订阅组上会被吃掉
-                        if (e.DropIndex < 0)
-                        {
-                            goto Skip;
-                        }
-                        //属于同样的订阅
-                        if (e.TargetDropItem is TreeViewItemAdv treeViewItem)
-                        {
-                            if (treeViewItem.Header is ServerTreeViewModel st && st.Type == ServerTreeViewType.Subtag)
-                            {
-                                if (draggingItems.All(draggingItem => draggingItem.Parent == st))
-                                {
-                                    e.Cancel = false;
-                                    return;
-                                }
-                            }
-                        }
-                        break;
-                    case ServerTreeViewType.Server:
-                        //属于同一个订阅
-                        var subs = new HashSet<string>();
-                        foreach (var draggingItem in draggingItems)
-                        {
-                            var parent = draggingItem.Parent;
-                            while (parent.Parent != null)
-                            {
-                                parent = parent.Parent;
-                            }
-                            if (parent is ServerTreeViewModel parentModel)
-                            {
-                                subs.Add(parentModel.Name);
-                                continue;
-                            }
-                            goto Skip;
-                        }
-                        if (subs.Count != 1)
-                        {
-                            goto Skip;
-                        }
-                        var sub = subs.First();
-                        //且 目标为群组或原版的订阅连接
-                        if (e.TargetDropItem is TreeViewItemAdv treeViewItemAdv)
-                        {
-                            if (treeViewItemAdv.Header is ServerTreeViewModel st)
-                            {
-                                switch (st.Type)
-                                {
-                                    case ServerTreeViewType.Subtag:
-                                    {
-                                        //移到相同订阅组上会被吃掉
-                                        if (e.DropIndex < 0)
-                                        {
-                                            goto Skip;
-                                        }
-                                        //原版的订阅连接
-                                        if (draggingItems.All(draggingItem => draggingItem.Parent == st))
-                                        {
-                                            e.Cancel = false;
-                                            return;
-                                        }
-                                        break;
-                                    }
-                                    case ServerTreeViewType.Group:
-                                    {
-                                        //相同订阅组
-                                        if (st.Parent is ServerTreeViewModel targetParent && sub == targetParent.Name)
-                                        {
-                                            //同一个组
-                                            var parents = new HashSet<IVirtualTree>(draggingItems.Select(items => items.Parent));
-                                            if (parents.Count != 1)
-                                            {
-                                                goto Skip;
-                                            }
-                                            var parent = parents.First();
-                                            if (e.DropIndex < 0 && parent == st)
-                                            {
-                                                goto Skip;
-                                            }
 
-                                            foreach (var draggingItem in draggingItems)
-                                            {
-                                                var first = st.Nodes.FirstOrDefault();
-                                                draggingItem.Server.Group = first != null ? first.Server.Group :
-                                                        st.Name != I18NUtil.GetAppStringValue(@"EmptyGroup") ? st.Name :
-                                                        string.Empty;
-                                                draggingItem.Parent = st;
-                                            }
-                                            e.Cancel = false;
-                                            return;
-                                        }
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                if (source.Any(st => st.Type == ServerTreeViewType.Subtag))
+                {
+                    if (ServerTreeViewModel.FindParentNode(ServerConfigViewModel.ServersTreeViewCollection, target) != null)
+                    {
+                        goto Skip;
+                    }
+
+                    var res = e.DraggingNodes.Where(n => n.Content is ServerTreeViewModel st && st.Type == ServerTreeViewType.Subtag).ToArray();
+                    e.DraggingNodes.Clear();
+                    res.ForEach(x => e.DraggingNodes.Add(x));
+
+                    if (e.DropPosition == DropPosition.DropAsChild)
+                    {
+                        e.DropPosition = DropPosition.DropBelow;
+                    }
+                    return;
                 }
+                if (source.Any(st => st.Type == ServerTreeViewType.Group))
+                {
+                    var res = e.DraggingNodes.Where(n => n.Content is ServerTreeViewModel st && st.Type == ServerTreeViewType.Group).ToArray();
+                    e.DraggingNodes.Clear();
+                    res.ForEach(x => e.DraggingNodes.Add(x));
+
+                    if (target.Type == ServerTreeViewType.Subtag)
+                    {
+                        goto Skip;
+                    }
+                    if (target.Type == ServerTreeViewType.Group)
+                    {
+                        var parent = ServerTreeViewModel.FindParentNode(ServerConfigViewModel.ServersTreeViewCollection, target);
+                        if (parent == null)
+                        {
+                            goto Skip;
+                        }
+
+                        var isSameParent = e.DraggingNodes.All(n => n.Content is ServerTreeViewModel st
+                           && ServerTreeViewModel.FindParentNode(ServerConfigViewModel.ServersTreeViewCollection, st) == parent);
+
+                        if (!isSameParent)
+                        {
+                            goto Skip;
+                        }
+
+                        if (e.DropPosition == DropPosition.DropAsChild)
+                        {
+                            e.DropPosition = DropPosition.DropBelow;
+                        }
+                        return;
+                    }
+                    goto Skip;
+                }
+                // all is servers
+                if (target.Type == ServerTreeViewType.Subtag)
+                {
+                    goto Skip;
+                }
+                if (target.Type == ServerTreeViewType.Group)
+                {
+                    var sub = ServerTreeViewModel.FindParentNode(ServerConfigViewModel.ServersTreeViewCollection, target);
+                    if (sub == null) return;
+
+                    var subName = sub.Name == I18NUtil.GetAppStringValue(@"EmptySubtag") ? string.Empty : sub.Name;
+                    var groupName = target.Name == I18NUtil.GetAppStringValue(@"EmptyGroup") ? string.Empty : target.Name;
+
+                    e.DraggingNodes.ForEach(n =>
+                    {
+                        var server = ((ServerTreeViewModel)n.Content).Server;
+                        server.Group = groupName;
+                        server.SubTag = subName;
+                    });
+
+                    e.DropPosition = DropPosition.DropAsChild;
+                    return;
+                }
+
+                e.DraggingNodes.ForEach(n =>
+                {
+                    var server = ((ServerTreeViewModel)n.Content).Server;
+                    server.Group = target.Server.Group;
+                    server.SubTag = target.Server.SubTag;
+                });
+
+                if (e.DropPosition == DropPosition.DropAsChild)
+                {
+                    e.DropPosition = DropPosition.DropBelow;
+                }
+                return;
             }
             Skip:
-            e.Cancel = true;
+            e.Handled = true;
         }
 
         #endregion
@@ -442,7 +381,7 @@ namespace Shadowsocks.View
                     return;
                 }
                 var obfs = (Obfs.ObfsBase)Obfs.ObfsFactory.GetObfs(ObfsComboBox.SelectedItem.ToString());
-                var properties = obfs.GetObfs()[ObfsComboBox.SelectedItem.ToString()];
+                var properties = obfs.GetObfs()[$@"{ObfsComboBox.SelectedItem}"];
                 ObfsParamTextBox.IsEnabled = properties[2] > 0;
             }
             catch

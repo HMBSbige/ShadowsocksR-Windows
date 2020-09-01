@@ -2,6 +2,7 @@
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
+using Shadowsocks.View.Controls;
 using Shadowsocks.ViewModel;
 using Syncfusion.Data;
 using Syncfusion.UI.Xaml.Grid;
@@ -23,6 +24,8 @@ namespace Shadowsocks.View
             InitializeComponent();
             I18NUtil.SetLanguage(Resources, @"ServerLogWindow");
             LoadLanguage();
+
+            ServerDataGrid.GridColumnSizer = new GridColumnSizerExt(ServerDataGrid);
 
             _controller = controller;
             Closed += (o, e) => { _controller.ConfigChanged -= controller_ConfigChanged; };

@@ -1,119 +1,68 @@
-# REM The reason we don't use dotnet build is that dotnet build doesn't support COM references yet https://github.com/microsoft/msbuild/issues/3986
 param([string]$buildtfm = 'all')
+$ErrorActionPreference = 'Stop'
 
 Write-Host 'dotnet SDK version'
 dotnet --version
 
 $exe = 'ShadowsocksR.exe'
-$net_tfm = 'net48'
 $netcore_tfm = 'netcoreapp3.1'
 $configuration = 'Release'
-$mainDir = (Get-Item -Path ".\").FullName
-$net_baseoutput = "$mainDir\shadowsocks-csharp\bin\$configuration"
-$apphostpatcher_dir = "$mainDir\AppHostPatcher"
+$output_dir = "shadowsocks-csharp\bin\$configuration"
+$dllpatcher_dir = "Build\DotNetDllPathPatcher"
+$proj_path = 'shadowsocks-csharp\shadowsocksr.csproj'
 
-Write-Host $mainDir
-Write-Host $net_baseoutput
-Write-Host $apphostpatcher_dir
-
-$buildNet     = $buildtfm -eq 'all' -or $buildtfm -eq 'net'
 $buildCore    = $buildtfm -eq 'all' -or $buildtfm -eq 'core'
 $buildCoreX86 = $buildtfm -eq 'all' -or $buildtfm -eq 'core-x86'
 $buildCoreX64 = $buildtfm -eq 'all' -or $buildtfm -eq 'core-x64'
-
-function Build-AppHostPatcher
-{
-	Write-Host Building AppHostPatcher
-	
-	$outdir = "$apphostpatcher_dir\bin\$configuration\$netcore_tfm"
-	$publishDir = "$outdir\publish"
-	
-	Remove-Item $publishDir -Recurse -Force -Confirm:$false -ErrorAction Ignore
-	
-	msbuild -v:m -m -r -t:Publish -p:Configuration=$configuration -p:TargetFramework=$netcore_tfm
-	if ($LASTEXITCODE) { cd $mainDir ; exit $LASTEXITCODE }
-}
-
-function Build-NetFramework
-{
-	Write-Host 'Building .NET Framework x86 and x64'
-	
-	$outdir = "$net_baseoutput\$net_tfm"
-	
-	msbuild -v:m -m -r -t:Build -p:Configuration=$configuration -p:TargetFramework=$net_tfm
-	if ($LASTEXITCODE) { cd $mainDir ; exit $LASTEXITCODE }
-}
-
 function Build-NetCore
 {
 	Write-Host 'Building .NET Core'
 	
-	$outdir = "$net_baseoutput\$netcore_tfm"
+	$outdir = "$output_dir\$netcore_tfm"
 	$publishDir = "$outdir\publish"
 
 	Remove-Item $publishDir -Recurse -Force -Confirm:$false -ErrorAction Ignore
 	
-	msbuild -v:m -m -r -t:Publish -p:Configuration=$configuration -p:TargetFramework=$netcore_tfm
-	if ($LASTEXITCODE) { cd $mainDir ; exit $LASTEXITCODE }
+	dotnet publish -c $configuration -f $netcore_tfm $proj_path
+	if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
-	$tmpbin = 'tmpbin'
-	Rename-Item $publishDir $tmpbin
-	New-Item -ItemType Directory $publishDir > $null
-	Move-Item $outdir\$tmpbin $publishDir
-	Rename-Item $publishDir\$tmpbin bin
-
-	Move-Item $publishDir\bin\$exe $publishDir
-	& $apphostpatcher_dir\bin\$configuration\$netcore_tfm\AppHostPatcher.exe $publishDir\$exe -d bin
-	if ($LASTEXITCODE) { cd $mainDir ; exit $LASTEXITCODE }
+	& $dllpatcher_dir\bin\$configuration\$netcore_tfm\DotNetDllPathPatcher.exe $publishDir\$exe bin
+	if ($LASTEXITCODE) { exit $LASTEXITCODE }
 }
 
 function Build-NetCoreSelfContained
 {
 	param([string]$arch)
+
 	Write-Host "Building .NET Core $arch"
 
 	$rid = "win-$arch"
-	$outdir = "$net_baseoutput\$netcore_tfm\$rid"
+	$outdir = "$output_dir\$netcore_tfm\$rid"
 	$publishDir = "$outdir\publish"
 
 	Remove-Item $publishDir -Recurse -Force -Confirm:$false -ErrorAction Ignore
-	
-	msbuild -v:m -m -r -t:Publish -p:Configuration=$configuration -p:TargetFramework=$netcore_tfm -p:RuntimeIdentifier=$rid -p:SelfContained=True -p:PublishReadyToRun=True
-	if ($LASTEXITCODE) { cd $mainDir ; exit $LASTEXITCODE }
-	
-	$tmpbin = 'tmpbin'
-	Rename-Item $publishDir $tmpbin
-	New-Item -ItemType Directory $publishDir > $null
-	Move-Item $outdir\$tmpbin $publishDir
-	Rename-Item $publishDir\$tmpbin bin
-	
-	Move-Item $publishDir\bin\$exe $publishDir
-	& $apphostpatcher_dir\bin\$configuration\$netcore_tfm\AppHostPatcher.exe $publishDir\$exe -d bin
-	if ($LASTEXITCODE) { cd $mainDir ; exit $LASTEXITCODE }
+
+	dotnet publish -c $configuration -f $netcore_tfm -r $rid --self-contained true $proj_path
+	if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+	& $dllpatcher_dir\bin\$configuration\$netcore_tfm\DotNetDllPathPatcher.exe $publishDir\$exe bin
+	if ($LASTEXITCODE) { exit $LASTEXITCODE }
 }
 
-if ($buildCore -or $buildCoreX86 -or $buildCoreX64)
+dotnet build -c $configuration -f $netcore_tfm $dllpatcher_dir\DotNetDllPathPatcher.csproj
+if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+if ($buildCore)
 {
-	cd $apphostpatcher_dir
-	Build-AppHostPatcher
-}
-
-cd $mainDir\shadowsocks-csharp
-
-if ($buildNet) {
-	Build-NetFramework
-}
-
-if ($buildCore) {
 	Build-NetCore
 }
 
-if ($buildCoreX86) {
+if ($buildCoreX86)
+{
 	Build-NetCoreSelfContained x86
 }
 
-if ($buildCoreX64) {
+if ($buildCoreX64)
+{
 	Build-NetCoreSelfContained x64
 }
-
-cd $mainDir

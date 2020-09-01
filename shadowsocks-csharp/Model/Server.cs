@@ -1,8 +1,4 @@
-﻿#if IsDotNetCore
-using System.Text.Json.Serialization;
-#else
-using Newtonsoft.Json;
-#endif
+﻿using System.Text.Json.Serialization;
 using Shadowsocks.Model.Transfer;
 using Shadowsocks.Util;
 using Shadowsocks.ViewModel;

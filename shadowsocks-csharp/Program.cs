@@ -1,10 +1,9 @@
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using Shadowsocks.Controller;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
-using Shadowsocks.Util.SingleInstance;
 using System;
 using System.IO;
 using System.Linq;
@@ -32,7 +31,7 @@ namespace Shadowsocks
             }
 
             var identifier = $@"Global\{UpdateChecker.Name}_{Directory.GetCurrentDirectory().GetDeterministicHashCode()}";
-            using var singleInstance = new SingleInstance(identifier);
+            using var singleInstance = new SingleInstance.SingleInstance(identifier);
             if (!singleInstance.IsFirstInstance)
             {
                 singleInstance.PassArgumentsToFirstInstance(args.Length == 0
@@ -40,7 +39,7 @@ namespace Shadowsocks
                         : args);
                 return;
             }
-            singleInstance.ArgumentsReceived += SingleInstance_ArgumentsReceived;
+            singleInstance.ArgumentsReceived.Subscribe(SingleInstance_ArgumentsReceived);
 
             var app = new Application
             {
@@ -169,9 +168,9 @@ namespace Shadowsocks
             }
         }
 
-        private static void SingleInstance_ArgumentsReceived(object sender, ArgumentsReceivedEventArgs e)
+        private static void SingleInstance_ArgumentsReceived(string[] args)
         {
-            if (e.Args.Contains(Constants.ParameterMultiplyInstance))
+            if (args.Contains(Constants.ParameterMultiplyInstance))
             {
                 MessageBox.Show(I18NUtil.GetAppStringValue(@"SuccessiveInstancesMessage1") + Environment.NewLine +
                                 I18NUtil.GetAppStringValue(@"SuccessiveInstancesMessage2"),
@@ -179,7 +178,7 @@ namespace Shadowsocks
             }
             Application.Current.Dispatcher?.InvokeAsync(() =>
             {
-                Global.ViewController.ImportAddress(string.Join(Environment.NewLine, e.Args));
+                Global.ViewController.ImportAddress(string.Join(Environment.NewLine, args));
             });
         }
     }
