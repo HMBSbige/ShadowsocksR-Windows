@@ -76,7 +76,7 @@ jobs:
     - name: Create a new GitHub release if a new tag is pushed
       uses: softprops/action-gh-release@v1
       with:
-        name: v${{ env.GITHUB_TAG_NAME }}
+        name: v${{ env.GIT_TAG_NAME }}
         prerelease: true
         draft: false
         files: |
