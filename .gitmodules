@@ -1,6 +1,3 @@
 [submodule "Build/DotNetDllPathPatcher"]
 	path = Build/DotNetDllPathPatcher
 	url = https://github.com/HMBSbige/DotNetDllPathPatcher
-[submodule "SingleInstance"]
-	path = SingleInstance
-	url = https://github.com/HMBSbige/SingleInstance
