@@ -13,19 +13,16 @@ jobs:
       ProjectName: ShadowsocksR
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v2.3.3
       with:
         submodules: true
 
     - name: Get tag name
       uses: olegtarasov/get-tag@v2
 
-    - name: Setup Nuget.exe
-      uses: warrenbuckley/Setup-Nuget@v1
-
     - name: Setup NuGet Private Sources
-      run: nuget sources add -Name "GitHub-HMBSbige" -Source "https://nuget.pkg.github.com/HMBSbige/index.json" -UserName HMBSbige -Password "${{ secrets.NUGET_TOKEN }}"
-      shell: cmd
+      shell: pwsh
+      run: dotnet nuget add source https://nuget.pkg.github.com/HMBSbige/index.json -n GitHub-HMBSbige -u HMBSbige -p ${{ secrets.NUGET_TOKEN }}
 
     - name: Build .NET Core
       shell: pwsh
@@ -72,9 +69,8 @@ jobs:
         name: ${{ env.ProjectName }}-Portable-Win32
         path: shadowsocks-csharp\bin\${{ env.Configuration }}\${{ env.Netcore_tfm }}\win-x86\publish\
 
-    # Create a new release: create a tag, then 'git push origin <tagname>', wait for it to build      
     - name: Create a new GitHub release if a new tag is pushed
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v0.1.5
       with:
         name: v${{ env.GIT_TAG_NAME }}
         prerelease: true
