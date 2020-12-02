@@ -1,4 +1,4 @@
-﻿using ARSoft.Tools.Net;
+using ARSoft.Tools.Net;
 using ARSoft.Tools.Net.Dns;
 using Shadowsocks.Enums;
 using Shadowsocks.ViewModel;
@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Security.Authentication;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -132,7 +133,8 @@ namespace Shadowsocks.Model
 
         #region 构造函数
 
-        private DnsClient()
+        [JsonConstructor]
+        public DnsClient()
         {
             _ip = null;
 
