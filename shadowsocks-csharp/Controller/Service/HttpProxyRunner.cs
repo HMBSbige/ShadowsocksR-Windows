@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Model;
+using Shadowsocks.Model;
 using Shadowsocks.Properties;
 using Shadowsocks.Util;
 using System;
@@ -8,13 +8,14 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using WindowsJobAPI;
 
 namespace Shadowsocks.Controller.Service
 {
     public class HttpProxyRunner
     {
         private static readonly string UNIQUE_CONFIG_FILE;
-        private static readonly Job PRIVOXY_JOB;
+        private static readonly JobObject PRIVOXY_JOB;
         private Process _process;
         private const string ExeNameNoExt = @"ShadowsocksR";
         private const string ExeName = @"ShadowsocksR.exe";
@@ -25,7 +26,7 @@ namespace Shadowsocks.Controller.Service
             {
                 var uid = Directory.GetCurrentDirectory().GetDeterministicHashCode();
                 UNIQUE_CONFIG_FILE = $@"privoxy_{uid}.conf";
-                PRIVOXY_JOB = new Job();
+                PRIVOXY_JOB = new();
 
                 FileManager.DecompressFile(Utils.GetTempPath(ExeName), Resources.privoxy_exe);
             }
@@ -74,7 +75,7 @@ namespace Shadowsocks.Controller.Service
                  * Add this process to job obj associated with this ss process, so that
                  * when ss exit unexpectedly, this process will be forced killed by system.
                  */
-                PRIVOXY_JOB.AddProcess(_process.Handle);
+                PRIVOXY_JOB.AddProcess(_process);
             }
         }
 
