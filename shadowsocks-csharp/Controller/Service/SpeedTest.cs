@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Shadowsocks.Model.Transfer;
 #if DEBUG
 using System.Collections.Generic;
@@ -24,7 +24,7 @@ namespace Shadowsocks.Controller.Service
         public long SizeProtocolRecv;
         public long SizeRecv;
 #if DEBUG
-        private readonly List<TransLog> _sizeTransfer = new List<TransLog>();
+        private readonly List<TransLog> _sizeTransfer = new();
 #endif
         public string ServerId;
         public ServerTransferTotal Transfer;

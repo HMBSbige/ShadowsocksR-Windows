@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 
@@ -12,19 +12,20 @@ namespace Shadowsocks.Obfs
             has_sent_header = false;
             has_recv_header = false;
         }
-        private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
+        private static Dictionary<string, int[]> _obfs = new()
+        {
                 {"auth_sha1_v4", new[]{1, 0, 1}}
         };
 
         protected bool has_sent_header;
         protected bool has_recv_header;
-        protected static RNGCryptoServiceProvider g_random = new RNGCryptoServiceProvider();
+        protected static RNGCryptoServiceProvider g_random = new();
         protected const string SALT = "auth_sha1_v4";
         protected const int overhead = 9;
 
         public static List<string> SupportedObfs()
         {
-            return new List<string>(_obfs.Keys);
+            return new(_obfs.Keys);
         }
 
         public override Dictionary<string, int[]> GetObfs()
@@ -57,7 +58,10 @@ namespace Shadowsocks.Obfs
             var rand_len = (datalength > 1200 ? 0 : datalength > 400 ? LinearRandomInt(256) : LinearRandomInt(512)) + 1;
             outlength = rand_len + datalength + 8;
             if (datalength > 0)
+            {
                 Array.Copy(data, 0, outdata, rand_len + 4, datalength);
+            }
+
             outdata[0] = (byte)(outlength >> 8);
             outdata[1] = (byte)outlength;
             var crc32 = Util.CRC32.CalcCRC32(outdata, 2);
@@ -186,7 +190,10 @@ namespace Shadowsocks.Obfs
             if (datalength > 0 || ogn_datalength == -1)
             {
                 if (ogn_datalength == -1)
+                {
                     datalength = 0;
+                }
+
                 PackData(data, datalength, packdata, out var outlen);
                 Util.Utils.SetArrayMinSize2(ref outdata, outlength + outlen);
                 Array.Copy(packdata, 0, outdata, outlength, outlen);
@@ -209,12 +216,14 @@ namespace Shadowsocks.Obfs
                     throw new ObfsException("ClientPostDecrypt data error");
                 }
                 var len = (recv_buf[0] << 8) + recv_buf[1];
-                if (len >= 8192 || len < 8)
+                if (len is >= 8192 or < 8)
                 {
                     throw new ObfsException("ClientPostDecrypt data error");
                 }
                 if (len > recv_buf_len)
+                {
                     break;
+                }
 
                 if (Util.Adler32.CheckAdler32(recv_buf, len))
                 {

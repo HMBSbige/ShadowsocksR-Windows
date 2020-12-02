@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Shadowsocks.Obfs
@@ -11,13 +11,14 @@ namespace Shadowsocks.Obfs
 
         }
 
-        private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
+        private static Dictionary<string, int[]> _obfs = new()
+        {
                 {"auth_chain_f", new[]{1, 0, 1}}
         };
 
         public static new List<string> SupportedObfs()
         {
-            return new List<string>(_obfs.Keys);
+            return new(_obfs.Keys);
         }
 
         public override Dictionary<string, int[]> GetObfs()
@@ -27,7 +28,7 @@ namespace Shadowsocks.Obfs
 
         protected ulong key_change_interval = 60 * 60 * 24;    // a day by second
         protected ulong key_change_datetime_key;
-        protected List<byte> key_change_datetime_key_bytes = new List<byte>();
+        protected List<byte> key_change_datetime_key_bytes = new();
 
         protected override void InitDataSizeList()
         {

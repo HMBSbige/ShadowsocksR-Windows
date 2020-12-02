@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.Encryption.Stream;
 using Shadowsocks.Enums;
@@ -26,21 +26,27 @@ namespace Shadowsocks.Obfs
             recv_id = 1;
             SALT = method;
             if (method == "auth_aes128_md5")
+            {
                 hash = MbedTLS.MD5;
+            }
             else
+            {
                 hash = MbedTLS.SHA1;
+            }
+
             var bytes = new byte[4];
             g_random.GetBytes(bytes);
             random = new Random(BitConverter.ToInt32(bytes, 0));
         }
-        private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
+        private static Dictionary<string, int[]> _obfs = new()
+        {
                 {"auth_aes128_md5", new[]{1, 0, 1}},
                 {"auth_aes128_sha1", new[]{1, 0, 1}}
         };
 
         protected bool has_sent_header;
         protected bool has_recv_header;
-        protected static RNGCryptoServiceProvider g_random = new RNGCryptoServiceProvider();
+        protected static RNGCryptoServiceProvider g_random = new();
         protected string SALT;
 
         protected uint pack_id;
@@ -53,7 +59,7 @@ namespace Shadowsocks.Obfs
 
         protected const int overhead = 9; // 2(length) + 2(len-MAC) + 4(data-MAC) + 1(padding)
         //protected int[] packet_cnt;
-        protected Dictionary<int, long> packet_cnt = new Dictionary<int, long>();
+        protected Dictionary<int, long> packet_cnt = new();
         //protected int[] packet_mul;
         protected Model.MinSearchTree tree;
         protected const int tree_offset = 9;
@@ -61,7 +67,7 @@ namespace Shadowsocks.Obfs
 
         public static List<string> SupportedObfs()
         {
-            return new List<string>(_obfs.Keys);
+            return new(_obfs.Keys);
         }
 
         public override Dictionary<string, int[]> GetObfs()
@@ -92,16 +98,22 @@ namespace Shadowsocks.Obfs
         protected MbedTLS.HMAC CreateHMAC(byte[] key)
         {
             if (Method == "auth_aes128_md5")
+            {
                 return new MbedTLS.HMAC_MD5(key);
+            }
+
             if (Method == "auth_aes128_sha1")
+            {
                 return new MbedTLS.HMAC_SHA1(key);
+            }
+
             return null;
         }
 
         protected void Sync()
         {
 #if PROTOCOL_STATISTICS
-            if (Server.data != null && Server.data is AuthDataAes128 authData)
+            if (Server.data is not null and AuthDataAes128 authData)
             {
                 lock (authData)
                 {
@@ -132,7 +144,11 @@ namespace Shadowsocks.Obfs
             if (length > tree_offset)
             {
                 length -= 1 + tree_offset;
-                if (length >= tree.Size) length = tree.Size - 1;
+                if (length >= tree.Size)
+                {
+                    length = tree.Size - 1;
+                }
+
                 lock (Server.data)
                 {
                     if (packet_cnt.ContainsKey(length))
@@ -168,12 +184,21 @@ namespace Shadowsocks.Obfs
         protected int GetRandLen(int datalength, int fulldatalength, bool nopadding)
         {
             if (nopadding || fulldatalength >= Server.buffer_size)
+            {
                 return 0;
+            }
+
             var rev_len = Server.tcp_mss - datalength - overhead;
             if (rev_len <= 0)
+            {
                 return 0;
+            }
+
             if (datalength > 1100)
+            {
                 return LinearRandomInt(rev_len);
+            }
+
             return TrapezoidRandomInt(rev_len, -0.3);
         }
 
@@ -183,7 +208,10 @@ namespace Shadowsocks.Obfs
         protected int GenRandLenFull(int packetlength, int fulldatalength, bool nopadding)
         {
             if (nopadding || fulldatalength >= Server.buffer_size)
+            {
                 return packetlength;
+            }
+
             if (packetlength >= Server.tcp_mss)
             {
                 if (packetlength > Server.tcp_mss && packetlength < Server.tcp_mss * 2)
@@ -212,7 +240,10 @@ namespace Shadowsocks.Obfs
 #endif
             outlength = rand_len + datalength + 8;
             if (datalength > 0)
+            {
                 Array.Copy(data, 0, outdata, rand_len + 4, datalength);
+            }
+
             outdata[0] = (byte)outlength;
             outdata[1] = (byte)(outlength >> 8);
             var key = new byte[user_key.Length + 4];
@@ -469,7 +500,10 @@ namespace Shadowsocks.Obfs
             if (datalength > 0 || ogn_datalength == -1)
             {
                 if (ogn_datalength == -1)
+                {
                     datalength = 0;
+                }
+
                 PackData(data, datalength, ogn_datalength, packdata, out var outlen, nopadding);
                 Util.Utils.SetArrayMinSize2(ref outdata, outlength + outlen);
                 Array.Copy(packdata, 0, outdata, outlength, outlen);
@@ -477,7 +511,10 @@ namespace Shadowsocks.Obfs
             }
             last_datalength = ogn_datalength;
             if (outlength > 0)
+            {
                 AddPacket(outlength);
+            }
+
             return outdata;
         }
 
@@ -502,12 +539,14 @@ namespace Shadowsocks.Obfs
                 }
 
                 var len = (recv_buf[1] << 8) + recv_buf[0];
-                if (len >= 8192 || len < 8)
+                if (len is >= 8192 or < 8)
                 {
                     throw new ObfsException("ClientPostDecrypt data error");
                 }
                 if (len > recv_buf_len)
+                {
                     break;
+                }
 
                 {
                     var sha1data = sha1.ComputeHash(recv_buf, 0, len - 4);

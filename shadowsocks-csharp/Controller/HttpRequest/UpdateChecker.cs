@@ -1,8 +1,6 @@
-﻿using Shadowsocks.Model;
-using Shadowsocks.Util.GitHubRelease;
+using Shadowsocks.Model;
 using System;
-using System.Collections.Generic;
-using System.Text.Json;
+using UpdateChecker;
 
 namespace Shadowsocks.Controller.HttpRequest
 {
@@ -42,25 +40,26 @@ namespace Shadowsocks.Controller.HttpRequest
         {
             try
             {
-                var updater = new GitHubRelease(Owner, Repo);
-                var url = updater.AllReleaseUrl;
+                var updater = new GitHubReleasesUpdateChecker(
+                    Owner,
+                    Repo,
+                    config.IsPreRelease,
+                    Version);
+
                 var userAgent = config.ProxyUserAgent;
                 var proxy = CreateProxy(config);
+                using var client = CreateClient(true, proxy, userAgent, config.ConnectTimeout * 1000);
 
-                var json = await AutoGetAsync(url, proxy, userAgent, config.ConnectTimeout * 1000);
-
-                var releases = JsonSerializer.Deserialize<List<Release>>(json);
-                var latestRelease = VersionUtil.GetLatestRelease(releases, config.IsPreRelease);
-                if (VersionUtil.CompareVersion(latestRelease.tag_name, Version) > 0)
+                var res = await updater.CheckAsync(client, default);
+                LatestVersionNumber = updater.LatestVersion;
+                Found = res;
+                if (Found)
                 {
-                    LatestVersionNumber = latestRelease.tag_name;
-                    LatestVersionUrl = latestRelease.html_url;
-                    Found = true;
+                    LatestVersionUrl = updater.LatestVersionUrl;
                     NewVersionFound?.Invoke(this, new EventArgs());
                 }
                 else
                 {
-                    LatestVersionNumber = latestRelease.tag_name;
                     if (notifyNoFound)
                     {
                         NewVersionNotFound?.Invoke(this, new EventArgs());

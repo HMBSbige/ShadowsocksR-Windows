@@ -1,4 +1,4 @@
-﻿namespace Shadowsocks.Util
+namespace Shadowsocks.Util
 {
     class CRC32
     {
@@ -15,9 +15,13 @@
                 for (j = 8; j > 0; j--)
                 {
                     if ((Crc & 1) == 1)
+                    {
                         Crc = (Crc >> 1) ^ 0xEDB88320;
+                    }
                     else
+                    {
                         Crc >>= 1;
+                    }
                 }
                 Crc32Table[i] = Crc;
             }
@@ -61,7 +65,10 @@
         {
             var crc = CalcCRC32(buffer, length);
             if (crc != 0xffffffffu)
+            {
                 return false;
+            }
+
             return true;
         }
     }

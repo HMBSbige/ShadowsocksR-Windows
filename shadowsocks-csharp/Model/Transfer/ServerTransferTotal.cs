@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Util;
+using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,7 +12,7 @@ namespace Shadowsocks.Model.Transfer
     {
         private const string LogFile = @"transfer_log.json";
 
-        public Dictionary<string, ServerTrans> Servers = new Dictionary<string, ServerTrans>();
+        public Dictionary<string, ServerTrans> Servers = new();
         private int _saveCounter;
         private DateTime _saveTime;
 

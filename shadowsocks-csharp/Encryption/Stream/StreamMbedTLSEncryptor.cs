@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Encryption.Exception;
+using Shadowsocks.Encryption.Exception;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -19,7 +19,8 @@ namespace Shadowsocks.Encryption.Stream
         {
         }
 
-        private static readonly Dictionary<string, EncryptorInfo> _ciphers = new Dictionary<string, EncryptorInfo> {
+        private static readonly Dictionary<string, EncryptorInfo> _ciphers = new()
+        {
             { @"aes-128-cbc", new EncryptorInfo(16, 16, CIPHER_AES, @"AES-128-CBC", false) },
             { @"aes-192-cbc", new EncryptorInfo(24, 16, CIPHER_AES, @"AES-192-CBC", false) },
             { @"aes-256-cbc", new EncryptorInfo(32, 16, CIPHER_AES, @"AES-256-CBC", false) },
@@ -41,7 +42,7 @@ namespace Shadowsocks.Encryption.Stream
 
         public static List<string> SupportedCiphers()
         {
-            return new List<string>(_ciphers.Keys);
+            return new(_ciphers.Keys);
         }
 
         protected override Dictionary<string, EncryptorInfo> getCiphers()
@@ -91,11 +92,19 @@ namespace Shadowsocks.Encryption.Stream
              */
             if (MbedTLS.cipher_setkey(ctx, realKey, keyLen * 8,
                 isEncrypt ? MbedTLS.MBEDTLS_ENCRYPT : MbedTLS.MBEDTLS_DECRYPT) != 0)
+            {
                 throw new System.Exception("Cannot set mbed TLS cipher key");
+            }
+
             if (MbedTLS.cipher_set_iv(ctx, iv, ivLen) != 0)
+            {
                 throw new System.Exception("Cannot set mbed TLS cipher IV");
+            }
+
             if (MbedTLS.cipher_reset(ctx) != 0)
+            {
                 throw new System.Exception("Cannot finalize mbed TLS cipher context");
+            }
         }
 
         protected override void CipherUpdate(bool isCipher, int length, byte[] buf, byte[] outbuf)
@@ -116,7 +125,7 @@ namespace Shadowsocks.Encryption.Stream
         private bool _disposed;
 
         // instance based lock
-        private readonly object _lock = new object();
+        private readonly object _lock = new();
 
         public override void Dispose()
         {

@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller;
 using Shadowsocks.Util;
 using System;
 using System.Diagnostics;
@@ -24,7 +24,7 @@ namespace Shadowsocks.View
         private string _currentLogFileName;
         private long _currentOffset;
 
-        private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+        private readonly CancellationTokenSource _cts = new();
 
         private void ReadLog()
         {

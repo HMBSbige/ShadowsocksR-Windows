@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.Encryption.Stream;
 using Shadowsocks.Enums;
@@ -27,13 +27,14 @@ namespace Shadowsocks.Obfs
             random = new Random(BitConverter.ToInt32(bytes, 0));
         }
 
-        private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
+        private static Dictionary<string, int[]> _obfs = new()
+        {
             {"auth_akarin_rand", new[]{1, 0, 1}}
         };
 
         protected bool has_sent_header;
         protected bool has_recv_header;
-        protected static RNGCryptoServiceProvider g_random = new RNGCryptoServiceProvider();
+        protected static RNGCryptoServiceProvider g_random = new();
         protected string SALT;
 
         protected uint pack_id;
@@ -44,18 +45,18 @@ namespace Shadowsocks.Obfs
         protected int last_datalength;
         protected byte[] last_client_hash;
         protected byte[] last_server_hash;
-        protected xorshift128plus random_client = new xorshift128plus(0);
-        protected xorshift128plus random_server = new xorshift128plus(0);
+        protected xorshift128plus random_client = new(0);
+        protected xorshift128plus random_server = new(0);
         protected StreamEncryptor encryptor;
         protected int send_tcp_mss = 2000;
         protected int recv_tcp_mss = 2000;
-        protected List<int> send_back_cmd = new List<int>();
+        protected List<int> send_back_cmd = new();
 
         protected const int overhead = 4;
 
         public static List<string> SupportedObfs()
         {
-            return new List<string>(_obfs.Keys);
+            return new(_obfs.Keys);
         }
 
         public override Dictionary<string, int[]> GetObfs()
@@ -105,14 +106,26 @@ namespace Shadowsocks.Obfs
                 return (int)(rd.next() % 521);
             }
             if (datalength >= 1440 || datalength + Server.overhead == recv_tcp_mss)
+            {
                 return 0;
+            }
+
             rd.init_from_bin(last_hash, datalength);
             if (datalength > 1300)
+            {
                 return (int)(rd.next() % 31);
+            }
+
             if (datalength > 900)
+            {
                 return (int)(rd.next() % 127);
+            }
+
             if (datalength > 400)
+            {
                 return (int)(rd.next() % 521);
+            }
+
             return (int)(rd.next() % (ulong)(send_tcp_mss - datalength - Server.overhead));
             //return (int)(random.next() % 1021);
         }
@@ -125,14 +138,26 @@ namespace Shadowsocks.Obfs
                 return (int)(rd.next() % 521);
             }
             if (datalength >= 1440 || datalength + Server.overhead == recv_tcp_mss)
+            {
                 return 0;
+            }
+
             rd.init_from_bin(last_hash, datalength);
             if (datalength > 1300)
+            {
                 return (int)(rd.next() % 31);
+            }
+
             if (datalength > 900)
+            {
                 return (int)(rd.next() % 127);
+            }
+
             if (datalength > 400)
+            {
                 return (int)(rd.next() % 521);
+            }
+
             return (int)(rd.next() % (ulong)(recv_tcp_mss - datalength - Server.overhead));
             //return (int)(random.next() % 1021);
         }
@@ -406,7 +431,10 @@ namespace Shadowsocks.Obfs
             if (datalength > 0 || ogn_datalength == -1)
             {
                 if (ogn_datalength == -1)
+                {
                     datalength = 0;
+                }
+
                 PackData(data, datalength, packdata, out var outlen);
                 Util.Utils.SetArrayMinSize2(ref outdata, outlength + outlen);
                 Array.Copy(packdata, 0, outdata, outlength, outlen);
@@ -437,7 +465,9 @@ namespace Shadowsocks.Obfs
                     throw new ObfsException("ClientPostDecrypt data error");
                 }
                 if (len + 4 > recv_buf_len)
+                {
                     break;
+                }
 
                 var md5data = md5.ComputeHash(recv_buf, 0, len + 2);
                 if (md5data[0] != recv_buf[len + 2]

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Shadowsocks.Obfs
 {
@@ -13,7 +13,7 @@ namespace Shadowsocks.Obfs
 
         protected byte[] recv_buf = new byte[RecvBufferSize];
         protected int recv_buf_len;
-        protected Random random = new Random();
+        protected Random random = new();
 
         public override object InitData()
         {
@@ -34,8 +34,16 @@ namespace Shadowsocks.Obfs
                 r1 = random.Next(mid);
                 r2 = random.Next(mid + 1);
                 var r = r1 + r2;
-                if (r == max) return mid - 1;
-                if (r < mid) return mid - r - 1;
+                if (r == max)
+                {
+                    return mid - 1;
+                }
+
+                if (r < mid)
+                {
+                    return mid - r - 1;
+                }
+
                 return max - r + mid - 1;
             }
             else
@@ -44,7 +52,11 @@ namespace Shadowsocks.Obfs
                 r1 = random.Next(mid);
                 r2 = random.Next(mid + 1);
                 var r = r1 + r2;
-                if (r < mid) return mid - r - 1;
+                if (r < mid)
+                {
+                    return mid - r - 1;
+                }
+
                 return max - r + mid - 1;
             }
         }
@@ -52,7 +64,9 @@ namespace Shadowsocks.Obfs
         public double TrapezoidRandomFloat(double d) // －1 <= d <= 1
         {
             if (Math.Abs(d) < 0.000001)
+            {
                 return random.NextDouble();
+            }
 
             var s = random.NextDouble();
             //(2dx + 2(1 - d))x/2 = s

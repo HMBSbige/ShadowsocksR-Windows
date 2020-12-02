@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using Shadowsocks.Controller;
-using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
@@ -21,16 +20,7 @@ namespace Shadowsocks
         private static void Main(string[] args)
         {
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Utils.GetExecutablePath()) ?? throw new InvalidOperationException());
-            if (args.Contains(Constants.ParameterSetAutoRun))
-            {
-                if (!AutoStartup.Switch())
-                {
-                    Environment.ExitCode = 1;
-                }
-                return;
-            }
-
-            var identifier = $@"Global\{UpdateChecker.Name}_{Directory.GetCurrentDirectory().GetDeterministicHashCode()}";
+            var identifier = $@"Global\{Controller.HttpRequest.UpdateChecker.Name}_{Directory.GetCurrentDirectory().GetDeterministicHashCode()}";
             using var singleInstance = new SingleInstance.SingleInstance(identifier);
             if (!singleInstance.IsFirstInstance)
             {
@@ -75,7 +65,7 @@ namespace Shadowsocks
             {
                 var res = MessageBox.Show(
                 $@"{I18NUtil.GetAppStringValue(@"DefaultConfigMessage")}{Environment.NewLine}{I18NUtil.GetAppStringValue(@"DefaultConfigQuestion")}",
-                UpdateChecker.Name, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.OK);
+                Controller.HttpRequest.UpdateChecker.Name, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.OK);
                 switch (res)
                 {
                     case MessageBoxResult.Yes:
@@ -163,7 +153,7 @@ namespace Shadowsocks
                 Logging.Log(LogLevel.Error, $@"{e.ExceptionObject}");
                 MessageBox.Show(
                 $@"{I18NUtil.GetAppStringValue(@"UnexpectedError")}{Environment.NewLine}{e.ExceptionObject}",
-                    UpdateChecker.Name, MessageBoxButton.OK, MessageBoxImage.Error);
+                Controller.HttpRequest.UpdateChecker.Name, MessageBoxButton.OK, MessageBoxImage.Error);
                 Application.Current.Shutdown();
             }
         }

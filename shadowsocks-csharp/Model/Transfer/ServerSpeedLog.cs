@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Util;
+using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
 using System;
 using System.Collections.Concurrent;
@@ -21,12 +21,12 @@ namespace Shadowsocks.Model.Transfer
         private long _transUpload;
         private long _transDownload;
         private long _transDownloadRaw;
-        private readonly List<TransLog> _downTransLog = new List<TransLog>();
-        private readonly List<TransLog> _upTransLog = new List<TransLog>();
+        private readonly List<TransLog> _downTransLog = new();
+        private readonly List<TransLog> _upTransLog = new();
         private long _maxTransDownload;
         private long _maxTransUpload;
         private long _avgConnectTime = -1;
-        private readonly ConcurrentQueue<ErrorLog> _errList = new ConcurrentQueue<ErrorLog>();
+        private readonly ConcurrentQueue<ErrorLog> _errList = new();
 
         private const int AvgTime = 5;
 
@@ -78,7 +78,10 @@ namespace Shadowsocks.Model.Transfer
                 totalBytes -= transLog[0].firstsize;
 
                 if (transLog.Count > 1)
+                {
                     totalTime = (transLog.Last().endTime - transLog[0].recvTime).TotalSeconds;
+                }
+
                 if (totalTime > 0.2)
                 {
                     var ret = (long)(totalBytes / totalTime);
@@ -115,7 +118,10 @@ namespace Shadowsocks.Model.Transfer
                 totalBytes -= transLog[0].firstsize;
 
                 if (transLog.Count > 1)
+                {
                     totalTime = (transLog.Last().endTime - transLog[0].recvTime).TotalSeconds;
+                }
+
                 if (totalTime > 0.2)
                 {
                     var ret = (long)(totalBytes / totalTime);
@@ -445,7 +451,9 @@ namespace Shadowsocks.Model.Transfer
                     transLog.Last().times++;
                     transLog.Last().size += bytes;
                     if (transLog.Last().endTime < now)
+                    {
                         transLog.Last().endTime = now;
+                    }
                 }
                 else
                 {

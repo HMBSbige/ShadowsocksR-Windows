@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -19,7 +19,7 @@ namespace Shadowsocks.Util.NetUtils
         public EndPoint LocalEndPoint => _activeSocket?.LocalEndPoint;
 
         // Only used during connection and close, so it won't cost too much.
-        private SpinLock _socketSyncLock = new SpinLock();
+        private SpinLock _socketSyncLock = new();
 
         private bool _disposed;
         private bool Connected => _activeSocket != null;

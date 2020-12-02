@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
+using URIScheme;
 
 namespace Shadowsocks.Util
 {
@@ -9,16 +10,8 @@ namespace Shadowsocks.Util
         {
             try
             {
-                var path = Utils.GetExecutablePath();
-                using var runKey = Utils.OpenRegKey(@"Software\Classes", true);
-                using var ssr = runKey?.CreateSubKey(link);
-                if (ssr != null)
-                {
-                    ssr.SetValue(null, @"URL:ShadowsocksR Link");
-                    ssr.SetValue(@"URL Protocol", @"");
-                    using var command = ssr.CreateSubKey(@"Shell\Open\Command");
-                    command?.SetValue(null, $@"""{path}"" ""%1""");
-                }
+                var service = new URISchemeService(link, @"URL:ShadowsocksR Link", $@"""{Utils.GetExecutablePath()}""");
+                service.Set();
             }
             catch
             {
@@ -31,8 +24,8 @@ namespace Shadowsocks.Util
         {
             try
             {
-                using var runKey = Utils.OpenRegKey(@"Software\Classes", true);
-                runKey?.DeleteSubKeyTree(link);
+                var service = new URISchemeService(link, string.Empty, string.Empty);
+                service.Delete();
             }
             catch
             {

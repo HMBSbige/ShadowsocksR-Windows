@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Collections.Generic;
 
@@ -71,16 +71,31 @@ namespace Shadowsocks.Obfs
         public static int GetHeadSize(byte[] plaindata, int defaultValue)
         {
             if (plaindata == null || plaindata.Length < 2)
+            {
                 return defaultValue;
+            }
+
             var head_type = plaindata[0] & 0x7;
             if (head_type == 1)
+            {
                 return 7;
+            }
+
             if (head_type == 4)
+            {
                 return 19;
+            }
+
             if (head_type == 3)
+            {
                 return 4 + plaindata[1];
+            }
+
             if (head_type == 2)
+            {
                 return 4 + plaindata[1];
+            }
+
             return defaultValue;
         }
         public long GetSentLength()

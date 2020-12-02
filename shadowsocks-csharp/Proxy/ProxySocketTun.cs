@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -349,10 +349,16 @@ namespace Shadowsocks.Proxy
             var cmd = "CONNECT " + host + " HTTP/1.0\r\n"
                 + "Host: " + host + "\r\n";
             if (!string.IsNullOrEmpty(proxyUserAgent))
+            {
                 cmd += "User-Agent: " + proxyUserAgent + "\r\n";
+            }
+
             cmd += "Proxy-Connection: Keep-Alive\r\n";
             if (socks5RemoteUsername.Length > 0)
+            {
                 cmd += "Proxy-Authorization: Basic " + authstr + "\r\n";
+            }
+
             cmd += "\r\n";
             var httpData = Encoding.UTF8.GetBytes(cmd);
             _socket.Send(httpData, httpData.Length, SocketFlags.None);

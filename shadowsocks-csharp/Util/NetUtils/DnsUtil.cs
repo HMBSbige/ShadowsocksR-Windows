@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller;
 using Shadowsocks.Model;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ namespace Shadowsocks.Util.NetUtils
 {
     public static class DnsUtil
     {
-        public static LRUCache<string, IPAddress> DnsBuffer { get; } = new LRUCache<string, IPAddress>();
+        public static LRUCache<string, IPAddress> DnsBuffer { get; } = new();
 
         public static IPAddress QueryDns(string host)
         {

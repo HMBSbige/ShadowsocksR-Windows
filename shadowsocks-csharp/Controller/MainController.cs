@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller.HttpRequest;
+using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Controller.Service;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
@@ -11,7 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Shadowsocks.Controller
@@ -70,8 +69,6 @@ namespace Shadowsocks.Controller
                     server.SpeedLog = log;
                 }
             }
-
-            StartReleasingMemory();
         }
 
         private void ReportError(Exception e)
@@ -205,7 +202,10 @@ namespace Shadowsocks.Controller
                     {
                         var index = Global.GuiConfig.Index + 1;
                         if (index < 0 || index > Global.GuiConfig.Configs.Count)
+                        {
                             index = Global.GuiConfig.Configs.Count;
+                        }
+
                         Global.GuiConfig.Configs.Insert(index, server);
                     }
                 }
@@ -385,7 +385,7 @@ namespace Shadowsocks.Controller
 
             _listener?.Stop();
             _privoxyRunner?.Stop();
-            if (Global.GuiConfig.SysProxyMode != ProxyMode.NoModify && Global.GuiConfig.SysProxyMode != ProxyMode.Direct)
+            if (Global.GuiConfig.SysProxyMode is not ProxyMode.NoModify and not ProxyMode.Direct)
             {
                 SystemProxy.SystemProxy.Update(Global.GuiConfig, true, null);
             }
@@ -537,7 +537,6 @@ namespace Shadowsocks.Controller
             Application.Current.Dispatcher?.InvokeAsync(() => { ConfigChanged?.Invoke(this, new EventArgs()); });
 
             UpdateSystemProxy();
-            Utils.ReleaseMemory();
         }
 
         private static void ThrowSocketException(ref Exception e)
@@ -545,7 +544,11 @@ namespace Shadowsocks.Controller
             // TODO:translate Microsoft language into human language
             // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
             // https://docs.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketerror
-            if (!(e is SocketException se)) return;
+            if (e is not SocketException se)
+            {
+                return;
+            }
+
             switch (se.SocketErrorCode)
             {
                 case SocketError.AddressAlreadyInUse:
@@ -618,22 +621,5 @@ namespace Shadowsocks.Controller
         {
             Clipboard.SetDataObject(_pacServer.PacUrl);
         }
-
-        #region Memory Management
-
-        private static void StartReleasingMemory()
-        {
-            Task.Factory.StartNew(() =>
-            {
-                while (true)
-                {
-                    Utils.ReleaseMemory(false);
-                    Task.Delay(30 * 1000).Wait();
-                }
-                // ReSharper disable once FunctionNeverReturns
-            }, TaskCreationOptions.LongRunning);
-        }
-
-        #endregion
     }
 }

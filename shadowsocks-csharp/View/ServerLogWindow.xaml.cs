@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
@@ -91,11 +91,11 @@ namespace Shadowsocks.View
         }
 
         private readonly MainController _controller;
-        public ServerLogViewModel ServerLogViewModel { get; set; } = new ServerLogViewModel();
+        public ServerLogViewModel ServerLogViewModel { get; set; } = new();
 
         private void UpdateTitle()
         {
-            Title = $@"{this.GetWindowStringValue(@"Title")}({(Global.GuiConfig.ShareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{Global.GuiConfig.LocalPort} {this.GetWindowStringValue(@"Version")}{UpdateChecker.FullVersion})";
+            Title = $@"{this.GetWindowStringValue(@"Title")}({(Global.GuiConfig.ShareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{Global.GuiConfig.LocalPort} {this.GetWindowStringValue(@"Version")}{Controller.HttpRequest.UpdateChecker.FullVersion})";
         }
 
         private void AlwaysTopMenuItem_OnClick(object sender, RoutedEventArgs e)
@@ -302,11 +302,15 @@ namespace Shadowsocks.View
             var visualContainer = ServerDataGrid.GetVisualContainer();
             var rowColumnIndex = visualContainer.PointToCellRowColumnIndex(e.GetPosition(visualContainer));
             if (rowColumnIndex.IsEmpty)
+            {
                 return;
+            }
 
             var columnIndex = ServerDataGrid.ResolveToGridVisibleColumnIndex(rowColumnIndex.ColumnIndex);
             if (columnIndex != -1)
+            {
                 return;
+            }
 
             var recordIndex = ServerDataGrid.ResolveToRecordIndex(rowColumnIndex.RowIndex);
             if (recordIndex == -1)

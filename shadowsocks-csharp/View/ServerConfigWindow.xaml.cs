@@ -1,18 +1,17 @@
-﻿using Shadowsocks.Controller;
-using Shadowsocks.Controller.HttpRequest;
+using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
+using Syncfusion.Data.Extensions;
+using Syncfusion.UI.Xaml.TreeView;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Syncfusion.Data.Extensions;
-using Syncfusion.UI.Xaml.TreeView;
 
 namespace Shadowsocks.View
 {
@@ -85,7 +84,7 @@ namespace Shadowsocks.View
         private Configuration _modifiedConfiguration;
         private int _focusIndex;
 
-        public ServerConfigViewModel ServerConfigViewModel { get; set; } = new ServerConfigViewModel();
+        public ServerConfigViewModel ServerConfigViewModel { get; set; } = new();
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -97,7 +96,10 @@ namespace Shadowsocks.View
                 {
                     var index = _modifiedConfiguration.Index + 1;
                     if (index < 0 || index > _modifiedConfiguration.Configs.Count)
+                    {
                         index = _modifiedConfiguration.Configs.Count;
+                    }
+
                     _focusIndex = index;
                     break;
                 }
@@ -105,7 +107,10 @@ namespace Shadowsocks.View
                 {
                     var index = _modifiedConfiguration.Index;
                     if (index < 0 || index > _modifiedConfiguration.Configs.Count)
+                    {
                         index = _modifiedConfiguration.Configs.Count;
+                    }
+
                     _focusIndex = index;
                     break;
                 }
@@ -119,7 +124,7 @@ namespace Shadowsocks.View
 
         private void UpdateTitle()
         {
-            Title = $@"{this.GetWindowStringValue(@"Title")}({(Global.GuiConfig.ShareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{Global.GuiConfig.LocalPort} {this.GetWindowStringValue(@"Version")}:{UpdateChecker.FullVersion})";
+            Title = $@"{this.GetWindowStringValue(@"Title")}({(Global.GuiConfig.ShareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{Global.GuiConfig.LocalPort} {this.GetWindowStringValue(@"Version")}:{Controller.HttpRequest.UpdateChecker.FullVersion})";
         }
 
         private void controller_ConfigChanged(object sender, EventArgs e)
@@ -167,7 +172,7 @@ namespace Shadowsocks.View
         private void MoveToSelectedItem(ServerTreeViewModel serverTreeViewModel)
         {
             ServersTreeView.BringIntoView(serverTreeViewModel, false, true, ScrollToPosition.Center);
-            ServersTreeView.SelectedItems.Clear();
+            ServersTreeView.SelectedItems?.Clear();
             ServersTreeView.SelectedItem = serverTreeViewModel;
             ServersTreeView_OnSelectionChanged(this, new ItemSelectionChangedEventArgs());
         }
@@ -179,7 +184,7 @@ namespace Shadowsocks.View
                 switch (st.Type)
                 {
                     case ServerTreeViewType.Subtag:
-                        MessageBox.Show(this.GetWindowStringValue(@"AddServerError"), UpdateChecker.Name, MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show(this.GetWindowStringValue(@"AddServerError"), Controller.HttpRequest.UpdateChecker.Name, MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     case ServerTreeViewType.Group:
                     {
@@ -233,9 +238,9 @@ namespace Shadowsocks.View
 
         private void ServersTreeView_OnSelectionChanged(object sender, ItemSelectionChangedEventArgs e)
         {
-            if (ServersTreeView.SelectedItems.Count == 1 &&
-                ServersTreeView.SelectedItem is ServerTreeViewModel node &&
-                node.Type == ServerTreeViewType.Server)
+            if (ServersTreeView.SelectedItems is not null
+                && ServersTreeView.SelectedItems.Count == 1
+                && ServersTreeView.SelectedItem is ServerTreeViewModel { Type: ServerTreeViewType.Server })
             {
                 ServerGroupBox.Visibility = Visibility.Visible;
             }
@@ -314,7 +319,10 @@ namespace Shadowsocks.View
                 if (target.Type == ServerTreeViewType.Group)
                 {
                     var sub = ServerTreeViewModel.FindParentNode(ServerConfigViewModel.ServersTreeViewCollection, target);
-                    if (sub == null) return;
+                    if (sub == null)
+                    {
+                        return;
+                    }
 
                     var subName = sub.Name == I18NUtil.GetAppStringValue(@"EmptySubtag") ? string.Empty : sub.Name;
                     var groupName = target.Name == I18NUtil.GetAppStringValue(@"EmptyGroup") ? string.Empty : target.Name;
@@ -343,7 +351,7 @@ namespace Shadowsocks.View
                 }
                 return;
             }
-            Skip:
+Skip:
             e.Handled = true;
         }
 

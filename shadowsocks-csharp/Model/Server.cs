@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using Shadowsocks.Model.Transfer;
 using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
@@ -306,13 +306,13 @@ namespace Shadowsocks.Model
         }
 
         [JsonIgnore]
-        public Connections Connections { get; private set; } = new Connections();
+        public Connections Connections { get; private set; } = new();
 
         [JsonIgnore]
-        public DnsBuffer DnsBuffer { get; private set; } = new DnsBuffer();
+        public DnsBuffer DnsBuffer { get; private set; } = new();
 
         [JsonIgnore]
-        public static Server ForwardServer { get; } = new Server();
+        public static Server ForwardServer { get; } = new();
 
         #endregion
 
@@ -350,7 +350,7 @@ namespace Shadowsocks.Model
 
         public static Server Clone(Server serverObject)
         {
-            return new Server
+            return new()
             {
                 server = serverObject.server,
                 Server_Port = serverObject.Server_Port,
@@ -426,7 +426,9 @@ namespace Shadowsocks.Model
             // ssr://host:port:protocol:method:obfs:base64pass/?obfsparam=base64&remarks=base64&group=base64&udpport=0&uot=1
             var ssr = Regex.Match(ssrUrl, "ssr://([A-Za-z0-9+/=_-]+)", RegexOptions.IgnoreCase);
             if (!ssr.Success)
+            {
                 throw new FormatException();
+            }
 
             var data = Base64.DecodeUrlSafeBase64(ssr.Groups[1].Value);
             var params_dict = new Dictionary<string, string>();
@@ -446,7 +448,9 @@ namespace Shadowsocks.Model
             var match = UrlFinder.Match(data);
 
             if (match == null || !match.Success)
+            {
                 throw new FormatException();
+            }
 
             server = match.Groups[1].Value;
             Server_Port = ushort.Parse(match.Groups[2].Value);
@@ -487,13 +491,15 @@ namespace Shadowsocks.Model
 
         private void ServerFromSs(string ssUrl, string forceGroup)
         {
-            Regex UrlFinder = new Regex("^(?i)ss://([A-Za-z0-9+-/=_]+)(#(.+))?", RegexOptions.IgnoreCase),
-                DetailsParser = new Regex("^((?<method>.+):(?<password>.*)@(?<hostname>.+?)" +
-                                      ":(?<port>\\d+?))$", RegexOptions.IgnoreCase);
+            Regex UrlFinder = new("^(?i)ss://([A-Za-z0-9+-/=_]+)(#(.+))?", RegexOptions.IgnoreCase),
+                DetailsParser = new("^((?<method>.+):(?<password>.*)@(?<hostname>.+?)" +
+                                    ":(?<port>\\d+?))$", RegexOptions.IgnoreCase);
 
             var match = UrlFinder.Match(ssUrl);
             if (!match.Success)
+            {
                 throw new FormatException();
+            }
 
             var base64 = match.Groups[1].Value;
             match = DetailsParser.Match(Encoding.UTF8.GetString(Convert.FromBase64String(

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Shadowsocks.Controller;
 using Shadowsocks.Util;
@@ -11,13 +11,14 @@ namespace Shadowsocks.Obfs
                 : base(method)
         {
         }
-        private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
+        private static Dictionary<string, int[]> _obfs = new()
+        {
                 {"verify_deflate", new[]{1, 0, 1}}
         };
 
         public static List<string> SupportedObfs()
         {
-            return new List<string>(_obfs.Keys);
+            return new(_obfs.Keys);
         }
 
         public override Dictionary<string, int[]> GetObfs()
@@ -81,12 +82,14 @@ namespace Shadowsocks.Obfs
             while (recv_buf_len > 2)
             {
                 var len = (recv_buf[0] << 8) + recv_buf[1];
-                if (len >= 32768 || len < 6)
+                if (len is >= 32768 or < 6)
                 {
                     throw new ObfsException("ClientPostDecrypt data error");
                 }
                 if (len > recv_buf_len)
+                {
                     break;
+                }
 
                 var buf = FileManager.DeflateDecompress(recv_buf, 2, len - 6, out var outlen);
                 if (buf != null)

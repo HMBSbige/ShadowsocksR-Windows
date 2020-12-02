@@ -1,7 +1,8 @@
-﻿using Shadowsocks.Controller.Service;
+using Shadowsocks.Controller.Service;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using System;
+using WindowsProxy;
 
 namespace Shadowsocks.Controller.SystemProxy
 {
@@ -22,16 +23,20 @@ namespace Shadowsocks.Controller.SystemProxy
             var enabled = sysProxyMode != ProxyMode.Direct;
             try
             {
-                using var proxy = new SetSystemProxy();
+                using var proxy = new ProxyService();
+
                 if (enabled)
                 {
                     if (global)
                     {
-                        proxy.Global($@"localhost:{config.LocalPort}");
+                        proxy.Server = $@"localhost:{config.LocalPort}";
+                        proxy.Bypass = string.Join(@";", ProxyService.LanIp);
+                        proxy.Global();
                     }
                     else
                     {
-                        proxy.Pac(pacSrv.PacUrl);
+                        proxy.AutoConfigUrl = pacSrv.PacUrl;
+                        proxy.Pac();
                     }
                 }
                 else

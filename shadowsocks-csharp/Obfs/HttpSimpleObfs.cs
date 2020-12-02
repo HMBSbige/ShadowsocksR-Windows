@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Shadowsocks.Obfs
@@ -13,7 +13,8 @@ namespace Shadowsocks.Obfs
             raw_trans_sent = false;
             raw_trans_recv = false;
         }
-        private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
+        private static Dictionary<string, int[]> _obfs = new()
+        {
                 //modify original protocol, wrap protocol, obfs param
                 {"http_simple", new[] {0, 1, 1}},
                 {"http_post", new[] {0, 1, 1}},
@@ -49,12 +50,12 @@ namespace Shadowsocks.Obfs
         //private bool has_recv_header;
         private bool raw_trans_sent;
         private bool raw_trans_recv;
-        private List<byte[]> data_buffer = new List<byte[]>();
-        private Random random = new Random();
+        private List<byte[]> data_buffer = new();
+        private Random random = new();
 
         public static List<string> SupportedObfs()
         {
-            return new List<string>(_obfs.Keys);
+            return new(_obfs.Keys);
         }
 
         public override Dictionary<string, int[]> GetObfs()
@@ -131,7 +132,7 @@ namespace Shadowsocks.Obfs
                     data_buffer.Add(data);
                 }
             }
-            else if (Method == "http_simple" || Method == "http_post")
+            else if (Method is "http_simple" or "http_post")
             {
                 var headsize = Server.Iv.Length + Server.head_len;
                 if (datalength - headsize > 64)
@@ -209,7 +210,9 @@ namespace Shadowsocks.Obfs
                 for (; offset < subArray.Length; ++offset)
                 {
                     if (array[pos + offset] != subArray[offset])
+                    {
                         break;
+                    }
                 }
                 if (offset == subArray.Length)
                 {

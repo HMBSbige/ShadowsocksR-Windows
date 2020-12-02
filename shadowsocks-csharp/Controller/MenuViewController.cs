@@ -1,4 +1,4 @@
-﻿using Hardcodet.Wpf.TaskbarNotification;
+using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Win32;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Controller.Service;
@@ -41,7 +41,7 @@ namespace Shadowsocks.Controller
         // and it should just do anything related to the config form
 
         private readonly MainController controller;
-        private readonly UpdateChecker updateChecker;
+        private readonly HttpRequest.UpdateChecker updateChecker;
 
         private readonly TaskbarIcon _notifyIcon;
         private ContextMenu _contextMenu;
@@ -84,7 +84,7 @@ namespace Shadowsocks.Controller
         private System.Timers.Timer timerDelayCheckUpdate;
 
         private bool configFrom_open;
-        private readonly List<EventParams> eventList = new List<EventParams>();
+        private readonly List<EventParams> eventList = new();
 
         public MenuViewController(MainController controller)
         {
@@ -110,7 +110,7 @@ namespace Shadowsocks.Controller
             _notifyIcon.TrayMiddleMouseUp += notifyIcon_TrayMiddleMouseUp;
             _notifyIcon.TrayBalloonTipClicked += notifyIcon_TrayBalloonTipClicked;
 
-            updateChecker = new UpdateChecker();
+            updateChecker = new HttpRequest.UpdateChecker();
             updateChecker.NewVersionFound += updateChecker_NewVersionFound;
             updateChecker.NewVersionNotFound += updateChecker_NewVersionNotFound;
             updateChecker.NewVersionFoundFailed += UpdateChecker_NewVersionFoundFailed;
@@ -148,7 +148,7 @@ namespace Shadowsocks.Controller
         private void UpdateTrayIcon()
         {
             var config = Global.GuiConfig;
-            var enabled = config.SysProxyMode != ProxyMode.NoModify && config.SysProxyMode != ProxyMode.Direct;
+            var enabled = config.SysProxyMode is not ProxyMode.NoModify and not ProxyMode.Direct;
             var global = config.SysProxyMode == ProxyMode.Global;
             var random = config.Random;
 
@@ -380,7 +380,7 @@ namespace Shadowsocks.Controller
                     e.PacType == PacType.GfwList ?
                     I18NUtil.GetAppStringValue(@"GfwListPacUpdated") : I18NUtil.GetAppStringValue(@"PacUpdated")
                 : I18NUtil.GetAppStringValue(@"GfwListPacNotFound");
-            _notifyIcon.ShowBalloonTip(UpdateChecker.Name, result, BalloonIcon.Info);
+            _notifyIcon.ShowBalloonTip(HttpRequest.UpdateChecker.Name, result, BalloonIcon.Info);
         }
 
         private void UpdateNodeCheckerNewNodeFound(object sender, EventArgs e)
@@ -563,28 +563,28 @@ namespace Shadowsocks.Controller
                     {
                         _notifyIcon.ShowBalloonTip(
                                 string.Format(I18NUtil.GetAppStringValue(@"NewVersionFound"),
-                                UpdateChecker.Name, updateChecker.LatestVersionNumber),
+                                        HttpRequest.UpdateChecker.Name, updateChecker.LatestVersionNumber),
                                 I18NUtil.GetAppStringValue(@"ClickMenuToDownload"), BalloonIcon.Info);
                     }
                     _moreMenu.Icon = CreateSelectedIcon();
                     _updateMenu.Icon = CreateSelectedIcon();
                     UpdateItem.Visibility = Visibility.Visible;
                     UpdateItem.Header = string.Format(I18NUtil.GetAppStringValue(@"NewVersionAvailable"),
-                            UpdateChecker.Name, updateChecker.LatestVersionNumber);
+                            HttpRequest.UpdateChecker.Name, updateChecker.LatestVersionNumber);
                 }
             });
         }
 
         private void updateChecker_NewVersionNotFound(object sender, EventArgs e)
         {
-            _notifyIcon.ShowBalloonTip($@"{UpdateChecker.Name} {UpdateChecker.FullVersion}",
-            $@"{I18NUtil.GetAppStringValue(@"NewVersionNotFound")}{Environment.NewLine}{UpdateChecker.Version}≥{updateChecker.LatestVersionNumber}",
+            _notifyIcon.ShowBalloonTip($@"{HttpRequest.UpdateChecker.Name} {HttpRequest.UpdateChecker.FullVersion}",
+            $@"{I18NUtil.GetAppStringValue(@"NewVersionNotFound")}{Environment.NewLine}{HttpRequest.UpdateChecker.Version}≥{updateChecker.LatestVersionNumber}",
             BalloonIcon.Info);
         }
 
         private void UpdateChecker_NewVersionFoundFailed(object sender, EventArgs e)
         {
-            _notifyIcon.ShowBalloonTip($@"{UpdateChecker.Name} {UpdateChecker.FullVersion}", I18NUtil.GetAppStringValue(@"NewVersionFoundFailed"), BalloonIcon.Info);
+            _notifyIcon.ShowBalloonTip($@"{HttpRequest.UpdateChecker.Name} {HttpRequest.UpdateChecker.FullVersion}", I18NUtil.GetAppStringValue(@"NewVersionFoundFailed"), BalloonIcon.Info);
         }
 
         private void UpdateItem_Clicked(object sender, RoutedEventArgs e)
@@ -757,7 +757,6 @@ namespace Shadowsocks.Controller
         {
             _serverConfigWindow = null;
             configFrom_open = false;
-            Utils.ReleaseMemory();
             if (eventList.Count > 0)
             {
                 foreach (var p in eventList)
@@ -805,10 +804,9 @@ namespace Shadowsocks.Controller
                 _settingsWindow.Show();
                 _settingsWindow.Activate();
                 _settingsWindow.BringToFront();
-                _settingsWindow.Closed += (o, args) =>
+                _settingsWindow.Closed += (_, _) =>
                 {
                     _settingsWindow = null;
-                    Utils.ReleaseMemory();
                 };
             }
         }
@@ -828,7 +826,6 @@ namespace Shadowsocks.Controller
                 _dnsSettingsWindow.Closed += (o, args) =>
                 {
                     _dnsSettingsWindow = null;
-                    Utils.ReleaseMemory();
                 };
             }
         }
@@ -853,7 +850,6 @@ namespace Shadowsocks.Controller
                 _portMapWindow.Closed += (o, e) =>
                 {
                     _portMapWindow = null;
-                    Utils.ReleaseMemory();
                 };
             }
         }
@@ -879,7 +875,6 @@ namespace Shadowsocks.Controller
                 {
                     _serverLogWindowStatus = new WindowStatus(_serverLogWindow);
                     _serverLogWindow = null;
-                    Utils.ReleaseMemory();
                 };
             }
         }
@@ -904,7 +899,6 @@ namespace Shadowsocks.Controller
                 _logWindow.Closed += (sender, args) =>
                 {
                     _logWindow = null;
-                    Utils.ReleaseMemory();
                 };
             }
         }
@@ -929,7 +923,6 @@ namespace Shadowsocks.Controller
                 _subScribeWindow.Closed += (sender, args) =>
                 {
                     _subScribeWindow = null;
-                    Utils.ReleaseMemory();
                 };
             }
         }
@@ -965,7 +958,7 @@ namespace Shadowsocks.Controller
                     var cfg = Global.LoadFile(name);
                     if (cfg.IsDefaultConfig())
                     {
-                        MessageBox.Show(I18NUtil.GetAppStringValue(@"ImportConfigFailed"), UpdateChecker.Name);
+                        MessageBox.Show(I18NUtil.GetAppStringValue(@"ImportConfigFailed"), HttpRequest.UpdateChecker.Name);
                     }
                     else
                     {

@@ -1,149 +1,151 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <UseWPF>true</UseWPF>
-	
-	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <AssemblyName>ShadowsocksR</AssemblyName>
-    <RootNamespace>Shadowsocks</RootNamespace>
-    <ApplicationIcon>shadowsocks.ico</ApplicationIcon>
-    <StartupObject>Shadowsocks.Program</StartupObject>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <UseWPF>true</UseWPF>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <AssemblyName>ShadowsocksR</AssemblyName>
+        <RootNamespace>Shadowsocks</RootNamespace>
+        <ApplicationIcon>shadowsocks.ico</ApplicationIcon>
+        <StartupObject>Shadowsocks.Program</StartupObject>
+        <LangVersion>latest</LangVersion>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;PROTOCOL_STATISTICS</DefineConstants>
-  </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>DEBUG;TRACE;PROTOCOL_STATISTICS</DefineConstants>
+    </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;PROTOCOL_STATISTICS</DefineConstants>
-  </PropertyGroup>
-  
-  <PropertyGroup>
-      <DefineConstants Condition=" '$(SelfContained)' == 'true' ">$(DefineConstants);IsSelfContainedDotNetCore</DefineConstants>
-	<DefineConstants Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">$(DefineConstants);Is64Bit</DefineConstants>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <None Remove="View\Controls\MaskedTextBox.xaml" />
-    <None Remove="View\Controls\NumberUpDown.xaml" />
-    <None Remove="Resources\ssw128.png" />
-    <None Remove="View\LogWindow.xaml" />
-    <None Remove="View\PortSettingsWindow.xaml" />
-    <None Remove="View\QRCodeSplashWindow.xaml" />
-    <None Remove="View\ServerLogWindow.xaml" />
-    <None Remove="View\ShowTextWindow.xaml" />
-    <None Remove="View\SubscribeWindow.xaml" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Resource Include="..\pic\wechat.jpg" Link="Resources\wechat.jpg" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Hardcodet.NotifyIcon.Wpf.NetCore" Version="1.0.13" />
-    <PackageReference Include="HMBSbige.SingleInstance" Version="1.0.2" />
-    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="18.3.0.42" />
-    <PackageReference Include="ARSoft.Tools.Net" Version="2.3.0" />
-    <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="18.3.0.42" />
-    <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="System.Reactive" Version="4.4.1" />
-    <PackageReference Include="WpfColorFontDialog" Version="1.0.8" />
-    <PackageReference Include="ZXing.Net" Version="0.16.6" />
-  </ItemGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE;PROTOCOL_STATISTICS</DefineConstants>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+    <PropertyGroup>
+        <DefineConstants Condition=" '$(SelfContained)' == 'true' ">$(DefineConstants);IsSelfContainedDotNetCore</DefineConstants>
+        <DefineConstants Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">$(DefineConstants);Is64Bit</DefineConstants>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+    <ItemGroup>
+        <None Remove="View\Controls\MaskedTextBox.xaml" />
+        <None Remove="View\Controls\NumberUpDown.xaml" />
+        <None Remove="Resources\ssw128.png" />
+        <None Remove="View\LogWindow.xaml" />
+        <None Remove="View\PortSettingsWindow.xaml" />
+        <None Remove="View\QRCodeSplashWindow.xaml" />
+        <None Remove="View\ServerLogWindow.xaml" />
+        <None Remove="View\ShowTextWindow.xaml" />
+        <None Remove="View\SubscribeWindow.xaml" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Page Update="I18N\SettingsWindow.en-US.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\SettingsWindow.zh-CN.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\SettingsWindow.zh-TW.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\PortSettingsWindow.en-US.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\PortSettingsWindow.zh-CN.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\PortSettingsWindow.zh-TW.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\ServerLogWindow.en-US.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\ServerLogWindow.zh-CN.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\ServerLogWindow.zh-TW.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\LogWindow.en-US.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\LogWindow.zh-CN.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\LogWindow.zh-TW.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\DnsSettingWindow.en-US.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\DnsSettingWindow.zh-CN.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\DnsSettingWindow.zh-TW.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\SubscribeWindow.en-US.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\SubscribeWindow.zh-CN.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\SubscribeWindow.zh-TW.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\ConfigWindow.en-US.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\ConfigWindow.zh-CN.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="I18N\ConfigWindow.zh-TW.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
+    <ItemGroup>
+        <Resource Include="..\pic\wechat.jpg" Link="Resources\wechat.jpg" />
+    </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="cd &quot;$(ProjectDir)&quot;&#xD;&#xA;&#xD;&#xA;SyncfusionLicenseRegister.bat PreBuild Program.cs" />
-  </Target>
+    <ItemGroup>
+        <PackageReference Include="ARSoft.Tools.Net" Version="2.3.0" />
+        <PackageReference Include="Hardcodet.NotifyIcon.Wpf.NetCore" Version="1.0.14" />
+        <PackageReference Include="HMBSbige.SingleInstance" Version="5.0.0" />
+        <PackageReference Include="HMBSbige.UpdateChecker" Version="5.0.0" />
+        <PackageReference Include="RunAtStartup" Version="5.0.0" />
+        <PackageReference Include="Syncfusion.SfGrid.WPF" Version="18.3.0.52" />
+        <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="18.3.0.52" />
+        <PackageReference Include="URIScheme" Version="5.0.0" />
+        <PackageReference Include="WindowsJobAPI" Version="5.0.0" />
+        <PackageReference Include="WindowsProxy" Version="5.0.0" />
+        <PackageReference Include="WpfColorFontDialog" Version="1.0.8" />
+        <PackageReference Include="ZXing.Net" Version="0.16.6" />
+    </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="cd &quot;$(ProjectDir)&quot;&#xD;&#xA;&#xD;&#xA;SyncfusionLicenseRegister.bat PostBuild Program.cs" />
-  </Target>
+    <ItemGroup>
+        <Compile Update="Properties\Resources.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Update="Properties\Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Page Update="I18N\SettingsWindow.en-US.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\SettingsWindow.zh-CN.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\SettingsWindow.zh-TW.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\PortSettingsWindow.en-US.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\PortSettingsWindow.zh-CN.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\PortSettingsWindow.zh-TW.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\ServerLogWindow.en-US.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\ServerLogWindow.zh-CN.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\ServerLogWindow.zh-TW.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\LogWindow.en-US.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\LogWindow.zh-CN.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\LogWindow.zh-TW.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\DnsSettingWindow.en-US.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\DnsSettingWindow.zh-CN.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\DnsSettingWindow.zh-TW.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\SubscribeWindow.en-US.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\SubscribeWindow.zh-CN.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\SubscribeWindow.zh-TW.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\ConfigWindow.en-US.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\ConfigWindow.zh-CN.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+        <Page Update="I18N\ConfigWindow.zh-TW.xaml">
+            <SubType>Designer</SubType>
+        </Page>
+    </ItemGroup>
+
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+        <Exec Command="cd &quot;$(ProjectDir)&quot;&#xD;&#xA;&#xD;&#xA;SyncfusionLicenseRegister.bat PreBuild Program.cs" />
+    </Target>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="cd &quot;$(ProjectDir)&quot;&#xD;&#xA;&#xD;&#xA;SyncfusionLicenseRegister.bat PostBuild Program.cs" />
+    </Target>
 
 </Project>

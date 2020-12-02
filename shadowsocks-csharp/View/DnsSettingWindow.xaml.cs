@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Util;
+using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
 using System.Threading.Tasks;
 using System.Windows;
@@ -25,7 +25,7 @@ namespace Shadowsocks.View
             ApplyButton.IsEnabled = true;
         }
 
-        public DnsSettingViewModel DnsSettingViewModel { get; set; } = new DnsSettingViewModel();
+        public DnsSettingViewModel DnsSettingViewModel { get; set; } = new();
 
         private void LoadConfig()
         {

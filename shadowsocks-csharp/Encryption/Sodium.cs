@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using Shadowsocks.Controller;
@@ -12,7 +12,7 @@ namespace Shadowsocks.Encryption
         private const string DLLNAME = @"libsscrypto.dll";
 
         private static readonly bool _initialized;
-        private static readonly object _initLock = new object();
+        private static readonly object _initLock = new();
 
         public static bool AES256GCMAvailable { get; }
 

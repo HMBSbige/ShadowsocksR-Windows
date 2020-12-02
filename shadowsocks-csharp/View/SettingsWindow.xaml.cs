@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
@@ -22,7 +22,7 @@ namespace Shadowsocks.View
 
         private readonly MainController _controller;
 
-        public SettingViewModel SettingViewModel { get; set; } = new SettingViewModel();
+        public SettingViewModel SettingViewModel { get; set; } = new();
 
         private void LoadCurrentConfiguration()
         {
@@ -32,7 +32,7 @@ namespace Shadowsocks.View
                 ApplyButton.IsEnabled = true;
             };
             AutoStartupCheckBox.IsChecked = AutoStartup.Check();
-            Title = $@"{this.GetWindowStringValue(@"Title")}({(Global.GuiConfig.ShareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{Global.GuiConfig.LocalPort} {this.GetWindowStringValue(@"Version")}:{UpdateChecker.FullVersion})";
+            Title = $@"{this.GetWindowStringValue(@"Title")}({(Global.GuiConfig.ShareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{Global.GuiConfig.LocalPort} {this.GetWindowStringValue(@"Version")}:{Controller.HttpRequest.UpdateChecker.FullVersion})";
             ApplyButton.IsEnabled = false;
         }
 
@@ -45,14 +45,14 @@ namespace Shadowsocks.View
         {
             if (SettingViewModel.ModifiedConfiguration.LangName != Global.GuiConfig.LangName)
             {
-                MessageBox.Show(this.GetWindowStringValue(@"RestartRequired"), UpdateChecker.Name, MessageBoxButton.OK);
+                MessageBox.Show(this.GetWindowStringValue(@"RestartRequired"), Controller.HttpRequest.UpdateChecker.Name, MessageBoxButton.OK);
             }
             _controller.SaveServersConfig(SettingViewModel.ModifiedConfiguration, true);
             var isAutoStartup = AutoStartupCheckBox.IsChecked.GetValueOrDefault();
             if (isAutoStartup != AutoStartup.Check()
             && !AutoStartup.Set(isAutoStartup))
             {
-                MessageBox.Show(this.GetWindowStringValue(@"FailAutoStartUp"), UpdateChecker.Name, MessageBoxButton.OK);
+                MessageBox.Show(this.GetWindowStringValue(@"FailAutoStartUp"), Controller.HttpRequest.UpdateChecker.Name, MessageBoxButton.OK);
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 
@@ -11,26 +11,29 @@ namespace Shadowsocks.Obfs
         {
             handshake_status = 0;
             if (method == "tls1.2_ticket_fastauth")
+            {
                 fastauth = true;
+            }
         }
-        private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
+        private static Dictionary<string, int[]> _obfs = new()
+        {
                 {"tls1.2_ticket_auth", new[]  {0, 1, 1}},
                 {"tls1.2_ticket_fastauth", new[]  {0, 1, 1}}
         };
 
         private int handshake_status;
-        private List<byte[]> data_sent_buffer = new List<byte[]>();
+        private List<byte[]> data_sent_buffer = new();
         private byte[] data_recv_buffer = new byte[0];
         private uint send_id;
         private bool fastauth;
 
-        protected static RNGCryptoServiceProvider g_random = new RNGCryptoServiceProvider();
-        protected Random random = new Random();
+        protected static RNGCryptoServiceProvider g_random = new();
+        protected Random random = new();
         protected const int overhead = 5;
 
         public static List<string> SupportedObfs()
         {
-            return new List<string>(_obfs.Keys);
+            return new(_obfs.Keys);
         }
 
         public override Dictionary<string, int[]> GetObfs()
@@ -165,13 +168,21 @@ namespace Shadowsocks.Obfs
                 while (send_id <= 4 && datalength - start > 256)
                 {
                     var len = random.Next(512) + 64;
-                    if (len > datalength - start) len = datalength - start;
+                    if (len > datalength - start)
+                    {
+                        len = datalength - start;
+                    }
+
                     PackData(encryptdata, ref start, len, outdata, ref outlength);
                 }
                 while (datalength - start > 2048)
                 {
                     var len = random.Next(4096) + 100;
-                    if (len > datalength - start) len = datalength - start;
+                    if (len > datalength - start)
+                    {
+                        len = datalength - start;
+                    }
+
                     PackData(encryptdata, ref start, len, outdata, ref outlength);
                 }
                 if (datalength - start > 0)
@@ -337,11 +348,17 @@ namespace Shadowsocks.Obfs
                 while (data_recv_buffer.Length > 5)
                 {
                     if (data_recv_buffer[0] != 0x17)
+                    {
                         throw new ObfsException("ClientDecode appdata error");
+                    }
+
                     var len = (data_recv_buffer[3] << 8) + data_recv_buffer[4];
                     var pack_len = len + 5;
                     if (pack_len > data_recv_buffer.Length)
+                    {
                         break;
+                    }
+
                     Array.Copy(data_recv_buffer, 5, outdata, outlength, len);
                     outlength += len;
                     var buffer = new byte[data_recv_buffer.Length - pack_len];

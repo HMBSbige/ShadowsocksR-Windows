@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Encryption.CircularBuffer;
+using Shadowsocks.Encryption.CircularBuffer;
 using Shadowsocks.Proxy;
 using Shadowsocks.Util;
 using System;
@@ -10,8 +10,8 @@ namespace Shadowsocks.Encryption.Stream
     public abstract class StreamEncryptor : EncryptorBase
     {
         // every connection should create its own buffer
-        private readonly ByteCircularBuffer _encCircularBuffer = new ByteCircularBuffer(ProxyAuthHandler.BufferSize * 2);
-        private readonly ByteCircularBuffer _decCircularBuffer = new ByteCircularBuffer(ProxyAuthHandler.BufferSize * 2);
+        private readonly ByteCircularBuffer _encCircularBuffer = new(ProxyAuthHandler.BufferSize * 2);
+        private readonly ByteCircularBuffer _decCircularBuffer = new(ProxyAuthHandler.BufferSize * 2);
 
         protected Dictionary<string, EncryptorInfo> ciphers;
 
@@ -87,8 +87,16 @@ namespace Shadowsocks.Encryption.Stream
         private void InitKey(string password)
         {
             var passBuf = Encoding.UTF8.GetBytes(password);
-            if (_key == null) _key = new byte[keyLen];
-            if (_key.Length != keyLen) Array.Resize(ref _key, keyLen);
+            if (_key == null)
+            {
+                _key = new byte[keyLen];
+            }
+
+            if (_key.Length != keyLen)
+            {
+                Array.Resize(ref _key, keyLen);
+            }
+
             LegacyDeriveKey(passBuf, _key, keyLen);
 
             Array.Resize(ref _iv, ivLen);

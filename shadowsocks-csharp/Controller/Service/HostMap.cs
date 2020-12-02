@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Model;
+using Shadowsocks.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,7 @@ namespace Shadowsocks.Controller.Service
 {
     public static class HostMap
     {
-        private static readonly Dictionary<string, HostNode> Root = new Dictionary<string, HostNode>();
+        private static readonly Dictionary<string, HostNode> Root = new();
         private static IPSegment _ips;
 
         public const string UserRule = @"user.rule";
@@ -112,10 +112,16 @@ namespace Shadowsocks.Controller.Service
                     foreach (var line in File.ReadLines(UserRule))
                     {
                         if (line.Length > 0 && line.StartsWith(@"#"))
+                        {
                             continue;
+                        }
+
                         var parts = line.Split(new[] { ' ', '\t' }, 2, StringSplitOptions.RemoveEmptyEntries);
                         if (parts.Length < 2)
+                        {
                             continue;
+                        }
+
                         AddHost(parts[0], parts[1]);
                     }
                 }

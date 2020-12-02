@@ -1,31 +1,15 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shadowsocks.Encryption;
 using Shadowsocks.Util;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using Shadowsocks.Util.GitHubRelease;
 
 namespace UnitTest
 {
     [TestClass]
     public class UnitTest
     {
-        [TestMethod]
-        public void TestCompareVersion()
-        {
-            Assert.IsTrue(VersionUtil.CompareVersion(@"2.3.1.0", @"2.3.1") > 0); // wtf??? Be aware that
-            Assert.IsTrue(VersionUtil.CompareVersion(@"2.0.0.0", @"2.3.1") < 0);
-            Assert.IsTrue(VersionUtil.CompareVersion(@"1.3.1.0", @"2.3.1") < 0);
-            Assert.IsTrue(VersionUtil.CompareVersion(@"2.3.1.0", @"1.3.1") > 0);
-            Assert.IsTrue(VersionUtil.CompareVersion(@"1.2", @"1.3") < 0);
-            Assert.IsTrue(VersionUtil.CompareVersion(@"1.3", @"1.2") > 0);
-            Assert.IsTrue(VersionUtil.CompareVersion(@"1.3", @"1.3") == 0);
-            Assert.IsTrue(VersionUtil.CompareVersion(@"1.2.1", @"1.2") > 0);
-            Assert.IsTrue(VersionUtil.CompareVersion(@"2.3.1", @"2.4") < 0);
-            Assert.IsTrue(VersionUtil.CompareVersion(@"1.3.2", @"1.3.1") > 0);
-        }
-
         [TestMethod]
         public void TestMd5()
         {

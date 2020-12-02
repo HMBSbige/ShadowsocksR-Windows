@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -27,18 +27,32 @@ namespace Shadowsocks.Controller.Service
 
         public void OnSend(byte[] sendData, int length)
         {
-            if (protocol != Protocol.NotBegin) return;
+            if (protocol != Protocol.NotBegin)
+            {
+                return;
+            }
+
             Array.Resize(ref _sendBuffer, _sendBuffer.Length + length);
             Array.Copy(sendData, 0, _sendBuffer, _sendBuffer.Length - length, length);
 
-            if (_sendBuffer.Length < 2) return;
+            if (_sendBuffer.Length < 2)
+            {
+                return;
+            }
 
             var head_size = Obfs.ObfsBase.GetHeadSize(_sendBuffer, _sendBuffer.Length);
-            if (_sendBuffer.Length - head_size < 0) return;
+            if (_sendBuffer.Length - head_size < 0)
+            {
+                return;
+            }
+
             var data = new byte[_sendBuffer.Length - head_size];
             Array.Copy(_sendBuffer, head_size, data, 0, data.Length);
 
-            if (data.Length < 2) return;
+            if (data.Length < 2)
+            {
+                return;
+            }
 
             if (data.Length > 8)
             {
@@ -65,11 +79,18 @@ namespace Shadowsocks.Controller.Service
 
         public int OnRecv(byte[] recv_data, int length)
         {
-            if (protocol == Protocol.Unknown || protocol == Protocol.NotBegin) return 0;
+            if (protocol is Protocol.Unknown or Protocol.NotBegin)
+            {
+                return 0;
+            }
+
             Array.Resize(ref _recvBuffer, _recvBuffer.Length + length);
             Array.Copy(recv_data, 0, _recvBuffer, _recvBuffer.Length - length, length);
 
-            if (_recvBuffer.Length < 2) return 0;
+            if (_recvBuffer.Length < 2)
+            {
+                return 0;
+            }
 
             if (protocol == Protocol.HTTP && _recvBuffer.Length > 4)
             {

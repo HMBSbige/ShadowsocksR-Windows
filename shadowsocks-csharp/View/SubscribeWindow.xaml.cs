@@ -1,5 +1,4 @@
-﻿using Shadowsocks.Controller;
-using Shadowsocks.Controller.HttpRequest;
+using Shadowsocks.Controller;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
@@ -36,7 +35,7 @@ namespace Shadowsocks.View
         private readonly MainController _controller;
         private Configuration _modifiedConfiguration;
 
-        public SubscribeWindowViewModel SubscribeWindowViewModel { get; set; } = new SubscribeWindowViewModel();
+        public SubscribeWindowViewModel SubscribeWindowViewModel { get; set; } = new();
 
         private bool _isDeleteServer;
 
@@ -90,7 +89,7 @@ namespace Shadowsocks.View
             && _modifiedConfiguration.ServerSubscribes.All(subscribe => subscribe.Tag != server.SubTag)))
             {
                 if (MessageBox.Show(this.GetWindowStringValue(@"SaveQuestion"),
-                        UpdateChecker.Name, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes)
+                            Controller.HttpRequest.UpdateChecker.Name, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes)
                         == MessageBoxResult.Yes)
                 {
                     DeleteUnusedServer();
@@ -176,7 +175,7 @@ namespace Shadowsocks.View
 
         private void SaveError()
         {
-            MessageBox.Show(this.GetWindowStringValue(@"SaveError"), UpdateChecker.Name, MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(this.GetWindowStringValue(@"SaveError"), Controller.HttpRequest.UpdateChecker.Name, MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         private void UpdateButton_OnClick(object sender, RoutedEventArgs e)

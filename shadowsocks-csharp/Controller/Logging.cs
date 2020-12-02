@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Enums;
+using Shadowsocks.Enums;
 using Shadowsocks.Obfs;
 using Shadowsocks.Util;
 using System;
@@ -19,7 +19,7 @@ namespace Shadowsocks.Controller
 
         private static FileStream _logFileStream;
         private static StreamWriterWithTimestamp _logStreamWriter;
-        private static readonly object Lock = new object();
+        private static readonly object Lock = new();
         public static bool SaveToFile = true;
         public static TextWriter DefaultOut;
         public static TextWriter DefaultError;

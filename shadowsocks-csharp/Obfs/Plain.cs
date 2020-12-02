@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Shadowsocks.Obfs
 {
@@ -8,14 +8,15 @@ namespace Shadowsocks.Obfs
             : base(method)
         {
         }
-        private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
+        private static Dictionary<string, int[]> _obfs = new()
+        {
                 {"plain", new[]{0, 0, 0}},
                 {"origin", new[]{0, 0, 0}}
         };
 
         public static List<string> SupportedObfs()
         {
-            return new List<string>(_obfs.Keys);
+            return new(_obfs.Keys);
         }
 
         public override Dictionary<string, int[]> GetObfs()

@@ -1,4 +1,4 @@
-﻿#region Original License
+#region Original License
 
 //New BSD License(BSD)
 //
@@ -244,7 +244,11 @@ namespace Shadowsocks.Encryption.CircularBuffer
         /// <returns>The objects that are removed from the beginning of the <see cref="ByteCircularBuffer"/>.</returns>
         public byte[] Get(int count)
         {
-            if (count <= 0) throw new ArgumentOutOfRangeException(nameof(count));
+            if (count <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count));
+            }
+
             var result = new byte[count];
 
             this.Get(result);
@@ -259,7 +263,11 @@ namespace Shadowsocks.Encryption.CircularBuffer
         /// <returns>The actual number of elements copied into <paramref name="array"/>.</returns>
         public int Get(byte[] array)
         {
-            if (array.Length <= 0) throw new ArgumentOutOfRangeException(nameof(array));
+            if (array.Length <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(array));
+            }
+
             return this.Get(array, 0, array.Length);
         }
 
@@ -411,7 +419,11 @@ namespace Shadowsocks.Encryption.CircularBuffer
         /// <remarks>If <see cref="Size"/> plus <paramref name="count"/> exceeds the capacity of the <see cref="ByteCircularBuffer"/> and the property is <c>true</c>, the oldest items in the <see cref="ByteCircularBuffer"/> are overwritten with <paramref name="array"/>.</remarks>
         public virtual int Put(byte[] array, int arrayIndex, int count)
         {
-            if (count <= 0) throw new ArgumentOutOfRangeException(nameof(count), @"Count must be positive.");
+            if (count <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), @"Count must be positive.");
+            }
+
             if (this.Size + count > this.Capacity)
             {
                 throw new InvalidOperationException("The buffer does not have sufficient capacity to put new items.");

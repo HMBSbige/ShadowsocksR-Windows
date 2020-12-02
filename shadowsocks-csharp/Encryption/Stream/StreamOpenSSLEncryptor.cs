@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Encryption.Exception;
+using Shadowsocks.Encryption.Exception;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,7 +20,8 @@ namespace Shadowsocks.Encryption.Stream
 
         }
 
-        private static readonly Dictionary<string, EncryptorInfo> _ciphers = new Dictionary<string, EncryptorInfo> {
+        private static readonly Dictionary<string, EncryptorInfo> _ciphers = new()
+        {
                 {@"aes-128-cbc", new EncryptorInfo(16, 16, CIPHER_AES,@"",false)},
                 {@"aes-192-cbc", new EncryptorInfo(24, 16, CIPHER_AES, @"", false)},
                 {@"aes-256-cbc", new EncryptorInfo(32, 16, CIPHER_AES, @"", false)},
@@ -53,7 +54,7 @@ namespace Shadowsocks.Encryption.Stream
 
         public static List<string> SupportedCiphers()
         {
-            return new List<string>(_ciphers.Keys);
+            return new(_ciphers.Keys);
         }
 
         protected override Dictionary<string, EncryptorInfo> getCiphers()
@@ -66,9 +67,16 @@ namespace Shadowsocks.Encryption.Stream
             base.InitCipher(iv, isEncrypt);
 
             var cipherInfo = OpenSSL.GetCipherInfo(_innerLibName);
-            if (cipherInfo == IntPtr.Zero) throw new System.Exception("openssl: cipher not found");
+            if (cipherInfo == IntPtr.Zero)
+            {
+                throw new System.Exception("openssl: cipher not found");
+            }
+
             var ctx = OpenSSL.EVP_CIPHER_CTX_new();
-            if (ctx == IntPtr.Zero) throw new System.Exception("fail to create ctx");
+            if (ctx == IntPtr.Zero)
+            {
+                throw new System.Exception("fail to create ctx");
+            }
 
             if (isEncrypt)
             {
@@ -93,13 +101,22 @@ namespace Shadowsocks.Encryption.Stream
             }
 
             var ret = OpenSSL.EVP_CipherInit_ex(ctx, cipherInfo, IntPtr.Zero, null, null, isEncrypt ? OpenSSL.OPENSSL_ENCRYPT : OpenSSL.OPENSSL_DECRYPT);
-            if (ret != 1) throw new System.Exception("openssl: fail to set key length");
+            if (ret != 1)
+            {
+                throw new System.Exception("openssl: fail to set key length");
+            }
 
             ret = OpenSSL.EVP_CIPHER_CTX_set_key_length(ctx, keyLen);
-            if (ret != 1) throw new System.Exception("openssl: fail to set key length");
+            if (ret != 1)
+            {
+                throw new System.Exception("openssl: fail to set key length");
+            }
 
             ret = OpenSSL.EVP_CipherInit_ex(ctx, IntPtr.Zero, IntPtr.Zero, realKey, _method.StartsWith(@"rc4-") ? null : iv, isEncrypt ? OpenSSL.OPENSSL_ENCRYPT : OpenSSL.OPENSSL_DECRYPT);
-            if (ret != 1) throw new System.Exception("openssl: cannot set key and iv");
+            if (ret != 1)
+            {
+                throw new System.Exception("openssl: cannot set key and iv");
+            }
 
             OpenSSL.EVP_CIPHER_CTX_set_padding(ctx, 0);
         }
@@ -124,7 +141,7 @@ namespace Shadowsocks.Encryption.Stream
         private bool _disposed;
 
         // instance based lock
-        private readonly object _lock = new object();
+        private readonly object _lock = new();
 
         public override void Dispose()
         {

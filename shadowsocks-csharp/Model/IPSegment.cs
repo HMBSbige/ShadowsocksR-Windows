@@ -31,21 +31,35 @@ namespace Shadowsocks.Model
             for (var i = 0; i < b1.Length; ++i)
             {
                 if (b1[i] < b2[i])
+                {
                     return -1;
+                }
+
                 if (b1[i] > b2[i])
+                {
                     return 1;
+                }
             }
             if (b1.Length < b2.Length)
+            {
                 return -1;
+            }
+
             if (b1.Length > b2.Length)
+            {
                 return 1;
+            }
+
             return 0;
         }
 
         public IPAddressCmp ToIPv6()
         {
             if (AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+            {
                 return this;
+            }
+
             var b1 = GetAddressBytes();
             var br = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0, 0, 0, 0 };
             b1.CopyTo(br, 12);
@@ -78,7 +92,7 @@ namespace Shadowsocks.Model
 
     public class IPSegment
     {
-        protected SortedList list = new SortedList();
+        protected SortedList list = new();
 
         public IPSegment(object val = null)
         {
@@ -114,7 +128,9 @@ namespace Shadowsocks.Model
                         --index;
                     }
                     else
+                    {
                         break;
+                    }
                 }
                 ++index;
                 var keep = false;
@@ -124,7 +140,10 @@ namespace Shadowsocks.Model
                     if (cmp >= 0)
                     {
                         if (cmp == 0)
+                        {
                             keep = true;
+                        }
+
                         break;
                     }
                     ed_val = list.GetByIndex(index);
@@ -142,7 +161,9 @@ namespace Shadowsocks.Model
                             --index;
                         }
                         else
+                        {
                             break;
+                        }
                     }
                     while (index + 1 < list.Count)
                     {
@@ -151,7 +172,9 @@ namespace Shadowsocks.Model
                             list.RemoveAt(index);
                         }
                         else
+                        {
                             break;
+                        }
                     }
                 }
             }

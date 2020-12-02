@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Enums;
+using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Proxy;
 using Shadowsocks.Util.NetUtils;
@@ -213,7 +213,7 @@ namespace Shadowsocks.Controller.Service
 
             protected int TTL = 600;
             protected System.Timers.Timer timer;
-            protected object timerLock = new object();
+            protected object timerLock = new();
             protected DateTime lastTimerSetTime;
 
             public void Start(Configuration config, byte[] firstPacket, Socket socket, string local_sendback_protocol, bool proxy)
@@ -306,7 +306,9 @@ namespace Shadowsocks.Controller.Service
                                 else
                                 {
                                     if (!_local_proxy)
+                                    {
                                         throw new SocketException((int)SocketError.HostNotFound);
+                                    }
                                 }
                             }
                         }
@@ -391,7 +393,9 @@ namespace Shadowsocks.Controller.Service
             private void ResetTimeout(double time)
             {
                 if (time <= 0 && timer == null)
+                {
                     return;
+                }
 
                 if (time <= 0)
                 {
@@ -484,7 +488,9 @@ namespace Shadowsocks.Controller.Service
                             _remote.BeginReceive(remoteRecvBuffer, RecvSize, SocketFlags.None, PipeRemoteReceiveCallback, null);
                         }
                         else
+                        {
                             PipeRemoteReceiveLoop();
+                        }
                     }
                     else
                     {
@@ -546,7 +552,9 @@ namespace Shadowsocks.Controller.Service
                     }
                 }
                 if (final_close)
+                {
                     Close();
+                }
             }
 
             private void PipeConnectionReceiveCallback(IAsyncResult ar)

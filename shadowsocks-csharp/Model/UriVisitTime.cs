@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Shadowsocks.Model
 {
@@ -10,8 +10,11 @@ namespace Shadowsocks.Model
 
         public int CompareTo(object other)
         {
-            if (!(other is UriVisitTime))
+            if (other is not UriVisitTime)
+            {
                 throw new InvalidOperationException("CompareTo: Not a UriVisitTime");
+            }
+
             return Equals(other) ? 0 : visitTime.CompareTo(((UriVisitTime)other).visitTime);
         }
 

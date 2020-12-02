@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller.HttpRequest;
+using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Model;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,11 @@ namespace Shadowsocks.Controller.Service
 
         public void CreateTask(Configuration config, UpdateNode updater, bool updateManually, List<ServerSubscribe> serverSubscribe = null)
         {
-            if (_config != null) return;
+            if (_config != null)
+            {
+                return;
+            }
+
             _config = config;
             _updater = updater;
             _notify = updateManually;
