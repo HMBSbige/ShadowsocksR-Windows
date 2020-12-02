@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Enums;
+using Shadowsocks.Enums;
 using Shadowsocks.Model.Transfer;
 using System;
 using System.Collections.Generic;
@@ -223,9 +223,9 @@ namespace Shadowsocks.Model
                         serverListIndex = randomGennarator.Next(serverList.Count);
                         serverListIndex = serverList[serverListIndex].index;
                     }
-                    else if (algorithm == BalanceType.LowException
-                        || algorithm == BalanceType.Timer
-                        || algorithm == BalanceType.FastDownloadSpeed)
+                    else if (algorithm is BalanceType.LowException
+                        or BalanceType.Timer
+                        or BalanceType.FastDownloadSpeed)
                     {
                         if (algorithm == BalanceType.Timer)
                         {

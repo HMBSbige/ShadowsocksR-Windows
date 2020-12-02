@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,7 +11,7 @@ namespace Shadowsocks.Util
 
         public static string CurrentLanguage;
 
-        public static readonly Dictionary<string, string> SupportLanguage = new Dictionary<string, string>
+        public static readonly Dictionary<string, string> SupportLanguage = new()
         {
                 {@"zh-CN", @"zh-CN"},
                 {@"zh", @"zh-CN"},

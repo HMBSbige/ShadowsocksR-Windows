@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Enums;
+using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Proxy;
 using Shadowsocks.Util.NetUtils;
@@ -213,7 +213,7 @@ namespace Shadowsocks.Controller.Service
 
             protected int TTL = 600;
             protected System.Timers.Timer timer;
-            protected object timerLock = new object();
+            protected object timerLock = new();
             protected DateTime lastTimerSetTime;
 
             public void Start(Configuration config, byte[] firstPacket, Socket socket, string local_sendback_protocol, bool proxy)

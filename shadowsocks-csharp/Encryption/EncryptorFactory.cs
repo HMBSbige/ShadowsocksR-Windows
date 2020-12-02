@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Encryption.Stream;
+using Shadowsocks.Encryption.Stream;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ namespace Shadowsocks.Encryption
 {
     public static class EncryptorFactory
     {
-        public static readonly Dictionary<string, Type> RegisteredEncryptors = new Dictionary<string, Type>();
+        public static readonly Dictionary<string, Type> RegisteredEncryptors = new();
 
         private static readonly Type[] ConstructorTypes = { typeof(string), typeof(string) };
 

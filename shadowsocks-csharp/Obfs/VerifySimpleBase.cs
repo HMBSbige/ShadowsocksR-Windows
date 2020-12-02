@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Shadowsocks.Obfs
 {
@@ -13,7 +13,7 @@ namespace Shadowsocks.Obfs
 
         protected byte[] recv_buf = new byte[RecvBufferSize];
         protected int recv_buf_len;
-        protected Random random = new Random();
+        protected Random random = new();
 
         public override object InitData()
         {

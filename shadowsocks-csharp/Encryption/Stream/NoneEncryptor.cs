@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Shadowsocks.Encryption.Stream
@@ -8,14 +8,14 @@ namespace Shadowsocks.Encryption.Stream
         public NoneEncryptor(string method, string password) : base(method, password)
         { }
 
-        private static Dictionary<string, EncryptorInfo> _ciphers = new Dictionary<string, EncryptorInfo>
+        private static Dictionary<string, EncryptorInfo> _ciphers = new()
         {
                 {@"none", new EncryptorInfo(16, 0, 1)}
         };
 
         public static List<string> SupportedCiphers()
         {
-            return new List<string>(_ciphers.Keys);
+            return new(_ciphers.Keys);
         }
 
         protected override Dictionary<string, EncryptorInfo> getCiphers()

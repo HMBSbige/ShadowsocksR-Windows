@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Util;
+using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
 using System;
 using System.Collections.Concurrent;
@@ -21,12 +21,12 @@ namespace Shadowsocks.Model.Transfer
         private long _transUpload;
         private long _transDownload;
         private long _transDownloadRaw;
-        private readonly List<TransLog> _downTransLog = new List<TransLog>();
-        private readonly List<TransLog> _upTransLog = new List<TransLog>();
+        private readonly List<TransLog> _downTransLog = new();
+        private readonly List<TransLog> _upTransLog = new();
         private long _maxTransDownload;
         private long _maxTransUpload;
         private long _avgConnectTime = -1;
-        private readonly ConcurrentQueue<ErrorLog> _errList = new ConcurrentQueue<ErrorLog>();
+        private readonly ConcurrentQueue<ErrorLog> _errList = new();
 
         private const int AvgTime = 5;
 

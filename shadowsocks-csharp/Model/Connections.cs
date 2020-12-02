@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Shadowsocks.Proxy;
 
 namespace Shadowsocks.Model
 {
     public class Connections
     {
-        private readonly Dictionary<IHandler, int> sockets = new Dictionary<IHandler, int>();
+        private readonly Dictionary<IHandler, int> sockets = new();
         public bool AddRef(IHandler socket)
         {
             lock (this)

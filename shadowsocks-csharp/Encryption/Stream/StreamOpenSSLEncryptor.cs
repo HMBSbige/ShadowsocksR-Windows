@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Encryption.Exception;
+using Shadowsocks.Encryption.Exception;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,7 +20,8 @@ namespace Shadowsocks.Encryption.Stream
 
         }
 
-        private static readonly Dictionary<string, EncryptorInfo> _ciphers = new Dictionary<string, EncryptorInfo> {
+        private static readonly Dictionary<string, EncryptorInfo> _ciphers = new()
+        {
                 {@"aes-128-cbc", new EncryptorInfo(16, 16, CIPHER_AES,@"",false)},
                 {@"aes-192-cbc", new EncryptorInfo(24, 16, CIPHER_AES, @"", false)},
                 {@"aes-256-cbc", new EncryptorInfo(32, 16, CIPHER_AES, @"", false)},
@@ -53,7 +54,7 @@ namespace Shadowsocks.Encryption.Stream
 
         public static List<string> SupportedCiphers()
         {
-            return new List<string>(_ciphers.Keys);
+            return new(_ciphers.Keys);
         }
 
         protected override Dictionary<string, EncryptorInfo> getCiphers()
@@ -124,7 +125,7 @@ namespace Shadowsocks.Encryption.Stream
         private bool _disposed;
 
         // instance based lock
-        private readonly object _lock = new object();
+        private readonly object _lock = new();
 
         public override void Dispose()
         {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Shadowsocks.Controller;
 
@@ -6,10 +6,10 @@ namespace Shadowsocks.Model
 {
     public class LRUCache<K, V>
     {
-        protected Dictionary<K, V> _store = new Dictionary<K, V>();
-        protected Dictionary<K, DateTime> _key_2_time = new Dictionary<K, DateTime>();
-        protected Dictionary<DateTime, K> _time_2_key = new Dictionary<DateTime, K>();
-        protected object _lock = new object();
+        protected Dictionary<K, V> _store = new();
+        protected Dictionary<K, DateTime> _key_2_time = new();
+        protected Dictionary<DateTime, K> _time_2_key = new();
+        protected object _lock = new();
         protected int _sweep_time;
 
         public LRUCache(int sweep_time = 60 * 60)

@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
@@ -36,7 +36,7 @@ namespace Shadowsocks.View
         private readonly MainController _controller;
         private Configuration _modifiedConfiguration;
 
-        public SubscribeWindowViewModel SubscribeWindowViewModel { get; set; } = new SubscribeWindowViewModel();
+        public SubscribeWindowViewModel SubscribeWindowViewModel { get; set; } = new();
 
         private bool _isDeleteServer;
 

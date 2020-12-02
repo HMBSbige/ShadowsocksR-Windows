@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller;
 using Shadowsocks.Controller.Service;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
@@ -425,7 +425,7 @@ namespace Shadowsocks.Proxy
                     if (HttpHandshakeRecv())
                         break;
                 }
-                else if (err == 3 || err == 4)
+                else if (err is 3 or 4)
                 {
                     Connect();
                     break;

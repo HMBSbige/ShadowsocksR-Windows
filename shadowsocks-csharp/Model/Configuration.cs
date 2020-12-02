@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using Shadowsocks.Enums;
 using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
@@ -217,12 +217,12 @@ namespace Shadowsocks.Model
 
         private const int KeepVisitTime = 1800;
 
-        private readonly Dictionary<int, ServerSelectStrategy> _serverStrategyMap = new Dictionary<int, ServerSelectStrategy>();
+        private readonly Dictionary<int, ServerSelectStrategy> _serverStrategyMap = new();
 
         [JsonIgnore]
-        public Dictionary<int, PortMapConfigCache> PortMapCache { get; private set; } = new Dictionary<int, PortMapConfigCache>();
+        public Dictionary<int, PortMapConfigCache> PortMapCache { get; private set; } = new();
 
-        private readonly LRUCache<string, UriVisitTime> _uriCache = new LRUCache<string, UriVisitTime>(180);
+        private readonly LRUCache<string, UriVisitTime> _uriCache = new(180);
 
         #endregion
 
@@ -451,10 +451,10 @@ namespace Shadowsocks.Model
             LangName = string.Empty;
             DnsClients = new List<DnsClient>
             {
-                new DnsClient(DnsType.DnsOverTls) {DnsServer = @"1.1.1.1"},
-                new DnsClient(DnsType.Default) {DnsServer = @"1.1.1.1"},
-                new DnsClient(DnsType.DnsOverTls),
-                new DnsClient(DnsType.Default)
+                new(DnsType.DnsOverTls) {DnsServer = @"1.1.1.1"},
+                new(DnsType.Default) {DnsServer = @"1.1.1.1"},
+                new(DnsType.DnsOverTls),
+                new(DnsType.Default)
             };
             ServerSubscribes = new List<ServerSubscribe>();
             PortMap = new Dictionary<string, PortMapConfig>();
@@ -545,7 +545,7 @@ namespace Shadowsocks.Model
 
         private static bool IsPort(int port)
         {
-            return port > IPEndPoint.MinPort && port <= IPEndPoint.MaxPort;
+            return port is > IPEndPoint.MinPort and <= IPEndPoint.MaxPort;
         }
     }
 }

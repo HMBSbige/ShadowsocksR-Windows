@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Model;
+using Shadowsocks.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,7 +8,7 @@ namespace Shadowsocks.Controller.Service
 {
     public static class HostMap
     {
-        private static readonly Dictionary<string, HostNode> Root = new Dictionary<string, HostNode>();
+        private static readonly Dictionary<string, HostNode> Root = new();
         private static IPSegment _ips;
 
         public const string UserRule = @"user.rule";

@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller.HttpRequest;
+using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Controller.Service;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
@@ -385,7 +385,7 @@ namespace Shadowsocks.Controller
 
             _listener?.Stop();
             _privoxyRunner?.Stop();
-            if (Global.GuiConfig.SysProxyMode != ProxyMode.NoModify && Global.GuiConfig.SysProxyMode != ProxyMode.Direct)
+            if (Global.GuiConfig.SysProxyMode is not ProxyMode.NoModify and not ProxyMode.Direct)
             {
                 SystemProxy.SystemProxy.Update(Global.GuiConfig, true, null);
             }
@@ -545,7 +545,7 @@ namespace Shadowsocks.Controller
             // TODO:translate Microsoft language into human language
             // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
             // https://docs.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketerror
-            if (!(e is SocketException se)) return;
+            if (e is not SocketException se) return;
             switch (se.SocketErrorCode)
             {
                 case SocketError.AddressAlreadyInUse:

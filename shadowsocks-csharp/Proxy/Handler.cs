@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller;
 using Shadowsocks.Controller.Service;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
@@ -27,14 +27,14 @@ namespace Shadowsocks.Proxy
         public KeepCurrentServer keepCurrentServer;
         public Server server;
         public ServerSelectStrategy.FilterFunc select_server;
-        public HandlerConfig cfg = new HandlerConfig();
+        public HandlerConfig cfg = new();
         // Connection socket
         public ProxySocketTunLocal connection;
         public Socket connectionUDP;
         protected IPEndPoint connectionUDPEndPoint;
         protected int localPort;
 
-        protected ProtocolResponseDetector detector = new ProtocolResponseDetector();
+        protected ProtocolResponseDetector detector = new();
         // remote socket.
         //protected Socket remote;
         protected ProxyEncryptSocket remote;
@@ -45,14 +45,14 @@ namespace Shadowsocks.Proxy
         // remote header send buffer
         protected byte[] remoteHeaderSendBuffer;
         // connection send buffer
-        protected List<byte[]> connectionSendBufferList = new List<byte[]>();
+        protected List<byte[]> connectionSendBufferList = new();
 
         protected DateTime lastKeepTime;
         private int _totalRecvSize;
 
         protected byte[] remoteUDPRecvBuffer = new byte[BufferSize];
         protected int remoteUDPRecvBufferLength;
-        protected object recvUDPoverTCPLock = new object();
+        protected object recvUDPoverTCPLock = new();
 
         protected bool closed;
         protected bool local_error;
@@ -61,10 +61,10 @@ namespace Shadowsocks.Proxy
 
         protected bool connectionTCPIdle, connectionUDPIdle, remoteTCPIdle, remoteUDPIdle;
 
-        protected SpeedTester speedTester = new SpeedTester();
+        protected SpeedTester speedTester = new();
         protected int lastErrCode;
         protected Timer timer;
-        protected object timerLock = new object();
+        protected object timerLock = new();
         protected DateTime lastTimerSetTime;
 
         enum ConnectState

@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shadowsocks.Enums;
 using Shadowsocks.Util.NetUtils;
 using System;
@@ -50,14 +50,14 @@ namespace UnitTest
             const string host = @"www.google.com";
             var clients = new List<Shadowsocks.Model.DnsClient>
             {
-                new Shadowsocks.Model.DnsClient(DnsType.Default)
+                new(DnsType.Default)
                 {
                         DnsServer = @"101.6.6.6",
                         Port = 5353,
                         IsTcpEnabled = true,
                         IsUdpEnabled = false
                 },
-                new Shadowsocks.Model.DnsClient(DnsType.DnsOverTls)
+                new(DnsType.DnsOverTls)
             };
             var res = await DnsUtil.QueryAsync(host, clients);
             Assert.IsNotNull(res);

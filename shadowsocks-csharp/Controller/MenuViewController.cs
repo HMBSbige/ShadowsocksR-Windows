@@ -1,4 +1,4 @@
-﻿using Hardcodet.Wpf.TaskbarNotification;
+using Hardcodet.Wpf.TaskbarNotification;
 using Microsoft.Win32;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Controller.Service;
@@ -84,7 +84,7 @@ namespace Shadowsocks.Controller
         private System.Timers.Timer timerDelayCheckUpdate;
 
         private bool configFrom_open;
-        private readonly List<EventParams> eventList = new List<EventParams>();
+        private readonly List<EventParams> eventList = new();
 
         public MenuViewController(MainController controller)
         {
@@ -148,7 +148,7 @@ namespace Shadowsocks.Controller
         private void UpdateTrayIcon()
         {
             var config = Global.GuiConfig;
-            var enabled = config.SysProxyMode != ProxyMode.NoModify && config.SysProxyMode != ProxyMode.Direct;
+            var enabled = config.SysProxyMode is not ProxyMode.NoModify and not ProxyMode.Direct;
             var global = config.SysProxyMode == ProxyMode.Global;
             var random = config.Random;
 

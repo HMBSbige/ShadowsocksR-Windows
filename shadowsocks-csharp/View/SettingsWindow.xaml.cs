@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
@@ -22,7 +22,7 @@ namespace Shadowsocks.View
 
         private readonly MainController _controller;
 
-        public SettingViewModel SettingViewModel { get; set; } = new SettingViewModel();
+        public SettingViewModel SettingViewModel { get; set; } = new();
 
         private void LoadCurrentConfiguration()
         {

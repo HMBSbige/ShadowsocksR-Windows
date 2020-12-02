@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.Encryption.Stream;
 using Shadowsocks.Enums;
@@ -27,13 +27,14 @@ namespace Shadowsocks.Obfs
             random = new Random(BitConverter.ToInt32(bytes, 0));
         }
 
-        private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
+        private static Dictionary<string, int[]> _obfs = new()
+        {
                 {"auth_chain_a", new[]{1, 0, 1}}
         };
 
         protected bool has_sent_header;
         protected bool has_recv_header;
-        protected static RNGCryptoServiceProvider g_random = new RNGCryptoServiceProvider();
+        protected static RNGCryptoServiceProvider g_random = new();
         protected string SALT;
 
         protected uint pack_id;
@@ -44,15 +45,15 @@ namespace Shadowsocks.Obfs
         protected int last_datalength;
         protected byte[] last_client_hash;
         protected byte[] last_server_hash;
-        protected xorshift128plus random_client = new xorshift128plus();
-        protected xorshift128plus random_server = new xorshift128plus();
+        protected xorshift128plus random_client = new();
+        protected xorshift128plus random_server = new();
         protected IEncryptor encryptor;
 
         protected const int overhead = 4;
 
         public static List<string> SupportedObfs()
         {
-            return new List<string>(_obfs.Keys);
+            return new(_obfs.Keys);
         }
 
         public override Dictionary<string, int[]> GetObfs()

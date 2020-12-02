@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Encryption.Exception;
+using Shadowsocks.Encryption.Exception;
 using System;
 using System.Collections.Generic;
 
@@ -39,7 +39,8 @@ namespace Shadowsocks.Encryption.Stream
             };
         }
 
-        private static Dictionary<string, EncryptorInfo> _ciphers = new Dictionary<string, EncryptorInfo> {
+        private static Dictionary<string, EncryptorInfo> _ciphers = new()
+        {
                 {@"salsa20", new EncryptorInfo(32, 8,  CIPHER_SALSA20)},
                 {@"chacha20", new EncryptorInfo(32, 8,  CIPHER_CHACHA20)},
                 {@"xsalsa20", new EncryptorInfo(32, 24,  CIPHER_XSALSA20)},
@@ -54,7 +55,7 @@ namespace Shadowsocks.Encryption.Stream
 
         public static List<string> SupportedCiphers()
         {
-            return new List<string>(_ciphers.Keys);
+            return new(_ciphers.Keys);
         }
 
         protected override void CipherUpdate(bool isCipher, int length, byte[] buf, byte[] outbuf)

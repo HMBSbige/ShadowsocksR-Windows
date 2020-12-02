@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Encryption;
 using Shadowsocks.Enums;
@@ -85,7 +85,7 @@ namespace Shadowsocks.View
         private Configuration _modifiedConfiguration;
         private int _focusIndex;
 
-        public ServerConfigViewModel ServerConfigViewModel { get; set; } = new ServerConfigViewModel();
+        public ServerConfigViewModel ServerConfigViewModel { get; set; } = new();
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {

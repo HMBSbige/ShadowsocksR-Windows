@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Model;
+using Shadowsocks.Model;
 using Shadowsocks.Model.Transfer;
 using Shadowsocks.Proxy;
 using System.Diagnostics;
@@ -27,7 +27,7 @@ namespace Shadowsocks.Controller.Service
             {
                 return false;
             }
-            if (firstPacket[0] == 5 || firstPacket[0] == 4)
+            if (firstPacket[0] is 5 or 4)
             {
                 return true;
             }

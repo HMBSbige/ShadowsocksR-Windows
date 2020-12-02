@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.Encryption.Stream;
 using Shadowsocks.Enums;
@@ -33,14 +33,15 @@ namespace Shadowsocks.Obfs
             g_random.GetBytes(bytes);
             random = new Random(BitConverter.ToInt32(bytes, 0));
         }
-        private static Dictionary<string, int[]> _obfs = new Dictionary<string, int[]> {
+        private static Dictionary<string, int[]> _obfs = new()
+        {
                 {"auth_aes128_md5", new[]{1, 0, 1}},
                 {"auth_aes128_sha1", new[]{1, 0, 1}}
         };
 
         protected bool has_sent_header;
         protected bool has_recv_header;
-        protected static RNGCryptoServiceProvider g_random = new RNGCryptoServiceProvider();
+        protected static RNGCryptoServiceProvider g_random = new();
         protected string SALT;
 
         protected uint pack_id;
@@ -53,7 +54,7 @@ namespace Shadowsocks.Obfs
 
         protected const int overhead = 9; // 2(length) + 2(len-MAC) + 4(data-MAC) + 1(padding)
         //protected int[] packet_cnt;
-        protected Dictionary<int, long> packet_cnt = new Dictionary<int, long>();
+        protected Dictionary<int, long> packet_cnt = new();
         //protected int[] packet_mul;
         protected Model.MinSearchTree tree;
         protected const int tree_offset = 9;
@@ -61,7 +62,7 @@ namespace Shadowsocks.Obfs
 
         public static List<string> SupportedObfs()
         {
-            return new List<string>(_obfs.Keys);
+            return new(_obfs.Keys);
         }
 
         public override Dictionary<string, int[]> GetObfs()
@@ -101,7 +102,7 @@ namespace Shadowsocks.Obfs
         protected void Sync()
         {
 #if PROTOCOL_STATISTICS
-            if (Server.data != null && Server.data is AuthDataAes128 authData)
+            if (Server.data is not null and AuthDataAes128 authData)
             {
                 lock (authData)
                 {
@@ -502,7 +503,7 @@ namespace Shadowsocks.Obfs
                 }
 
                 var len = (recv_buf[1] << 8) + recv_buf[0];
-                if (len >= 8192 || len < 8)
+                if (len is >= 8192 or < 8)
                 {
                     throw new ObfsException("ClientPostDecrypt data error");
                 }

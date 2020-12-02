@@ -78,7 +78,7 @@ namespace Shadowsocks.Model
 
     public class IPSegment
     {
-        protected SortedList list = new SortedList();
+        protected SortedList list = new();
 
         public IPSegment(object val = null)
         {

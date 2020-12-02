@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
@@ -91,7 +91,7 @@ namespace Shadowsocks.View
         }
 
         private readonly MainController _controller;
-        public ServerLogViewModel ServerLogViewModel { get; set; } = new ServerLogViewModel();
+        public ServerLogViewModel ServerLogViewModel { get; set; } = new();
 
         private void UpdateTitle()
         {

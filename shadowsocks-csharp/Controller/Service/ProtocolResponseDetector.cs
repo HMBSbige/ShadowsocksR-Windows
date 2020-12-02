@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -65,7 +65,7 @@ namespace Shadowsocks.Controller.Service
 
         public int OnRecv(byte[] recv_data, int length)
         {
-            if (protocol == Protocol.Unknown || protocol == Protocol.NotBegin) return 0;
+            if (protocol is Protocol.Unknown or Protocol.NotBegin) return 0;
             Array.Resize(ref _recvBuffer, _recvBuffer.Length + length);
             Array.Copy(recv_data, 0, _recvBuffer, _recvBuffer.Length - length, length);
 

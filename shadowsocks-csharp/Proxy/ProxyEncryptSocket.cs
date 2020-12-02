@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Encryption;
+using Shadowsocks.Encryption;
 using Shadowsocks.Model;
 using Shadowsocks.Obfs;
 using System;
@@ -17,8 +17,8 @@ namespace Shadowsocks.Proxy
         protected IPEndPoint _remoteUDPEndPoint;
 
         protected IEncryptor _encryptor;
-        protected object _encryptionLock = new object();
-        protected object _decryptionLock = new object();
+        protected object _encryptionLock = new();
+        protected object _decryptionLock = new();
         protected string _method;
         protected string _password;
         public IObfs _protocol;
