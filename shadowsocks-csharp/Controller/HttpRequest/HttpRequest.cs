@@ -12,45 +12,38 @@ namespace Shadowsocks.Controller.HttpRequest
         private const int DefaultGetTimeout = 30000;
         private const int DefaultHeadTimeout = 4000;
 
-        private static async Task<string> GetAsync(string url, IWebProxy proxy, string userAgent = @"", double timeout = DefaultGetTimeout, bool setProxy = true)
-        {
-            var httpClientHandler = new SocketsHttpHandler();
-            if (setProxy)
-            {
-                httpClientHandler.Proxy = proxy;
-                httpClientHandler.UseProxy = proxy != null;
-            }
-            var httpClient = new HttpClient(httpClientHandler)
-            {
-                Timeout = TimeSpan.FromMilliseconds(timeout),
-                DefaultRequestVersion = HttpVersion.Version20
-            };
-            var request = new HttpRequestMessage(HttpMethod.Get, url);
-            request.Headers.Add(@"User-Agent", string.IsNullOrWhiteSpace(userAgent) ? DefaultUserAgent : userAgent);
-
-            var response = await httpClient.SendAsync(request);
-
-            response.EnsureSuccessStatusCode();
-            var resultStr = await response.Content.ReadAsStringAsync();
-            return resultStr;
-        }
-
-        private static async Task<bool> HeadAsync(string url, IWebProxy proxy, double timeout = DefaultHeadTimeout)
+        public static HttpClient CreateClient(bool useProxy, IWebProxy proxy, string userAgent, double timeout)
         {
             var httpClientHandler = new SocketsHttpHandler
             {
                 Proxy = proxy,
-                UseProxy = proxy != null
+                UseProxy = useProxy
             };
-            var httpClient = new HttpClient(httpClientHandler)
+
+            var client = new HttpClient(httpClientHandler)
             {
                 Timeout = TimeSpan.FromMilliseconds(timeout),
                 DefaultRequestVersion = HttpVersion.Version20
             };
 
+            client.DefaultRequestHeaders.Add(@"User-Agent", string.IsNullOrWhiteSpace(userAgent) ? DefaultUserAgent : userAgent);
+            return client;
+        }
+
+        private static async Task<string> GetAsync(string url, IWebProxy proxy, string userAgent = DefaultUserAgent, double timeout = DefaultGetTimeout, bool useProxy = true)
+        {
+            using var client = CreateClient(useProxy, proxy, userAgent, timeout);
+            using var response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        private static async Task<bool> HeadAsync(string url, IWebProxy proxy, double timeout = DefaultHeadTimeout)
+        {
+            using var client = CreateClient(proxy != null, proxy, DefaultUserAgent, timeout);
             try
             {
-                using var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
                 return true;
             }
             catch
@@ -82,22 +75,22 @@ namespace Shadowsocks.Controller.HttpRequest
             return res;
         }
 
-        protected static async Task<string> DirectGetAsync(string url, string userAgent = @"", double getTimeout = DefaultGetTimeout)
+        protected static async Task<string> DirectGetAsync(string url, string userAgent = DefaultUserAgent, double getTimeout = DefaultGetTimeout)
         {
             Logging.Info($@"GET request directly: {url}");
-            return await GetAsync(url, null, userAgent, getTimeout);
+            return await GetAsync(url, null, userAgent, getTimeout, false);
         }
 
-        protected static async Task<string> ProxyGetAsync(string url, IWebProxy proxy, string userAgent = @"", double timeout = DefaultGetTimeout)
+        protected static async Task<string> ProxyGetAsync(string url, IWebProxy proxy, string userAgent = DefaultUserAgent, double timeout = DefaultGetTimeout)
         {
             Logging.Info($@"GET request by proxy: {url}");
             return await GetAsync(url, proxy, userAgent, timeout);
         }
 
-        protected static async Task<string> DefaultGetAsync(string url, string userAgent = @"", double getTimeout = DefaultGetTimeout)
+        protected static async Task<string> DefaultGetAsync(string url, string userAgent = DefaultUserAgent, double getTimeout = DefaultGetTimeout)
         {
             Logging.Info($@"GET request by default: {url}");
-            return await GetAsync(url, null, userAgent, getTimeout, false);
+            return await GetAsync(url, null, userAgent, getTimeout);
         }
 
         protected static IWebProxy CreateProxy(Configuration config)

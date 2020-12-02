@@ -95,7 +95,7 @@ namespace Shadowsocks.View
 
         private void UpdateTitle()
         {
-            Title = $@"{this.GetWindowStringValue(@"Title")}({(Global.GuiConfig.ShareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{Global.GuiConfig.LocalPort} {this.GetWindowStringValue(@"Version")}{UpdateChecker.FullVersion})";
+            Title = $@"{this.GetWindowStringValue(@"Title")}({(Global.GuiConfig.ShareOverLan ? this.GetWindowStringValue(@"Any") : this.GetWindowStringValue(@"Local"))}:{Global.GuiConfig.LocalPort} {this.GetWindowStringValue(@"Version")}{Controller.HttpRequest.UpdateChecker.FullVersion})";
         }
 
         private void AlwaysTopMenuItem_OnClick(object sender, RoutedEventArgs e)

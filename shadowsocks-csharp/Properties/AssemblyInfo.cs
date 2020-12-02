@@ -1,16 +1,15 @@
-﻿using Shadowsocks.Controller.HttpRequest;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
 // 有关程序集的常规信息通过下列属性集
 // 控制。更改这些属性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle(UpdateChecker.Name)]
+[assembly: AssemblyTitle(Shadowsocks.Controller.HttpRequest.UpdateChecker.Name)]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct(UpdateChecker.Name)]
-[assembly: AssemblyCopyright(UpdateChecker.Copyright)]
+[assembly: AssemblyProduct(Shadowsocks.Controller.HttpRequest.UpdateChecker.Name)]
+[assembly: AssemblyCopyright(Shadowsocks.Controller.HttpRequest.UpdateChecker.Copyright)]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +31,5 @@ using System.Runtime.InteropServices;
 // 可以指定所有这些值，也可以使用“内部版本号”和“修订号”的默认值，
 // 方法是按如下所示使用“*”:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion(UpdateChecker.Version)]
+[assembly: AssemblyVersion(Shadowsocks.Controller.HttpRequest.UpdateChecker.Version)]
 // [assembly: AssemblyFileVersion("2.0.0")]

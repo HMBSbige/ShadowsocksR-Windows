@@ -48,6 +48,7 @@
         <PackageReference Include="ARSoft.Tools.Net" Version="2.3.0" />
         <PackageReference Include="Hardcodet.NotifyIcon.Wpf.NetCore" Version="1.0.14" />
         <PackageReference Include="HMBSbige.SingleInstance" Version="5.0.0" />
+        <PackageReference Include="HMBSbige.UpdateChecker" Version="5.0.0" />
         <PackageReference Include="Syncfusion.SfGrid.WPF" Version="18.3.0.52" />
         <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="18.3.0.52" />
         <PackageReference Include="WindowsJobAPI" Version="5.0.0" />
