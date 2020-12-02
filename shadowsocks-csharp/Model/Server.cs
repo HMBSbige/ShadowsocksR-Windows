@@ -426,7 +426,9 @@ namespace Shadowsocks.Model
             // ssr://host:port:protocol:method:obfs:base64pass/?obfsparam=base64&remarks=base64&group=base64&udpport=0&uot=1
             var ssr = Regex.Match(ssrUrl, "ssr://([A-Za-z0-9+/=_-]+)", RegexOptions.IgnoreCase);
             if (!ssr.Success)
+            {
                 throw new FormatException();
+            }
 
             var data = Base64.DecodeUrlSafeBase64(ssr.Groups[1].Value);
             var params_dict = new Dictionary<string, string>();
@@ -446,7 +448,9 @@ namespace Shadowsocks.Model
             var match = UrlFinder.Match(data);
 
             if (match == null || !match.Success)
+            {
                 throw new FormatException();
+            }
 
             server = match.Groups[1].Value;
             Server_Port = ushort.Parse(match.Groups[2].Value);
@@ -493,7 +497,9 @@ namespace Shadowsocks.Model
 
             var match = UrlFinder.Match(ssUrl);
             if (!match.Success)
+            {
                 throw new FormatException();
+            }
 
             var base64 = match.Groups[1].Value;
             match = DetailsParser.Match(Encoding.UTF8.GetString(Convert.FromBase64String(

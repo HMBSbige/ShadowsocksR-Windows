@@ -56,13 +56,25 @@ namespace Shadowsocks.Obfs
             if (other_data_size >= data_size_list0[data_size_list0.Length - 1])
             {
                 if (datalength >= 1440)
+                {
                     return 0;
+                }
+
                 if (datalength > 1300)
+                {
                     return (int)(rd.next() % 31);
+                }
+
                 if (datalength > 900)
+                {
                     return (int)(rd.next() % 127);
+                }
+
                 if (datalength > 400)
+                {
                     return (int)(rd.next() % 521);
+                }
+
                 return (int)(rd.next() % 1021);
             }
 

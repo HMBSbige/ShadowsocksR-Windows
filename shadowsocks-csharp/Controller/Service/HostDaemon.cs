@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Model;
+using Shadowsocks.Model;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -51,7 +51,11 @@ namespace Shadowsocks.Controller.Service
 
         private void UserRuleWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            if (UserRuleChanged == null) return;
+            if (UserRuleChanged == null)
+            {
+                return;
+            }
+
             try
             {
                 ((FileSystemWatcher)sender).EnableRaisingEvents = false;
@@ -66,7 +70,11 @@ namespace Shadowsocks.Controller.Service
 
         private void ChnIpWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            if (ChnIpChanged == null) return;
+            if (ChnIpChanged == null)
+            {
+                return;
+            }
+
             try
             {
                 ((FileSystemWatcher)sender).EnableRaisingEvents = false;

@@ -136,7 +136,9 @@ namespace Shadowsocks.Model
                         break;
                     }
                     if (finish)
+                    {
                         break;
+                    }
                 }
                 if (sweep > 0)
                 {

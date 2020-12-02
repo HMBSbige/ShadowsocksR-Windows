@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
@@ -369,7 +369,9 @@ namespace Shadowsocks.View
             {
                 var pos = text.IndexOf(' ');
                 if (pos > 0)
+                {
                     return text.Substring(0, pos);
+                }
             }
 
             return text;

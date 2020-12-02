@@ -275,7 +275,10 @@ namespace Shadowsocks.Proxy
                         _ => 0
                     };
                     if (size == 0)
+                    {
                         throw new Exception("Wrong socks5 addr type");
+                    }
+
                     HandshakeReceive3Callback(size + ADDR_PORT_LEN); // recv port
                 }
                 else
@@ -335,9 +338,13 @@ namespace Shadowsocks.Proxy
             {
                 ipv6 = _remoteHeaderSendBuffer[0] == 4;
                 if (!ipv6)
+                {
                     udpPort = _remoteHeaderSendBuffer[5] * 0x100 + _remoteHeaderSendBuffer[6];
+                }
                 else
+                {
                     udpPort = _remoteHeaderSendBuffer[17] * 0x100 + _remoteHeaderSendBuffer[18];
+                }
             }
             if (!ipv6)
             {
@@ -415,7 +422,9 @@ namespace Shadowsocks.Proxy
                 if (err == 1)
                 {
                     if (HttpHandshakeRecv())
+                    {
                         break;
+                    }
                 }
                 else if (err == 2)
                 {
@@ -423,7 +432,9 @@ namespace Shadowsocks.Proxy
                     var httpData = Encoding.UTF8.GetBytes(dataSend);
                     _connection.Send(httpData);
                     if (HttpHandshakeRecv())
+                    {
                         break;
+                    }
                 }
                 else if (err is 3 or 4)
                 {
@@ -442,7 +453,9 @@ namespace Shadowsocks.Proxy
                     var httpData = Encoding.UTF8.GetBytes(dataSend);
                     _connection.Send(httpData);
                     if (HttpHandshakeRecv())
+                    {
                         break;
+                    }
                 }
                 if (i == 3)
                 {
@@ -571,7 +584,11 @@ namespace Shadowsocks.Proxy
         {
             lock (this)
             {
-                if (sock == null) return;
+                if (sock == null)
+                {
+                    return;
+                }
+
                 try
                 {
                     sock.Shutdown(SocketShutdown.Both);

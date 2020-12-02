@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Properties;
+using Shadowsocks.Properties;
 using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
@@ -84,12 +84,21 @@ namespace Shadowsocks.Model
                         {
                             var line = stream.ReadLine();
                             if (line == null)
+                            {
                                 break;
+                            }
+
                             var parts = line.Split('|');
                             if (parts.Length < 7)
+                            {
                                 continue;
+                            }
+
                             if (parts[0] != "apnic" || parts[1] != zone || parts[2] != "ipv4")
+                            {
                                 continue;
+                            }
+
                             IPAddress.TryParse(parts[3], out var addr);
                             var size = uint.Parse(parts[4]);
                             Insert(addr, size);

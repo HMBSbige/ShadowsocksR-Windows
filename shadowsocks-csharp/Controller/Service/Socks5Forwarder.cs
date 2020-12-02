@@ -306,7 +306,9 @@ namespace Shadowsocks.Controller.Service
                                 else
                                 {
                                     if (!_local_proxy)
+                                    {
                                         throw new SocketException((int)SocketError.HostNotFound);
+                                    }
                                 }
                             }
                         }
@@ -391,7 +393,9 @@ namespace Shadowsocks.Controller.Service
             private void ResetTimeout(double time)
             {
                 if (time <= 0 && timer == null)
+                {
                     return;
+                }
 
                 if (time <= 0)
                 {
@@ -484,7 +488,9 @@ namespace Shadowsocks.Controller.Service
                             _remote.BeginReceive(remoteRecvBuffer, RecvSize, SocketFlags.None, PipeRemoteReceiveCallback, null);
                         }
                         else
+                        {
                             PipeRemoteReceiveLoop();
+                        }
                     }
                     else
                     {
@@ -546,7 +552,9 @@ namespace Shadowsocks.Controller.Service
                     }
                 }
                 if (final_close)
+                {
                     Close();
+                }
             }
 
             private void PipeConnectionReceiveCallback(IAsyncResult ar)

@@ -205,7 +205,10 @@ namespace Shadowsocks.Controller
                     {
                         var index = Global.GuiConfig.Index + 1;
                         if (index < 0 || index > Global.GuiConfig.Configs.Count)
+                        {
                             index = Global.GuiConfig.Configs.Count;
+                        }
+
                         Global.GuiConfig.Configs.Insert(index, server);
                     }
                 }
@@ -545,7 +548,11 @@ namespace Shadowsocks.Controller
             // TODO:translate Microsoft language into human language
             // i.e. An attempt was made to access a socket in a way forbidden by its access permissions => Port already in use
             // https://docs.microsoft.com/zh-cn/dotnet/api/system.net.sockets.socketerror
-            if (e is not SocketException se) return;
+            if (e is not SocketException se)
+            {
+                return;
+            }
+
             switch (se.SocketErrorCode)
             {
                 case SocketError.AddressAlreadyInUse:

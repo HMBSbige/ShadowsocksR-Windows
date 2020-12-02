@@ -63,7 +63,9 @@ namespace Shadowsocks.Obfs
             var high = arr.Length - 1;
 
             if (key > arr[high])
+            {
                 return arr.Length;
+            }
 
             while (low < high)
             {
@@ -88,7 +90,10 @@ namespace Shadowsocks.Obfs
                 return (int)(rd.next() % 521);
             }
             if (datalength >= 1440 || datalength + Server.overhead == recv_tcp_mss)
+            {
                 return 0;
+            }
+
             rd.init_from_bin(last_hash, datalength);
 
             var pos = FindPos(data_size_list, datalength + Server.overhead);
@@ -109,11 +114,20 @@ namespace Shadowsocks.Obfs
                 return 0;
             }
             if (datalength > 1300)
+            {
                 return (int)(rd.next() % 31);
+            }
+
             if (datalength > 900)
+            {
                 return (int)(rd.next() % 127);
+            }
+
             if (datalength > 400)
+            {
                 return (int)(rd.next() % 521);
+            }
+
             return (int)(rd.next() % 1021);
         }
 
@@ -125,7 +139,10 @@ namespace Shadowsocks.Obfs
                 return (int)(rd.next() % 521);
             }
             if (datalength >= 1440 || datalength + Server.overhead == recv_tcp_mss)
+            {
                 return 0;
+            }
+
             rd.init_from_bin(last_hash, datalength);
 
             var pos = FindPos(data_size_list, datalength + Server.overhead);
@@ -146,11 +163,20 @@ namespace Shadowsocks.Obfs
                 return 0;
             }
             if (datalength > 1300)
+            {
                 return (int)(rd.next() % 31);
+            }
+
             if (datalength > 900)
+            {
                 return (int)(rd.next() % 127);
+            }
+
             if (datalength > 400)
+            {
                 return (int)(rd.next() % 521);
+            }
+
             return (int)(rd.next() % 1021);
         }
 

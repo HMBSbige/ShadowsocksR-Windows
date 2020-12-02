@@ -151,7 +151,10 @@ namespace Shadowsocks.Proxy
             OverHead = _protocol.GetOverhead() + _obfs.GetOverhead();
             RecvBufferSize = RecvSize - OverHead;
             if (_proxy_server != null)
+            {
                 server_addr = _proxy_server;
+            }
+
             _protocol.SetServerInfo(new ServerInfo(server_addr, server.Server_Port, server.ProtocolParam, server.ProtocolData,
                 _encryptor.getIV(), _password, _encryptor.getKey(), head_len, mss, OverHead, RecvBufferSize));
             _obfs.SetServerInfo(new ServerInfo(server_addr, server.Server_Port, server.ObfsParam, server.ObfsData,
@@ -250,7 +253,10 @@ namespace Shadowsocks.Proxy
             {
                 var bytesToEncrypt = _protocol.ClientPreEncrypt(buffer, size, out var outlength);
                 if (bytesToEncrypt == null)
+                {
                     return 0;
+                }
+
                 Util.Utils.SetArrayMinSize(ref SendEncryptBuffer, outlength + 32);
                 _encryptor.Encrypt(bytesToEncrypt, outlength, SendEncryptBuffer, out var bytesToSend);
                 obfsBuffer = _obfs.ClientEncode(SendEncryptBuffer, bytesToSend, out obfsSendSize);
@@ -309,7 +315,10 @@ namespace Shadowsocks.Proxy
         protected static byte[] ParseUDPHeader(byte[] buffer, ref int len)
         {
             if (buffer.Length == 0)
+            {
                 return buffer;
+            }
+
             if (buffer[0] == 0x81)
             {
                 len = len - 1;
@@ -685,10 +694,16 @@ namespace Shadowsocks.Proxy
             var cmd = "CONNECT " + host + " HTTP/1.0\r\n"
                 + "Host: " + host + "\r\n";
             if (!string.IsNullOrEmpty(proxyUserAgent))
+            {
                 cmd += "User-Agent: " + proxyUserAgent + "\r\n";
+            }
+
             cmd += "Proxy-Connection: Keep-Alive\r\n";
             if (socks5RemoteUsername.Length > 0)
+            {
                 cmd += "Proxy-Authorization: Basic " + authstr + "\r\n";
+            }
+
             cmd += "\r\n";
             var httpData = Encoding.UTF8.GetBytes(cmd);
             SendAll(httpData, httpData.Length, SocketFlags.None);

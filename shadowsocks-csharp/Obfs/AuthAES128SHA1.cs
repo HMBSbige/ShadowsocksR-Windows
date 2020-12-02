@@ -26,9 +26,14 @@ namespace Shadowsocks.Obfs
             recv_id = 1;
             SALT = method;
             if (method == "auth_aes128_md5")
+            {
                 hash = MbedTLS.MD5;
+            }
             else
+            {
                 hash = MbedTLS.SHA1;
+            }
+
             var bytes = new byte[4];
             g_random.GetBytes(bytes);
             random = new Random(BitConverter.ToInt32(bytes, 0));
@@ -93,9 +98,15 @@ namespace Shadowsocks.Obfs
         protected MbedTLS.HMAC CreateHMAC(byte[] key)
         {
             if (Method == "auth_aes128_md5")
+            {
                 return new MbedTLS.HMAC_MD5(key);
+            }
+
             if (Method == "auth_aes128_sha1")
+            {
                 return new MbedTLS.HMAC_SHA1(key);
+            }
+
             return null;
         }
 
@@ -133,7 +144,11 @@ namespace Shadowsocks.Obfs
             if (length > tree_offset)
             {
                 length -= 1 + tree_offset;
-                if (length >= tree.Size) length = tree.Size - 1;
+                if (length >= tree.Size)
+                {
+                    length = tree.Size - 1;
+                }
+
                 lock (Server.data)
                 {
                     if (packet_cnt.ContainsKey(length))
@@ -169,12 +184,21 @@ namespace Shadowsocks.Obfs
         protected int GetRandLen(int datalength, int fulldatalength, bool nopadding)
         {
             if (nopadding || fulldatalength >= Server.buffer_size)
+            {
                 return 0;
+            }
+
             var rev_len = Server.tcp_mss - datalength - overhead;
             if (rev_len <= 0)
+            {
                 return 0;
+            }
+
             if (datalength > 1100)
+            {
                 return LinearRandomInt(rev_len);
+            }
+
             return TrapezoidRandomInt(rev_len, -0.3);
         }
 
@@ -184,7 +208,10 @@ namespace Shadowsocks.Obfs
         protected int GenRandLenFull(int packetlength, int fulldatalength, bool nopadding)
         {
             if (nopadding || fulldatalength >= Server.buffer_size)
+            {
                 return packetlength;
+            }
+
             if (packetlength >= Server.tcp_mss)
             {
                 if (packetlength > Server.tcp_mss && packetlength < Server.tcp_mss * 2)
@@ -213,7 +240,10 @@ namespace Shadowsocks.Obfs
 #endif
             outlength = rand_len + datalength + 8;
             if (datalength > 0)
+            {
                 Array.Copy(data, 0, outdata, rand_len + 4, datalength);
+            }
+
             outdata[0] = (byte)outlength;
             outdata[1] = (byte)(outlength >> 8);
             var key = new byte[user_key.Length + 4];
@@ -470,7 +500,10 @@ namespace Shadowsocks.Obfs
             if (datalength > 0 || ogn_datalength == -1)
             {
                 if (ogn_datalength == -1)
+                {
                     datalength = 0;
+                }
+
                 PackData(data, datalength, ogn_datalength, packdata, out var outlen, nopadding);
                 Util.Utils.SetArrayMinSize2(ref outdata, outlength + outlen);
                 Array.Copy(packdata, 0, outdata, outlength, outlen);
@@ -478,7 +511,10 @@ namespace Shadowsocks.Obfs
             }
             last_datalength = ogn_datalength;
             if (outlength > 0)
+            {
                 AddPacket(outlength);
+            }
+
             return outdata;
         }
 
@@ -508,7 +544,9 @@ namespace Shadowsocks.Obfs
                     throw new ObfsException("ClientPostDecrypt data error");
                 }
                 if (len > recv_buf_len)
+                {
                     break;
+                }
 
                 {
                     var sha1data = sha1.ComputeHash(recv_buf, 0, len - 4);

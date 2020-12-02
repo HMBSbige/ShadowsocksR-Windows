@@ -98,14 +98,26 @@ namespace Shadowsocks.Obfs
         protected virtual int GetRandLen(int datalength, xorshift128plus rd, byte[] last_hash)
         {
             if (datalength > 1440)
+            {
                 return 0;
+            }
+
             rd.init_from_bin(last_hash, datalength);
             if (datalength > 1300)
+            {
                 return (int)(rd.next() % 31);
+            }
+
             if (datalength > 900)
+            {
                 return (int)(rd.next() % 127);
+            }
+
             if (datalength > 400)
+            {
                 return (int)(rd.next() % 521);
+            }
+
             return (int)(rd.next() % 1021);
         }
 
@@ -118,7 +130,10 @@ namespace Shadowsocks.Obfs
         protected int GetRandStartPos(int rand_len, xorshift128plus rd)
         {
             if (rand_len > 0)
+            {
                 return (int)(rd.next() % 8589934609 % (ulong)rand_len);
+            }
+
             return 0;
         }
 
@@ -366,7 +381,10 @@ namespace Shadowsocks.Obfs
             if (datalength > 0 || ogn_datalength == -1)
             {
                 if (ogn_datalength == -1)
+                {
                     datalength = 0;
+                }
+
                 PackData(data, datalength, packdata, out var outlen);
                 Util.Utils.SetArrayMinSize2(ref outdata, outlength + outlen);
                 Array.Copy(packdata, 0, outdata, outlength, outlen);
@@ -397,7 +415,9 @@ namespace Shadowsocks.Obfs
                     throw new ObfsException("ClientPostDecrypt data error");
                 }
                 if (len + 4 > recv_buf_len)
+                {
                     break;
+                }
 
                 var md5data = md5.ComputeHash(recv_buf, 0, len + 2);
                 if (md5data[0] != recv_buf[len + 2]

@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Properties;
+using Shadowsocks.Properties;
 using System;
 using System.IO;
 using System.Text;
@@ -93,7 +93,11 @@ namespace Shadowsocks.Controller.Service
         // Add a short delay to avoid raise event twice in a short period
         private void PACFileWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            if (PACFileChanged == null) return;
+            if (PACFileChanged == null)
+            {
+                return;
+            }
+
             try
             {
                 ((FileSystemWatcher)sender).EnableRaisingEvents = false;
@@ -108,7 +112,11 @@ namespace Shadowsocks.Controller.Service
 
         private void UserRuleFileWatcher_Changed(object sender, FileSystemEventArgs e)
         {
-            if (UserRuleFileChanged == null) return;
+            if (UserRuleFileChanged == null)
+            {
+                return;
+            }
+
             try
             {
                 ((FileSystemWatcher)sender).EnableRaisingEvents = false;

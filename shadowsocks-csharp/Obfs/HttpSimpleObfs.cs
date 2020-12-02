@@ -210,7 +210,9 @@ namespace Shadowsocks.Obfs
                 for (; offset < subArray.Length; ++offset)
                 {
                     if (array[pos + offset] != subArray[offset])
+                    {
                         break;
+                    }
                 }
                 if (offset == subArray.Length)
                 {

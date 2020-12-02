@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 
 namespace Shadowsocks.Model
@@ -12,8 +12,16 @@ namespace Shadowsocks.Model
 
         public bool IsExpired(string host)
         {
-            if (Host != host) return true;
-            if (force_expired && (DateTime.Now - updateTime).TotalMinutes > 1) return true;
+            if (Host != host)
+            {
+                return true;
+            }
+
+            if (force_expired && (DateTime.Now - updateTime).TotalMinutes > 1)
+            {
+                return true;
+            }
+
             return (DateTime.Now - updateTime).TotalMinutes > 30;
         }
 

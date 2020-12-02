@@ -87,7 +87,9 @@ namespace Shadowsocks.Obfs
                     throw new ObfsException("ClientPostDecrypt data error");
                 }
                 if (len > recv_buf_len)
+                {
                     break;
+                }
 
                 var buf = FileManager.DeflateDecompress(recv_buf, 2, len - 6, out var outlen);
                 if (buf != null)

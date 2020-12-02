@@ -92,11 +92,19 @@ namespace Shadowsocks.Encryption.Stream
              */
             if (MbedTLS.cipher_setkey(ctx, realKey, keyLen * 8,
                 isEncrypt ? MbedTLS.MBEDTLS_ENCRYPT : MbedTLS.MBEDTLS_DECRYPT) != 0)
+            {
                 throw new System.Exception("Cannot set mbed TLS cipher key");
+            }
+
             if (MbedTLS.cipher_set_iv(ctx, iv, ivLen) != 0)
+            {
                 throw new System.Exception("Cannot set mbed TLS cipher IV");
+            }
+
             if (MbedTLS.cipher_reset(ctx) != 0)
+            {
                 throw new System.Exception("Cannot finalize mbed TLS cipher context");
+            }
         }
 
         protected override void CipherUpdate(bool isCipher, int length, byte[] buf, byte[] outbuf)

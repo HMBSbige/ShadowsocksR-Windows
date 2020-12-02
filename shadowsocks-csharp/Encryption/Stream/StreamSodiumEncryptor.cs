@@ -81,7 +81,10 @@ namespace Shadowsocks.Encryption.Stream
             var padding = bytesRemaining;
             Buffer.BlockCopy(buf, 0, sodiumBuf, padding, length);
             var ret = _encryptorDelegate(sodiumBuf, sodiumBuf, (ulong)(padding + length), iv, ic, _key);
-            if (ret != 0) throw new CryptoErrorException();
+            if (ret != 0)
+            {
+                throw new CryptoErrorException();
+            }
 
             Buffer.BlockCopy(sodiumBuf, padding, outbuf, 0, length);
             padding += length;

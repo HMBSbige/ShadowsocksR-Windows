@@ -51,7 +51,10 @@ namespace Shadowsocks.Obfs
             var rand_len = (datalength >= 1300 ? 0 : datalength > 400 ? LinearRandomInt(128) : LinearRandomInt(1024)) + 1;
             outlength = rand_len + datalength + 6;
             if (datalength > 0)
+            {
                 Array.Copy(data, 0, outdata, rand_len + 2, datalength);
+            }
+
             outdata[0] = (byte)(outlength >> 8);
             outdata[1] = (byte)outlength;
             {
@@ -173,7 +176,10 @@ namespace Shadowsocks.Obfs
             if (datalength > 0 || ogn_datalength == -1)
             {
                 if (ogn_datalength == -1)
+                {
                     datalength = 0;
+                }
+
                 PackData(data, datalength, packdata, out var outlen);
                 Util.Utils.SetArrayMinSize2(ref outdata, outlength + outlen);
                 Array.Copy(packdata, 0, outdata, outlength, outlen);
@@ -196,7 +202,9 @@ namespace Shadowsocks.Obfs
                     throw new ObfsException("ClientPostDecrypt data error");
                 }
                 if (len > recv_buf_len)
+                {
                     break;
+                }
 
                 if (Util.Adler32.CheckAdler32(recv_buf, len))
                 {

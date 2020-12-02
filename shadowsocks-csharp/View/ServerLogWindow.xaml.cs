@@ -302,11 +302,15 @@ namespace Shadowsocks.View
             var visualContainer = ServerDataGrid.GetVisualContainer();
             var rowColumnIndex = visualContainer.PointToCellRowColumnIndex(e.GetPosition(visualContainer));
             if (rowColumnIndex.IsEmpty)
+            {
                 return;
+            }
 
             var columnIndex = ServerDataGrid.ResolveToGridVisibleColumnIndex(rowColumnIndex.ColumnIndex);
             if (columnIndex != -1)
+            {
                 return;
+            }
 
             var recordIndex = ServerDataGrid.ResolveToRecordIndex(rowColumnIndex.RowIndex);
             if (recordIndex == -1)

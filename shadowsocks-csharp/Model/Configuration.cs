@@ -233,7 +233,9 @@ namespace Shadowsocks.Model
                 lock (_serverStrategyMap)
                 {
                     if (!_serverStrategyMap.ContainsKey(port))
+                    {
                         _serverStrategyMap[port] = new ServerSelectStrategy();
+                    }
 
                     if (_uriCache.ContainsKey(targetAddr))
                     {
@@ -263,7 +265,10 @@ namespace Shadowsocks.Model
             lock (_serverStrategyMap)
             {
                 if (!_serverStrategyMap.ContainsKey(port))
+                {
                     _serverStrategyMap[port] = new ServerSelectStrategy();
+                }
+
                 var serverStrategy = _serverStrategyMap[port];
 
                 _uriCache.SetTimeout(KeepVisitTime);
@@ -285,7 +290,10 @@ namespace Shadowsocks.Model
                         i = serverStrategy.Select(Configs, Index, BalanceType, delegate (Server server, Server selServer)
                         {
                             if (selServer != null)
+                            {
                                 return selServer.Group == server.Group;
+                            }
+
                             return false;
                         }, true);
                     }
@@ -304,7 +312,10 @@ namespace Shadowsocks.Model
                         i = serverStrategy.Select(Configs, Index, BalanceType, delegate (Server server, Server selServer)
                         {
                             if (selServer != null)
+                            {
                                 return selServer.Group == server.Group;
+                            }
+
                             return false;
                         });
                     }
@@ -312,7 +323,11 @@ namespace Shadowsocks.Model
                     {
                         i = serverStrategy.Select(Configs, Index, BalanceType, filter);
                     }
-                    if (i == -1) return GetErrorServer();
+                    if (i == -1)
+                    {
+                        return GetErrorServer();
+                    }
+
                     if (targetAddr != null)
                     {
                         var visit = new UriVisitTime
@@ -377,11 +392,17 @@ namespace Shadowsocks.Model
                 int key;
                 var pm = pair.Value;
                 if (!pm.Enable)
+                {
                     continue;
+                }
+
                 if (id2server.ContainsKey(pm.Id) || server_group.ContainsKey(pm.Id) || pm.Id == null || pm.Id.Length == 0)
                 { }
                 else
+                {
                     continue;
+                }
+
                 try
                 {
                     key = int.Parse(pair.Key);
@@ -404,7 +425,11 @@ namespace Shadowsocks.Model
                 var remove_ports = new List<int>();
                 foreach (var pair in _serverStrategyMap)
                 {
-                    if (PortMapCache.ContainsKey(pair.Key)) continue;
+                    if (PortMapCache.ContainsKey(pair.Key))
+                    {
+                        continue;
+                    }
+
                     remove_ports.Add(pair.Key);
                 }
                 foreach (var port in remove_ports)
@@ -412,7 +437,9 @@ namespace Shadowsocks.Model
                     _serverStrategyMap.Remove(port);
                 }
                 if (!PortMapCache.ContainsKey(LocalPort))
+                {
                     _serverStrategyMap.Remove(LocalPort);
+                }
             }
 
             _uriCache.Clear();

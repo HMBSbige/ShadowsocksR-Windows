@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Shadowsocks.Model
@@ -36,7 +36,10 @@ namespace Shadowsocks.Model
                 ret++;
             }
             if (size != 1 << ret)
+            {
                 ++ret;
+            }
+
             return ret;
         }
 
@@ -120,11 +123,20 @@ namespace Shadowsocks.Model
                 var min = Math.Min(_tree[l].min, _tree[r].min);
                 var count = 0;
                 if (min == _tree[l].min)
+                {
                     count += _tree[l].count;
+                }
+
                 if (min == _tree[r].min)
+                {
                     count += _tree[r].count;
+                }
+
                 if (_tree[index].min == min && _tree[index].count == count)
+                {
                     return;
+                }
+
                 _tree[index].min = min;
                 _tree[index].count = count;
             }
@@ -191,7 +203,11 @@ namespace Shadowsocks.Model
                 if (_tree[r].range_min < range_max)
                 {
                     var cnt = FindMinCount(l, range_min, _tree[l].range_max, out var out_val);
-                    if (out_val != val) cnt = 0;
+                    if (out_val != val)
+                    {
+                        cnt = 0;
+                    }
+
                     if (cnt > nth)
                     {
                         return FindNthMin(l, range_min, _tree[l].range_max, nth, val);
@@ -246,7 +262,10 @@ namespace Shadowsocks.Model
                 if (_tree[offset + i].min == min)
                 {
                     if (cnt == nth)
+                    {
                         return i;
+                    }
+
                     ++cnt;
                 }
             }

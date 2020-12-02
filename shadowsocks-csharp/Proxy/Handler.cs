@@ -92,10 +92,14 @@ namespace Shadowsocks.Proxy
         private void ResetTimeout(double time, bool reset_keep_alive = true)
         {
             if (time <= 0 && timer == null)
+            {
                 return;
+            }
 
             if (reset_keep_alive)
+            {
                 cfg.TryKeepAlive = 0;
+            }
 
             if (time <= 0)
             {
@@ -495,7 +499,10 @@ namespace Shadowsocks.Proxy
         public bool TryReconnect()
         {
             if (local_error)
+            {
                 return false;
+            }
+
             if (cfg.ReconnectTimesRemain > 0)
             {
                 if (State == ConnectState.CONNECTING)
@@ -634,14 +641,20 @@ namespace Shadowsocks.Proxy
                         server.SpeedLog.AddErrorDecodeTimes();
                     }
                     else
+                    {
                         server.SpeedLog.AddErrorEmptyTimes();
+                    }
                 }
                 else
+                {
                     server.SpeedLog.AddNoErrorTimes();
+                }
             }
 
             if (lastErrCode == 0 && server != null && cfg != null)
+            {
                 keepCurrentServer?.Invoke(localPort, cfg.TargetHost, server.Id);
+            }
 
             ResetTimeout(0);
             try
@@ -883,7 +896,9 @@ namespace Shadowsocks.Proxy
             {
                 ((CallbackStatus)ar.AsyncState).SetIfEqu(1, 0);
                 if (((CallbackStatus)ar.AsyncState).Status != 1)
+                {
                     return;
+                }
             }
             try
             {
@@ -952,7 +967,10 @@ namespace Shadowsocks.Proxy
             {
                 var bytesRead = connectionUDP.EndReceiveFrom(ar, ref endPoint);
                 if (connectionUDPEndPoint == null)
+                {
                     connectionUDPEndPoint = (IPEndPoint)endPoint;
+                }
+
                 connectionUDPIdle = true;
                 return bytesRead;
             }
@@ -1037,7 +1055,9 @@ namespace Shadowsocks.Proxy
         private string GetQueryString()
         {
             if (remoteHeaderSendBuffer == null)
+            {
                 return null;
+            }
 
             switch (remoteHeaderSendBuffer[0])
             {
@@ -1074,7 +1094,9 @@ namespace Shadowsocks.Proxy
         private int GetQueryPort()
         {
             if (remoteHeaderSendBuffer == null)
+            {
                 return 0;
+            }
 
             switch (remoteHeaderSendBuffer[0])
             {
@@ -1147,7 +1169,10 @@ namespace Shadowsocks.Proxy
                         remoteUDP != null)
                     {
                         if (cfg.Socks5RemotePort == 0)
+                        {
                             CloseSocket(ref remote);
+                        }
+
                         remoteHeaderSendBuffer = null;
                     }
                     else if (remoteHeaderSendBuffer != null)
@@ -1201,7 +1226,9 @@ namespace Shadowsocks.Proxy
                 {
                     var len = (remoteUDPRecvBuffer[0] << 8) + remoteUDPRecvBuffer[1];
                     if (len > remoteUDPRecvBufferLength)
+                    {
                         break;
+                    }
 
                     var buffer = new byte[len];
                     Array.Copy(remoteUDPRecvBuffer, buffer, len);
@@ -1222,9 +1249,13 @@ namespace Shadowsocks.Proxy
                 foreach (var buffer in buffer_list)
                 {
                     if (buffer == buffer_list[buffer_list.Count - 1])
+                    {
                         connectionUDP.BeginSendTo(buffer, 0, buffer.Length, SocketFlags.None, connectionUDPEndPoint, PipeConnectionUDPSendCallback, null);
+                    }
                     else
+                    {
                         connectionUDP.BeginSendTo(buffer, 0, buffer.Length, SocketFlags.None, connectionUDPEndPoint, PipeConnectionUDPSendCallbackNoRecv, null);
+                    }
                 }
             }
         }
@@ -1251,7 +1282,9 @@ namespace Shadowsocks.Proxy
                     {
                         var pingTime = Convert.ToInt64((speedTester.TimeBeginDownload - speedTester.TimeBeginUpload).TotalMilliseconds);
                         if (pingTime >= 0)
+                        {
                             server.SpeedLog.AddConnectTime(pingTime);
+                        }
                     }
                     ResetTimeout(cfg.Ttl);
 
@@ -1334,7 +1367,9 @@ namespace Shadowsocks.Proxy
                     {
                         var pingTime = Convert.ToInt64((speedTester.TimeBeginDownload - speedTester.TimeBeginUpload).TotalMilliseconds);
                         if (pingTime >= 0)
+                        {
                             server.SpeedLog.AddConnectTime(pingTime);
+                        }
                     }
                     server.SpeedLog.AddDownloadBytes(bytesRecv, now, speedTester.AddDownloadSize(bytesRecv));
                     ResetTimeout(cfg.Ttl);
@@ -1391,7 +1426,9 @@ namespace Shadowsocks.Proxy
                 }
             }
             if (final_close)
+            {
                 Close();
+            }
         }
 
         // end ReceiveCallback
@@ -1420,7 +1457,9 @@ namespace Shadowsocks.Proxy
                     {
                         var pingTime = Convert.ToInt64((speedTester.TimeBeginDownload - speedTester.TimeBeginUpload).TotalMilliseconds);
                         if (pingTime >= 0)
+                        {
                             server.SpeedLog.AddConnectTime(pingTime);
+                        }
                     }
                     server.SpeedLog.AddDownloadBytes(bytesRecv, DateTime.Now, speedTester.AddDownloadSize(bytesRecv));
                     ResetTimeout(cfg.Ttl);
@@ -1461,9 +1500,14 @@ namespace Shadowsocks.Proxy
             {
                 server.SpeedLog.AddUploadBytes(send_len, DateTime.Now, speedTester.AddUploadSize(send_len));
                 if (length >= 0)
+                {
                     ResetTimeout(cfg.Ttl);
+                }
                 else
+                {
                     ResetTimeout(cfg.ConnectTimeout <= 0 ? 30 : cfg.ConnectTimeout, false);
+                }
+
                 total_len += send_len;
 
                 if ((DateTime.Now - lastKeepTime).TotalSeconds > 5)
@@ -1481,7 +1525,9 @@ namespace Shadowsocks.Proxy
                         total_len += send_len;
                     }
                     else
+                    {
                         break;
+                    }
                 }
             }
             return total_len;
@@ -1555,7 +1601,9 @@ namespace Shadowsocks.Proxy
                     }
                     var send_len = RemoteSend(connetionRecvBuffer, bytesRead);
                     if (!(send_len == 0 && bytesRead > 0))
+                    {
                         doConnectionRecv();
+                    }
                 }
                 else
                 {
@@ -1699,7 +1747,9 @@ namespace Shadowsocks.Proxy
             var err = LogSocketException(e);
             var server_url = getServerUrl(out var remarks);
             if (err != 0 && !Logging.LogSocketException(remarks, server_url, e))
+            {
                 Logging.LogUsefulException(e);
+            }
         }
 
         private void LogExceptionAndClose(Exception e)

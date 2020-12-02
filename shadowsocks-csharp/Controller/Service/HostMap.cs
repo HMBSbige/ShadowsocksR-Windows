@@ -112,10 +112,16 @@ namespace Shadowsocks.Controller.Service
                     foreach (var line in File.ReadLines(UserRule))
                     {
                         if (line.Length > 0 && line.StartsWith(@"#"))
+                        {
                             continue;
+                        }
+
                         var parts = line.Split(new[] { ' ', '\t' }, 2, StringSplitOptions.RemoveEmptyEntries);
                         if (parts.Length < 2)
+                        {
                             continue;
+                        }
+
                         AddHost(parts[0], parts[1]);
                     }
                 }

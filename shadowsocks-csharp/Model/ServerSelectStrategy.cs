@@ -36,9 +36,13 @@ namespace Shadowsocks.Model
             {
                 var mid = (left + right) / 2;
                 if (data[mid] >= target)
+                {
                     right = mid;
+                }
                 else if (data[mid] < target)
+                {
                     left = mid + 1;
+                }
             }
             return left;
         }
@@ -46,67 +50,136 @@ namespace Shadowsocks.Model
         private double Algorithm2(ServerSpeedLog serverSpeedLog) // perfer less delay
         {
             if (serverSpeedLog.ErrorContinuousTimes >= 20)
+            {
                 return 1;
+            }
+
             if (serverSpeedLog.ErrorContinuousTimes >= 10)
+            {
                 return MIN_CHANCE;
+            }
+
             if (serverSpeedLog.AvgConnectTime < 0 && serverSpeedLog.TotalConnectTimes >= 3)
+            {
                 return MIN_CHANCE;
+            }
+
             if (serverSpeedLog.TotalConnectTimes < 1)
+            {
                 return MAX_CHANCE;
+            }
+
             long avgConnectTime = serverSpeedLog.AvgConnectTime <= 0 ? 1 : serverSpeedLog.AvgConnectTime;
             if (serverSpeedLog.TotalConnectTimes >= 1 && serverSpeedLog.AvgConnectTime < 0)
+            {
                 avgConnectTime = 5000;
+            }
+
             var connections = serverSpeedLog.TotalConnectTimes - serverSpeedLog.TotalDisconnectTimes;
             var chance = MAX_CHANCE * 10.0 / avgConnectTime - connections * CONNECTION_PENALTY;
-            if (chance > MAX_CHANCE) chance = MAX_CHANCE;
+            if (chance > MAX_CHANCE)
+            {
+                chance = MAX_CHANCE;
+            }
+
             chance -= serverSpeedLog.ErrorContinuousTimes * ERROR_PENALTY;
-            if (chance < MIN_CHANCE) chance = MIN_CHANCE;
+            if (chance < MIN_CHANCE)
+            {
+                chance = MIN_CHANCE;
+            }
+
             return chance;
         }
 
         private double Algorithm3(ServerSpeedLog serverSpeedLog) // perfer less error
         {
             if (serverSpeedLog.ErrorContinuousTimes >= 20)
+            {
                 return 1;
+            }
+
             if (serverSpeedLog.ErrorContinuousTimes >= 10)
+            {
                 return MIN_CHANCE;
+            }
+
             if (serverSpeedLog.AvgConnectTime < 0 && serverSpeedLog.TotalConnectTimes >= 3)
+            {
                 return MIN_CHANCE;
+            }
+
             if (serverSpeedLog.TotalConnectTimes < 1)
+            {
                 return MAX_CHANCE;
+            }
+
             long avgConnectTime = serverSpeedLog.AvgConnectTime <= 0 ? 1 : serverSpeedLog.AvgConnectTime / 1000 * 1000;
             if (serverSpeedLog.TotalConnectTimes >= 1 && serverSpeedLog.AvgConnectTime < 0)
+            {
                 avgConnectTime = 5000;
+            }
+
             var connections = serverSpeedLog.TotalConnectTimes - serverSpeedLog.TotalDisconnectTimes;
             var chance = MAX_CHANCE * 1.0 / (avgConnectTime / 500 + 1) - connections * CONNECTION_PENALTY;
-            if (chance > MAX_CHANCE) chance = MAX_CHANCE;
+            if (chance > MAX_CHANCE)
+            {
+                chance = MAX_CHANCE;
+            }
+
             chance -= serverSpeedLog.ErrorContinuousTimes * ERROR_PENALTY;
-            if (chance < MIN_CHANCE) chance = MIN_CHANCE;
+            if (chance < MIN_CHANCE)
+            {
+                chance = MIN_CHANCE;
+            }
+
             return chance;
         }
 
         private double Algorithm4(ServerSpeedLog serverSpeedLog, long avg_speed, double zero_chance) // perfer fast speed
         {
             if (serverSpeedLog.ErrorContinuousTimes >= 20)
+            {
                 return 1;
+            }
+
             if (serverSpeedLog.ErrorContinuousTimes >= 10)
+            {
                 return MIN_CHANCE;
+            }
+
             if (serverSpeedLog.AvgConnectTime < 0 && serverSpeedLog.TotalConnectTimes >= 3)
+            {
                 return MIN_CHANCE;
+            }
+
             if (serverSpeedLog.TotalConnectTimes < 1)
+            {
                 return MAX_CHANCE;
+            }
+
             long avgConnectTime = serverSpeedLog.AvgConnectTime <= 0 ? 1 : serverSpeedLog.AvgConnectTime / 2000 * 2000;
             serverSpeedLog.GetTransSpeed(out _, out var speed_d);
             if (serverSpeedLog.TotalConnectTimes >= 1 && serverSpeedLog.AvgConnectTime < 0)
+            {
                 avgConnectTime = 5000;
+            }
+
             var speed_mul = speed_d > avg_speed ? 1.0 :
                     speed_d == 0 ? zero_chance :
                     speed_d < avg_speed / 2 ? 0.001 : 0.005;
             var connections = serverSpeedLog.TotalConnectTimes - serverSpeedLog.TotalDisconnectTimes;
             var chance = MAX_CHANCE * speed_mul / (avgConnectTime / 500 + 1) - connections * CONNECTION_PENALTY;
-            if (chance > MAX_CHANCE) chance = MAX_CHANCE;
+            if (chance > MAX_CHANCE)
+            {
+                chance = MAX_CHANCE;
+            }
+
             chance -= serverSpeedLog.ErrorContinuousTimes * ERROR_PENALTY;
-            if (chance < MIN_CHANCE) chance = MIN_CHANCE;
+            if (chance < MIN_CHANCE)
+            {
+                chance = MIN_CHANCE;
+            }
+
             return chance;
         }
 
@@ -171,7 +244,9 @@ namespace Shadowsocks.Model
                         if (filter != null)
                         {
                             if (!filter(configs[i], lastSelectIndex < 0 ? null : configs[lastSelectIndex]))
+                            {
                                 continue;
+                            }
                         }
                         serverList.Add(new ServerIndex(i, configs[i]));
                     }
@@ -181,7 +256,10 @@ namespace Shadowsocks.Model
                     for (var i = 0; i < configs.Count; ++i)
                     {
                         if (!filter(configs[i], lastSelectIndex < 0 ? null : configs[lastSelectIndex]))
+                        {
                             continue;
+                        }
+
                         serverList.Add(new ServerIndex(i, configs[i]));
                     }
                 }
@@ -200,7 +278,9 @@ namespace Shadowsocks.Model
                 {
                     var i = lastSelectIndex;
                     if (i >= 0 && i < configs.Count && configs[i].Enable)
+                    {
                         serverList.Add(new ServerIndex(i, configs[i]));
+                    }
                 }
                 var serverListIndex = -1;
                 if (serverList.Count > 0)
@@ -253,7 +333,9 @@ namespace Shadowsocks.Model
                             {
                                 s.server.SpeedLog.GetTransSpeed(out _, out var speed_d);
                                 if (speed_d == 0)
+                                {
                                     ++zero_cnt;
+                                }
                                 else
                                 {
                                     sum_speed += speed_d;
@@ -265,7 +347,9 @@ namespace Shadowsocks.Model
                             {
                                 avg_speed = sum_speed / sum_cnt;
                                 if (zero_cnt + sum_cnt > 0)
+                                {
                                     zero_chance = 0.1 * sum_cnt / (zero_cnt + sum_cnt);
+                                }
                             }
                             foreach (var s in serverList)
                             {

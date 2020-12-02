@@ -41,7 +41,10 @@ namespace Shadowsocks.Obfs
             var rand_len = datalength > 1300 ? 1 : LinearRandomInt(64) + 1;
             outlength = rand_len + datalength + 6;
             if (datalength > 0)
+            {
                 Array.Copy(data, 0, outdata, rand_len + 2, datalength);
+            }
+
             outdata[0] = (byte)(outlength >> 8);
             outdata[1] = (byte)outlength;
             outdata[2] = (byte)rand_len;
@@ -154,7 +157,9 @@ namespace Shadowsocks.Obfs
                     throw new ObfsException("ClientPostDecrypt data error");
                 }
                 if (len > recv_buf_len)
+                {
                     break;
+                }
 
                 if (Util.Adler32.CheckAdler32(recv_buf, len))
                 {
