@@ -20,15 +20,6 @@ namespace Shadowsocks
         private static void Main(string[] args)
         {
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Utils.GetExecutablePath()) ?? throw new InvalidOperationException());
-            if (args.Contains(Constants.ParameterSetAutoRun))
-            {
-                if (!AutoStartup.Switch())
-                {
-                    Environment.ExitCode = 1;
-                }
-                return;
-            }
-
             var identifier = $@"Global\{Controller.HttpRequest.UpdateChecker.Name}_{Directory.GetCurrentDirectory().GetDeterministicHashCode()}";
             using var singleInstance = new SingleInstance.SingleInstance(identifier);
             if (!singleInstance.IsFirstInstance)
