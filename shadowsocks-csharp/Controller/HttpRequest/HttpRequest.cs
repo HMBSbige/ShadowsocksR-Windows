@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Model;
+using Shadowsocks.Model;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -8,13 +8,13 @@ namespace Shadowsocks.Controller.HttpRequest
 {
     public abstract class HttpRequest
     {
-        private const string DefaultUserAgent = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36";
+        private const string DefaultUserAgent = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36";
         private const int DefaultGetTimeout = 30000;
         private const int DefaultHeadTimeout = 4000;
 
         private static async Task<string> GetAsync(string url, IWebProxy proxy, string userAgent = @"", double timeout = DefaultGetTimeout, bool setProxy = true)
         {
-            var httpClientHandler = new HttpClientHandler();
+            var httpClientHandler = new SocketsHttpHandler();
             if (setProxy)
             {
                 httpClientHandler.Proxy = proxy;
@@ -23,7 +23,7 @@ namespace Shadowsocks.Controller.HttpRequest
             var httpClient = new HttpClient(httpClientHandler)
             {
                 Timeout = TimeSpan.FromMilliseconds(timeout),
-                DefaultRequestVersion = new Version(2, 0)
+                DefaultRequestVersion = HttpVersion.Version20
             };
             var request = new HttpRequestMessage(HttpMethod.Get, url);
             request.Headers.Add(@"User-Agent", string.IsNullOrWhiteSpace(userAgent) ? DefaultUserAgent : userAgent);
@@ -37,7 +37,7 @@ namespace Shadowsocks.Controller.HttpRequest
 
         private static async Task<bool> HeadAsync(string url, IWebProxy proxy, double timeout = DefaultHeadTimeout)
         {
-            var httpClientHandler = new HttpClientHandler
+            var httpClientHandler = new SocketsHttpHandler
             {
                 Proxy = proxy,
                 UseProxy = proxy != null
@@ -45,22 +45,17 @@ namespace Shadowsocks.Controller.HttpRequest
             var httpClient = new HttpClient(httpClientHandler)
             {
                 Timeout = TimeSpan.FromMilliseconds(timeout),
-                DefaultRequestVersion = new Version(2, 0)
+                DefaultRequestVersion = HttpVersion.Version20
             };
 
-            HttpResponseMessage response = null;
             try
             {
-                response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                using var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
                 return true;
             }
             catch
             {
                 return false;
-            }
-            finally
-            {
-                response?.Dispose();
             }
         }
 
@@ -78,7 +73,11 @@ namespace Shadowsocks.Controller.HttpRequest
                     res = null;
                 }
             }
-            if (res != null) return res;
+            if (res != null)
+            {
+                return res;
+            }
+
             res = await DirectGetAsync(url, userAgent, getTimeout);
             return res;
         }

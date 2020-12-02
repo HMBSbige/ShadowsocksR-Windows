@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -107,12 +107,7 @@ namespace Shadowsocks.Util
         public static int GetDpi()
         {
             var dpiXProperty = typeof(SystemParameters).GetProperty(@"DpiX", BindingFlags.NonPublic | BindingFlags.Static);
-            if (dpiXProperty != null)
-            {
-                var dpiX = (int)dpiXProperty.GetValue(null, null);
-                return dpiX;
-            }
-            return 96;
+            return dpiXProperty?.GetValue(null, null) is int dpiX ? dpiX : 96;
         }
 
         /// <summary>
@@ -122,33 +117,15 @@ namespace Shadowsocks.Util
         /// https://stackoverflow.com/a/40851713/2075611
         public static Size GetIconSize()
         {
-            Size size;
             var dpi = GetDpi();
-            if (dpi < 97)
+            var size = dpi switch
             {
-                // dpi = 96;//100%
-                size = new Size(16, 16);
-            }
-            else if (dpi < 121)
-            {
-                // dpi = 120;//125%
-                size = new Size(20, 20);
-            }
-            else if (dpi < 145)
-            {
-                // dpi = 144;//150%
-                size = new Size(24, 24);
-            }
-            else if (dpi < 169)
-            {
-                // dpi = 168;//175%
-                size = new Size(28, 28);
-            }
-            else
-            {
-                // dpi = 192;//200%
-                size = new Size(32, 32);
-            }
+                < 97 => new Size(16, 16),
+                < 121 => new Size(20, 20),
+                < 145 => new Size(24, 24),
+                < 169 => new Size(28, 28),
+                _ => new Size(32, 32)
+            };
             return size;
         }
 

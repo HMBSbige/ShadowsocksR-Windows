@@ -5,64 +5,65 @@ Write-Host 'dotnet SDK version'
 dotnet --version
 
 $exe = 'ShadowsocksR.exe'
-$netcore_tfm = 'netcoreapp3.1'
+$net_tfm = 'net5.0-windows10.0.19041.0'
+$dllpatcher_tfm = 'net5.0'
 $configuration = 'Release'
-$output_dir = "shadowsocks-csharp\bin\$configuration"
-$dllpatcher_dir = "Build\DotNetDllPathPatcher"
-$proj_path = 'shadowsocks-csharp\shadowsocksr.csproj'
+$output_dir = "$PSScriptRoot\shadowsocks-csharp\bin\$configuration"
+$dllpatcher_dir = "$PSScriptRoot\Build\DotNetDllPathPatcher"
+$dllpatcher_exe = "$dllpatcher_dir\bin\$configuration\$dllpatcher_tfm\DotNetDllPathPatcher.exe"
+$proj_path = "$PSScriptRoot\shadowsocks-csharp\shadowsocksr.csproj"
 
-$buildCore    = $buildtfm -eq 'all' -or $buildtfm -eq 'core'
-$buildCoreX86 = $buildtfm -eq 'all' -or $buildtfm -eq 'core-x86'
-$buildCoreX64 = $buildtfm -eq 'all' -or $buildtfm -eq 'core-x64'
-function Build-NetCore
+$build    = $buildtfm -eq 'all' -or $buildtfm -eq 'app'
+$buildX86 = $buildtfm -eq 'all' -or $buildtfm -eq 'x86'
+$buildX64 = $buildtfm -eq 'all' -or $buildtfm -eq 'x64'
+function Build-App
 {
-	Write-Host 'Building .NET Core'
+	Write-Host 'Building .NET App'
 	
-	$outdir = "$output_dir\$netcore_tfm"
+	$outdir = "$output_dir\$net_tfm"
 	$publishDir = "$outdir\publish"
 
 	Remove-Item $publishDir -Recurse -Force -Confirm:$false -ErrorAction Ignore
 	
-	dotnet publish -c $configuration -f $netcore_tfm $proj_path
+	dotnet publish -c $configuration -f $net_tfm $proj_path
 	if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
-	& $dllpatcher_dir\bin\$configuration\$netcore_tfm\DotNetDllPathPatcher.exe $publishDir\$exe bin
+	& $dllpatcher_exe $publishDir\$exe bin
 	if ($LASTEXITCODE) { exit $LASTEXITCODE }
 }
 
-function Build-NetCoreSelfContained
+function Build-SelfContained
 {
-	param([string]$arch)
+	param([string]$rid)
 
-	Write-Host "Building .NET Core $arch"
+	Write-Host "Building .NET App SelfContained $rid"
 
-	$rid = "win-$arch"
-	$outdir = "$output_dir\$netcore_tfm\$rid"
+	$outdir = "$output_dir\$net_tfm\$rid"
 	$publishDir = "$outdir\publish"
 
 	Remove-Item $publishDir -Recurse -Force -Confirm:$false -ErrorAction Ignore
 
-	dotnet publish -c $configuration -f $netcore_tfm -r $rid --self-contained true $proj_path
+	dotnet publish -c $configuration -f $net_tfm -r $rid --self-contained true $proj_path
 	if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
-	& $dllpatcher_dir\bin\$configuration\$netcore_tfm\DotNetDllPathPatcher.exe $publishDir\$exe bin
+	& $dllpatcher_exe $publishDir\$exe bin
 	if ($LASTEXITCODE) { exit $LASTEXITCODE }
 }
 
-dotnet build -c $configuration -f $netcore_tfm $dllpatcher_dir\DotNetDllPathPatcher.csproj
+dotnet build -c $configuration -f $dllpatcher_tfm $dllpatcher_dir\DotNetDllPathPatcher.csproj
 if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
-if ($buildCore)
+if ($build)
 {
-	Build-NetCore
+    Build-App
 }
 
-if ($buildCoreX86)
+if ($buildX64)
 {
-	Build-NetCoreSelfContained x86
+    Build-SelfContained win-x64
 }
 
-if ($buildCoreX64)
+if ($buildX86)
 {
-	Build-NetCoreSelfContained x64
+    Build-SelfContained win-x86
 }

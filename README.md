@@ -6,7 +6,7 @@
 
 ## Build
 
-[![](https://github.com/HMBSbige/ShadowsocksR-Windows/workflows/GitHub%20CI/badge.svg)](https://github.com/HMBSbige/ShadowsocksR-Windows/actions)
+[![](https://github.com/HMBSbige/ShadowsocksR-Windows/workflows/CI/badge.svg)](https://github.com/HMBSbige/ShadowsocksR-Windows/actions)
 
 ## [Wiki](https://github.com/HMBSbige/ShadowsocksR-Windows/wiki)
 

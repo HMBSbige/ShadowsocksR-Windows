@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.Model;
@@ -73,7 +73,9 @@ namespace Shadowsocks.Util
             for (var i = 0; i < targetLength; ++i)
             {
                 if (target[target_offset + i] != m[m_offset + i])
+                {
                     return false;
+                }
             }
 
             return true;
@@ -91,7 +93,9 @@ namespace Shadowsocks.Util
                         for (; j < m.Length; ++j)
                         {
                             if (target[i + j] != m[j])
+                            {
                                 break;
+                            }
                         }
 
                         if (j >= m.Length)
@@ -107,7 +111,7 @@ namespace Shadowsocks.Util
 
         public static string GetTimestamp(DateTime value)
         {
-            return value.ToString("yyyyMMddHHmmssffff");
+            return value.ToString(@"yyyyMMddHHmmssffff");
         }
 
         public static void SetArrayMinSize<T>(ref T[] array, int size)
@@ -129,14 +133,14 @@ namespace Shadowsocks.Util
         public static string GetExecutablePath()
         {
             var p = Process.GetCurrentProcess();
-            if (p.MainModule != null)
+            var res = p.MainModule?.FileName;
+            if (res is not null)
             {
-                var res = p.MainModule.FileName;
                 return res;
             }
 
             var dllPath = GetDllPath();
-            return Path.Combine(Path.GetDirectoryName(dllPath) ?? throw new InvalidOperationException(), $@"{Path.GetFileNameWithoutExtension(dllPath)}.exe");
+            return Path.ChangeExtension(dllPath, @"exe");
         }
 
         public static string GetDllPath()
@@ -233,7 +237,10 @@ namespace Shadowsocks.Util
                 {
                     hash1 = ((hash1 << 5) + hash1) ^ str[i];
                     if (i == str.Length - 1)
+                    {
                         break;
+                    }
+
                     hash2 = ((hash2 << 5) + hash2) ^ str[i + 1];
                 }
 
@@ -301,38 +308,24 @@ namespace Shadowsocks.Util
             const long P = T * 1024L;
             const long E = P * 1024L;
 
-            if (bytes >= M * 990)
+            return bytes switch
             {
-                if (bytes >= G * 990)
+                >= M * 990 when bytes >= G * 990 => bytes switch
                 {
-                    if (bytes >= P * 990)
-                        return $@"{bytes / (double)E:F3}EB";
-                    if (bytes >= T * 990)
-                        return $@"{bytes / (double)P:F3}PB";
-                    return $@"{bytes / (double)T:F3}TB";
-                }
-
-                if (bytes >= G * 99)
-                    return $@"{bytes / (double)G:F2}GB";
-                if (bytes >= G * 9)
-                    return $@"{bytes / (double)G:F3}GB";
-                return $@"{bytes / (double)G:F4}GB";
-            }
-
-            if (bytes >= K * 990)
-            {
-                if (bytes >= M * 100)
-                    return $@"{bytes / (double)M:F1}MB";
-                if (bytes > M * 9.9)
-                    return $@"{bytes / (double)M:F2}MB";
-                return $@"{bytes / (double)M:F3}MB";
-            }
-
-            if (bytes > K * 99)
-                return $@"{bytes / (double)K:F0}KB";
-            if (bytes > 900)
-                return $@"{bytes / (double)K:F1}KB";
-            return bytes == 0 ? $@"{bytes}Byte" : $@"{bytes}Bytes";
+                    >= P * 990 => $@"{bytes / (double)E:F3}EB",
+                    >= T * 990 => $@"{bytes / (double)P:F3}PB",
+                    _ => $@"{bytes / (double)T:F3}TB"
+                },
+                >= M * 990 when bytes >= G * 99 => $@"{bytes / (double)G:F2}GB",
+                >= M * 990 when bytes >= G * 9 => $@"{bytes / (double)G:F3}GB",
+                >= M * 990 => $@"{bytes / (double)G:F4}GB",
+                >= K * 990 when bytes >= M * 100 => $@"{bytes / (double)M:F1}MB",
+                >= K * 990 when bytes > M * 9.9 => $@"{bytes / (double)M:F2}MB",
+                >= K * 990 => $@"{bytes / (double)M:F3}MB",
+                > K * 99 => $@"{bytes / (double)K:F0}KB",
+                > 900 => $@"{bytes / (double)K:F1}KB",
+                _ => bytes == 0 ? $@"{bytes}Byte" : $@"{bytes}Bytes"
+            };
         }
 
         public static IEnumerable<Server> Except(this IEnumerable<Server> x, IList<Server> y)
