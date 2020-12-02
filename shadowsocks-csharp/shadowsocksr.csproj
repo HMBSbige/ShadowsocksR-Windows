@@ -52,6 +52,7 @@
         <PackageReference Include="RunAtStartup" Version="5.0.0" />
         <PackageReference Include="Syncfusion.SfGrid.WPF" Version="18.3.0.52" />
         <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="18.3.0.52" />
+        <PackageReference Include="URIScheme" Version="5.0.0" />
         <PackageReference Include="WindowsJobAPI" Version="5.0.0" />
         <PackageReference Include="WpfColorFontDialog" Version="1.0.8" />
         <PackageReference Include="ZXing.Net" Version="0.16.6" />
