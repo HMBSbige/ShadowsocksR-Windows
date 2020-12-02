@@ -170,7 +170,6 @@ Connection: Close
 {pac}";
                 var response = Encoding.UTF8.GetBytes(text);
                 socket.BeginSend(response, 0, response.Length, 0, SendCallback, socket);
-                Utils.ReleaseMemory();
             }
             catch (Exception e)
             {

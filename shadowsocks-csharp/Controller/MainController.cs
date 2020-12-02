@@ -11,7 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace Shadowsocks.Controller
@@ -70,8 +69,6 @@ namespace Shadowsocks.Controller
                     server.SpeedLog = log;
                 }
             }
-
-            StartReleasingMemory();
         }
 
         private void ReportError(Exception e)
@@ -540,7 +537,6 @@ namespace Shadowsocks.Controller
             Application.Current.Dispatcher?.InvokeAsync(() => { ConfigChanged?.Invoke(this, new EventArgs()); });
 
             UpdateSystemProxy();
-            Utils.ReleaseMemory();
         }
 
         private static void ThrowSocketException(ref Exception e)
@@ -625,22 +621,5 @@ namespace Shadowsocks.Controller
         {
             Clipboard.SetDataObject(_pacServer.PacUrl);
         }
-
-        #region Memory Management
-
-        private static void StartReleasingMemory()
-        {
-            Task.Factory.StartNew(() =>
-            {
-                while (true)
-                {
-                    Utils.ReleaseMemory(false);
-                    Task.Delay(30 * 1000).Wait();
-                }
-                // ReSharper disable once FunctionNeverReturns
-            }, TaskCreationOptions.LongRunning);
-        }
-
-        #endregion
     }
 }

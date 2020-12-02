@@ -757,7 +757,6 @@ namespace Shadowsocks.Controller
         {
             _serverConfigWindow = null;
             configFrom_open = false;
-            Utils.ReleaseMemory();
             if (eventList.Count > 0)
             {
                 foreach (var p in eventList)
@@ -808,7 +807,6 @@ namespace Shadowsocks.Controller
                 _settingsWindow.Closed += (_, _) =>
                 {
                     _settingsWindow = null;
-                    Utils.ReleaseMemory();
                 };
             }
         }
@@ -828,7 +826,6 @@ namespace Shadowsocks.Controller
                 _dnsSettingsWindow.Closed += (o, args) =>
                 {
                     _dnsSettingsWindow = null;
-                    Utils.ReleaseMemory();
                 };
             }
         }
@@ -853,7 +850,6 @@ namespace Shadowsocks.Controller
                 _portMapWindow.Closed += (o, e) =>
                 {
                     _portMapWindow = null;
-                    Utils.ReleaseMemory();
                 };
             }
         }
@@ -879,7 +875,6 @@ namespace Shadowsocks.Controller
                 {
                     _serverLogWindowStatus = new WindowStatus(_serverLogWindow);
                     _serverLogWindow = null;
-                    Utils.ReleaseMemory();
                 };
             }
         }
@@ -904,7 +899,6 @@ namespace Shadowsocks.Controller
                 _logWindow.Closed += (sender, args) =>
                 {
                     _logWindow = null;
-                    Utils.ReleaseMemory();
                 };
             }
         }
@@ -929,7 +923,6 @@ namespace Shadowsocks.Controller
                 _subScribeWindow.Closed += (sender, args) =>
                 {
                     _subScribeWindow = null;
-                    Utils.ReleaseMemory();
                 };
             }
         }
