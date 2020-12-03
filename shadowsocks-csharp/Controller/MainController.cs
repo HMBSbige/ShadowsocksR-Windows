@@ -385,10 +385,7 @@ namespace Shadowsocks.Controller
 
             _listener?.Stop();
             _privoxyRunner?.Stop();
-            if (Global.GuiConfig.SysProxyMode is not ProxyMode.NoModify and not ProxyMode.Direct)
-            {
-                SystemProxy.SystemProxy.Update(Global.GuiConfig, true, null);
-            }
+            SystemProxy.Restore();
             ServerTransferTotal.Save(_transfer, Global.GuiConfig.Configs);
         }
 
@@ -566,10 +563,7 @@ namespace Shadowsocks.Controller
 
         private void UpdateSystemProxy()
         {
-            if (Global.GuiConfig.SysProxyMode != ProxyMode.NoModify)
-            {
-                SystemProxy.SystemProxy.Update(Global.GuiConfig, false, _pacServer);
-            }
+            SystemProxy.Update(Global.GuiConfig, _pacServer);
         }
 
         private void PacDaemon_UserRuleFileChanged(object sender, EventArgs e)
