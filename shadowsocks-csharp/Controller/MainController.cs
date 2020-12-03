@@ -190,7 +190,7 @@ namespace Shadowsocks.Controller
             {
                 var urls = ssUrLs.GetLines().Reverse();
                 var i = 0;
-                foreach (var url in urls.Where(url => url.StartsWith(@"ss://", StringComparison.OrdinalIgnoreCase) || url.StartsWith(@"ssr://", StringComparison.OrdinalIgnoreCase)))
+                foreach (var url in urls.Select(url => url.Trim('/')).Where(url => url.StartsWith(@"ss://", StringComparison.OrdinalIgnoreCase) || url.StartsWith(@"ssr://", StringComparison.OrdinalIgnoreCase)))
                 {
                     ++i;
                     var server = new Server(url, force_group);

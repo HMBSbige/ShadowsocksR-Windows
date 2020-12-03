@@ -10,7 +10,7 @@ namespace Shadowsocks.Util
         {
             try
             {
-                var service = new URISchemeService(link, @"URL:ShadowsocksR Link", $@"""{Utils.GetExecutablePath()}""");
+                var service = new URISchemeService(link, @"URL:ShadowsocksR Link", Utils.GetExecutablePath());
                 service.Set();
             }
             catch
