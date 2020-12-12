@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using Shadowsocks.Controller;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
@@ -154,7 +154,7 @@ namespace Shadowsocks
                 MessageBox.Show(
                 $@"{I18NUtil.GetAppStringValue(@"UnexpectedError")}{Environment.NewLine}{e.ExceptionObject}",
                 Controller.HttpRequest.UpdateChecker.Name, MessageBoxButton.OK, MessageBoxImage.Error);
-                Application.Current.Shutdown();
+                Environment.Exit(1);
             }
         }
 
