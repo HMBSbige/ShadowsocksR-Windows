@@ -1,4 +1,4 @@
-﻿<Window x:Class="Shadowsocks.View.ServerLogWindow"
+<Window x:Class="Shadowsocks.View.ServerLogWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:syncfusion="http://schemas.syncfusion.com/wpf"
@@ -90,7 +90,7 @@
                 </MenuItem>
             </Menu>
             <syncfusion:SfDataGrid x:Name="ServerDataGrid"
-                                   AllowResizingHiddenColumns="True"
+                                   AllowResizingHiddenColumns="False"
                                    DataContext="{Binding ServerLogViewModel, ElementName=Slw}"
                                    ItemsSource="{Binding ServersCollection}"
                                    SourceType="{x:Type model:Server}"
@@ -109,7 +109,7 @@
                                    AllowSorting="True" AllowFiltering="False" ShowSortNumbers="True"
                                    ShowToolTip="True"
                                    ShowRowHeader="True"
-
+ 
                                    EnableDataVirtualization="True"
                                    ScrollMode="None" CanMaintainScrollPosition="True" ShowBusyIndicator="True"
                                    CellTapped="ServerDataGrid_OnCellTapped"
@@ -270,6 +270,8 @@
                             </Style>
                         </syncfusion:GridPercentColumn.CellStyle>
                     </syncfusion:GridPercentColumn>
+
+                    <syncfusion:GridCheckBoxColumn MappingName="Enable" IsHidden="True" />
 
                 </syncfusion:SfDataGrid.Columns>
             </syncfusion:SfDataGrid>
