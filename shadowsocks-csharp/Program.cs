@@ -6,7 +6,6 @@ using Shadowsocks.Util;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,7 +53,7 @@ namespace Shadowsocks
             Logging.DefaultOut = Console.Out;
             Logging.DefaultError = Console.Error;
 
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13 | SecurityProtocolType.Tls12;
+            Utils.SetTls();
 
             Global.ViewController = new MenuViewController(Global.Controller);
             SystemEvents.SessionEnding += Global.ViewController.Quit_Click;

@@ -1,4 +1,3 @@
-using Microsoft.Win32;
 using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.Model;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Text;
 
@@ -92,43 +92,6 @@ namespace Shadowsocks.Util
         public static string GetDllPath()
         {
             return Assembly.GetExecutingAssembly().Location;
-        }
-
-        public static RegistryKey OpenRegKey(string name, bool writable, RegistryHive hive = RegistryHive.CurrentUser)
-        {
-            var userKey = RegistryKey.OpenBaseKey(hive,
-                            Environment.Is64BitProcess ? RegistryView.Registry64 : RegistryView.Registry32)
-                    .OpenSubKey(name, writable);
-            return userKey;
-        }
-
-        public static int RunAsAdmin(string arguments)
-        {
-            Process process;
-            var processInfo = new ProcessStartInfo
-            {
-                Verb = "runas",
-                FileName = GetExecutablePath(),
-                Arguments = arguments
-            };
-            try
-            {
-                process = Process.Start(processInfo);
-            }
-            catch (System.ComponentModel.Win32Exception)
-            {
-                return -1;
-            }
-
-            process?.WaitForExit();
-            if (process != null)
-            {
-                var ret = process.ExitCode;
-                process.Close();
-                return ret;
-            }
-
-            return -1;
         }
 
         private static string _tempPath;
@@ -290,6 +253,20 @@ namespace Shadowsocks.Util
                     continue;
                 }
                 yield return line;
+            }
+        }
+
+        public static void SetTls()
+        {
+            var v = Environment.OSVersion;
+            if (v.Platform != PlatformID.Win32NT)
+            {
+                return;
+            }
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            if (v.Version >= Version.Parse(@"10.0.20170.0"))
+            {
+                ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls13;
             }
         }
     }
