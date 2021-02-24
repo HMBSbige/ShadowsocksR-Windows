@@ -36,8 +36,9 @@ namespace Shadowsocks.Controller
         {
             try
             {
+                var path = $@"""{Utils.GetExecutablePath()}""";
                 var service = new StartupService(Key);
-                return service.Check();
+                return service.Check(path);
             }
             catch (Exception e)
             {
