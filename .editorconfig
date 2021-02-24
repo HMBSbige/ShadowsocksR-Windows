@@ -16,6 +16,9 @@ insert_final_newline = true
 [*.bat]
 indent_style = tab
 
+[*.csproj]
+indent_size = 2
+
 # c# 文件
 [*.cs]
 
@@ -103,7 +106,7 @@ csharp_style_conditional_delegate_call = true:warning
 
 # 修饰符首选项
 csharp_prefer_static_local_function = true:suggestion
-csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:silent
+csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:suggestion
 
 # 代码块首选项
 csharp_prefer_braces = true:warning
@@ -211,9 +214,3 @@ dotnet_naming_style.begins_with_i.required_prefix = I
 dotnet_naming_style.begins_with_i.required_suffix =
 dotnet_naming_style.begins_with_i.word_separator =
 dotnet_naming_style.begins_with_i.capitalization = pascal_case
-
-# IDE1006: 命名样式
-dotnet_diagnostic.IDE1006.severity = silent
-
-# Default severity for analyzer diagnostics with category 'Interoperability'
-dotnet_analyzer_diagnostic.category-Interoperability.severity = none
