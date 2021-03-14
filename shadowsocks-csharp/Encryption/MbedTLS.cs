@@ -23,45 +23,6 @@ namespace Shadowsocks.Encryption
         public const int MBEDTLS_MD_SHA512 = 8;
         public const int MBEDTLS_MD_RIPEMD160 = 9;
 
-        public interface HMAC
-        {
-            byte[] ComputeHash(byte[] buffer, int offset, int count);
-        }
-
-        public class HMAC_MD5 : HMAC
-        {
-            byte[] key;
-
-            public HMAC_MD5(byte[] key)
-            {
-                this.key = key;
-            }
-
-            public byte[] ComputeHash(byte[] buffer, int offset, int count)
-            {
-                var output = new byte[64];
-                ss_hmac_ex(MBEDTLS_MD_MD5, key, key.Length, buffer, offset, count, output);
-                return output;
-            }
-        }
-
-        public class HMAC_SHA1 : HMAC
-        {
-            byte[] key;
-
-            public HMAC_SHA1(byte[] key)
-            {
-                this.key = key;
-            }
-
-            public byte[] ComputeHash(byte[] buffer, int offset, int count)
-            {
-                var output = new byte[64];
-                ss_hmac_ex(MBEDTLS_MD_SHA1, key, key.Length, buffer, offset, count, output);
-                return output;
-            }
-        }
-
         static MbedTLS()
         {
             var dllPath = Utils.GetTempPath(DLLNAME);

@@ -94,16 +94,16 @@ namespace Shadowsocks.Obfs
             return overhead;
         }
 
-        protected MbedTLS.HMAC CreateHMAC(byte[] key)
+        protected HMAC CreateHMAC(byte[] key)
         {
             if (Method == "auth_aes128_md5")
             {
-                return new MbedTLS.HMAC_MD5(key);
+                return new HMACMD5(key);
             }
 
             if (Method == "auth_aes128_sha1")
             {
-                return new MbedTLS.HMAC_SHA1(key);
+                return new HMACSHA1(key);
             }
 
             return null;

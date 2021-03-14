@@ -93,9 +93,9 @@ namespace Shadowsocks.Obfs
             return overhead;
         }
 
-        protected MbedTLS.HMAC CreateHMAC(byte[] key)
+        protected HMAC CreateHMAC(byte[] key)
         {
-            return new MbedTLS.HMAC_MD5(key);
+            return new HMACMD5(key);
         }
 
         protected virtual int GetSendRandLen(int datalength, xorshift128plus rd, byte[] last_hash)
