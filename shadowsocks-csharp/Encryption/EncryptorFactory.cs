@@ -29,11 +29,6 @@ namespace Shadowsocks.Encryption
                 RegisteredEncryptors.Add(method, typeof(StreamSodiumEncryptor));
             }
 
-            foreach (var method in StreamMbedTLSEncryptor.SupportedCiphers().Where(method => !RegisteredEncryptors.ContainsKey(method)))
-            {
-                RegisteredEncryptors.Add(method, typeof(StreamMbedTLSEncryptor));
-            }
-
             var allEncryptor = new StringBuilder(Environment.NewLine);
             allEncryptor.AppendLine(@"============================");
             allEncryptor.AppendLine(@"Registered Encryptor Info");

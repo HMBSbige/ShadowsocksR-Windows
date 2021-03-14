@@ -22,10 +22,6 @@ namespace Shadowsocks.Encryption.Stream
 
         private static readonly Dictionary<string, EncryptorInfo> _ciphers = new()
         {
-            { @"aes-128-cbc", new EncryptorInfo(16, 16, CIPHER_AES, @"", false) },
-            { @"aes-192-cbc", new EncryptorInfo(24, 16, CIPHER_AES, @"", false) },
-            { @"aes-256-cbc", new EncryptorInfo(32, 16, CIPHER_AES, @"", false) },
-
             { @"aes-128-ctr", new EncryptorInfo(16, 16, CIPHER_AES) },
             { @"aes-192-ctr", new EncryptorInfo(24, 16, CIPHER_AES) },
             { @"aes-256-ctr", new EncryptorInfo(32, 16, CIPHER_AES) },
