@@ -1,9 +1,9 @@
-﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
 using Shadowsocks.Controller;
 using Shadowsocks.Properties;
 using Shadowsocks.Util;
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Shadowsocks.Encryption
 {
@@ -77,27 +77,6 @@ namespace Shadowsocks.Encryption
             {
                 Logging.LogUsefulException(e);
             }
-        }
-
-        public static byte[] MD5(byte[] input)
-        {
-            var output = new byte[16];
-            md5(input, input.Length, output);
-            return output;
-        }
-
-        public static byte[] SHA1(byte[] input)
-        {
-            var output = new byte[20];
-            ss_md(MBEDTLS_MD_SHA1, input, 0, input.Length, output);
-            return output;
-        }
-
-        public static byte[] SHA512(byte[] input)
-        {
-            var output = new byte[64];
-            ss_md(MBEDTLS_MD_SHA512, input, 0, input.Length, output);
-            return output;
         }
 
         [DllImport(@"Kernel32.dll")]

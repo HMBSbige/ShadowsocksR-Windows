@@ -1,10 +1,10 @@
-﻿using System.Text.Json.Serialization;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Encryption;
 using Shadowsocks.Enums;
 using Shadowsocks.ViewModel;
 using System;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Shadowsocks.Model
 {
@@ -40,7 +40,7 @@ namespace Shadowsocks.Model
         public string OriginTag => _tag;
 
         [JsonIgnore]
-        public string UrlMd5 => BitConverter.ToString(MbedTLS.MD5(Encoding.UTF8.GetBytes(Url))).Replace(@"-", string.Empty);
+        public string UrlMd5 => BitConverter.ToString(CryptoUtils.MD5(Encoding.UTF8.GetBytes(Url))).Replace(@"-", string.Empty);
 
         public string Tag
         {

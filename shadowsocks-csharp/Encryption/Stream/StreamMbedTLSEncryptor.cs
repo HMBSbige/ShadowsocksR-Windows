@@ -68,7 +68,7 @@ namespace Shadowsocks.Encryption.Stream
                 var temp = new byte[keyLen + ivLen];
                 Array.Copy(_key, 0, temp, 0, keyLen);
                 Array.Copy(iv, 0, temp, keyLen, ivLen);
-                realKey = MbedTLS.MD5(temp);
+                realKey = CryptoUtils.MD5(temp);
             }
             else
             {

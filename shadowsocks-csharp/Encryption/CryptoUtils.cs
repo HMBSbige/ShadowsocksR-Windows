@@ -1,4 +1,6 @@
 using CryptoBase;
+using CryptoBase.Digests.MD5;
+using CryptoBase.Digests.SHA1;
 using Shadowsocks.Crypto;
 using System;
 using System.Buffers;
@@ -20,6 +22,20 @@ namespace Shadowsocks.Encryption
             {
                 ArrayPool<byte>.Shared.Return(buffer);
             }
+        }
+
+        public static byte[] MD5(Span<byte> input)
+        {
+            var output = new byte[16];
+            MD5Utils.Default(input, output);
+            return output;
+        }
+
+        public static byte[] SHA1(Span<byte> input)
+        {
+            var output = new byte[20];
+            SHA1Utils.Default(input, output);
+            return output;
         }
     }
 }

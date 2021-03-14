@@ -9,7 +9,7 @@ namespace Shadowsocks.Obfs
 {
     public class AuthAES128SHA1 : VerifySimpleBase
     {
-        protected delegate byte[] hash_func(byte[] input);
+        protected delegate byte[] hash_func(Span<byte> input);
 
         protected class AuthDataAes128 : AuthData
         {
@@ -26,11 +26,11 @@ namespace Shadowsocks.Obfs
             SALT = method;
             if (method == "auth_aes128_md5")
             {
-                hash = MbedTLS.MD5;
+                hash = CryptoUtils.MD5;
             }
             else
             {
-                hash = MbedTLS.SHA1;
+                hash = CryptoUtils.SHA1;
             }
 
             var bytes = new byte[4];
