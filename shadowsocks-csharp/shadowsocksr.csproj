@@ -47,7 +47,7 @@
 
     <ItemGroup>
         <PackageReference Include="ARSoft.Tools.Net" Version="2.3.0" />
-        <PackageReference Include="Hardcodet.NotifyIcon.Wpf.NetCore" Version="1.0.18" />
+        <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
         <PackageReference Include="HMBSbige.SingleInstance" Version="5.0.0" />
         <PackageReference Include="HMBSbige.UpdateChecker" Version="5.0.1" />
         <PackageReference Include="RunAtStartup" Version="5.0.2" />
