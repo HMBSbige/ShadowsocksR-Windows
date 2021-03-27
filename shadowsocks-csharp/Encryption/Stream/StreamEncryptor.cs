@@ -1,9 +1,9 @@
+using Shadowsocks.Crypto;
 using Shadowsocks.Encryption.CircularBuffer;
 using Shadowsocks.Proxy;
 using Shadowsocks.Util;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Shadowsocks.Encryption.Stream
 {
@@ -86,46 +86,12 @@ namespace Shadowsocks.Encryption.Stream
 
         private void InitKey(string password)
         {
-            var passBuf = Encoding.UTF8.GetBytes(password);
-            if (_key == null)
-            {
-                _key = new byte[keyLen];
-            }
+            _key = new byte[keyLen];
 
-            if (_key.Length != keyLen)
-            {
-                Array.Resize(ref _key, keyLen);
-            }
-
-            LegacyDeriveKey(passBuf, _key, keyLen);
+            _key.AsSpan(0, keyLen).SsDeriveKey(password);
 
             Array.Resize(ref _iv, ivLen);
             Rng.RandBytes(_iv, ivLen);
-        }
-
-        public static void LegacyDeriveKey(byte[] password, byte[] key, int keylen)
-        {
-            var result = new byte[password.Length + MD5_LEN];
-            var i = 0;
-            byte[] md5Sum = null;
-            while (i < keylen)
-            {
-                if (i == 0)
-                {
-                    md5Sum = MbedTLS.MD5(password);
-                }
-                else
-                {
-                    if (md5Sum != null)
-                    {
-                        Array.Copy(md5Sum, 0, result, 0, MD5_LEN);
-                        Array.Copy(password, 0, result, MD5_LEN, password.Length);
-                    }
-                    md5Sum = MbedTLS.MD5(result);
-                }
-                Array.Copy(md5Sum, 0, key, i, Math.Min(MD5_LEN, keylen - i));
-                i += MD5_LEN;
-            }
         }
 
         protected virtual void InitCipher(byte[] iv, bool isCipher)

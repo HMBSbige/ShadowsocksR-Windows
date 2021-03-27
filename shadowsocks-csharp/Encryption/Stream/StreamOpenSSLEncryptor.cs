@@ -22,34 +22,30 @@ namespace Shadowsocks.Encryption.Stream
 
         private static readonly Dictionary<string, EncryptorInfo> _ciphers = new()
         {
-                {@"aes-128-cbc", new EncryptorInfo(16, 16, CIPHER_AES,@"",false)},
-                {@"aes-192-cbc", new EncryptorInfo(24, 16, CIPHER_AES, @"", false)},
-                {@"aes-256-cbc", new EncryptorInfo(32, 16, CIPHER_AES, @"", false)},
+            { @"aes-128-ctr", new EncryptorInfo(16, 16, CIPHER_AES) },
+            { @"aes-192-ctr", new EncryptorInfo(24, 16, CIPHER_AES) },
+            { @"aes-256-ctr", new EncryptorInfo(32, 16, CIPHER_AES) },
+            { @"aes-128-cfb", new EncryptorInfo(16, 16, CIPHER_AES) },
+            { @"aes-192-cfb", new EncryptorInfo(24, 16, CIPHER_AES) },
+            { @"aes-256-cfb", new EncryptorInfo(32, 16, CIPHER_AES) },
 
-                {@"aes-128-ctr", new EncryptorInfo(16, 16, CIPHER_AES)},
-                {@"aes-192-ctr", new EncryptorInfo(24, 16, CIPHER_AES)},
-                {@"aes-256-ctr", new EncryptorInfo(32, 16, CIPHER_AES)},
-                {@"aes-128-cfb", new EncryptorInfo(16, 16, CIPHER_AES)},
-                {@"aes-192-cfb", new EncryptorInfo(24, 16, CIPHER_AES)},
-                {@"aes-256-cfb", new EncryptorInfo(32, 16, CIPHER_AES)},
-
-                {@"aes-128-cfb8", new EncryptorInfo(16, 16, CIPHER_AES)},
-                {@"aes-192-cfb8", new EncryptorInfo(24, 16, CIPHER_AES)},
-                {@"aes-256-cfb8", new EncryptorInfo(32, 16, CIPHER_AES)},
-                {@"aes-128-cfb1", new EncryptorInfo(16, 16, CIPHER_AES, @"", false)},
-                {@"aes-192-cfb1", new EncryptorInfo(24, 16, CIPHER_AES, @"", false)},
-                {@"aes-256-cfb1", new EncryptorInfo(32, 16, CIPHER_AES, @"", false)},
-                {@"camellia-128-cfb", new EncryptorInfo(16, 16, CIPHER_CAMELLIA, @"", false)},
-                {@"camellia-192-cfb", new EncryptorInfo(24, 16, CIPHER_CAMELLIA, @"", false)},
-                {@"camellia-256-cfb", new EncryptorInfo(32, 16, CIPHER_CAMELLIA, @"", false)},
-                {@"bf-cfb", new EncryptorInfo(16, 8, CIPHER_OTHER_CFB, @"", false)},
-                {@"cast5-cfb", new EncryptorInfo(16, 8, CIPHER_OTHER_CFB, @"", false)},
-                {@"idea-cfb", new EncryptorInfo(16, 8, CIPHER_OTHER_CFB, @"", false)},
-                {@"rc2-cfb", new EncryptorInfo(16, 8, CIPHER_OTHER_CFB, @"", false)},
-                {@"rc4", new EncryptorInfo(16, 0, CIPHER_RC4)}, // weak
-                {@"rc4-md5", new EncryptorInfo(16, 16, CIPHER_RC4, @"RC4")}, // weak
-                {@"rc4-md5-6", new EncryptorInfo(16, 6, CIPHER_RC4, @"RC4")}, // weak
-                {@"seed-cfb", new EncryptorInfo(16, 16,CIPHER_OTHER_CFB, @"", false)}
+            { @"aes-128-cfb8", new EncryptorInfo(16, 16, CIPHER_AES) },
+            { @"aes-192-cfb8", new EncryptorInfo(24, 16, CIPHER_AES) },
+            { @"aes-256-cfb8", new EncryptorInfo(32, 16, CIPHER_AES) },
+            { @"aes-128-cfb1", new EncryptorInfo(16, 16, CIPHER_AES, @"", false) },
+            { @"aes-192-cfb1", new EncryptorInfo(24, 16, CIPHER_AES, @"", false) },
+            { @"aes-256-cfb1", new EncryptorInfo(32, 16, CIPHER_AES, @"", false) },
+            { @"camellia-128-cfb", new EncryptorInfo(16, 16, CIPHER_CAMELLIA, @"", false) },
+            { @"camellia-192-cfb", new EncryptorInfo(24, 16, CIPHER_CAMELLIA, @"", false) },
+            { @"camellia-256-cfb", new EncryptorInfo(32, 16, CIPHER_CAMELLIA, @"", false) },
+            { @"bf-cfb", new EncryptorInfo(16, 8, CIPHER_OTHER_CFB, @"", false) },
+            { @"cast5-cfb", new EncryptorInfo(16, 8, CIPHER_OTHER_CFB, @"", false) },
+            { @"idea-cfb", new EncryptorInfo(16, 8, CIPHER_OTHER_CFB, @"", false) },
+            { @"rc2-cfb", new EncryptorInfo(16, 8, CIPHER_OTHER_CFB, @"", false) },
+            { @"rc4", new EncryptorInfo(16, 0, CIPHER_RC4) }, // weak
+            { @"rc4-md5", new EncryptorInfo(16, 16, CIPHER_RC4, @"RC4") }, // weak
+            { @"rc4-md5-6", new EncryptorInfo(16, 6, CIPHER_RC4, @"RC4") }, // weak
+            { @"seed-cfb", new EncryptorInfo(16, 16, CIPHER_OTHER_CFB, @"", false) }
         };
 
         public static List<string> SupportedCiphers()
@@ -93,7 +89,7 @@ namespace Shadowsocks.Encryption.Stream
                 var temp = new byte[keyLen + ivLen];
                 Array.Copy(_key, 0, temp, 0, keyLen);
                 Array.Copy(iv, 0, temp, keyLen, ivLen);
-                realKey = MbedTLS.MD5(temp);
+                realKey = CryptoUtils.MD5(temp);
             }
             else
             {

@@ -1,6 +1,5 @@
 using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
-using Shadowsocks.Encryption.Stream;
 using Shadowsocks.Enums;
 using System;
 using System.Collections.Generic;
@@ -29,7 +28,7 @@ namespace Shadowsocks.Obfs
 
         private static Dictionary<string, int[]> _obfs = new()
         {
-                {"auth_chain_a", new[]{1, 0, 1}}
+            { "auth_chain_a", new[] { 1, 0, 1 } }
         };
 
         protected bool has_sent_header;
@@ -90,9 +89,9 @@ namespace Shadowsocks.Obfs
             return overhead;
         }
 
-        protected MbedTLS.HMAC CreateHMAC(byte[] key)
+        protected HMAC CreateHMAC(byte[] key)
         {
-            return new MbedTLS.HMAC_MD5(key);
+            return new HMACMD5(key);
         }
 
         protected virtual int GetRandLen(int datalength, xorshift128plus rd, byte[] last_hash)
@@ -271,11 +270,7 @@ namespace Shadowsocks.Obfs
 
                 var encrypt_key = user_key;
 
-                var streamEncryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("aes-128-cbc", Convert.ToBase64String(encrypt_key) + SALT);
-
-                streamEncryptor.SetIV(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-                streamEncryptor.Encrypt(encrypt, 16, encrypt_data, out _);
-                streamEncryptor.Dispose();
+                CryptoUtils.SsAes128(Convert.ToBase64String(encrypt_key) + SALT, encrypt.AsSpan(0, 16), encrypt_data.AsSpan(0, 16));
                 Array.Copy(encrypt_data, 0, encrypt, 4, 16);
                 uid.CopyTo(encrypt, 0);
             }

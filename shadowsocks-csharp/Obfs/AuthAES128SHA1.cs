@@ -1,6 +1,5 @@
 using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
-using Shadowsocks.Encryption.Stream;
 using Shadowsocks.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ namespace Shadowsocks.Obfs
 {
     public class AuthAES128SHA1 : VerifySimpleBase
     {
-        protected delegate byte[] hash_func(byte[] input);
+        protected delegate byte[] hash_func(Span<byte> input);
 
         protected class AuthDataAes128 : AuthData
         {
@@ -27,11 +26,11 @@ namespace Shadowsocks.Obfs
             SALT = method;
             if (method == "auth_aes128_md5")
             {
-                hash = MbedTLS.MD5;
+                hash = CryptoUtils.MD5;
             }
             else
             {
-                hash = MbedTLS.SHA1;
+                hash = CryptoUtils.SHA1;
             }
 
             var bytes = new byte[4];
@@ -40,8 +39,8 @@ namespace Shadowsocks.Obfs
         }
         private static Dictionary<string, int[]> _obfs = new()
         {
-                {"auth_aes128_md5", new[]{1, 0, 1}},
-                {"auth_aes128_sha1", new[]{1, 0, 1}}
+            { "auth_aes128_md5", new[] { 1, 0, 1 } },
+            { "auth_aes128_sha1", new[] { 1, 0, 1 } }
         };
 
         protected bool has_sent_header;
@@ -95,16 +94,16 @@ namespace Shadowsocks.Obfs
             return overhead;
         }
 
-        protected MbedTLS.HMAC CreateHMAC(byte[] key)
+        protected HMAC CreateHMAC(byte[] key)
         {
             if (Method == "auth_aes128_md5")
             {
-                return new MbedTLS.HMAC_MD5(key);
+                return new HMACMD5(key);
             }
 
             if (Method == "auth_aes128_sha1")
             {
-                return new MbedTLS.HMAC_SHA1(key);
+                return new HMACSHA1(key);
             }
 
             return null;
@@ -357,11 +356,7 @@ namespace Shadowsocks.Obfs
 
                 var encrypt_key = user_key;
 
-                var encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("aes-128-cbc", Convert.ToBase64String(encrypt_key) + SALT);
-
-                encryptor.SetIV(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 });
-                encryptor.Encrypt(encrypt, 16, encrypt_data, out _);
-                encryptor.Dispose();
+                CryptoUtils.SsAes128(Convert.ToBase64String(encrypt_key) + SALT, encrypt.AsSpan(0, 16), encrypt_data.AsSpan(0, 16));
                 Array.Copy(encrypt_data, 0, encrypt, 4, 16);
                 uid.CopyTo(encrypt, 0);
             }

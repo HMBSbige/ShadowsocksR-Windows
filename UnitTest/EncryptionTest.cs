@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Shadowsocks.Encryption;
 using Shadowsocks.Encryption.Stream;
 using Shadowsocks.Util;
@@ -81,50 +81,6 @@ namespace UnitTest
             {
                 IEncryptor encryptor = new StreamOpenSSLEncryptor(methodName, password);
                 IEncryptor decryptor = new StreamOpenSSLEncryptor(methodName, password);
-                RunEncryptionRound(encryptor, decryptor);
-            }
-        }
-
-        [TestMethod]
-        public void TestStreamMbedTLSEncryption()
-        {
-            var failed = false;
-            // run it once before the multi-threading test to initialize global tables
-            RunSingleStreamMbedTLSEncryptionThread();
-            var tasks = new List<Task>();
-            foreach (var cipher in StreamMbedTLSEncryptor.SupportedCiphers())
-            {
-                if (cipher.EndsWith(@"-cbc"))
-                {
-                    continue;
-                }
-                var t = new Task(() =>
-                {
-                    try
-                    {
-                        RunSingleStreamMbedTLSEncryptionThread(cipher);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine($@"{cipher}:{e.Message}");
-                        failed = true;
-                        throw;
-                    }
-                });
-                tasks.Add(t);
-                t.Start();
-            }
-
-            Task.WaitAll(tasks.ToArray());
-            Assert.IsFalse(failed);
-        }
-
-        private void RunSingleStreamMbedTLSEncryptionThread(string methodName = @"rc4-md5-6", string password = @"barfoo!")
-        {
-            for (var i = 0; i < 100; i++)
-            {
-                IEncryptor encryptor = new StreamMbedTLSEncryptor(methodName, password);
-                IEncryptor decryptor = new StreamMbedTLSEncryptor(methodName, password);
                 RunEncryptionRound(encryptor, decryptor);
             }
         }

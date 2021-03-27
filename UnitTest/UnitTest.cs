@@ -14,7 +14,7 @@ namespace UnitTest
         public void TestMd5()
         {
             var buff = Encoding.UTF8.GetBytes(@"密码");
-            var md5Sum = MbedTLS.MD5(buff);
+            var md5Sum = CryptoUtils.MD5(buff);
             var md5Hash = MD5.Create().ComputeHash(buff);
             Assert.IsTrue(md5Hash.SequenceEqual(md5Sum));
         }
