@@ -21,7 +21,7 @@ jobs:
 
     - name: Setup NuGet Private Sources
       shell: pwsh
-      run: dotnet nuget update source GitHub-HMBSbige -u HMBSbige -p ${{ secrets.GITHUB_TOKEN }}
+      run: dotnet nuget add source https://nuget.pkg.github.com/HMBSbige/index.json -n GitHub-HMBSbige -u HMBSbige -p ${{ secrets.GITHUB_TOKEN }}
 
     - name: Build .NET App
       shell: pwsh
