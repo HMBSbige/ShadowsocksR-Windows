@@ -8,7 +8,8 @@ registries:
   GitHub-HMBSbige:
     type: nuget-feed
     url: https://nuget.pkg.github.com/HMBSbige/index.json
-    token: ${{ secrets.GITHUB_TOKEN }}
+    username: HMBSbige
+    password: ${{ secrets.GITHUB_TOKEN }}
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
