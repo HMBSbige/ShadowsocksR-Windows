@@ -4,6 +4,11 @@
 # https://help.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 
 version: 2
+registries:
+  nuget-github:
+    type: nuget-feed
+    url: https://nuget.pkg.github.com/HMBSbige/index.json
+    token: ${{ secrets.GITHUB_TOKEN }}
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
