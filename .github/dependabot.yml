@@ -5,7 +5,7 @@
 
 version: 2
 registries:
-  nuget-github:
+  GitHub-HMBSbige:
     type: nuget-feed
     url: https://nuget.pkg.github.com/HMBSbige/index.json
     token: ${{ secrets.GITHUB_TOKEN }}
