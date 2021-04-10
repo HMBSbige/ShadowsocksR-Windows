@@ -1,4 +1,4 @@
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using Shadowsocks.Controller;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
