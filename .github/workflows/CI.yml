@@ -105,7 +105,7 @@ jobs:
           C:\builtfiles\${{ env.ProjectName }}-Win64-${{ steps.tag.outputs.tag }}.7z
           C:\builtfiles\${{ env.ProjectName }}-Win32-${{ steps.tag.outputs.tag }}.7z
         body: |
-          [![](https://img.shields.io/badge/Telegram-Channel-blue)](https://t.me/ShadowsocksR_Windows) [![](https://img.shields.io/badge/Telegram-Group-green)](https://t.me/joinchat/Gn-Aa0-j4HcpdBaW-Iv8Sw)
+          [![](https://img.shields.io/badge/Channel-blue?label=Telegram&logo=telegram)](https://t.me/ShadowsocksR_Windows) [![](https://img.shields.io/badge/Group-green?label=Telegram&logo=telegram)](https://t.me/joinchat/Gn-Aa0-j4HcpdBaW-Iv8Sw)
           [![](https://img.shields.io/badge/ShadowsocksR-Android-e482a3)](https://github.com/HMBSbige/ShadowsocksR-Android/releases)
 
           ## 更新日志：
