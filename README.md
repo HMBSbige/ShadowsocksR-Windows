@@ -1,8 +1,8 @@
 <img src="shadowsocks-csharp/Resources/ssw128.png" width="48"/>ShadowsocksR for Windows
 =======================
 
-[![](https://img.shields.io/badge/Telegram-Channel-blue)](https://t.me/ShadowsocksR_Windows)
-[![](https://img.shields.io/badge/Telegram-Group-green)](https://t.me/joinchat/Gn-Aa0-j4HcpdBaW-Iv8Sw)
+[![](https://img.shields.io/badge/Channel-blue?label=Telegram&logo=telegram)](https://t.me/ShadowsocksR_Windows)
+[![](https://img.shields.io/badge/Group-green?label=Telegram&logo=telegram)](https://t.me/joinchat/Gn-Aa0-j4HcpdBaW-Iv8Sw)
 
 ## Build
 
