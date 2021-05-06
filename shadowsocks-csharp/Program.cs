@@ -6,7 +6,6 @@ using Shadowsocks.Util;
 using System;
 using System.IO;
 using System.Linq;
-using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -58,7 +57,6 @@ namespace Shadowsocks
             Global.ViewController = new MenuViewController(Global.Controller);
             SystemEvents.SessionEnding += Global.ViewController.Quit_Click;
 
-            Global.OSSupportsLocalIPv6 = Socket.OSSupportsIPv6;
             Global.Controller.Reload();
             if (Global.GuiConfig.IsDefaultConfig())
             {

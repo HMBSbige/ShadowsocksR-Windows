@@ -6,31 +6,34 @@ using System.Net;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
+#nullable enable
+
 namespace Shadowsocks.Util.NetUtils
 {
     public static class DnsUtil
     {
         public static LRUCache<string, IPAddress> DnsBuffer { get; } = new();
 
-        public static IPAddress QueryDns(string host)
+        public static IPAddress? QueryDns(string host)
         {
             var res = host.Contains('.') && Global.GuiConfig.DnsClients.Any(s => s.Enable)
                     ? QueryAsync(host, Global.GuiConfig.DnsClients).Result
-                    : QueryAsync(host).Result;
-            Logging.Info(res == null
+                    : QueryDefaultAsync(host).Result;
+            Logging.Info(res is null
                     ? $@"DNS query {host} failed."
                     : $@"DNS query {host} answer {res}");
             return res;
         }
 
-        public static async Task<IPAddress> QueryAsync(string host)
+        public static async Task<IPAddress?> QueryDefaultAsync(string host, bool ipv6First = default)
         {
-            return await DnsClient.QueryIpAddressDefault(host, false, default);
+            return await DnsClient.QueryIpAddressDefault(host, ipv6First, default);
         }
 
-        public static async Task<IPAddress> QueryAsync(string host, IEnumerable<DnsClient> clients)
+        public static async Task<IPAddress?> QueryAsync(string host, IEnumerable<DnsClient> clients)
         {
-            return await clients.Where(client => client.Enable)
+            return await clients
+                    .Where(client => client.Enable)
                     .Select(s => Observable
                             .FromAsync(ct => s.QueryIpAddress(host, ct))
                             .Where(ip => ip != null)

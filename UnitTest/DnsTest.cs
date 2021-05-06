@@ -4,6 +4,7 @@ using Shadowsocks.Util.NetUtils;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 
 namespace UnitTest
@@ -14,9 +15,9 @@ namespace UnitTest
         [TestMethod]
         public async Task DefaultTest()
         {
-            var ip1 = await DnsUtil.QueryAsync(@"dns.google");
+            var ip1 = await DnsUtil.QueryDefaultAsync(@"dns.google");
             Assert.IsTrue(Equals(ip1, IPAddress.Parse(@"8.8.8.8")) || Equals(ip1, IPAddress.Parse(@"8.8.4.4")));
-            var ip2 = await DnsUtil.QueryAsync(@"dns.google");
+            var ip2 = await DnsUtil.QueryDefaultAsync(@"dns.google", true);
             Assert.IsTrue(Equals(ip2, IPAddress.Parse(@"2001:4860:4860::8888")) || Equals(ip2, IPAddress.Parse(@"2001:4860:4860::8844")));
         }
 
@@ -61,6 +62,56 @@ namespace UnitTest
             };
             var res = await DnsUtil.QueryAsync(host, clients);
             Assert.IsNotNull(res);
+            Console.WriteLine(res);
+        }
+
+        [TestMethod]
+        public async Task TestIpv6FallbackAsync()
+        {
+            const string host = @"speed.neu6.edu.cn";
+
+            var resDefault = await DnsUtil.QueryDefaultAsync(host);
+            Assert.IsNotNull(resDefault);
+            Console.WriteLine(resDefault);
+
+            var clients = new List<Shadowsocks.Model.DnsClient>
+            {
+                    new(DnsType.DnsOverTls)
+                    {
+                        DnsServer = @"dns.alidns.com"
+                    },
+                    new(DnsType.Default)
+                    {
+                        DnsServer = @"114.114.114.114",
+                        Port = 53,
+                        IsTcpEnabled = true,
+                        IsUdpEnabled = false
+                    }
+            };
+            var res = await DnsUtil.QueryAsync(host, clients);
+            Assert.IsNotNull(res);
+            Console.WriteLine(res);
+        }
+
+        [TestMethod]
+        public async Task TestIpv6FirstAsync()
+        {
+            const string host = @"speed.neu.edu.cn";
+            var clients = new List<Shadowsocks.Model.DnsClient>
+            {
+                new(DnsType.Default)
+                {
+                    DnsServer = @"114.114.114.114",
+                    Port = 53,
+                    IsTcpEnabled = true,
+                    IsUdpEnabled = false,
+                    Ipv6First = true
+                }
+            };
+            var res = await DnsUtil.QueryAsync(host, clients);
+
+            Assert.IsNotNull(res);
+            Assert.AreEqual(AddressFamily.InterNetworkV6, res.AddressFamily);
             Console.WriteLine(res);
         }
     }

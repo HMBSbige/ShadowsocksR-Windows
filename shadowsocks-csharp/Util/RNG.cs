@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Security.Cryptography;
 
 namespace Shadowsocks.Util
@@ -7,29 +7,7 @@ namespace Shadowsocks.Util
     {
         public static void RandBytes(byte[] buf, int length = -1)
         {
-            if (length < 0)
-            {
-                length = buf.Length;
-            }
-
-            var temp = new byte[length];
-            using (var rngServiceProvider = new RNGCryptoServiceProvider())
-            {
-                rngServiceProvider.GetBytes(temp);
-            }
-
-            Buffer.BlockCopy(temp, 0, buf, 0, length);
-        }
-
-        public static uint RandUInt32()
-        {
-            var temp = new byte[4];
-            using (var rngServiceProvider = new RNGCryptoServiceProvider())
-            {
-                rngServiceProvider.GetBytes(temp);
-            }
-
-            return BitConverter.ToUInt32(temp, 0);
+            RandomNumberGenerator.Fill(length < 0 ? buf : buf.AsSpan(0, length));
         }
 
         public static string RandId()

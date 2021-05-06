@@ -1,10 +1,11 @@
-﻿using Shadowsocks.Controller;
+using Shadowsocks.Controller;
 using Shadowsocks.Controller.HttpRequest;
 using Shadowsocks.Controller.Service;
 using Shadowsocks.Util;
 using System;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Text.Json;
 
 namespace Shadowsocks.Model
@@ -13,7 +14,7 @@ namespace Shadowsocks.Model
     {
         private const string ConfigFile = @"gui-config.json";
 
-        public static bool OSSupportsLocalIPv6 = false;
+        public static readonly bool OSSupportsLocalIPv6 = Socket.OSSupportsIPv6;
 
         public static string LocalHost => OSSupportsLocalIPv6 ? $@"[{IPAddress.IPv6Loopback}]" : $@"{IPAddress.Loopback}";
 
@@ -64,13 +65,17 @@ namespace Shadowsocks.Model
             try
             {
                 var config = JsonSerializer.Deserialize<Configuration>(configStr);
-                config.FixConfiguration();
-                return config;
+                if (config is not null)
+                {
+                    config.FixConfiguration();
+                    return config;
+                }
             }
             catch
             {
-                return null;
+                // ignored
             }
+            return null;
         }
 
         public static void LoadConfig()

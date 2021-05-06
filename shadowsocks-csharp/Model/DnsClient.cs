@@ -216,16 +216,16 @@ namespace Shadowsocks.Model
 
         private static async Task<IPAddress> QueryBase(ARSoft.Tools.Net.Dns.DnsClient client, DomainName domain, DnsQueryOptions options, bool ipv6First, CancellationToken ct)
         {
+            var res = await Task.WhenAll(
+                QueryBaseAaaaAsync(client, domain, options, ct),
+                QueryBaseAAsync(client, domain, options, ct));
+
             if (ipv6First)
             {
-                var res = await Task.WhenAll(QueryBaseAaaaAsync(client, domain, options, ct), QueryBaseAAsync(client, domain, options, ct));
                 return res[0] ?? res[1];
             }
-            else
-            {
-                var res = await Task.WhenAll(QueryBaseAAsync(client, domain, options, ct));
-                return res[0];
-            }
+
+            return res[1] ?? res[0];
         }
 
         private static async Task<IPAddress> QueryBaseTlsAAsync(DnsOverTlsClient client, DomainName domain, DnsQueryOptions options, CancellationToken ct)
@@ -308,11 +308,8 @@ namespace Shadowsocks.Model
                 }
                 case DnsType.DnsOverTls:
                 {
-                    if (_ip == null)
-                    {
-                        _ip = await QueryIpAddressDefault(DnsServer, Ipv6First, ct);
-                    }
-                    if (_ip == null)
+                    _ip ??= await QueryIpAddressDefault(DnsServer, Ipv6First, ct);
+                    if (_ip is null)
                     {
                         return null;
                     }
@@ -324,7 +321,7 @@ namespace Shadowsocks.Model
                     };
                     var dnsClient = new DnsOverTlsClient(tlsServer, Timeout, Port);
                     var res = await QueryBaseTls(dnsClient, domain, options, Ipv6First, ct);
-                    if (res == null)
+                    if (res is null)
                     {
                         _ip = null;
                     }
