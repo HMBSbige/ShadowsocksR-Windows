@@ -175,14 +175,13 @@ namespace Shadowsocks.Controller.Service
                         {
                             return CONNECT_DIRECT;
                         }
-                        if ((_config.ProxyRuleMode == ProxyRuleMode.BypassLanAndChina || _config.ProxyRuleMode == ProxyRuleMode.BypassLanAndNotChina) && _IPRange != null
-                            && ipAddress.AddressFamily == AddressFamily.InterNetwork
-                            )
+                        if (_config.ProxyRuleMode is ProxyRuleMode.BypassLanAndChina or ProxyRuleMode.BypassLanAndNotChina && _IPRange is not null)
                         {
                             if (_IPRange.IsInIPRange(ipAddress))
                             {
                                 return CONNECT_LOCALPROXY;
                             }
+
                             DnsUtil.DnsBuffer.Sweep();
                         }
                     }

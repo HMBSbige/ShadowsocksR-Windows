@@ -441,10 +441,6 @@ namespace Shadowsocks.Controller
         {
             _chnRangeSet = new IPRangeSet();
             _chnRangeSet.LoadChn();
-            if (Global.GuiConfig.ProxyRuleMode == ProxyRuleMode.BypassLanAndNotChina)
-            {
-                _chnRangeSet.Reverse();
-            }
         }
 
         private void ReloadProxyRule()
@@ -591,7 +587,7 @@ namespace Shadowsocks.Controller
 
         public void ShowSubscribeWindow()
         {
-            ShowSubscribeWindowEvent?.Invoke(default, default);
+            ShowSubscribeWindowEvent?.Invoke(default, new EventArgs());
         }
 
         /// <summary>

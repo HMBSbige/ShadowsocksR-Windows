@@ -51,6 +51,7 @@
         <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
         <PackageReference Include="HMBSbige.SingleInstance" Version="5.0.0" />
         <PackageReference Include="HMBSbige.UpdateChecker" Version="5.0.1" />
+        <PackageReference Include="RouteMatcher" Version="1.0.0" />
         <PackageReference Include="RunAtStartup" Version="5.0.2" />
         <PackageReference Include="Shadowsocks.Crypto" Version="0.9.0" />
         <PackageReference Include="Syncfusion.SfGrid.WPF" Version="19.1.0.59" />

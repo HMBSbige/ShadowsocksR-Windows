@@ -1,4 +1,4 @@
-﻿using System.Net.Sockets;
+using System.Net.Sockets;
 
 namespace Shadowsocks.Proxy
 {
@@ -7,10 +7,6 @@ namespace Shadowsocks.Proxy
         public string local_sendback_protocol;
 
         public ProxySocketTunLocal(Socket socket) : base(socket)
-        {
-        }
-
-        public ProxySocketTunLocal(AddressFamily af, SocketType type, ProtocolType protocol) : base(af, type, protocol)
         {
         }
 
