@@ -36,8 +36,7 @@ namespace Shadowsocks.Util.NetUtils
                     .Where(client => client.Enable)
                     .Select(s => Observable
                             .FromAsync(ct => s.QueryIpAddress(host, ct))
-                            .Where(ip => ip != null)
-                            .Select(ip => ip)
+                            .Where(ip => ip is not null)
                     )
                     .Merge()
                     .FirstOrDefaultAsync();

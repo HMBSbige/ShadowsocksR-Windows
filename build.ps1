@@ -1,8 +1,8 @@
 param([string]$buildtfm = 'all')
 $ErrorActionPreference = 'Stop'
 
-Write-Host 'dotnet SDK version'
-dotnet --version
+Write-Host 'dotnet SDK info'
+dotnet --info
 
 $exe = 'ShadowsocksR.exe'
 $net_tfm = 'net5.0-windows10.0.19041.0'

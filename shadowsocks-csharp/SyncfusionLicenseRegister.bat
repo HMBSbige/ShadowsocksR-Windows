@@ -13,9 +13,9 @@
 	::Replacement statement
 	if NOT "%LicenseKey%" == "" (
 		if "%buildType%" == "PostBuild" (
-		powershell -Command "(gc %sourceFile% -encoding UTF8) -Replace '%LicenseKey%','%DummyKey%'|SC %sourceFile% -encoding UTF8"
+		powershell -Command "(gc %sourceFile%) -Replace '%LicenseKey%','%DummyKey%'|SC %sourceFile%"
 		)
 		if "%buildType%" == "PreBuild" (
-		powershell -Command "(gc %sourceFile% -encoding UTF8) -Replace '%DummyKey%','%LicenseKey%'|SC %sourceFile% -encoding UTF8"
+		powershell -Command "(gc %sourceFile%) -Replace '%DummyKey%','%LicenseKey%'|SC %sourceFile%"
 		)
 	)

@@ -1,4 +1,3 @@
-using CryptoBase;
 using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.Model;
@@ -11,56 +10,12 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 
+#nullable enable
+
 namespace Shadowsocks.Util
 {
     public static class Utils
     {
-        public static bool BitCompare(byte[] target, int target_offset, byte[] m, int m_offset, int targetLength)
-        {
-            for (var i = 0; i < targetLength; ++i)
-            {
-                if (target[target_offset + i] != m[m_offset + i])
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        public static int FindStr(byte[] target, int targetLength, byte[] m)
-        {
-            if (m.Length > 0 && targetLength >= m.Length)
-            {
-                for (var i = 0; i <= targetLength - m.Length; ++i)
-                {
-                    if (target[i] == m[0])
-                    {
-                        var j = 1;
-                        for (; j < m.Length; ++j)
-                        {
-                            if (target[i + j] != m[j])
-                            {
-                                break;
-                            }
-                        }
-
-                        if (j >= m.Length)
-                        {
-                            return i;
-                        }
-                    }
-                }
-            }
-
-            return -1;
-        }
-
-        public static string GetTimestamp(DateTime value)
-        {
-            return value.ToString(@"yyyyMMddHHmmssffff");
-        }
-
         public static void SetArrayMinSize<T>(ref T[] array, int size)
         {
             if (size > array.Length)
@@ -95,31 +50,26 @@ namespace Shadowsocks.Util
             return Assembly.GetExecutingAssembly().Location;
         }
 
-        private static string _tempPath;
-
-        // return path to store temporary files
-        public static string GetTempPath()
+        /// <summary>
+        /// return path to store temporary files
+        /// </summary>
+        public static string TempPath => TempPathLazy.Value;
+        private static readonly Lazy<string> TempPathLazy = new(() =>
         {
-            if (_tempPath == null)
+            try
             {
-                try
-                {
-                    _tempPath = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), @"temp"))
-                            .FullName;
-                }
-                catch (Exception e)
-                {
-                    Logging.Error(e);
-                    throw;
-                }
+                return Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), @"temp")).FullName;
             }
-
-            return _tempPath;
-        }
+            catch (Exception e)
+            {
+                Logging.Error(e);
+                throw;
+            }
+        });
 
         public static string GetTempPath(string filename)
         {
-            return Path.Combine(GetTempPath(), filename);
+            return Path.Combine(TempPath, filename);
         }
 
         public static bool IsGFWListPAC(string filename)
@@ -134,11 +84,6 @@ namespace Shadowsocks.Util
             }
 
             return false;
-        }
-
-        public static int GetDeterministicHashCode(this string str)
-        {
-            return str.GetClassicHashCode();
         }
 
         public static void OpenURL(string path)
@@ -203,16 +148,16 @@ namespace Shadowsocks.Util
 
             return bytes switch
             {
-                >= M * 990 when bytes >= G * 990 => bytes switch
+                >= M * 990 and >= G * 990 => bytes switch
                 {
                     >= P * 990 => $@"{bytes / (double)E:F3}EB",
                     >= T * 990 => $@"{bytes / (double)P:F3}PB",
                     _ => $@"{bytes / (double)T:F3}TB"
                 },
-                >= M * 990 when bytes >= G * 99 => $@"{bytes / (double)G:F2}GB",
-                >= M * 990 when bytes >= G * 9 => $@"{bytes / (double)G:F3}GB",
+                >= M * 990 and >= G * 99 => $@"{bytes / (double)G:F2}GB",
+                >= M * 990 and >= G * 9 => $@"{bytes / (double)G:F3}GB",
                 >= M * 990 => $@"{bytes / (double)G:F4}GB",
-                >= K * 990 when bytes >= M * 100 => $@"{bytes / (double)M:F1}MB",
+                >= K * 990 and >= M * 100 => $@"{bytes / (double)M:F1}MB",
                 >= K * 990 when bytes > M * 9.9 => $@"{bytes / (double)M:F2}MB",
                 >= K * 990 => $@"{bytes / (double)M:F3}MB",
                 > K * 99 => $@"{bytes / (double)K:F0}KB",
@@ -229,10 +174,10 @@ namespace Shadowsocks.Util
         public static IEnumerable<string> GetLines(this string str, bool removeEmptyLines = true)
         {
             using var sr = new StringReader(str);
-            string line;
-            while ((line = sr.ReadLine()) != null)
+            string? line;
+            while ((line = sr.ReadLine()) is not null)
             {
-                if (removeEmptyLines && string.IsNullOrWhiteSpace(line))
+                if (removeEmptyLines && string.IsNullOrEmpty(line))
                 {
                     continue;
                 }
@@ -243,7 +188,7 @@ namespace Shadowsocks.Util
         public static void SetTls()
         {
             var v = Environment.OSVersion;
-            if (v.Platform != PlatformID.Win32NT)
+            if (v.Platform is not PlatformID.Win32NT)
             {
                 return;
             }

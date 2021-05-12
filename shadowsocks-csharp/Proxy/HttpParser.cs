@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -165,7 +165,7 @@ namespace Shadowsocks.Proxy
                 Array.Resize(ref httpRequestBuffer, httpRequestBuffer.Length + PacketLength);
             }
             Array.Copy(Packet, 0, httpRequestBuffer, httpRequestBuffer.Length - PacketLength, PacketLength);
-            pos = Util.Utils.FindStr(httpRequestBuffer, httpRequestBuffer.Length, block);
+            pos = httpRequestBuffer.AsSpan().IndexOf(block);
             return pos;
         }
 

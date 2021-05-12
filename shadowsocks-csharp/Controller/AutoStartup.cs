@@ -1,13 +1,14 @@
+using CryptoBase;
 using RunAtStartup;
-using Shadowsocks.Util;
 using System;
 using System.IO;
+using Utils = Shadowsocks.Util.Utils;
 
 namespace Shadowsocks.Controller
 {
     internal static class AutoStartup
     {
-        private static readonly string Key = $@"ShadowsocksR_{Directory.GetCurrentDirectory().GetDeterministicHashCode()}";
+        private static readonly string Key = $@"ShadowsocksR_{Directory.GetCurrentDirectory().GetClassicHashCode()}";
 
         public static bool Set(bool enabled)
         {

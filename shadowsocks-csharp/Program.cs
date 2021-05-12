@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+using CryptoBase;
+using Microsoft.Win32;
 using Shadowsocks.Controller;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Utils = Shadowsocks.Util.Utils;
 
 namespace Shadowsocks
 {
@@ -18,7 +20,7 @@ namespace Shadowsocks
         private static void Main(string[] args)
         {
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Utils.GetExecutablePath()) ?? throw new InvalidOperationException());
-            var identifier = $@"Global\{Controller.HttpRequest.UpdateChecker.Name}_{Directory.GetCurrentDirectory().GetDeterministicHashCode()}";
+            var identifier = $@"Global\{Controller.HttpRequest.UpdateChecker.Name}_{Directory.GetCurrentDirectory().GetClassicHashCode()}";
             using var singleInstance = new SingleInstance.SingleInstance(identifier);
             if (!singleInstance.IsFirstInstance)
             {

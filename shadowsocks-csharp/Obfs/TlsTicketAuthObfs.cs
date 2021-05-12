@@ -17,8 +17,8 @@ namespace Shadowsocks.Obfs
         }
         private static Dictionary<string, int[]> _obfs = new()
         {
-                {"tls1.2_ticket_auth", new[]  {0, 1, 1}},
-                {"tls1.2_ticket_fastauth", new[]  {0, 1, 1}}
+            { "tls1.2_ticket_auth", new[] { 0, 1, 1 } },
+            { "tls1.2_ticket_fastauth", new[] { 0, 1, 1 } }
         };
 
         private int handshake_status;
@@ -379,7 +379,7 @@ namespace Shadowsocks.Obfs
                     Array.Copy(data_recv_buffer, 11, data, 0, 22);
                     hmac_sha1(data, data.Length);
 
-                    if (!Util.Utils.BitCompare(data_recv_buffer, 11 + 22, data, 22, 10))
+                    if (!data_recv_buffer.AsSpan(11 + 22, 10).SequenceEqual(data.AsSpan(22, 10)))
                     {
                         throw new ObfsException("ClientDecode data error: wrong sha1");
                     }
@@ -388,7 +388,7 @@ namespace Shadowsocks.Obfs
                     data = new byte[headerlength];
                     Array.Copy(data_recv_buffer, 0, data, 0, headerlength - 10);
                     hmac_sha1(data, headerlength);
-                    if (!Util.Utils.BitCompare(data_recv_buffer, headerlength - 10, data, headerlength - 10, 10))
+                    if (!data_recv_buffer.AsSpan(headerlength - 10, 10).SequenceEqual(data.AsSpan(headerlength - 10, 10)))
                     {
                         headerlength = 0;
                         while (headerlength < data_recv_buffer.Length &&
@@ -409,7 +409,7 @@ namespace Shadowsocks.Obfs
                         Array.Copy(data_recv_buffer, 0, data, 0, headerlength - 10);
                         hmac_sha1(data, headerlength);
 
-                        if (!Util.Utils.BitCompare(data_recv_buffer, headerlength - 10, data, headerlength - 10, 10))
+                        if (!data_recv_buffer.AsSpan(headerlength - 10, 10).SequenceEqual(data.AsSpan(headerlength - 10, 10)))
                         {
                             throw new ObfsException("ClientDecode data error: wrong sha1");
                         }

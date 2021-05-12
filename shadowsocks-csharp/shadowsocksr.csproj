@@ -47,7 +47,7 @@
 
     <ItemGroup>
         <PackageReference Include="ARSoft.Tools.Net" Version="2.3.0" />
-        <PackageReference Include="CryptoBase" Version="1.2.2" />
+        <PackageReference Include="CryptoBase" Version="1.2.3" />
         <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
         <PackageReference Include="HMBSbige.SingleInstance" Version="5.0.0" />
         <PackageReference Include="HMBSbige.UpdateChecker" Version="5.0.1" />

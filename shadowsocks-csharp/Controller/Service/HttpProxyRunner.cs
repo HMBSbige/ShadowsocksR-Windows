@@ -1,6 +1,6 @@
+using CryptoBase;
 using Shadowsocks.Model;
 using Shadowsocks.Properties;
-using Shadowsocks.Util;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using WindowsJobAPI;
+using Utils = Shadowsocks.Util.Utils;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -24,7 +25,7 @@ namespace Shadowsocks.Controller.Service
         {
             try
             {
-                var uid = Directory.GetCurrentDirectory().GetDeterministicHashCode();
+                var uid = Directory.GetCurrentDirectory().GetClassicHashCode();
                 UNIQUE_CONFIG_FILE = $@"privoxy_{uid}.conf";
                 PRIVOXY_JOB = new();
 
@@ -63,7 +64,7 @@ namespace Shadowsocks.Controller.Service
                         {
                                 FileName = ExeName,
                                 Arguments = UNIQUE_CONFIG_FILE,
-                                WorkingDirectory = Utils.GetTempPath(),
+                                WorkingDirectory = Utils.TempPath,
                                 WindowStyle = ProcessWindowStyle.Hidden,
                                 UseShellExecute = true,
                                 CreateNoWindow = true

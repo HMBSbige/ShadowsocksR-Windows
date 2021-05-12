@@ -1,11 +1,10 @@
-using Shadowsocks.Controller.HttpRequest;
+using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
 using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Shadowsocks.Enums;
 
 namespace Shadowsocks.Controller.Service
 {
@@ -33,7 +32,7 @@ namespace Shadowsocks.Controller.Service
         {
             _config = config;
             //Lots of software do not support ipv6 pac url yet
-            PacUrl = $@"http://{IPAddress.Loopback}:{config.LocalPort}/{ResourceName}?t={Utils.GetTimestamp(DateTime.Now)}";
+            PacUrl = $@"http://{IPAddress.Loopback}:{config.LocalPort}/{ResourceName}?t={DateTime.Now:yyyyMMddHHmmssffff}";
         }
 
         public override bool Handle(byte[] firstPacket, int length, Socket socket)
