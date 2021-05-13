@@ -1,4 +1,4 @@
-﻿using Syncfusion.UI.Xaml.Grid;
+using Syncfusion.UI.Xaml.Grid;
 using System.Linq;
 using System.Windows;
 

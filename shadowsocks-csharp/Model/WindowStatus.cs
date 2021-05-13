@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Util;
+using Shadowsocks.Util;
 using System.Windows;
 
 namespace Shadowsocks.Model

@@ -1,8 +1,8 @@
-﻿using System;
+using Shadowsocks.Util;
+using System;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.View.ValueConverter
 {

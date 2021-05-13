@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using Shadowsocks.Enums;
 using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
@@ -6,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.Json.Serialization;
 
 namespace Shadowsocks.Model
 {

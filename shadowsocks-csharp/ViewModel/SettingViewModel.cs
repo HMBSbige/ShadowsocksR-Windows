@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Model;
+using Shadowsocks.Model;
 
 namespace Shadowsocks.ViewModel
 {

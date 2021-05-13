@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Model;
+using Shadowsocks.Model;
 using System.Collections.ObjectModel;
 
 namespace Shadowsocks.ViewModel

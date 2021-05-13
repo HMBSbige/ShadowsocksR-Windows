@@ -41,11 +41,11 @@ namespace Shadowsocks.Encryption.Stream
 
         private static Dictionary<string, EncryptorInfo> _ciphers = new()
         {
-                {@"salsa20", new EncryptorInfo(32, 8,  CIPHER_SALSA20)},
-                {@"chacha20", new EncryptorInfo(32, 8,  CIPHER_CHACHA20)},
-                {@"xsalsa20", new EncryptorInfo(32, 24,  CIPHER_XSALSA20)},
-                {@"xchacha20", new EncryptorInfo(32, 24,  CIPHER_XCHACHA20)},
-                {@"chacha20-ietf", new EncryptorInfo(32, 12,  CIPHER_CHACHA20_IETF)}
+            { @"salsa20", new EncryptorInfo(32, 8, CIPHER_SALSA20) },
+            { @"chacha20", new EncryptorInfo(32, 8, CIPHER_CHACHA20) },
+            { @"xsalsa20", new EncryptorInfo(32, 24, CIPHER_XSALSA20) },
+            { @"xchacha20", new EncryptorInfo(32, 24, CIPHER_XCHACHA20) },
+            { @"chacha20-ietf", new EncryptorInfo(32, 12, CIPHER_CHACHA20_IETF) }
         };
 
         protected override Dictionary<string, EncryptorInfo> getCiphers()

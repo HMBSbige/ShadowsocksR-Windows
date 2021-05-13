@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Enums;
+using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
 using Shadowsocks.Util.NetUtils;

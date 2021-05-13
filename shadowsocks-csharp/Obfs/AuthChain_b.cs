@@ -12,7 +12,7 @@ namespace Shadowsocks.Obfs
 
         private static Dictionary<string, int[]> _obfs = new()
         {
-                {"auth_chain_b", new[]{1, 0, 1}}
+            { "auth_chain_b", new[] { 1, 0, 1 } }
         };
 
         protected int[] data_size_list;

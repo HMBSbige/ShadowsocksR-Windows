@@ -15,10 +15,10 @@ namespace Shadowsocks.Obfs
         }
         private static Dictionary<string, int[]> _obfs = new()
         {
-                //modify original protocol, wrap protocol, obfs param
-                {"http_simple", new[] {0, 1, 1}},
-                {"http_post", new[] {0, 1, 1}},
-                {"random_head", new[] {0, 1, 0}}
+            //modify original protocol, wrap protocol, obfs param
+            { "http_simple", new[] { 0, 1, 1 } },
+            { "http_post", new[] { 0, 1, 1 } },
+            { "random_head", new[] { 0, 1, 0 } }
         };
         private static string[] _request_path = {
             "", "",

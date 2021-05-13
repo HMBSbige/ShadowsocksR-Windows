@@ -1,4 +1,4 @@
-﻿namespace Shadowsocks.Obfs
+namespace Shadowsocks.Obfs
 {
     public class AuthData : VerifyData
     {

@@ -1,10 +1,10 @@
-﻿using Shadowsocks.Enums;
+using Shadowsocks.Enums;
 using Shadowsocks.Model;
+using Shadowsocks.Util.NetUtils;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using Shadowsocks.Util.NetUtils;
 
 namespace Shadowsocks.ViewModel
 {

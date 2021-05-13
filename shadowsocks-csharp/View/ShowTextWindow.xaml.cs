@@ -1,6 +1,6 @@
-﻿using System;
-using System.Windows;
 using Shadowsocks.Util;
+using System;
+using System.Windows;
 
 namespace Shadowsocks.View
 {

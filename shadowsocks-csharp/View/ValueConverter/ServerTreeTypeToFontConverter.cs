@@ -1,9 +1,9 @@
-﻿using System;
+using Shadowsocks.Enums;
+using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
-using Shadowsocks.Enums;
 
 namespace Shadowsocks.View.ValueConverter
 {

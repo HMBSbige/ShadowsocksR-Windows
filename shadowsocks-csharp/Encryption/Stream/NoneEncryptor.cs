@@ -10,7 +10,7 @@ namespace Shadowsocks.Encryption.Stream
 
         private static Dictionary<string, EncryptorInfo> _ciphers = new()
         {
-                {@"none", new EncryptorInfo(16, 0, 1)}
+            { @"none", new EncryptorInfo(16, 0, 1) }
         };
 
         public static List<string> SupportedCiphers()

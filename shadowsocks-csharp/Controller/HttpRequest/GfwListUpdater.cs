@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Controller.Service;
+using Shadowsocks.Controller.Service;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Properties;

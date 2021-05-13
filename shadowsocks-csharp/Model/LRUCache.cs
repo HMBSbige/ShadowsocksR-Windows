@@ -1,6 +1,6 @@
+using Shadowsocks.Controller;
 using System;
 using System.Collections.Generic;
-using Shadowsocks.Controller;
 
 namespace Shadowsocks.Model
 {

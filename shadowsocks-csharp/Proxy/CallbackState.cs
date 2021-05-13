@@ -1,4 +1,4 @@
-﻿namespace Shadowsocks.Proxy
+namespace Shadowsocks.Proxy
 {
     public class CallbackState
     {

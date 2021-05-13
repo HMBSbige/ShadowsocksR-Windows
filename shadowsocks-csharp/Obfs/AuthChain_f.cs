@@ -13,7 +13,7 @@ namespace Shadowsocks.Obfs
 
         private static Dictionary<string, int[]> _obfs = new()
         {
-                {"auth_chain_f", new[]{1, 0, 1}}
+            { "auth_chain_f", new[] { 1, 0, 1 } }
         };
 
         public static new List<string> SupportedObfs()

@@ -1,4 +1,4 @@
-﻿namespace Shadowsocks.Enums
+namespace Shadowsocks.Enums
 {
     public enum ServerTreeViewType
     {

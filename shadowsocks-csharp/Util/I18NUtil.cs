@@ -13,15 +13,15 @@ namespace Shadowsocks.Util
 
         public static readonly Dictionary<string, string> SupportLanguage = new()
         {
-                {@"zh-CN", @"zh-CN"},
-                {@"zh", @"zh-CN"},
-                {@"zh-Hans", @"zh-CN"},
-                {@"zh-SG", @"zh-CN"},
-                {@"zh-Hant", @"zh-TW"},
-                {@"zh-HK", @"zh-TW"},
-                {@"zh-TW", @"zh-TW"},
-                {@"zh-MO", @"zh-TW"},
-                {@"en-US", @"en-US"}
+            { @"zh-CN", @"zh-CN" },
+            { @"zh", @"zh-CN" },
+            { @"zh-Hans", @"zh-CN" },
+            { @"zh-SG", @"zh-CN" },
+            { @"zh-Hant", @"zh-TW" },
+            { @"zh-HK", @"zh-TW" },
+            { @"zh-TW", @"zh-TW" },
+            { @"zh-MO", @"zh-TW" },
+            { @"en-US", @"en-US" }
         };
 
         public static string GetLanguage(string langName = @"")

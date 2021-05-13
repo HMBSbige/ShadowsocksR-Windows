@@ -1,4 +1,4 @@
-﻿namespace Shadowsocks.Encryption.Exception
+namespace Shadowsocks.Encryption.Exception
 {
     public class CryptoErrorException : System.Exception
     {

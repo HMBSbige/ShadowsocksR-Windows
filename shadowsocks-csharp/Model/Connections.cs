@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using Shadowsocks.Proxy;
+using System.Collections.Generic;
 
 namespace Shadowsocks.Model
 {

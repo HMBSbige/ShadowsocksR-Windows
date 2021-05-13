@@ -14,7 +14,7 @@ namespace Shadowsocks.Obfs
         }
         private static Dictionary<string, int[]> _obfs = new()
         {
-                {"auth_sha1_v4", new[]{1, 0, 1}}
+            { "auth_sha1_v4", new[] { 1, 0, 1 } }
         };
 
         protected bool has_sent_header;

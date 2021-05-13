@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Shadowsocks.Obfs
 {
-    public abstract class ObfsBase: IObfs
+    public abstract class ObfsBase : IObfs
     {
         protected ObfsBase(string method)
         {

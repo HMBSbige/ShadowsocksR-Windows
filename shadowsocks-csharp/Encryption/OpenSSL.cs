@@ -1,11 +1,11 @@
-﻿using System;
+using Shadowsocks.Controller;
+using Shadowsocks.Properties;
+using Shadowsocks.Util;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
-using Shadowsocks.Controller;
-using Shadowsocks.Properties;
-using Shadowsocks.Util;
 
 namespace Shadowsocks.Encryption
 {

@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Generic;
 using Shadowsocks.Controller;
 using Shadowsocks.Util;
+using System;
+using System.Collections.Generic;
 
 namespace Shadowsocks.Obfs
 {
@@ -13,7 +13,7 @@ namespace Shadowsocks.Obfs
         }
         private static Dictionary<string, int[]> _obfs = new()
         {
-                {"verify_deflate", new[]{1, 0, 1}}
+            { "verify_deflate", new[] { 1, 0, 1 } }
         };
 
         public static List<string> SupportedObfs()

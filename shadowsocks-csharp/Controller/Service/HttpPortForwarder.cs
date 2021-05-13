@@ -1,4 +1,4 @@
-﻿using Shadowsocks.Model;
+using Shadowsocks.Model;
 using Shadowsocks.Proxy;
 using Shadowsocks.Util.NetUtils;
 using System;

@@ -1,4 +1,4 @@
-﻿namespace Shadowsocks.Encryption
+namespace Shadowsocks.Encryption
 {
     public class EncryptorInfo
     {

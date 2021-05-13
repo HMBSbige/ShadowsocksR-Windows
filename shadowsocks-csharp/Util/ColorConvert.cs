@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Windows.Media;
 using Color = System.Windows.Media.Color;
