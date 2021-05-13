@@ -187,13 +187,12 @@ namespace Shadowsocks.Util
 
         public static void SetTls()
         {
-            var v = Environment.OSVersion;
-            if (v.Platform is not PlatformID.Win32NT)
+            if (!OperatingSystem.IsWindows())
             {
                 return;
             }
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            if (v.Version >= Version.Parse(@"10.0.20170.0"))
+            if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 20170))
             {
                 ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls13;
             }
