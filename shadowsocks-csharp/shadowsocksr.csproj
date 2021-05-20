@@ -1,155 +1,160 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>WinExe</OutputType>
-        <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
-        <UseWPF>true</UseWPF>
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <AssemblyName>ShadowsocksR</AssemblyName>
-        <RootNamespace>Shadowsocks</RootNamespace>
-        <ApplicationIcon>shadowsocks.ico</ApplicationIcon>
-        <StartupObject>Shadowsocks.Program</StartupObject>
-        <LangVersion>latest</LangVersion>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows10.0.19041.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <UseWPF>true</UseWPF>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+    <AssemblyName>ShadowsocksR</AssemblyName>
+    <RootNamespace>Shadowsocks</RootNamespace>
+    <ApplicationIcon>shadowsocks.ico</ApplicationIcon>
+    <StartupObject>Shadowsocks.Program</StartupObject>
+    <LangVersion>latest</LangVersion>
+    <SelfContained>false</SelfContained>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <OutputPath>bin\Debug\</OutputPath>
-        <DefineConstants>DEBUG;TRACE;PROTOCOL_STATISTICS</DefineConstants>
-        <NoWarn>CA1416</NoWarn>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;PROTOCOL_STATISTICS</DefineConstants>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <OutputPath>bin\Release\</OutputPath>
-        <DefineConstants>TRACE;PROTOCOL_STATISTICS</DefineConstants>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;PROTOCOL_STATISTICS</DefineConstants>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <DefineConstants Condition=" '$(SelfContained)' == 'true' ">$(DefineConstants);IsSelfContainedDotNetCore</DefineConstants>
-        <DefineConstants Condition=" '$(RuntimeIdentifier)' == 'win-x64' ">$(DefineConstants);Is64Bit</DefineConstants>
-    </PropertyGroup>
+  <PropertyGroup>
+    <DefineConstants Condition=" $(SelfContained) ">$(DefineConstants);SelfContained</DefineConstants>
+    <DefineConstants Condition=" $(RuntimeIdentifier.Contains('x64')) ">$(DefineConstants);Is64Bit</DefineConstants>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <None Remove="View\Controls\MaskedTextBox.xaml" />
-        <None Remove="View\Controls\NumberUpDown.xaml" />
-        <None Remove="Resources\ssw128.png" />
-        <None Remove="View\LogWindow.xaml" />
-        <None Remove="View\PortSettingsWindow.xaml" />
-        <None Remove="View\QRCodeSplashWindow.xaml" />
-        <None Remove="View\ServerLogWindow.xaml" />
-        <None Remove="View\ShowTextWindow.xaml" />
-        <None Remove="View\SubscribeWindow.xaml" />
-    </ItemGroup>
+  <ItemGroup>
+    <None Remove="View\Controls\MaskedTextBox.xaml" />
+    <None Remove="View\Controls\NumberUpDown.xaml" />
+    <None Remove="Resources\ssw128.png" />
+    <None Remove="View\LogWindow.xaml" />
+    <None Remove="View\PortSettingsWindow.xaml" />
+    <None Remove="View\QRCodeSplashWindow.xaml" />
+    <None Remove="View\ServerLogWindow.xaml" />
+    <None Remove="View\ShowTextWindow.xaml" />
+    <None Remove="View\SubscribeWindow.xaml" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Resource Include="..\pic\wechat.jpg" Link="Resources\wechat.jpg" />
-    </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\pic\wechat.jpg" Link="Resources\wechat.jpg" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="ARSoft.Tools.Net" Version="2.3.0" />
-        <PackageReference Include="CryptoBase" Version="1.2.3" />
-        <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
-        <PackageReference Include="HMBSbige.SingleInstance" Version="5.0.0" />
-        <PackageReference Include="HMBSbige.UpdateChecker" Version="5.0.1" />
-        <PackageReference Include="RouteMatcher" Version="1.0.0" />
-        <PackageReference Include="RunAtStartup" Version="5.0.2" />
-        <PackageReference Include="Shadowsocks.Crypto" Version="0.9.0" />
-        <PackageReference Include="Syncfusion.SfGrid.WPF" Version="19.1.0.64" />
-        <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="19.1.0.64" />
-        <PackageReference Include="URIScheme" Version="5.0.0" />
-        <PackageReference Include="WindowsJobAPI" Version="5.0.1" />
-        <PackageReference Include="WindowsProxy" Version="5.0.3" />
-        <PackageReference Include="WpfColorFontDialog" Version="1.0.8" />
-        <PackageReference Include="ZXing.Net" Version="0.16.6" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ARSoft.Tools.Net" Version="2.3.0" />
+    <PackageReference Include="CryptoBase" Version="1.2.3" />
+    <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
+    <PackageReference Include="HMBSbige.SingleInstance" Version="5.0.0" />
+    <PackageReference Include="HMBSbige.UpdateChecker" Version="5.0.1" />
+    <PackageReference Include="RouteMatcher" Version="1.0.0" />
+    <PackageReference Include="RunAtStartup" Version="5.0.2" />
+    <PackageReference Include="Shadowsocks.Crypto" Version="0.9.0" />
+    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="19.1.0.64" />
+    <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="19.1.0.64" />
+    <PackageReference Include="URIScheme" Version="5.0.0" />
+    <PackageReference Include="WindowsJobAPI" Version="5.0.1" />
+    <PackageReference Include="WindowsProxy" Version="5.0.3" />
+    <PackageReference Include="WpfColorFontDialog" Version="1.0.8" />
+    <PackageReference Include="ZXing.Net" Version="0.16.6" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Compile Update="Properties\Resources.Designer.cs">
-            <DesignTime>True</DesignTime>
-            <AutoGen>True</AutoGen>
-            <DependentUpon>Resources.resx</DependentUpon>
-        </Compile>
-    </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
 
-    <ItemGroup>
-        <EmbeddedResource Update="Properties\Resources.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-        </EmbeddedResource>
-    </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
 
-    <ItemGroup>
-        <Page Update="I18N\SettingsWindow.en-US.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\SettingsWindow.zh-CN.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\SettingsWindow.zh-TW.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\PortSettingsWindow.en-US.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\PortSettingsWindow.zh-CN.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\PortSettingsWindow.zh-TW.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\ServerLogWindow.en-US.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\ServerLogWindow.zh-CN.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\ServerLogWindow.zh-TW.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\LogWindow.en-US.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\LogWindow.zh-CN.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\LogWindow.zh-TW.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\DnsSettingWindow.en-US.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\DnsSettingWindow.zh-CN.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\DnsSettingWindow.zh-TW.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\SubscribeWindow.en-US.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\SubscribeWindow.zh-CN.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\SubscribeWindow.zh-TW.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\ConfigWindow.en-US.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\ConfigWindow.zh-CN.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-        <Page Update="I18N\ConfigWindow.zh-TW.xaml">
-            <SubType>Designer</SubType>
-        </Page>
-    </ItemGroup>
+  <ItemGroup>
+    <Page Update="I18N\SettingsWindow.en-US.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\SettingsWindow.zh-CN.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\SettingsWindow.zh-TW.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\PortSettingsWindow.en-US.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\PortSettingsWindow.zh-CN.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\PortSettingsWindow.zh-TW.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\ServerLogWindow.en-US.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\ServerLogWindow.zh-CN.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\ServerLogWindow.zh-TW.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\LogWindow.en-US.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\LogWindow.zh-CN.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\LogWindow.zh-TW.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\DnsSettingWindow.en-US.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\DnsSettingWindow.zh-CN.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\DnsSettingWindow.zh-TW.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\SubscribeWindow.en-US.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\SubscribeWindow.zh-CN.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\SubscribeWindow.zh-TW.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\ConfigWindow.en-US.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\ConfigWindow.zh-CN.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="I18N\ConfigWindow.zh-TW.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
 
-    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-        <Exec Command="cd &quot;$(ProjectDir)&quot;&#xD;&#xA;&#xD;&#xA;SyncfusionLicenseRegister.bat PreBuild Program.cs" />
-    </Target>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="cd &quot;$(ProjectDir)&quot;&#xD;&#xA;&#xD;&#xA;SyncfusionLicenseRegister.bat PreBuild Program.cs" />
+  </Target>
 
-    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Exec Command="cd &quot;$(ProjectDir)&quot;&#xD;&#xA;&#xD;&#xA;SyncfusionLicenseRegister.bat PostBuild Program.cs" />
-    </Target>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="cd &quot;$(ProjectDir)&quot;&#xD;&#xA;&#xD;&#xA;SyncfusionLicenseRegister.bat PostBuild Program.cs" />
+  </Target>
 
 </Project>

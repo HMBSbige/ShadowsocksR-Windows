@@ -23,11 +23,11 @@ namespace Shadowsocks.Controller.HttpRequest
         public const string Version = @"5.3.0";
 
         public const string FullVersion = Version +
-#if IsSelfContainedDotNetCore
+#if SelfContained
 #if Is64Bit
             @" x64" +
 #else
-            @"" +
+            @" x86" +
 #endif
 #endif
 #if DEBUG
