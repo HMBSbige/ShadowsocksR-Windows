@@ -4,6 +4,7 @@ using Shadowsocks.Controller;
 using Shadowsocks.Enums;
 using Shadowsocks.Model;
 using Shadowsocks.Util;
+using SingleInstance;
 using System;
 using System.IO;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace Shadowsocks
         {
             Directory.SetCurrentDirectory(Path.GetDirectoryName(Utils.GetExecutablePath()) ?? throw new InvalidOperationException());
             var identifier = $@"Global\{Controller.HttpRequest.UpdateChecker.Name}_{Directory.GetCurrentDirectory().GetClassicHashCode()}";
-            using var singleInstance = new SingleInstance.SingleInstance(identifier);
+            using var singleInstance = new SingleInstanceService(identifier);
             if (!singleInstance.IsFirstInstance)
             {
                 singleInstance.PassArgumentsToFirstInstance(args.Length == 0
