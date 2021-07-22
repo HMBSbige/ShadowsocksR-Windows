@@ -1,3 +1,5 @@
+using CryptoBase.Digests;
+using CryptoBase.Macs.Hmac;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -99,14 +101,15 @@ namespace Shadowsocks.Obfs
 
         protected void hmac_sha1(byte[] data, int length)
         {
-            var key = new byte[Server.key.Length + 32];
-            Server.key.CopyTo(key, 0);
-            ((TlsAuthData)Server.data).clientID.CopyTo(key, Server.key.Length);
+            Span<byte> key = new byte[Server.key.Length + 32];
+            Server.key.AsSpan().CopyTo(key);
+            ((TlsAuthData)Server.data).clientID.AsSpan().CopyTo(key[Server.key.Length..]);
 
-            var sha1 = new HMACSHA1(key);
-            var sha1data = sha1.ComputeHash(data, 0, length - 10);
-
-            Array.Copy(sha1data, 0, data, length - 10, 10);
+            using var hmac = HmacUtils.Create(DigestType.Sha1, key);
+            hmac.Update(data.AsSpan(0, length - 10));
+            Span<byte> hash = stackalloc byte[hmac.Length];
+            hmac.GetMac(hash);
+            hash[..10].CopyTo(data.AsSpan(length - 10, 10));
         }
 
         public void PackAuthData(byte[] outdata)

@@ -1,3 +1,5 @@
+using CryptoBase.Digests;
+using CryptoBase.Macs.Hmac;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -139,14 +141,16 @@ namespace Shadowsocks.Obfs
             var crc32 = Util.CRC32.CalcCRC32(crcdata, crcdata.Length);
             BitConverter.GetBytes((uint)crc32).CopyTo(outdata, 2);
 
-            var key = new byte[Server.Iv.Length + Server.key.Length];
-            Server.Iv.CopyTo(key, 0);
-            Server.key.CopyTo(key, Server.Iv.Length);
+            Span<byte> key = new byte[Server.Iv.Length + Server.key.Length];
+            Server.Iv.AsSpan().CopyTo(key);
+            Server.key.AsSpan().CopyTo(key[Server.Iv.Length..]);
 
-            var sha1 = new HMACSHA1(key);
-            var sha1data = sha1.ComputeHash(outdata, 0, outlength - 10);
+            using var hmac = HmacUtils.Create(DigestType.Sha1, key);
+            hmac.Update(outdata.AsSpan(0, outlength - 10));
+            Span<byte> hash = stackalloc byte[hmac.Length];
+            hmac.GetMac(hash);
 
-            Array.Copy(sha1data, 0, outdata, outlength - 10, 10);
+            hash[..10].CopyTo(outdata.AsSpan(outlength - 10, 10));
         }
 
         public override byte[] ClientPreEncrypt(byte[] plaindata, int datalength, out int outlength)

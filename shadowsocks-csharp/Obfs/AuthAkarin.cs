@@ -1,3 +1,6 @@
+using CryptoBase.Abstractions;
+using CryptoBase.Digests;
+using CryptoBase.Macs.Hmac;
 using Shadowsocks.Controller;
 using Shadowsocks.Encryption;
 using Shadowsocks.Encryption.Stream;
@@ -8,7 +11,7 @@ using System.Security.Cryptography;
 
 namespace Shadowsocks.Obfs
 {
-    class AuthAkarin : VerifySimpleBase
+    internal class AuthAkarin : VerifySimpleBase
     {
         protected class AuthDataAesChain : AuthData
         {
@@ -93,9 +96,9 @@ namespace Shadowsocks.Obfs
             return overhead;
         }
 
-        protected HMAC CreateHMAC(byte[] key)
+        protected IMac CreateHMAC(byte[] key)
         {
-            return new HMACMD5(key);
+            return HmacUtils.Create(DigestType.Md5, key);
         }
 
         protected virtual int GetSendRandLen(int datalength, xorshift128plus rd, byte[] last_hash)
@@ -220,12 +223,14 @@ namespace Shadowsocks.Obfs
             user_key.CopyTo(key, 0);
             BitConverter.GetBytes(pack_id).CopyTo(key, key.Length - 4);
 
-            var md5 = CreateHMAC(key);
+            using var md5 = CreateHMAC(key);
             ++pack_id;
             {
-                var md5data = md5.ComputeHash(outdata, 0, outlength);
+                md5.Update(outdata.AsSpan(0, outlength));
+                var md5data = new byte[md5.Length];
+                md5.GetMac(md5data);
                 last_client_hash = md5data;
-                Array.Copy(md5data, 0, outdata, outlength, 2);
+                md5data[..2].CopyTo(outdata.AsSpan(outlength, 2));
                 outlength += 2;
             }
         }
@@ -276,13 +281,15 @@ namespace Shadowsocks.Obfs
 
             // first 12 bytes
             {
-                var rnd = new byte[4];
-                random.NextBytes(rnd);
-                rnd.CopyTo(outdata, 0);
-                var md5 = CreateHMAC(key);
-                var md5data = md5.ComputeHash(rnd, 0, rnd.Length);
+                Span<byte> rnd = stackalloc byte[4];
+                RandomNumberGenerator.Fill(rnd);
+                rnd.CopyTo(outdata);
+                using var md5 = CreateHMAC(key);
+                md5.Update(rnd);
+                var md5data = new byte[md5.Length];
+                md5.GetMac(md5data);
                 last_client_hash = md5data;
-                Array.Copy(md5data, 0, outdata, rnd.Length, 8);
+                md5data[..8].CopyTo(outdata.AsSpan(rnd.Length, 8));
             }
             // uid & 16 bytes auth data
             {
@@ -319,10 +326,12 @@ namespace Shadowsocks.Obfs
             }
             // final HMAC
             {
-                var md5 = CreateHMAC(user_key);
-                var md5data = md5.ComputeHash(encrypt, 0, 20);
+                using var md5 = CreateHMAC(user_key);
+                md5.Update(encrypt.AsSpan(0, 20));
+                var md5data = new byte[md5.Length];
+                md5.GetMac(md5data);
                 last_server_hash = md5data;
-                Array.Copy(md5data, 0, encrypt, 20, 4);
+                md5data[..4].CopyTo(encrypt.AsSpan(20, 4));
             }
             encrypt.CopyTo(outdata, 12);
             encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("chacha20", Convert.ToBase64String(user_key) + Convert.ToBase64String(last_client_hash, 0, 16));
@@ -451,7 +460,7 @@ namespace Shadowsocks.Obfs
             while (recv_buf_len > 4)
             {
                 BitConverter.GetBytes(recv_id).CopyTo(key, key.Length - 4);
-                var md5 = CreateHMAC(key);
+                using var md5 = CreateHMAC(key);
 
                 var data_len = ((recv_buf[1] ^ last_server_hash[15]) << 8) + (recv_buf[0] ^ last_server_hash[14]);
                 var rand_len = GetRecvRandLen(data_len, random_server, last_server_hash);
@@ -465,7 +474,9 @@ namespace Shadowsocks.Obfs
                     break;
                 }
 
-                var md5data = md5.ComputeHash(recv_buf, 0, len + 2);
+                md5.Update(recv_buf.AsSpan(0, len + 2));
+                var md5data = new byte[md5.Length];
+                md5.GetMac(md5data);
                 if (md5data[0] != recv_buf[len + 2]
                     || md5data[1] != recv_buf[len + 3]
                     )
@@ -531,8 +542,10 @@ namespace Shadowsocks.Obfs
             var auth_data = new byte[3];
             random.NextBytes(auth_data);
 
-            var md5 = CreateHMAC(Server.key);
-            var md5data = md5.ComputeHash(auth_data, 0, auth_data.Length);
+            using var md5 = CreateHMAC(Server.key);
+            md5.Update(auth_data);
+            var md5data = new byte[md5.Length];
+            md5.GetMac(md5data);
             var rand_len = UdpGetRandLen(random_client, md5data);
             var rand_data = new byte[rand_len];
             random.NextBytes(rand_data);
@@ -553,9 +566,11 @@ namespace Shadowsocks.Obfs
             }
             uid.CopyTo(outdata, outlength - 5);
             {
-                md5 = CreateHMAC(user_key);
-                md5data = md5.ComputeHash(outdata, 0, outlength - 1);
-                Array.Copy(md5data, 0, outdata, outlength - 1, 1);
+                using var userMd5 = CreateHMAC(user_key);
+                userMd5.Update(outdata.AsSpan(0, outlength - 1));
+                Span<byte> span = stackalloc byte[userMd5.Length];
+                userMd5.GetMac(span);
+                outdata[outlength - 1] = span[0];
             }
             return outdata;
         }
@@ -567,15 +582,20 @@ namespace Shadowsocks.Obfs
                 outlength = 0;
                 return plaindata;
             }
-            var md5 = CreateHMAC(user_key);
-            var md5data = md5.ComputeHash(plaindata, 0, datalength - 1);
+
+            using var md5 = CreateHMAC(user_key);
+            md5.Update(plaindata.AsSpan(0, datalength - 1));
+            var md5data = new byte[md5.Length];
+            md5.GetMac(md5data);
             if (md5data[0] != plaindata[datalength - 1])
             {
                 outlength = 0;
                 return plaindata;
             }
-            md5 = CreateHMAC(Server.key);
-            md5data = md5.ComputeHash(plaindata, datalength - 8, 7);
+
+            using var serverMd5 = CreateHMAC(Server.key);
+            serverMd5.Update(plaindata.AsSpan(datalength - 8, 7));
+            md5.GetMac(md5data);
             var rand_len = UdpGetRandLen(random_server, md5data);
             outlength = datalength - rand_len - 8;
             encryptor = (StreamEncryptor)EncryptorFactory.GetEncryptor("chacha20", Convert.ToBase64String(user_key) + Convert.ToBase64String(md5data, 0, 16));
