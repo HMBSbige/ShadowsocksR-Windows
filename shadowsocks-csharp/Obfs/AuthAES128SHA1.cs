@@ -9,7 +9,7 @@ namespace Shadowsocks.Obfs
 {
     public class AuthAES128SHA1 : VerifySimpleBase
     {
-        protected delegate byte[] hash_func(Span<byte> input);
+        protected delegate byte[] hash_func(ReadOnlySpan<byte> input);
 
         protected class AuthDataAes128 : AuthData
         {

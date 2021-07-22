@@ -1,6 +1,6 @@
-using CryptoBase;
-using CryptoBase.Digests.MD5;
-using CryptoBase.Digests.SHA1;
+using CryptoBase.Abstractions.Digests;
+using CryptoBase.Digests;
+using CryptoBase.SymmetricCryptos.BlockCryptos.AES;
 using Shadowsocks.Crypto;
 using System;
 using System.Buffers;
@@ -24,17 +24,19 @@ namespace Shadowsocks.Encryption
             }
         }
 
-        public static byte[] MD5(Span<byte> input)
+        public static byte[] MD5(ReadOnlySpan<byte> input)
         {
-            var output = new byte[16];
-            MD5Utils.Default(input, output);
+            var output = new byte[HashConstants.Md5Length];
+            using var hash = DigestUtils.Create(DigestType.Md5);
+            hash.UpdateFinal(input, output);
             return output;
         }
 
-        public static byte[] SHA1(Span<byte> input)
+        public static byte[] SHA1(ReadOnlySpan<byte> input)
         {
-            var output = new byte[20];
-            SHA1Utils.Default(input, output);
+            var output = new byte[HashConstants.Sha1Length];
+            using var hash = DigestUtils.Create(DigestType.Sha1);
+            hash.UpdateFinal(input, output);
             return output;
         }
     }
