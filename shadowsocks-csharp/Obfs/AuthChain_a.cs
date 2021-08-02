@@ -546,7 +546,7 @@ namespace Shadowsocks.Obfs
 
             using var serverMd5 = CreateHMAC(Server.key);
             serverMd5.Update(plaindata.AsSpan(datalength - 8, 7));
-            md5.GetMac(md5data);
+            serverMd5.GetMac(md5data);
             var rand_len = UdpGetRandLen(random_server, md5data);
             outlength = datalength - rand_len - 8;
             encryptor = EncryptorFactory.GetEncryptor("rc4", Convert.ToBase64String(user_key) + Convert.ToBase64String(md5data, 0, 16));

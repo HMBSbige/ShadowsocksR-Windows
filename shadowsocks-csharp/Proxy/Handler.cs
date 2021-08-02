@@ -628,7 +628,10 @@ namespace Shadowsocks.Proxy
             CloseSocket(ref remoteUDP);
             if (connection != null && cfg != null && connection.GetSocket() != null)
             {
-                Logging.Debug("Close   " + cfg.TargetHost + ":" + cfg.TargetPort + " " + connection.GetSocket().Handle);
+                if (cfg.TargetHost is not null)
+                {
+                    Logging.Debug($@"Close {cfg.TargetHost}:{cfg.TargetPort} {connection.GetSocket().Handle}");
+                }
             }
             if (lastErrCode == 0 && server != null && speedTester != null)
             {
@@ -677,10 +680,18 @@ namespace Shadowsocks.Proxy
 
                 if (!reconnect)
                 {
-                    Logging.Info($"Disconnect {cfg.TargetHost}:{cfg.TargetPort.ToString()}");
+                    if (cfg.TargetHost is not null)
+                    {
+                        Logging.Info($@"Disconnect {cfg.TargetHost}:{cfg.TargetPort}");
+                    }
+
                     CloseSocket(ref connection);
                     CloseSocket(ref connectionUDP);
-                    Logging.Debug($"Transfer {cfg.TargetHost}:{cfg.TargetPort + speedTester.TransferLog()}");
+
+                    if (cfg.TargetHost is not null)
+                    {
+                        Logging.Debug($@"Transfer {cfg.TargetHost}:{cfg.TargetPort + speedTester.TransferLog()}");
+                    }
                 }
                 else
                 {
@@ -775,7 +786,9 @@ namespace Shadowsocks.Proxy
                 }
             }
             speedTester.ServerId = server.Id;
-            Logging.Info($@"Connect {cfg.TargetHost}:{cfg.TargetPort.ToString()} via {server.server}:{server.Server_Port}");
+            Logging.Info(cfg.TargetHost is null
+                    ? $@"Send udp via {server.server}:{server.Server_Port}"
+                    : $@"Connect {cfg.TargetHost}:{cfg.TargetPort} via {server.server}:{server.Server_Port}");
 
             ResetTimeout(cfg.Ttl);
             if (Global.GuiConfig.ProxyRuleMode != ProxyRuleMode.Disable && cfg.TargetHost != null)
