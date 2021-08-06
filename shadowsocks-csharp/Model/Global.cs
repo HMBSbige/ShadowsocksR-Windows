@@ -14,11 +14,15 @@ namespace Shadowsocks.Model
     {
         private const string ConfigFile = @"gui-config.json";
 
-        public static readonly bool OSSupportsLocalIPv6 = Socket.OSSupportsIPv6;
+        public static bool OSSupportsLocalIPv6 => Socket.OSSupportsIPv6;
 
         public static string LocalHost => OSSupportsLocalIPv6 ? $@"[{IPAddress.IPv6Loopback}]" : $@"{IPAddress.Loopback}";
 
         public static string AnyHost => OSSupportsLocalIPv6 ? $@"[{IPAddress.IPv6Any}]" : $@"{IPAddress.Any}";
+
+        public static IPAddress IpLocal => OSSupportsLocalIPv6 ? IPAddress.IPv6Loopback : IPAddress.Loopback;
+
+        public static IPAddress IpAny => OSSupportsLocalIPv6 ? IPAddress.IPv6Any : IPAddress.Any;
 
         public static Configuration GuiConfig;
 

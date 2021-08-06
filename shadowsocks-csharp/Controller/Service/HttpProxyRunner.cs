@@ -1,152 +1,70 @@
-using CryptoBase;
+using HttpProxy;
+using Microsoft.VisualStudio.Threading;
 using Shadowsocks.Model;
-using Shadowsocks.Properties;
+using Socks5.Models;
 using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using WindowsJobAPI;
-using Utils = Shadowsocks.Util.Utils;
+
+#nullable enable
 
 namespace Shadowsocks.Controller.Service
 {
     public class HttpProxyRunner
     {
-        private static readonly string UNIQUE_CONFIG_FILE;
-        private static readonly JobObject PRIVOXY_JOB;
-        private Process _process;
-        private const string ExeNameNoExt = @"ShadowsocksR";
-        private const string ExeName = @"ShadowsocksR.exe";
-
-        static HttpProxyRunner()
-        {
-            try
-            {
-                var uid = Directory.GetCurrentDirectory().GetClassicHashCode();
-                UNIQUE_CONFIG_FILE = $@"privoxy_{uid}.conf";
-                PRIVOXY_JOB = new();
-
-                FileManager.DecompressFile(Utils.GetTempPath(ExeName), Resources.privoxy_exe);
-            }
-            catch (IOException e)
-            {
-                Logging.LogUsefulException(e);
-            }
-        }
+        private HttpSocks5Service? _service;
 
         public int RunningPort { get; private set; }
 
         public void Start(Configuration configuration)
         {
-            if (_process == null)
+            if (_service is not null)
             {
-                var existingPrivoxy = Process.GetProcessesByName(ExeNameNoExt);
-                foreach (var p in existingPrivoxy.Where(IsChildProcess))
-                {
-                    KillProcess(p);
-                }
-                var privoxyConfig = Resources.privoxy_conf;
-                RunningPort = GetFreePort();
-                privoxyConfig = privoxyConfig.Replace(@"__SOCKS_PORT__", configuration.LocalPort.ToString());
-                privoxyConfig = privoxyConfig.Replace(@"__PRIVOXY_BIND_PORT__", RunningPort.ToString());
-                privoxyConfig = privoxyConfig.Replace(@"__PRIVOXY_BIND_IP__",
-                configuration.ShareOverLan ? Global.AnyHost : Global.LocalHost)
-                .Replace(@"__SOCKS_HOST__", Global.LocalHost);
-                FileManager.ByteArrayToFile(Utils.GetTempPath(UNIQUE_CONFIG_FILE), Encoding.UTF8.GetBytes(privoxyConfig));
-
-                _process = new Process
-                {
-                    // Configure the process using the StartInfo properties.
-                    StartInfo =
-                        {
-                                FileName = ExeName,
-                                Arguments = UNIQUE_CONFIG_FILE,
-                                WorkingDirectory = Utils.TempPath,
-                                WindowStyle = ProcessWindowStyle.Hidden,
-                                UseShellExecute = true,
-                                CreateNoWindow = true
-                        }
-                };
-                _process.Start();
-
-                /*
-                 * Add this process to job obj associated with this ss process, so that
-                 * when ss exit unexpectedly, this process will be forced killed by system.
-                 */
-                PRIVOXY_JOB.AddProcess(_process);
+                return;
             }
+
+            var ip = configuration.ShareOverLan ? Global.IpAny : Global.IpLocal;
+            RunningPort = GetFreePort(ip);
+            var ipe = new IPEndPoint(ip, RunningPort);
+            var option = new Socks5CreateOption
+            {
+                Address = Global.IpLocal,
+                Port = (ushort)configuration.LocalPort,
+                UsernamePassword = new UsernamePassword
+                {
+                    UserName = configuration.AuthUser,
+                    Password = configuration.AuthPass
+                }
+            };
+            _service = new HttpSocks5Service(ipe, new HttpToSocks5(), option);
+            _service.StartAsync().Forget();
         }
 
         public void Stop()
         {
-            if (_process != null)
+            if (_service is null)
             {
-                KillProcess(_process);
-                _process.Dispose();
-                _process = null;
+                return;
             }
+
+            _service.Stop();
+            _service = null;
         }
 
-        private static void KillProcess(Process p)
-        {
-            try
-            {
-                p.CloseMainWindow();
-                p.WaitForExit(100);
-                if (!p.HasExited)
-                {
-                    p.Kill();
-                    p.WaitForExit();
-                }
-            }
-            catch (Exception e)
-            {
-                Logging.LogUsefulException(e);
-            }
-        }
-
-        private static bool IsChildProcess(Process process)
-        {
-            try
-            {
-                var path = process.MainModule?.FileName;
-
-                return Utils.GetTempPath(ExeName).Equals(path);
-
-            }
-            catch (Exception ex)
-            {
-                /*
-                 * Sometimes Process.GetProcessesByName will return some processes that
-                 * are already dead, and that will cause exceptions here.
-                 * We could simply ignore those exceptions.
-                 */
-                Logging.LogUsefulException(ex);
-                return false;
-            }
-        }
-
-        public static int GetFreePort()
+        private static int GetFreePort(IPAddress bindIp)
         {
             const int defaultPort = 60000;
             try
             {
-                // TCP stack please do me a favor
-                var l = new TcpListener(Global.OSSupportsLocalIPv6
-                        ? IPAddress.IPv6Loopback
-                        : IPAddress.Loopback, 0);
+                var l = new TcpListener(bindIp, 0);
                 l.Start();
                 var port = ((IPEndPoint)l.LocalEndpoint).Port;
                 l.Stop();
                 return port;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                // in case access denied
-                Logging.LogUsefulException(e);
+                Logging.LogUsefulException(ex);
                 return defaultPort;
             }
         }

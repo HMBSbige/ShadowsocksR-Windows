@@ -47,8 +47,8 @@ namespace Shadowsocks.Properties {
         }
         
         /// <summary>
-        ///   重写当前线程的 CurrentUICulture 属性
-        ///   重写当前线程的 CurrentUICulture 属性。
+        ///   重写当前线程的 CurrentUICulture 属性，对
+        ///   使用此强类型资源类的所有资源查找执行重写。
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Globalization.CultureInfo Culture {
@@ -85,32 +85,49 @@ namespace Shadowsocks.Properties {
         }
         
         /// <summary>
-        ///   查找类似 1.0.1.0 1.0.1.255
-        ///1.0.2.0 1.0.3.255
-        ///1.0.8.0 1.0.15.255
-        ///1.0.32.0 1.0.63.255
-        ///1.1.0.0 1.1.0.255
-        ///1.1.2.0 1.1.3.255
-        ///1.1.4.0 1.1.7.255
-        ///1.1.8.0 1.1.8.255
-        ///1.1.9.0 1.1.9.255
-        ///1.1.10.0 1.1.11.255
-        ///1.1.12.0 1.1.15.255
-        ///1.1.16.0 1.1.31.255
-        ///1.1.32.0 1.1.63.255
-        ///1.2.0.0 1.2.1.255
-        ///1.2.2.0 1.2.2.255
-        ///1.2.4.0 1.2.4.255
-        ///1.2.5.0 1.2.5.255
-        ///1.2.6.0 1.2.7.255
-        ///1.2.8.0 1.2.8.255
-        ///1.2.9.0 1.2.9.255
-        ///1.2.10.0 1.2.11.255
-        ///1.2.12.0 1.2.15.255
-        ///1.2.16.0 1.2.31.255
-        ///1.2.32.0 1.2.63.255
-        ///1.2.64.0 1.2.127.255
-        ///1.3.0.0 1.3.255 [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///   查找类似 1.0.1.0/24
+        ///1.0.2.0/23
+        ///1.0.8.0/21
+        ///1.0.32.0/19
+        ///1.1.0.0/24
+        ///1.1.2.0/23
+        ///1.1.4.0/22
+        ///1.1.8.0/21
+        ///1.1.16.0/20
+        ///1.1.32.0/19
+        ///1.2.0.0/23
+        ///1.2.2.0/24
+        ///1.2.4.0/22
+        ///1.2.8.0/21
+        ///1.2.16.0/20
+        ///1.2.32.0/19
+        ///1.2.64.0/18
+        ///1.3.0.0/16
+        ///1.4.1.0/24
+        ///1.4.2.0/23
+        ///1.4.4.0/22
+        ///1.4.8.0/21
+        ///1.4.16.0/20
+        ///1.4.32.0/19
+        ///1.4.64.0/18
+        ///1.8.0.0/16
+        ///1.10.0.0/21
+        ///1.10.8.0/23
+        ///1.10.11.0/24
+        ///1.10.12.0/22
+        ///1.10.16.0/20
+        ///1.10.32.0/19
+        ///1.10.64.0/18
+        ///1.12.16.0/20
+        ///1.12.32.0/23
+        ///1.12.36.0/22
+        ///1.12.40.0/21
+        ///1.12.48.0/20
+        ///1.12.64.0/18
+        ///1.12.128.0/17
+        ///1.13.0.0/16
+        ///1.14.0.0/15
+        ///1.18.128.0/2 [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string chn_ip {
             get {
@@ -139,33 +156,6 @@ namespace Shadowsocks.Properties {
         }
         
         /// <summary>
-        ///   查找类似 listen-address __PRIVOXY_BIND_IP__:__PRIVOXY_BIND_PORT__
-        ///toggle 0
-        ///logfile ShadowsocksR.log
-        ///show-on-task-bar 0
-        ///activity-animation 0
-        ///forward-socks5 / __SOCKS_HOST__:__SOCKS_PORT__ .
-        ///max-client-connections 2048
-        ///hide-console
-        /// 的本地化字符串。
-        /// </summary>
-        internal static string privoxy_conf {
-            get {
-                return ResourceManager.GetString("privoxy_conf", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Byte[] 类型的本地化资源。
-        /// </summary>
-        internal static byte[] privoxy_exe {
-            get {
-                object obj = ResourceManager.GetObject("privoxy_exe", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
         ///   查找类似 var direct = &quot;__DIRECT__&quot;;
         ///if (direct == &quot;__DIR&quot; + &quot;ECT__&quot;) direct = &quot;DIRECT;&quot;;
         ///
@@ -179,11 +169,12 @@ namespace Shadowsocks.Properties {
         ///var userrules = [];
         ///var rules = [
         ///  &quot;|http://85.17.73.31/&quot;,
+        ///  &quot;||afreecatv.com&quot;,
         ///  &quot;||agnesb.fr&quot;,
         ///  &quot;||akiba-web.com&quot;,
         ///  &quot;||altrec.com&quot;,
         ///  &quot;||angela-merkel.de&quot;,
-        ///  &quot;||ang [字符串的其余部分被截断]&quot;; 的本地化字符串。
+        ///  &quot;| [字符串的其余部分被截断]&quot;; 的本地化字符串。
         /// </summary>
         internal static string proxy_pac {
             get {
