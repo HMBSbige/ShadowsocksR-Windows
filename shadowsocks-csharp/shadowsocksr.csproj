@@ -56,10 +56,9 @@
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
     <PackageReference Include="HMBSbige.SingleInstance" Version="5.0.7" />
     <PackageReference Include="HMBSbige.UpdateChecker" Version="5.0.1" />
-    <PackageReference Include="HttpProxy" Version="0.9.2" />
     <PackageReference Include="RouteMatcher" Version="1.0.0" />
     <PackageReference Include="RunAtStartup" Version="5.0.2" />
-    <PackageReference Include="Shadowsocks.Crypto" Version="0.9.2" />
+    <PackageReference Include="Shadowsocks.Protocol" Version="0.9.3" />
     <PackageReference Include="Syncfusion.SfGrid.WPF" Version="19.2.0.51" />
     <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="19.2.0.51" />
     <PackageReference Include="URIScheme" Version="5.0.0" />

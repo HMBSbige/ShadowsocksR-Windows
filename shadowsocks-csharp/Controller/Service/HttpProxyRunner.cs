@@ -2,9 +2,7 @@ using HttpProxy;
 using Microsoft.VisualStudio.Threading;
 using Shadowsocks.Model;
 using Socks5.Models;
-using System;
 using System.Net;
-using System.Net.Sockets;
 
 #nullable enable
 
@@ -24,8 +22,7 @@ namespace Shadowsocks.Controller.Service
             }
 
             var ip = configuration.ShareOverLan ? Global.IpAny : Global.IpLocal;
-            RunningPort = GetFreePort(ip);
-            var ipe = new IPEndPoint(ip, RunningPort);
+            var ipe = new IPEndPoint(ip, 0);
             var option = new Socks5CreateOption
             {
                 Address = Global.IpLocal,
@@ -38,6 +35,7 @@ namespace Shadowsocks.Controller.Service
             };
             _service = new HttpSocks5Service(ipe, new HttpToSocks5(), option);
             _service.StartAsync().Forget();
+            RunningPort = ((IPEndPoint)_service.TcpListener.LocalEndpoint).Port;
         }
 
         public void Stop()
@@ -49,24 +47,6 @@ namespace Shadowsocks.Controller.Service
 
             _service.Stop();
             _service = null;
-        }
-
-        private static int GetFreePort(IPAddress bindIp)
-        {
-            const int defaultPort = 60000;
-            try
-            {
-                var l = new TcpListener(bindIp, 0);
-                l.Start();
-                var port = ((IPEndPoint)l.LocalEndpoint).Port;
-                l.Stop();
-                return port;
-            }
-            catch (Exception ex)
-            {
-                Logging.LogUsefulException(ex);
-                return defaultPort;
-            }
         }
     }
 }
