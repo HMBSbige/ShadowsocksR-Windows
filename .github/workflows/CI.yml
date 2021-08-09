@@ -92,18 +92,14 @@ jobs:
         echo "NET86_SHA256=$(.\Build\GetSHA256\GetSHA256.ps1 C:\builtfiles\$env:ProjectName-Win32-${{ steps.tag.outputs.tag }}.7z)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Create a new GitHub release if a new tag is pushed
-      uses: softprops/action-gh-release@v1
+      uses: ncipollo/release-action@v1
       if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') }}
-      env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         name: v${{ steps.tag.outputs.tag }}
         prerelease: true
         draft: false
-        files: |
-          C:\builtfiles\${{ env.ProjectName }}-${{ steps.tag.outputs.tag }}.7z
-          C:\builtfiles\${{ env.ProjectName }}-Win64-${{ steps.tag.outputs.tag }}.7z
-          C:\builtfiles\${{ env.ProjectName }}-Win32-${{ steps.tag.outputs.tag }}.7z
+        artifacts: C:\builtfiles\*
         body: |
           [![](https://img.shields.io/badge/Channel-blue?label=Telegram&logo=telegram)](https://t.me/ShadowsocksR_Windows) [![](https://img.shields.io/badge/Group-green?label=Telegram&logo=telegram)](https://t.me/joinchat/Gn-Aa0-j4HcpdBaW-Iv8Sw)
           [![](https://img.shields.io/badge/ShadowsocksR-Android-e482a3)](https://github.com/HMBSbige/ShadowsocksR-Android/releases)
