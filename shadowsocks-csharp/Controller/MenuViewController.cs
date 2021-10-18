@@ -501,21 +501,28 @@ namespace Shadowsocks.Controller
 
                     //Set SelectedServer
                     var selectedIndex = -1;
-                    if (selectedServer != null)
+                    if (selectedServer is not null)
                     {
-                        selectedIndex = config.Configs.FindIndex(server =>
-                          server.Id == selectedServer.Id
-                          || server.SubTag == selectedServer.SubTag && server.IsMatchServer(selectedServer));
+                        selectedIndex = config.Configs.FindIndex(server => server.Id == selectedServer.Id);
+
+                        if (selectedIndex < 0)
+                        {
+                            selectedIndex = config.Configs.FindIndex(server =>
+                                server.SubTag == selectedServer.SubTag && server.IsMatchServer(selectedServer)
+                            );
+                        }
+
+                        if (selectedIndex < 0)
+                        {
+                            selectedIndex = config.Configs.FindIndex(server =>
+                                server.SubTag == selectedServer.SubTag
+                                && server.Group == selectedServer.Group
+                                && server.Remarks == selectedServer.Remarks
+                            );
+                        }
                     }
 
-                    if (selectedServer == null || selectedIndex == -1)
-                    {
-                        config.Index = config.Configs.Count - 1;
-                    }
-                    else
-                    {
-                        config.Index = selectedIndex;
-                    }
+                    config.Index = selectedIndex < 0 ? default : selectedIndex;
 
                     //If Update Success
                     if (count > 0)
