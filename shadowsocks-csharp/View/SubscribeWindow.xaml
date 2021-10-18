@@ -1,4 +1,4 @@
-﻿<Window x:Class="Shadowsocks.View.SubscribeWindow"
+<Window x:Class="Shadowsocks.View.SubscribeWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:model="clr-namespace:Shadowsocks.Model"
@@ -36,7 +36,7 @@
                     </DockPanel>
                 </StackPanel>
             </DataTemplate>
-            <valueConverter:UlongToDateTimeString x:Key="UlongToDateTimeString" />
+            <valueConverter:UnixSecondsToString x:Key="UlongToDateTimeString" />
             <valueConverter:ProxyTypeConverter x:Key="ProxyTypeConverter" />
         </ResourceDictionary>
     </Window.Resources>

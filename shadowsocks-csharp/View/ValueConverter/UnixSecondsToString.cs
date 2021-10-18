@@ -3,17 +3,15 @@ using System.Windows.Data;
 
 namespace Shadowsocks.View.ValueConverter
 {
-    public class UlongToDateTimeString : IValueConverter
+    public class UnixSecondsToString : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (value is ulong lastUpdateTime && targetType == typeof(string))
+            if (value is long lastUpdateTime && targetType == typeof(string))
             {
-                if (lastUpdateTime != 0)
+                if (lastUpdateTime is not 0)
                 {
-                    var now = new DateTime(1970, 1, 1, 0, 0, 0);
-                    now = now.AddSeconds(lastUpdateTime);
-                    return $@"{now.ToLongDateString()} {now.ToLongTimeString()}";
+                    return DateTimeOffset.FromUnixTimeSeconds(lastUpdateTime).ToLocalTime().ToString();
                 }
             }
             return @"(｀・ω・´)";

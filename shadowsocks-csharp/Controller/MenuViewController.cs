@@ -542,7 +542,7 @@ namespace Shadowsocks.Controller
                     {
                         foreach (var serverSubscribe in config.ServerSubscribes.Where(serverSubscribe => serverSubscribe.Url == Global.UpdateNodeChecker.SubscribeTask.Url))
                         {
-                            serverSubscribe.LastUpdateTime = (ulong)DateTimeOffset.Now.ToUnixTimeSeconds();
+                            serverSubscribe.LastUpdateTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
                         }
 
                         var defaultServer = new Server();

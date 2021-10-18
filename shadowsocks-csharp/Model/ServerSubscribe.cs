@@ -13,7 +13,7 @@ namespace Shadowsocks.Model
     {
         private string _url;
         private string _tag;
-        private ulong _lastUpdateTime;
+        private long _lastUpdateTime;
         private bool _autoCheckUpdate;
         private HttpRequestProxyType _proxyType;
 
@@ -58,7 +58,7 @@ namespace Shadowsocks.Model
             }
         }
 
-        public ulong LastUpdateTime
+        public long LastUpdateTime
         {
             get => _lastUpdateTime;
             set
