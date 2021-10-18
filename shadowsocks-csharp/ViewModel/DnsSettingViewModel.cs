@@ -40,12 +40,12 @@ namespace Shadowsocks.ViewModel
                     };
                 }
             }
-            DnsClientsChanged?.Invoke(sender, new EventArgs());
+            DnsClientsChanged?.Invoke(sender, EventArgs.Empty);
         }
 
         private void Clients_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            DnsClientsChanged?.Invoke(sender, new EventArgs());
+            DnsClientsChanged?.Invoke(sender, EventArgs.Empty);
         }
 
         #endregion
@@ -60,7 +60,7 @@ namespace Shadowsocks.ViewModel
             {
                 if (SetField(ref _clients, value))
                 {
-                    DnsClientsChanged?.Invoke(this, new EventArgs());
+                    DnsClientsChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }

@@ -31,7 +31,7 @@ namespace Shadowsocks.Model
             {
                 if (SetField(ref _url, value))
                 {
-                    SubscribeChanged?.Invoke(this, new EventArgs());
+                    SubscribeChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -53,7 +53,7 @@ namespace Shadowsocks.Model
                 }
                 if (SetField(ref _tag, value))
                 {
-                    SubscribeChanged?.Invoke(this, new EventArgs());
+                    SubscribeChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -65,7 +65,7 @@ namespace Shadowsocks.Model
             {
                 if (SetField(ref _lastUpdateTime, value))
                 {
-                    SubscribeChanged?.Invoke(this, new EventArgs());
+                    SubscribeChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -77,7 +77,7 @@ namespace Shadowsocks.Model
             {
                 if (SetField(ref _autoCheckUpdate, value))
                 {
-                    SubscribeChanged?.Invoke(this, new EventArgs());
+                    SubscribeChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -89,7 +89,7 @@ namespace Shadowsocks.Model
             {
                 if (SetField(ref _proxyType, value))
                 {
-                    SubscribeChanged?.Invoke(this, new EventArgs());
+                    SubscribeChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }

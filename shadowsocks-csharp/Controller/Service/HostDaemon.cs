@@ -60,7 +60,7 @@ namespace Shadowsocks.Controller.Service
             {
                 ((FileSystemWatcher)sender).EnableRaisingEvents = false;
                 Logging.Info($@"Detected: user rule file '{e.Name}' was {e.ChangeType.ToString().ToLower()}.");
-                Task.Delay(10).ContinueWith(task => UserRuleChanged(this, new EventArgs()));
+                Task.Delay(10).ContinueWith(task => UserRuleChanged(this, EventArgs.Empty));
             }
             finally
             {
@@ -79,7 +79,7 @@ namespace Shadowsocks.Controller.Service
             {
                 ((FileSystemWatcher)sender).EnableRaisingEvents = false;
                 Logging.Info($@"Detected: '{e.Name}' was {e.ChangeType.ToString().ToLower()}.");
-                Task.Delay(10).ContinueWith(task => ChnIpChanged(this, new EventArgs()));
+                Task.Delay(10).ContinueWith(task => ChnIpChanged(this, EventArgs.Empty));
             }
             finally
             {

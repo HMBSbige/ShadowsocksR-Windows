@@ -325,7 +325,7 @@ namespace Shadowsocks.Controller
         public void SaveAndNotifyChanged()
         {
             Global.SaveConfig();
-            Application.Current.Dispatcher?.InvokeAsync(() => { ConfigChanged?.Invoke(this, new EventArgs()); });
+            Application.Current.Dispatcher?.InvokeAsync(() => { ConfigChanged?.Invoke(this, EventArgs.Empty); });
         }
 
         /// <summary>
@@ -500,7 +500,7 @@ namespace Shadowsocks.Controller
 
             LoadPortMap();
 
-            Application.Current.Dispatcher?.InvokeAsync(() => { ConfigChanged?.Invoke(this, new EventArgs()); });
+            Application.Current.Dispatcher?.InvokeAsync(() => { ConfigChanged?.Invoke(this, EventArgs.Empty); });
 
             UpdateSystemProxy();
         }
@@ -555,12 +555,12 @@ namespace Shadowsocks.Controller
 
         public void ShowConfigForm(int? index = null)
         {
-            ShowConfigFormEvent?.Invoke(index, new EventArgs());
+            ShowConfigFormEvent?.Invoke(index, EventArgs.Empty);
         }
 
         public void ShowSubscribeWindow()
         {
-            ShowSubscribeWindowEvent?.Invoke(default, new EventArgs());
+            ShowSubscribeWindowEvent?.Invoke(default, EventArgs.Empty);
         }
 
         /// <summary>

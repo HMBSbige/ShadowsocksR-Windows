@@ -56,13 +56,13 @@ namespace Shadowsocks.Controller.HttpRequest
                 if (Found)
                 {
                     LatestVersionUrl = updater.LatestVersionUrl;
-                    NewVersionFound?.Invoke(this, new EventArgs());
+                    NewVersionFound?.Invoke(this, EventArgs.Empty);
                 }
                 else
                 {
                     if (notifyNoFound)
                     {
-                        NewVersionNotFound?.Invoke(this, new EventArgs());
+                        NewVersionNotFound?.Invoke(this, EventArgs.Empty);
                     }
                 }
             }
@@ -71,7 +71,7 @@ namespace Shadowsocks.Controller.HttpRequest
                 Logging.LogUsefulException(e);
                 if (notifyNoFound)
                 {
-                    NewVersionFoundFailed?.Invoke(this, new EventArgs());
+                    NewVersionFoundFailed?.Invoke(this, EventArgs.Empty);
                 }
             }
         }

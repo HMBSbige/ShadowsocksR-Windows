@@ -25,7 +25,7 @@ namespace Shadowsocks.ViewModel
 
         private void SubscribeCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            SubscribesChanged?.Invoke(this, new EventArgs());
+            SubscribesChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public event EventHandler SubscribesChanged;
@@ -38,7 +38,7 @@ namespace Shadowsocks.ViewModel
             {
                 if (SetField(ref _subscribeCollection, value))
                 {
-                    SubscribesChanged?.Invoke(this, new EventArgs());
+                    SubscribesChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -62,7 +62,7 @@ namespace Shadowsocks.ViewModel
 
         private void _selectedServer_SubscribeChanged(object sender, EventArgs e)
         {
-            SubscribesChanged?.Invoke(this, new EventArgs());
+            SubscribesChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

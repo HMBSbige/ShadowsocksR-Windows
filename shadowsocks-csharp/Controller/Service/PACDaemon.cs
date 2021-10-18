@@ -102,7 +102,7 @@ namespace Shadowsocks.Controller.Service
             {
                 ((FileSystemWatcher)sender).EnableRaisingEvents = false;
                 Logging.Info($@"Detected: PAC file '{e.Name}' was {e.ChangeType.ToString().ToLower()}.");
-                Task.Delay(10).ContinueWith(task => { PACFileChanged(this, new EventArgs()); });
+                Task.Delay(10).ContinueWith(task => { PACFileChanged(this, EventArgs.Empty); });
             }
             finally
             {
@@ -121,7 +121,7 @@ namespace Shadowsocks.Controller.Service
             {
                 ((FileSystemWatcher)sender).EnableRaisingEvents = false;
                 Logging.Info($@"Detected: User Rule file '{e.Name}' was {e.ChangeType.ToString().ToLower()}.");
-                Task.Delay(10).ContinueWith(task => { UserRuleFileChanged(this, new EventArgs()); });
+                Task.Delay(10).ContinueWith(task => { UserRuleFileChanged(this, EventArgs.Empty); });
             }
             finally
             {

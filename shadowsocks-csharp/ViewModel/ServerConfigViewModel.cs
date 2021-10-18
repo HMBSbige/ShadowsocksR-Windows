@@ -22,7 +22,7 @@ namespace Shadowsocks.ViewModel
             {
                 if (SetField(ref _serverTreeViewCollection, value))
                 {
-                    ServersChanged?.Invoke(this, new EventArgs());
+                    ServersChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
@@ -100,14 +100,14 @@ namespace Shadowsocks.ViewModel
 
         private void ServerCollection_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            ServersChanged?.Invoke(this, new EventArgs());
+            ServersChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public event EventHandler ServersChanged;
 
         private void ServerChanged(object sender, EventArgs e)
         {
-            ServersChanged?.Invoke(this, new EventArgs());
+            ServersChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

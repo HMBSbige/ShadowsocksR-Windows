@@ -40,7 +40,7 @@ namespace Shadowsocks.View
                 {
                     c.TextChanged += (o, e) =>
                     {
-                        ValueChanged?.Invoke(this, new EventArgs());
+                        ValueChanged?.Invoke(this, EventArgs.Empty);
                     };
                 }
             }
@@ -48,25 +48,25 @@ namespace Shadowsocks.View
             {
                 c.Checked += (o, e) =>
                 {
-                    ValueChanged?.Invoke(this, new EventArgs());
+                    ValueChanged?.Invoke(this, EventArgs.Empty);
                 };
                 c.Unchecked += (o, e) =>
                 {
-                    ValueChanged?.Invoke(this, new EventArgs());
+                    ValueChanged?.Invoke(this, EventArgs.Empty);
                 };
             }
             foreach (var c in ViewUtils.FindVisualChildren<ComboBox>(this))
             {
                 c.SelectionChanged += (o, e) =>
                 {
-                    ValueChanged?.Invoke(this, new EventArgs());
+                    ValueChanged?.Invoke(this, EventArgs.Empty);
                 };
             }
             foreach (var c in ViewUtils.FindVisualChildren<NumberUpDown>(this))
             {
                 c.ValueChanged += (o, e) =>
                 {
-                    ValueChanged?.Invoke(this, new EventArgs());
+                    ValueChanged?.Invoke(this, EventArgs.Empty);
                 };
             }
 
@@ -250,7 +250,7 @@ namespace Shadowsocks.View
             if (!_modifiedConfiguration.PortMap.ContainsKey(key))
             {
                 _modifiedConfiguration.PortMap[key] = new PortMapConfig();
-                PortSettingsWindow_ValueChanged(this, new EventArgs());
+                PortSettingsWindow_ValueChanged(this, EventArgs.Empty);
             }
 
             var cfg = _modifiedConfiguration.PortMap[key];
@@ -282,7 +282,7 @@ namespace Shadowsocks.View
             _oldSelectedIndex = -1;
             LoadConfiguration(_modifiedConfiguration);
             LoadSelectedServer();
-            ValueChanged?.Invoke(this, new EventArgs());
+            ValueChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void TypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

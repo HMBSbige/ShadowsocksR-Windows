@@ -536,7 +536,7 @@ namespace Shadowsocks.Model
             {
                 OnPropertyChanged(nameof(SsLink));
                 OnPropertyChanged(nameof(SsrLink));
-                ServerChanged?.Invoke(this, new EventArgs());
+                ServerChanged?.Invoke(this, EventArgs.Empty);
                 return true;
             }
             return false;

@@ -34,7 +34,7 @@ namespace Shadowsocks.View.Controls
                 if (_plainMode != value)
                 {
                     _plainMode = value;
-                    PlainModeChanged?.Invoke(this, new EventArgs());
+                    PlainModeChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }

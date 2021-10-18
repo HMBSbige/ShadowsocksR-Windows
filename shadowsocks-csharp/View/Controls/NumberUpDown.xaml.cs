@@ -32,7 +32,7 @@ namespace Shadowsocks.View.Controls
                 {
                     _numValue = value;
                     TxtNum.Text = value.ToString();
-                    ValueChanged?.Invoke(this, new EventArgs());
+                    ValueChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
