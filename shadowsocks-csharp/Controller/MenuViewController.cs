@@ -520,6 +520,19 @@ namespace Shadowsocks.Controller
                                 && server.Remarks == selectedServer.Remarks
                             );
                         }
+
+                        if (selectedIndex < 0)
+                        {
+                            selectedIndex = config.Configs.FindIndex(server =>
+                                server.SubTag == selectedServer.SubTag
+                                && server.Group == selectedServer.Group
+                            );
+                        }
+
+                        if (selectedIndex < 0)
+                        {
+                            selectedIndex = config.Configs.FindIndex(server => server.SubTag == selectedServer.SubTag);
+                        }
                     }
 
                     config.Index = selectedIndex < 0 ? default : selectedIndex;
@@ -529,9 +542,11 @@ namespace Shadowsocks.Controller
                     {
                         foreach (var serverSubscribe in config.ServerSubscribes.Where(serverSubscribe => serverSubscribe.Url == Global.UpdateNodeChecker.SubscribeTask.Url))
                         {
-                            serverSubscribe.LastUpdateTime = (ulong)Math.Floor(DateTime.Now.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
+                            serverSubscribe.LastUpdateTime = (ulong)DateTimeOffset.Now.ToUnixTimeSeconds();
                         }
-                        config.Configs.RemoveAll(server => server.IsMatchServer(new Server()));
+
+                        var defaultServer = new Server();
+                        config.Configs.RemoveAll(server => server.IsMatchServer(defaultServer));
                     }
                     controller.SaveServersConfig(config, true);
                 }
