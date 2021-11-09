@@ -19,6 +19,11 @@ jobs:
       with:
         submodules: true
 
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
+
     - name: Setup NuGet Private Sources
       shell: pwsh
       run: dotnet nuget add source https://nuget.pkg.github.com/HMBSbige/index.json -n GitHub-HMBSbige -u HMBSbige -p ${{ secrets.GITHUB_TOKEN }}
