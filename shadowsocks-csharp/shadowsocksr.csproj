@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows10.0.20348.0</TargetFramework>
+    <TargetFramework>net6.0-windows10.0.22000.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <UseWPF>true</UseWPF>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -59,8 +59,8 @@
     <PackageReference Include="RouteMatcher" Version="1.0.0" />
     <PackageReference Include="RunAtStartup" Version="5.0.2" />
     <PackageReference Include="Shadowsocks.Protocol" Version="0.9.9" />
-    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="19.3.0.45" />
-    <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="19.3.0.45" />
+    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="19.3.0.48" />
+    <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="19.3.0.48" />
     <PackageReference Include="URIScheme" Version="5.0.0" />
     <PackageReference Include="WindowsProxy" Version="5.0.6" />
     <PackageReference Include="WpfColorFontDialog" Version="1.0.8" />
