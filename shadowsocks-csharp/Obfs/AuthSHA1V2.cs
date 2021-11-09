@@ -21,7 +21,6 @@ namespace Shadowsocks.Obfs
 
         protected bool has_sent_header;
         protected bool has_recv_header;
-        protected static RNGCryptoServiceProvider g_random = new();
 
         public static List<string> SupportedObfs()
         {
@@ -97,8 +96,7 @@ namespace Shadowsocks.Obfs
                 }
                 if (authData.clientID == null)
                 {
-                    authData.clientID = new byte[8];
-                    g_random.GetBytes(authData.clientID);
+                    authData.clientID = RandomNumberGenerator.GetBytes(8);
                     authData.connectionID = (uint)BitConverter.ToInt64(authData.clientID, 0) % 0xFFFFFD;
                 }
                 authData.connectionID += 1;

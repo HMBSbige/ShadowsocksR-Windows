@@ -21,7 +21,6 @@ namespace Shadowsocks.Obfs
 
         protected bool has_sent_header;
         protected bool has_recv_header;
-        protected static RNGCryptoServiceProvider g_random = new();
         protected const string SALT = "auth_sha1_v4";
         protected const int overhead = 9;
 
@@ -106,8 +105,7 @@ namespace Shadowsocks.Obfs
                 }
                 if (authData.clientID == null)
                 {
-                    authData.clientID = new byte[4];
-                    g_random.GetBytes(authData.clientID);
+                    authData.clientID = RandomNumberGenerator.GetBytes(4);
                     authData.connectionID = (uint)BitConverter.ToInt32(authData.clientID, 0) % 0xFFFFFD;
                 }
                 authData.connectionID += 1;

@@ -29,7 +29,6 @@ namespace Shadowsocks.Obfs
         private uint send_id;
         private bool fastauth;
 
-        protected static RNGCryptoServiceProvider g_random = new();
         protected Random random = new();
         protected const int overhead = 5;
 
@@ -120,18 +119,14 @@ namespace Shadowsocks.Obfs
                 var randomdata = new byte[18];
                 lock (authData)
                 {
-                    g_random.GetBytes(randomdata);
+                    RandomNumberGenerator.Fill(randomdata);
                 }
                 randomdata.CopyTo(outdata, 4);
             }
 
             lock (authData)
             {
-                if (authData.clientID == null)
-                {
-                    authData.clientID = new byte[32];
-                    g_random.GetBytes(authData.clientID);
-                }
+                authData.clientID ??= RandomNumberGenerator.GetBytes(32);
             }
             var utc_time_second = (ulong)Math.Floor(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds);
             var utc_time = (uint)utc_time_second;
@@ -285,9 +280,8 @@ namespace Shadowsocks.Obfs
                         }
                         if (!authData.ticket_buf.ContainsKey(host ?? throw new InvalidOperationException()) || random.Next(16) == 0)
                         {
-                            var ticket_size = random.Next(32, 196) * 2;
-                            ticket = new byte[ticket_size];
-                            g_random.GetBytes(ticket);
+                            var ticketSize = random.Next(32, 196) * 2;
+                            ticket = RandomNumberGenerator.GetBytes(ticketSize);
                             authData.ticket_buf[host] = ticket;
                         }
                         else

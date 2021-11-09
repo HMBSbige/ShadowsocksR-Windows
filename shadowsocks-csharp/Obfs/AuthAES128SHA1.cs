@@ -37,9 +37,7 @@ namespace Shadowsocks.Obfs
                 hash = CryptoUtils.SHA1;
             }
 
-            var bytes = new byte[4];
-            g_random.GetBytes(bytes);
-            random = new Random(BitConverter.ToInt32(bytes, 0));
+            random = new Random(RandomNumberGenerator.GetInt32(int.MaxValue));
         }
         private static Dictionary<string, int[]> _obfs = new()
         {
@@ -49,7 +47,6 @@ namespace Shadowsocks.Obfs
 
         protected bool has_sent_header;
         protected bool has_recv_header;
-        protected static RNGCryptoServiceProvider g_random = new();
         protected string SALT;
 
         protected uint pack_id;
@@ -296,8 +293,7 @@ namespace Shadowsocks.Obfs
 
                     if (authData.clientID == null)
                     {
-                        authData.clientID = new byte[4];
-                        g_random.GetBytes(authData.clientID);
+                        authData.clientID = RandomNumberGenerator.GetBytes(4);
                         authData.connectionID = (uint)BitConverter.ToInt32(authData.clientID, 0) % 0xFFFFFD;
                     }
 
