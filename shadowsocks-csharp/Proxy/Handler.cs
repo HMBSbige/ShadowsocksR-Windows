@@ -1615,7 +1615,19 @@ namespace Shadowsocks.Proxy
                     var send_len = RemoteSend(connetionRecvBuffer, bytesRead);
                     if (!(send_len == 0 && bytesRead > 0))
                     {
-                        doConnectionRecv();
+                        Task.Run(() =>
+                        {
+                            try
+                            {
+                                doConnectionRecv();
+                            }
+                            catch (Exception ex)
+                            {
+                                local_error = true;
+                                LogException(ex);
+                                Close();
+                            }
+                        });
                     }
                 }
                 else
