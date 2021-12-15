@@ -55,7 +55,7 @@
     <PackageReference Include="CryptoBase" Version="1.6.0" />
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
     <PackageReference Include="HMBSbige.SingleInstance" Version="6.0.0" />
-    <PackageReference Include="HMBSbige.UpdateChecker" Version="6.0.0" />
+    <PackageReference Include="HMBSbige.UpdateChecker" Version="6.0.1" />
     <PackageReference Include="RouteMatcher" Version="1.0.0" />
     <PackageReference Include="RunAtStartup" Version="5.0.2" />
     <PackageReference Include="Shadowsocks.Protocol" Version="1.0.0" />
