@@ -60,7 +60,7 @@
     <PackageReference Include="RunAtStartup" Version="5.0.2" />
     <PackageReference Include="Shadowsocks.Protocol" Version="1.0.0" />
     <PackageReference Include="Syncfusion.SfGrid.WPF" Version="19.4.0.43" />
-    <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="19.4.0.43" />
+    <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="19.4.0.52" />
     <PackageReference Include="URIScheme" Version="5.0.0" />
     <PackageReference Include="WindowsProxy" Version="5.0.6" />
     <PackageReference Include="WpfColorFontDialog" Version="1.0.8" />
