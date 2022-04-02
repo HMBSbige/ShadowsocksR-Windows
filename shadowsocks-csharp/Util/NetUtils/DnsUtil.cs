@@ -27,7 +27,7 @@ namespace Shadowsocks.Util.NetUtils
 
         public static async Task<IPAddress?> QueryDefaultAsync(string host, bool ipv6First = default)
         {
-            return await DnsClient.QueryIpAddressDefault(host, ipv6First, default);
+            return await DnsClient.QueryIpAddressDefaultAsync(host, ipv6First, default);
         }
 
         public static async Task<IPAddress?> QueryAsync(string host, IEnumerable<DnsClient> clients)
@@ -35,7 +35,7 @@ namespace Shadowsocks.Util.NetUtils
             return await clients
                     .Where(client => client.Enable)
                     .Select(s => Observable
-                            .FromAsync(ct => s.QueryIpAddress(host, ct))
+                            .FromAsync(ct => s.QueryIpAddressAsync(host, ct))
                             .Where(ip => ip is not null)
                     )
                     .Merge()

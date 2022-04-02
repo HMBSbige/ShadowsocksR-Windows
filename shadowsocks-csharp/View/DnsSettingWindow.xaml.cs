@@ -78,7 +78,7 @@ namespace Shadowsocks.View
                 AnswerTextBox.Text = string.Empty;
                 Task.Run(async () =>
                 {
-                    var res = await client.QueryIpAddress(domain, default);
+                    var res = await client.QueryIpAddressAsync(domain, default);
                     Dispatcher?.InvokeAsync(() => { AnswerTextBox.Text = $@"{res}"; });
                 }).ContinueWith(task =>
                 {
