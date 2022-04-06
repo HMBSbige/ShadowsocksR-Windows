@@ -6,11 +6,8 @@ dotnet --info
 
 $exe = 'ShadowsocksR.exe'
 $net_tfm = 'net6.0-windows10.0.22000.0'
-$dllpatcher_tfm = 'net6.0'
 $configuration = 'Release'
 $output_dir = "$PSScriptRoot\shadowsocks-csharp\bin\$configuration"
-$dllpatcher_dir = "$PSScriptRoot\Build\DotNetDllPathPatcher"
-$dllpatcher_exe = "$dllpatcher_dir\bin\$configuration\$dllpatcher_tfm\DotNetDllPathPatcher.exe"
 $proj_path = "$PSScriptRoot\shadowsocks-csharp\shadowsocksr.csproj"
 
 $build    = $buildtfm -eq 'all' -or $buildtfm -eq 'app'
@@ -28,7 +25,7 @@ function Build-App
 	dotnet publish -c $configuration -f $net_tfm $proj_path
 	if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
-	& $dllpatcher_exe $publishDir\$exe bin
+	& "$PSScriptRoot\Build\DotNetDllPathPatcher.ps1" $publishDir\$exe bin
 	if ($LASTEXITCODE) { exit $LASTEXITCODE }
 }
 
@@ -46,24 +43,21 @@ function Build-SelfContained
 	dotnet publish -c $configuration -f $net_tfm -r $rid --self-contained true $proj_path
 	if ($LASTEXITCODE) { exit $LASTEXITCODE }
 
-	& $dllpatcher_exe $publishDir\$exe bin
+	& "$PSScriptRoot\Build\DotNetDllPathPatcher.ps1" $publishDir\$exe bin
 	if ($LASTEXITCODE) { exit $LASTEXITCODE }
 }
 
-dotnet build -c $configuration -f $dllpatcher_tfm $dllpatcher_dir\DotNetDllPathPatcher.csproj
-if ($LASTEXITCODE) { exit $LASTEXITCODE }
-
 if ($build)
 {
-    Build-App
+	Build-App
 }
 
 if ($buildX64)
 {
-    Build-SelfContained win-x64
+	Build-SelfContained win-x64
 }
 
 if ($buildX86)
 {
-    Build-SelfContained win-x86
+	Build-SelfContained win-x86
 }

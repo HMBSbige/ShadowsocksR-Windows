@@ -74,27 +74,30 @@ jobs:
       shell: pwsh
       run: |
         New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
-        7z a -mx9 "C:\builtfiles\$env:ProjectName-${{ steps.tag.outputs.tag }}.7z" ".\shadowsocks-csharp\bin\$env:Configuration\$env:NET_TFM\publish\"
-        7z rn "C:\builtfiles\$env:ProjectName-${{ steps.tag.outputs.tag }}.7z" publish $env:ProjectName
-        echo "NET_SHA256=$(.\Build\GetSHA256\GetSHA256.ps1 C:\builtfiles\$env:ProjectName-${{ steps.tag.outputs.tag }}.7z)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        $zip_path = "C:\builtfiles\$env:ProjectName-${{ steps.tag.outputs.tag }}.7z"
+        7z a -mx9 "$zip_path" ".\shadowsocks-csharp\bin\$env:Configuration\$env:NET_TFM\publish\"
+        7z rn "$zip_path" publish $env:ProjectName
+        echo "NET_SHA256=$((Get-FileHash $zip_path -Algorithm SHA256).Hash)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Package x64
       if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') }}
       shell: pwsh
       run: |
         New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
-        7z a -mx9 "C:\builtfiles\$env:ProjectName-Win64-${{ steps.tag.outputs.tag }}.7z" ".\shadowsocks-csharp\bin\$env:Configuration\$env:NET_TFM\win-x64\publish\"
-        7z rn "C:\builtfiles\$env:ProjectName-Win64-${{ steps.tag.outputs.tag }}.7z" publish $env:ProjectName
-        echo "NET64_SHA256=$(.\Build\GetSHA256\GetSHA256.ps1 C:\builtfiles\$env:ProjectName-Win64-${{ steps.tag.outputs.tag }}.7z)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        $zip_path = "C:\builtfiles\$env:ProjectName-Win64-${{ steps.tag.outputs.tag }}.7z"
+        7z a -mx9 "$zip_path" ".\shadowsocks-csharp\bin\$env:Configuration\$env:NET_TFM\win-x64\publish\"
+        7z rn "$zip_path" publish $env:ProjectName
+        echo "NET64_SHA256=$((Get-FileHash $zip_path -Algorithm SHA256).Hash)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Package x86
       if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') }}
       shell: pwsh
       run: |
         New-Item -ItemType Directory -Path C:\builtfiles -Force > $null
-        7z a -mx9 "C:\builtfiles\$env:ProjectName-Win32-${{ steps.tag.outputs.tag }}.7z" ".\shadowsocks-csharp\bin\$env:Configuration\$env:NET_TFM\win-x86\publish\"
-        7z rn "C:\builtfiles\$env:ProjectName-Win32-${{ steps.tag.outputs.tag }}.7z" publish $env:ProjectName
-        echo "NET86_SHA256=$(.\Build\GetSHA256\GetSHA256.ps1 C:\builtfiles\$env:ProjectName-Win32-${{ steps.tag.outputs.tag }}.7z)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        $zip_path = "C:\builtfiles\$env:ProjectName-Win32-${{ steps.tag.outputs.tag }}.7z"
+        7z a -mx9 "$zip_path" ".\shadowsocks-csharp\bin\$env:Configuration\$env:NET_TFM\win-x86\publish\"
+        7z rn "$zip_path" publish $env:ProjectName
+        echo "NET86_SHA256=$((Get-FileHash $zip_path -Algorithm SHA256).Hash)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Create a new GitHub release if a new tag is pushed
       uses: ncipollo/release-action@v1
@@ -107,7 +110,6 @@ jobs:
         artifacts: C:\builtfiles\*
         body: |
           [![](https://img.shields.io/badge/Channel-blue?label=Telegram&logo=telegram)](https://t.me/ShadowsocksR_Windows) [![](https://img.shields.io/badge/Group-green?label=Telegram&logo=telegram)](https://t.me/joinchat/Gn-Aa0-j4HcpdBaW-Iv8Sw)
-          [![](https://img.shields.io/badge/ShadowsocksR-Android-e482a3)](https://github.com/HMBSbige/ShadowsocksR-Android/releases)
 
           ## 更新日志：
           * 这是 GitHub Action 自动化部署，更新日志应该很快会手动更新
