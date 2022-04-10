@@ -43,7 +43,7 @@ jobs:
     - name: Upload .NET App
       continue-on-error: true
       if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: ${{ env.ProjectName }}
         path: shadowsocks-csharp\bin\${{ env.Configuration }}\${{ env.NET_TFM }}\publish\
@@ -51,7 +51,7 @@ jobs:
     - name: Upload x64
       continue-on-error: true
       if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: ${{ env.ProjectName }}-Win64
         path: shadowsocks-csharp\bin\${{ env.Configuration }}\${{ env.NET_TFM }}\win-x64\publish\
@@ -59,7 +59,7 @@ jobs:
     - name: Upload x86
       continue-on-error: true
       if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: ${{ env.ProjectName }}-Win32
         path: shadowsocks-csharp\bin\${{ env.Configuration }}\${{ env.NET_TFM }}\win-x86\publish\
