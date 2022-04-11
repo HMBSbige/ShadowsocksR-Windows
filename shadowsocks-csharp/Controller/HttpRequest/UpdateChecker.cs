@@ -20,7 +20,7 @@ namespace Shadowsocks.Controller.HttpRequest
 
         public const string Name = @"ShadowsocksR";
         public const string Copyright = @"Copyright © 2019 - 2022 HMBSbige. Forked from ShadowsocksR by BreakWa11";
-        public const string Version = @"6.0.2";
+        public const string Version = @"6.0.3";
 
         public const string FullVersion = Version +
 #if SelfContained
