@@ -382,7 +382,7 @@ namespace Shadowsocks.Model
             SubTag = @"";
             UdpOverTcp = false;
             Enable = true;
-            Id = Rng.RandId();
+            Id = Guid.NewGuid().ToString(@"N");
             SpeedLog = new ServerSpeedLog();
             Index = 0;
             IsSelected = false;

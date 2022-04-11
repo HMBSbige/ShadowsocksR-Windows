@@ -1,5 +1,4 @@
 using Shadowsocks.Enums;
-using Shadowsocks.Util;
 using Shadowsocks.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -553,7 +552,7 @@ namespace Shadowsocks.Model
             {
                 while (id.Contains(server.Id))
                 {
-                    server.Id = Rng.RandId();
+                    server.Id = Guid.NewGuid().ToString(@"N");
                 }
                 id.Add(server.Id);
             }
