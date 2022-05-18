@@ -62,7 +62,7 @@
     <PackageReference Include="Syncfusion.SfGrid.WPF" Version="20.1.0.47" />
     <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="20.1.0.47" />
     <PackageReference Include="URIScheme" Version="5.0.0" />
-    <PackageReference Include="WindowsProxy" Version="5.0.6" />
+    <PackageReference Include="WindowsProxy" Version="6.0.0" />
     <PackageReference Include="WpfColorFontDialog" Version="1.0.8" />
     <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.10" />
   </ItemGroup>
