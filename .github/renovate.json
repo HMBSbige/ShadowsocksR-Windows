@@ -1,0 +1,18 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"assignees": [
+		"HMBSbige"
+	],
+	"commitMessagePrefix": "dep:",
+	"dependencyDashboard": false,
+	"extends": [
+		"config:base",
+		":automergeBranch",
+		":automergeDigest",
+		":automergeMinor",
+		":disableRateLimiting"
+	],
+	"labels": [
+		"Automatic"
+	]
+}
