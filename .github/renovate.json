@@ -12,6 +12,14 @@
 		":automergeMinor",
 		":disableRateLimiting"
 	],
+	"packageRules": [
+		{
+			"matchPackagePrefixes": [
+				"Syncfusion"
+			],
+			"groupName": "Syncfusion"
+		}
+	],
 	"labels": [
 		"Automatic"
 	]
