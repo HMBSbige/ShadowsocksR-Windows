@@ -275,9 +275,17 @@ namespace Shadowsocks.Controller
         /// </summary>
         public void ToggleMode(ProxyMode mode)
         {
+            ProxyMode oldMode = Global.GuiConfig.SysProxyMode;
             Global.GuiConfig.SysProxyMode = mode;
             ReloadPacServer();
-            UpdateSystemProxy();
+            if (oldMode is not ProxyMode.NoModify && mode is ProxyMode.NoModify)
+            {
+                SystemProxy.Restore();
+            }
+            else
+            {
+                UpdateSystemProxy();
+            }
             SaveAndNotifyChanged();
         }
 
@@ -384,7 +392,10 @@ namespace Shadowsocks.Controller
 
             _listener?.Stop();
             _httpProxyRunner?.Stop();
-            SystemProxy.Restore();
+            if (Global.GuiConfig.SysProxyMode is not ProxyMode.NoModify)
+            {
+                SystemProxy.Restore();
+            }
             ServerTransferTotal.Save(_transfer, Global.GuiConfig.Configs);
         }
 

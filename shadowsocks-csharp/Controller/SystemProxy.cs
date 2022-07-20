@@ -4,80 +4,69 @@ using Shadowsocks.Model;
 using System;
 using WindowsProxy;
 
-namespace Shadowsocks.Controller
+namespace Shadowsocks.Controller;
+
+public static class SystemProxy
 {
-    public static class SystemProxy
+    private static readonly ProxyStatus Old;
+    static SystemProxy()
     {
-        private static readonly ProxyStatus Old;
-        static SystemProxy()
+        try
         {
-            try
-            {
-                using var proxy = new ProxyService();
-                Old = proxy.Query();
-            }
-            catch (Exception e)
-            {
-                Logging.LogUsefulException(e);
-            }
+            using var proxy = new ProxyService();
+            Old = proxy.Query();
         }
-
-        public static void Restore()
+        catch (Exception e)
         {
-            try
-            {
-                using var proxy = new ProxyService();
-                proxy.Set(Old);
-            }
-            catch (Exception e)
-            {
-                Logging.LogUsefulException(e);
-            }
+            Logging.LogUsefulException(e);
         }
+    }
 
-        public static void Update(Configuration config, PACServer pacSrv)
+    public static void Restore()
+    {
+        try
         {
-            var sysProxyMode = config.SysProxyMode;
-            if (sysProxyMode == ProxyMode.NoModify)
-            {
-                Restore();
-                return;
-            }
-            try
-            {
-                using var proxy = new ProxyService();
+            using var proxy = new ProxyService();
+            proxy.Set(Old);
+        }
+        catch (Exception e)
+        {
+            Logging.LogUsefulException(e);
+        }
+    }
 
-                switch (sysProxyMode)
+    public static void Update(Configuration config, PACServer pacSrv)
+    {
+        var sysProxyMode = config.SysProxyMode;
+        try
+        {
+            using var proxy = new ProxyService();
+
+            switch (sysProxyMode)
+            {
+                case ProxyMode.Direct:
                 {
-                    case ProxyMode.Direct:
-                    {
-                        proxy.Direct();
-                        break;
-                    }
-                    case ProxyMode.Pac:
-                    {
-                        proxy.AutoConfigUrl = pacSrv.PacUrl;
-                        proxy.Pac();
-                        break;
-                    }
-                    case ProxyMode.Global:
-                    {
-                        proxy.Server = $@"localhost:{config.LocalPort}";
-                        proxy.Bypass = string.Join(@";", ProxyService.LanIp);
-                        proxy.Global();
-                        break;
-                    }
-                    default:
-                    {
-                        Restore();
-                        break;
-                    }
+                    proxy.Direct();
+                    break;
+                }
+                case ProxyMode.Pac:
+                {
+                    proxy.AutoConfigUrl = pacSrv.PacUrl;
+                    proxy.Pac();
+                    break;
+                }
+                case ProxyMode.Global:
+                {
+                    proxy.Server = $@"localhost:{config.LocalPort}";
+                    proxy.Bypass = string.Join(';', ProxyService.LanIp);
+                    proxy.Global();
+                    break;
                 }
             }
-            catch (Exception e)
-            {
-                Logging.LogUsefulException(e);
-            }
+        }
+        catch (Exception e)
+        {
+            Logging.LogUsefulException(e);
         }
     }
 }
