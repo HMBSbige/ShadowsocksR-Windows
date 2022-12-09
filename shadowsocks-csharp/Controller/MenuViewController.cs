@@ -342,11 +342,6 @@ namespace Shadowsocks.Controller
                             AllowPreReleaseItem.Click += AllowPreRelease_Click;
                             break;
                         }
-                        case @"Donate":
-                        {
-                            menuItem.Click += DonateMenuItem_Click;
-                            break;
-                        }
                         case @"Quit":
                         {
                             menuItem.Click += Quit_Click;
@@ -1035,11 +1030,6 @@ namespace Shadowsocks.Controller
         private static void FeedbackItem_Click(object sender, RoutedEventArgs e)
         {
             Utils.OpenURL(@"https://github.com/HMBSbige/ShadowsocksR-Windows/issues/new/choose");
-        }
-
-        private static void DonateMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            new ImageWindow().Show();
         }
 
         private void notifyIcon_TrayLeftMouseUp(object sender, RoutedEventArgs e)

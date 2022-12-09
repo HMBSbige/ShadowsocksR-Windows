@@ -10,18 +10,9 @@
 
 ## [Wiki](https://github.com/HMBSbige/ShadowsocksR-Windows/wiki)
 
-## 相关推荐
-
-[**壁虎翻墙网 :100:**](https://freegecko.com/index.php/#/register?code=ua6ot4EE)
-
-这是我所选择的服务器提供商，IPLC专线翻墙、稳定、速度快、价格便宜。欢迎大家使用我的推广链接前去注册。https://freegecko.com/index.php/#/register?code=ua6ot4EE
-
 ## Download
 
 * [latest release]
-
-## Donate
-[Donate](./pic/wechat.jpg)
 
 ## Develop
 

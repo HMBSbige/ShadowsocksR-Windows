@@ -1,4 +1,4 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <sys:String x:Key="ResourceDictionaryName">en-US</sys:String>
@@ -51,7 +51,6 @@
     <sys:String x:Key="PortSettings">Port settings...</sys:String>
     <sys:String x:Key="OpenWiki">Open wiki...</sys:String>
     <sys:String x:Key="Feedback">Feedback...</sys:String>
-    <sys:String x:Key="Donate">Donate...</sys:String>
     <sys:String x:Key="GenQrCode">Gen custom QRCode...</sys:String>
     <sys:String x:Key="Update">Update...</sys:String>
     <sys:String x:Key="CheckUpdate">Check update</sys:String>
