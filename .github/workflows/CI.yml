@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-latest
     env:
       SyncfusionLicenseKey: ${{ secrets.SyncfusionLicenseKey }}
-      NET_TFM: net6.0-windows10.0.22000.0
+      NET_TFM: net7.0-windows
       Configuration: Release
 
     steps:
@@ -22,7 +22,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 7.0.x
 
     - name: Setup NuGet Private Sources
       shell: pwsh
