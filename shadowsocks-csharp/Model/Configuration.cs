@@ -477,10 +477,11 @@ namespace Shadowsocks.Model
             LangName = string.Empty;
             DnsClients = new List<DnsClient>
             {
-                new(DnsType.DnsOverTls) {DnsServer = @"1.1.1.1"},
-                new(DnsType.Default) {DnsServer = @"1.1.1.1"},
-                new(DnsType.DnsOverTls),
-                new(DnsType.Default)
+                new(DnsType.DnsOverTls) { DnsServer = @"208.67.222.222" },
+                new(DnsType.DnsOverTls) { DnsServer = @"208.67.220.220" },
+                new(DnsType.DnsOverTls) { DnsServer = @"1.1.1.1" },
+                new(DnsType.DnsOverTls) { DnsServer = @"1.0.0.1" },
+                new(DnsType.DnsOverTls) { DnsServer = @"1.12.12.12" },
             };
             ServerSubscribes = new List<ServerSubscribe>();
             PortMap = new Dictionary<string, PortMapConfig>();

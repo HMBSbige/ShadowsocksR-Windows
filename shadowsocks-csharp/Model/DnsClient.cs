@@ -127,9 +127,9 @@ public class DnsClient : ViewModelBase
     #region Ignore
 
     private IPAddress? _ip;
-    public const string DefaultDnsServer = @"8.8.8.8";
+    public const string DefaultDnsServer = @"208.67.222.222";
     public const ushort DefaultPort = 53;
-    public const string DefaultTlsDnsServer = @"dns.google";
+    public const string DefaultTlsDnsServer = @"208.67.222.222";
     public const ushort DefaultTlsPort = 853;
 
     #endregion
