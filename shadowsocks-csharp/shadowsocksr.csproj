@@ -60,7 +60,7 @@
     <PackageReference Include="URIScheme" Version="5.0.0" />
     <PackageReference Include="WindowsProxy" Version="6.0.0" />
     <PackageReference Include="WpfColorFontDialog" Version="1.0.8" />
-    <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.11" />
+    <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.12" />
   </ItemGroup>
 
   <ItemGroup>
