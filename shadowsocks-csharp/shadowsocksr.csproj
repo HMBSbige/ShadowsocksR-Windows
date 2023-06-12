@@ -55,8 +55,8 @@
     <PackageReference Include="RouteMatcher" Version="1.0.0" />
     <PackageReference Include="RunAtStartup" Version="5.0.2" />
     <PackageReference Include="Shadowsocks.Protocol" Version="1.0.0" />
-    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="21.2.9" />
-    <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="21.2.9" />
+    <PackageReference Include="Syncfusion.SfGrid.WPF" Version="21.2.10" />
+    <PackageReference Include="Syncfusion.SfTreeView.WPF" Version="21.2.10" />
     <PackageReference Include="URIScheme" Version="5.0.0" />
     <PackageReference Include="WindowsProxy" Version="6.0.0" />
     <PackageReference Include="WpfColorFontDialog" Version="1.0.8" />
